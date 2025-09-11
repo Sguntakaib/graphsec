@@ -82,6 +82,9 @@ function AppContent() {
   const [showThreatModelingWizard, setShowThreatModelingWizard] = useState(false);
   const [currentQuestionnaireNode, setCurrentQuestionnaireNode] = useState(null);
   const [nodeBranches, setNodeBranches] = useState({}); // Store security branches for each node
+  
+  // Smart Node Connector instance
+  const smartNodeConnector = new SmartNodeConnector(setNodes, setEdges, saveStateToUndoStack);
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
