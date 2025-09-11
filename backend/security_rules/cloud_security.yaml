@@ -1,0 +1,242 @@
+rules:
+  - id: rule.cloud.s3_public_read
+    name: "Public S3 Bucket Read Access"
+    description: "S3 bucket allows public read access to potentially sensitive data"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: S3Bucket
+      - field: node.public_read
+        operator: "=="
+        value: true
+    outcome:
+      impact: High
+      attack_path: "Public Internet → S3 Bucket → Data Exposure"
+      recommendations:
+        - "Remove public read permissions"
+        - "Implement bucket policies with specific IP restrictions"
+        - "Use IAM roles for authenticated access"
+        - "Enable S3 access logging and monitoring"
+      risk_score: 8.4
+    mitre_techniques: ["T1530", "T1213"]
+    priority: 1
+
+  - id: rule.cloud.s3_public_write
+    name: "Public S3 Bucket Write Access"
+    description: "S3 bucket allows public write access enabling data manipulation"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: S3Bucket
+      - field: node.public_write
+        operator: "=="
+        value: true
+    outcome:
+      impact: Critical
+      attack_path: "Public Internet → S3 Bucket → Data Tampering/Ransomware"
+      recommendations:
+        - "Immediately remove public write permissions"
+        - "Implement strict bucket policies"
+        - "Enable versioning and MFA delete"
+        - "Set up CloudTrail logging for all S3 activities"
+      risk_score: 9.5
+    mitre_techniques: ["T1530", "T1486", "T1565"]
+    priority: 1
+
+  - id: rule.cloud.imds_v1
+    name: "IMDSv1 Enabled on EC2"
+    description: "EC2 instance using vulnerable IMDSv1 instead of IMDSv2"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: IMDS
+      - field: node.version
+        operator: "=="
+        value: "v1"
+    outcome:
+      impact: High
+      attack_path: "SSRF/XXE → IMDSv1 → IAM Credentials → Privilege Escalation"
+      recommendations:
+        - "Upgrade to IMDSv2 with token requirement"
+        - "Disable IMDSv1 support"
+        - "Implement hop limit restrictions"
+        - "Monitor IMDS access patterns"
+      risk_score: 8.1
+    mitre_techniques: ["T1552.005", "T1078.004"]
+    priority: 1
+
+  - id: rule.cloud.vm_public_ip
+    name: "VM with Public IP Without Protection"
+    description: "Virtual machine directly exposed to internet without security controls"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: VM
+      - field: node.public_ip
+        operator: "=="
+        value: true
+      - field: missing_control
+        operator: "=="
+        value: NetworkACL
+    outcome:
+      impact: High
+      attack_path: "Internet → Public VM → Remote Code Execution → Lateral Movement"
+      recommendations:
+        - "Implement network security groups/ACLs"
+        - "Use bastion hosts for remote access"
+        - "Deploy intrusion detection systems"
+        - "Regular security patching and updates"
+      risk_score: 7.8
+    mitre_techniques: ["T1190", "T1021", "T1210"]
+    priority: 1
+
+  - id: rule.cloud.storage_unencrypted
+    name: "Unencrypted Cloud Storage"
+    description: "Cloud storage containing sensitive data without encryption"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: in
+        value: ["S3Bucket", "BlobStorage", "CloudStorage"]
+      - field: node.data_classification
+        operator: in
+        value: ["Confidential", "Restricted", "PII"]
+      - field: node.encryption_at_rest
+        operator: "=="
+        value: false
+    outcome:
+      impact: High
+      attack_path: "Storage Access → Unencrypted Data → Data Breach"
+      recommendations:
+        - "Enable server-side encryption at rest"
+        - "Use customer-managed encryption keys"
+        - "Implement encryption in transit"
+        - "Regular encryption compliance audits"
+      risk_score: 8.2
+    mitre_techniques: ["T1005", "T1213", "T1530"]
+    priority: 1
+
+  - id: rule.cloud.container_privileged
+    name: "Privileged Container Deployment"
+    description: "Container running with privileged access increasing attack surface"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: Container
+      - field: node.privileged
+        operator: "=="
+        value: true
+    outcome:
+      impact: High
+      attack_path: "Container Compromise → Privileged Access → Host Escape"
+      recommendations:
+        - "Remove privileged flag from containers"
+        - "Use security contexts and pod security standards"
+        - "Implement least privilege principles"
+        - "Regular container security scanning"
+      risk_score: 8.0
+    mitre_techniques: ["T1611", "T1068", "T1610"]
+    priority: 1
+
+  - id: rule.cloud.api_gateway_no_auth
+    name: "API Gateway Without Authentication"
+    description: "Cloud API Gateway endpoint accessible without authentication"  
+    category: api_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: APIGateway
+      - field: node.authentication_required
+        operator: "=="
+        value: false
+    outcome:
+      impact: High
+      attack_path: "Public API → Unauthenticated Access → Backend Services"
+      recommendations:
+        - "Enable API authentication (API keys, OAuth, JWT)"
+        - "Implement rate limiting and throttling"
+        - "Use API gateway security policies"
+        - "Monitor API access patterns"
+      risk_score: 7.9
+    mitre_techniques: ["T1190", "T1078"]
+    priority: 1
+
+  - id: rule.cloud.lambda_public_url
+    name: "Lambda Function with Public URL"
+    description: "Serverless function exposed via public URL without proper access controls"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: Lambda
+      - field: node.public_url
+        operator: "=="
+        value: true
+      - field: missing_control
+        operator: "=="
+        value: IAMPolicy
+    outcome:
+      impact: Medium
+      attack_path: "Public URL → Lambda Function → Unauthorized Execution"
+      recommendations:
+        - "Implement function-level authentication"
+        - "Use API Gateway for controlled access"
+        - "Apply least privilege IAM policies"
+        - "Enable function logging and monitoring"
+      risk_score: 6.7
+    mitre_techniques: ["T1190", "T1078.004"]
+    priority: 2
+
+  - id: rule.cloud.database_public_access
+    name: "Cloud Database with Public Access"
+    description: "Managed database service accessible from public internet"
+    category: database_security
+    conditions:
+      - field: node.subtype
+        operator: in
+        value: ["RDSDatabase", "CosmosDB", "CloudSQL"]
+      - field: node.public_access
+        operator: "=="
+        value: true
+    outcome:
+      impact: Critical
+      attack_path: "Internet → Public Database → Data Breach"
+      recommendations:
+        - "Disable public access to database"
+        - "Use VPC/VNet private endpoints"
+        - "Implement database firewall rules"
+        - "Enable database activity monitoring"
+      risk_score: 9.1
+    mitre_techniques: ["T1190", "T1213", "T1552"]
+    priority: 1
+
+  - id: rule.cloud.kubernetes_default_sa
+    name: "Kubernetes Default Service Account Usage"
+    description: "Pod using default service account with excessive permissions"
+    category: cloud_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: KubernetesPod
+      - field: node.service_account
+        operator: "=="
+        value: default
+      - field: node.automount_service_account_token
+        operator: "=="
+        value: true
+    outcome:
+      impact: Medium
+      attack_path: "Pod Compromise → Default SA Token → Cluster API Access"
+      recommendations:
+        - "Create dedicated service accounts with minimal permissions"
+        - "Disable automounting of service account tokens"
+        - "Use Kubernetes RBAC for fine-grained access"
+        - "Regular service account permission audits"
+      risk_score: 6.4
+    mitre_techniques: ["T1078.004", "T1613"]
+    priority: 2
