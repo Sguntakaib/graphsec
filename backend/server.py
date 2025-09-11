@@ -1185,6 +1185,50 @@ async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = "smart
         }
     }
 
+# Enhanced Auto-Layout API with algorithm selection
+@api_router.get("/diagrams/{diagram_id}/layout-algorithms")
+async def get_available_layout_algorithms():
+    """Get available auto-layout algorithms"""
+    return {
+        "algorithms": [
+            {
+                "id": "smart_hierarchical",
+                "name": "Smart Hierarchical",
+                "description": "Security-aware hierarchical layout based on threat model semantics",
+                "best_for": "Security models with clear asset/threat relationships",
+                "complexity": "O(n)"
+            },
+            {
+                "id": "force_directed", 
+                "name": "Force-Directed",
+                "description": "Spring-based layout that minimizes edge crossings",
+                "best_for": "General network diagrams with natural clustering",
+                "complexity": "O(n²)"
+            },
+            {
+                "id": "circular",
+                "name": "Circular",
+                "description": "Circular layout with nodes grouped by type",
+                "best_for": "Showing relationships between different security domains",
+                "complexity": "O(n)"
+            },
+            {
+                "id": "layered_security",
+                "name": "Layered Security",
+                "description": "Concentric circles representing security perimeters",
+                "best_for": "Defense-in-depth security architectures",
+                "complexity": "O(n)"
+            },
+            {
+                "id": "network_topology",
+                "name": "Network Topology",
+                "description": "Graph structure-aware layout using topological analysis",
+                "best_for": "Complex network diagrams with hierarchical structure",
+                "complexity": "O(n log n)"
+            }
+        ]
+    }
+
 # Template Management APIs
 @api_router.get("/templates", response_model=List[SecurityTemplate])
 async def get_templates(category: Optional[str] = None, complexity: Optional[str] = None):
