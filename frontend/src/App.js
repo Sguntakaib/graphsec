@@ -258,7 +258,7 @@ function AppContent() {
   };
 
   const onDrop = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
 
       const reactFlowBounds = event.currentTarget.getBoundingClientRect();
@@ -284,7 +284,31 @@ function AppContent() {
         },
       };
 
+      // Add the node first
       setNodes((nds) => nds.concat(newNode));
+
+      // Check if this node type supports intelligent expansion
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/supported-types`);
+        if (response.ok) {
+          const data = await response.json();
+          const supportedType = data.supported_types.find(
+            type => type.node_subtype === nodeData.subtype
+          );
+
+          if (supportedType) {
+            // This node supports intelligent expansion - show questionnaire
+            setCurrentQuestionnaireNode({
+              ...newNode,
+              subtype: nodeData.subtype
+            });
+            setShowSecurityQuestionnaire(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking intelligent node support:', error);
+        // Continue without intelligent features if API fails
+      }
     },
     [setNodes],
   );
