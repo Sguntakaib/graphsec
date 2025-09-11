@@ -2538,6 +2538,63 @@ def generate_comprehensive_recommendations(wizard_data):
     
     return recommendations[:10]  # Limit to top 10 recommendations
 
+# Additional helper functions for other wizard steps
+def generate_boundary_recommendations(wizard_data):
+    return [
+        "Define trust zones based on security requirements",
+        "Identify boundaries between internal and external systems",
+        "Consider network segmentation and access controls"
+    ]
+
+def generate_dataflow_recommendations(wizard_data):
+    return [
+        "Map all data inputs and outputs",
+        "Identify sensitive data paths",
+        "Document authentication and authorization flows"
+    ]
+
+def generate_threat_recommendations(wizard_data):
+    return [
+        "Consider internal and external threat actors",
+        "Analyze threat motivations and capabilities", 
+        "Reference MITRE ATT&CK framework for threat intelligence"
+    ]
+
+def generate_attack_surface_recommendations(wizard_data):
+    return [
+        "Identify all system entry points",
+        "Analyze network-accessible services",
+        "Consider physical and social attack vectors"
+    ]
+
+def generate_control_recommendations(wizard_data):
+    return [
+        "Map existing security controls to assets",
+        "Identify control gaps and redundancies",
+        "Consider preventive, detective, and corrective controls"
+    ]
+
+def generate_risk_recommendations(wizard_data):
+    return [
+        "Calculate risk using impact and likelihood",
+        "Prioritize risks by business impact",
+        "Consider risk appetite and tolerance"
+    ]
+
+def generate_compliance_recommendations(wizard_data):
+    return [
+        "Map to relevant frameworks (SOC2, ISO 27001, NIST)",
+        "Identify compliance requirements",
+        "Document control mappings"
+    ]
+
+def generate_implementation_recommendations(wizard_data):
+    return [
+        "Prioritize recommendations by risk reduction",
+        "Consider implementation complexity and cost",
+        "Create actionable timeline and ownership"
+    ]
+
 # Include the router in the main app
 app.include_router(api_router)
 
