@@ -114,7 +114,12 @@ class SimulationResult(BaseModel):
     attack_paths: List[Dict[str, Any]] = []
     recommendations: List[str] = []
     mitre_techniques: List[str] = []
+    mitre_coverage: Dict[str, Any] = {}
     risk_score: float = 0.0
+    overall_risk_level: str = "Low"
+    detection_coverage: float = 0.0
+    technique_details: Dict[str, Any] = {}
+    suggested_controls: List[str] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 # Helper functions
