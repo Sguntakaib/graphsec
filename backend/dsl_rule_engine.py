@@ -333,6 +333,285 @@ class DSLRuleEngine:
                 },
                 "mitre_techniques": ["T1562"],
                 "priority": 3
+            },
+
+            # Additional Web Security Rules
+            {
+                "id": "rule.web.xss_vulnerability",
+                "name": "Cross-Site Scripting (XSS) Risk",
+                "description": "Web application vulnerable to XSS attacks",
+                "category": "web_security",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "==", "value": "WebApp"},
+                    {"field": "missing_control", "operator": "==", "value": "InputValidation"},
+                    {"field": "node.public_access", "operator": "==", "value": True}
+                ],
+                "outcome": {
+                    "impact": "High",
+                    "attack_path": "Malicious Script → User Browser → Session Hijacking",
+                    "recommendations": [
+                        "Implement output encoding and input validation",
+                        "Use Content Security Policy (CSP)",
+                        "Deploy XSS protection headers",
+                        "Regular security testing"
+                    ],
+                    "risk_score": 7.2
+                },
+                "mitre_techniques": ["T1189", "T1056"],
+                "priority": 1
+            },
+
+            # API Security Rules
+            {
+                "id": "rule.api.idor_vulnerability", 
+                "name": "Insecure Direct Object Reference",
+                "description": "API endpoints vulnerable to IDOR attacks",
+                "category": "api_security",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "==", "value": "API"},
+                    {"field": "missing_control", "operator": "==", "value": "Authorization"}
+                ],
+                "outcome": {
+                    "impact": "High",
+                    "attack_path": "API Request → Unauthorized Object Access → Data Exposure",
+                    "recommendations": [
+                        "Implement proper authorization checks",
+                        "Use indirect object references",
+                        "Validate user permissions for each request",
+                        "Deploy API security gateway"
+                    ],
+                    "risk_score": 7.8
+                },
+                "mitre_techniques": ["T1190", "T1213"],
+                "priority": 1
+            },
+
+            # Data Security Rules
+            {
+                "id": "rule.data.unprotected_pii",
+                "name": "Unprotected Personal Information",
+                "description": "Database containing PII without proper protection",
+                "category": "database_security",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "==", "value": "Database"},
+                    {"field": "node.data_classification", "operator": "in", "value": ["PII", "PHI", "Confidential"]},
+                    {"field": "missing_control", "operator": "==", "value": "DLP"}
+                ],
+                "outcome": {
+                    "impact": "Critical",
+                    "attack_path": "Database Access → Unprotected PII → Privacy Breach",
+                    "recommendations": [
+                        "Deploy Data Loss Prevention (DLP) controls",
+                        "Implement data masking and anonymization",
+                        "Enable database activity monitoring",
+                        "Use field-level encryption for sensitive data"
+                    ],
+                    "risk_score": 9.2
+                },
+                "mitre_techniques": ["T1213", "T1005"],
+                "priority": 1
+            },
+
+            # Cloud Security Rules
+            {
+                "id": "rule.cloud.weak_iam_policy",
+                "name": "Overly Permissive IAM Policy",
+                "description": "Cloud resources with excessive permissions",
+                "category": "cloud_security",
+                "conditions": [
+                    {"field": "node.type", "operator": "==", "value": "Asset"},
+                    {"field": "node.subtype", "operator": "in", "value": ["S3Bucket", "VM", "API"]},
+                    {"field": "node.iam_policy", "operator": "contains", "value": "*"}
+                ],
+                "outcome": {
+                    "impact": "High",
+                    "attack_path": "Credential Compromise → Excessive Permissions → Lateral Movement",
+                    "recommendations": [
+                        "Implement principle of least privilege",
+                        "Use specific resource ARNs instead of wildcards",
+                        "Regular IAM policy review and cleanup",
+                        "Enable AWS CloudTrail for monitoring"
+                    ],
+                    "risk_score": 8.1
+                },
+                "mitre_techniques": ["T1078", "T1484"],
+                "priority": 1
+            },
+
+            # Network Security Rules
+            {
+                "id": "rule.network.missing_segmentation",
+                "name": "Missing Network Segmentation",
+                "description": "Critical assets without proper network isolation",
+                "category": "network_security",
+                "conditions": [
+                    {"field": "node.criticality", "operator": "==", "value": "Critical"},
+                    {"field": "missing_control", "operator": "==", "value": "NetworkACL"}
+                ],
+                "outcome": {
+                    "impact": "High",
+                    "attack_path": "Network Access → Lateral Movement → Critical Asset Compromise",
+                    "recommendations": [
+                        "Implement network segmentation",
+                        "Deploy Network Access Control Lists (NACLs)",
+                        "Use micro-segmentation for critical assets",
+                        "Enable network monitoring and logging"
+                    ],
+                    "risk_score": 7.6
+                },
+                "mitre_techniques": ["T1021", "T1090"],
+                "priority": 2
+            },
+
+            # Identity and Access Rules
+            {
+                "id": "rule.iam.privileged_account_risk",
+                "name": "Unprotected Privileged Account",
+                "description": "Privileged accounts without additional protection",
+                "category": "identity_access",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "==", "value": "PrivilegedAccount"},
+                    {"field": "missing_control", "operator": "==", "value": "PAM"}
+                ],
+                "outcome": {
+                    "impact": "Critical",
+                    "attack_path": "Credential Compromise → Privileged Access → System Takeover",
+                    "recommendations": [
+                        "Implement Privileged Access Management (PAM)",
+                        "Enable session recording for privileged access",
+                        "Use just-in-time access provisioning",
+                        "Regular privileged account auditing"
+                    ],
+                    "risk_score": 9.0
+                },
+                "mitre_techniques": ["T1078", "T1133"],
+                "priority": 1
+            },
+
+            # Application Security Rules
+            {
+                "id": "rule.app.insecure_deserialization",
+                "name": "Insecure Deserialization Vulnerability",
+                "description": "Application vulnerable to deserialization attacks",
+                "category": "web_security",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "in", "value": ["WebApp", "API"]},
+                    {"field": "node.uses_serialization", "operator": "==", "value": True},
+                    {"field": "missing_control", "operator": "==", "value": "InputValidation"}
+                ],
+                "outcome": {
+                    "impact": "Critical",
+                    "attack_path": "Malicious Payload → Deserialization → Remote Code Execution",
+                    "recommendations": [
+                        "Avoid deserializing untrusted data",
+                        "Implement integrity checks on serialized objects",
+                        "Use safe serialization libraries",
+                        "Monitor and log deserialization activities"
+                    ],
+                    "risk_score": 9.1
+                },
+                "mitre_techniques": ["T1190", "T1059"],
+                "priority": 1
+            },
+
+            # Supply Chain Security Rules
+            {
+                "id": "rule.supply_chain.vulnerable_dependencies",
+                "name": "Vulnerable Third-Party Dependencies",
+                "description": "Application using components with known vulnerabilities",
+                "category": "web_security",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "in", "value": ["WebApp", "API"]},
+                    {"field": "node.has_vulnerabilities", "operator": "==", "value": True}
+                ],
+                "outcome": {
+                    "impact": "High",
+                    "attack_path": "Vulnerable Component → Exploitation → Application Compromise",
+                    "recommendations": [
+                        "Regularly update all dependencies",
+                        "Use dependency scanning tools",
+                        "Implement Software Bill of Materials (SBOM)",
+                        "Monitor for security advisories"
+                    ],
+                    "risk_score": 7.9
+                },
+                "mitre_techniques": ["T1195", "T1190"],
+                "priority": 2
+            },
+
+            # Mobile Security Rules  
+            {
+                "id": "rule.mobile.insecure_storage",
+                "name": "Insecure Mobile Data Storage",
+                "description": "Mobile application storing sensitive data insecurely",
+                "category": "web_security",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "==", "value": "MobileApp"},
+                    {"field": "missing_control", "operator": "==", "value": "Encryption"}
+                ],
+                "outcome": {
+                    "impact": "High",
+                    "attack_path": "Device Access → Unencrypted Storage → Data Theft",
+                    "recommendations": [
+                        "Use device keychain/keystore for sensitive data",
+                        "Implement application-layer encryption",
+                        "Avoid storing sensitive data locally",
+                        "Use certificate pinning for API communications"
+                    ],
+                    "risk_score": 7.4
+                },
+                "mitre_techniques": ["T1005", "T1041"],
+                "priority": 2
+            },
+
+            # Container Security Rules
+            {
+                "id": "rule.container.privileged_container",
+                "name": "Privileged Container Risk",
+                "description": "Container running with excessive privileges",
+                "category": "cloud_security",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "==", "value": "Container"},
+                    {"field": "node.privileged", "operator": "==", "value": True}
+                ],
+                "outcome": {
+                    "impact": "High",
+                    "attack_path": "Container Escape → Host System Access → Lateral Movement",
+                    "recommendations": [
+                        "Run containers with minimal privileges",
+                        "Use security contexts and pod security policies",
+                        "Implement runtime security monitoring",
+                        "Regular container image scanning"
+                    ],
+                    "risk_score": 8.3
+                },
+                "mitre_techniques": ["T1611", "T1068"],
+                "priority": 1
+            },
+
+            # IoT Security Rules
+            {
+                "id": "rule.iot.default_credentials",
+                "name": "IoT Device Default Credentials",
+                "description": "IoT device using default or weak credentials",
+                "category": "identity_access",
+                "conditions": [
+                    {"field": "node.subtype", "operator": "==", "value": "IoTDevice"},
+                    {"field": "node.default_credentials", "operator": "==", "value": True}
+                ],
+                "outcome": {
+                    "impact": "Medium",
+                    "attack_path": "Default Credentials → Device Compromise → Network Access",
+                    "recommendations": [
+                        "Change all default passwords immediately",
+                        "Implement strong authentication mechanisms",
+                        "Use device certificates for authentication",
+                        "Regular firmware updates and patching"
+                    ],
+                    "risk_score": 6.8
+                },
+                "mitre_techniques": ["T1078", "T1021"],
+                "priority": 2
             }
         ]
     
