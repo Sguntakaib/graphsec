@@ -662,4 +662,12 @@ function AppContent() {
   );
 }
 
-export default AppContent;
+function App() {
+  return (
+    <ReactFlowProvider>
+      <AppContent />
+    </ReactFlowProvider>
+  );
+}
+
+export default App;
