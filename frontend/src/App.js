@@ -638,15 +638,38 @@ function AppContent() {
             event.preventDefault();
             handleRunSimulation();
             break;
+          case 'z':
+            event.preventDefault();
+            if (event.shiftKey) {
+              handleRedo();
+            } else {
+              handleUndo();
+            }
+            break;
+          case 'y':
+            event.preventDefault();
+            handleRedo();
+            break;
+          case 'd':
+            if (selectedNode) {
+              event.preventDefault();
+              duplicateNode(selectedNode);
+            }
+            break;
           default:
             break;
         }
       } else if (event.key === 'Escape') {
-        // Clear attack path highlighting
-        if (highlightedPaths.length > 0) {
+        // Clear attack path highlighting or close context menu
+        if (contextMenu) {
+          setContextMenu(null);
+        } else if (highlightedPaths.length > 0) {
           event.preventDefault();
           clearAttackPathHighlighting();
         }
+      } else if (event.key === 'Delete' && selectedNode) {
+        event.preventDefault();
+        deleteNode(selectedNode);
       }
     };
 
