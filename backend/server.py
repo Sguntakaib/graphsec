@@ -108,7 +108,7 @@ class DiagramCreate(BaseModel):
     title: str
     description: str = ""
 
-class SimulationResult(BaseModel):
+class EnhancedSimulationResult(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     diagram_id: str
     attack_paths: List[Dict[str, Any]] = []
@@ -121,6 +121,9 @@ class SimulationResult(BaseModel):
     technique_details: Dict[str, Any] = {}
     suggested_controls: List[str] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Alias for backward compatibility
+SimulationResult = EnhancedSimulationResult
 
 # Helper functions
 def prepare_for_mongo(data):
