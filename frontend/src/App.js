@@ -1265,7 +1265,15 @@ function AppContent() {
           )}
         </div>
       </div>
-      
+
+      {/* Security Questionnaire Modal */}
+      <SecurityQuestionnaire
+        nodeSubtype={currentQuestionnaireNode?.subtype}
+        onComplete={handleSecurityQuestionnaireComplete}
+        onCancel={handleSecurityQuestionnaireCancel}
+        isVisible={showSecurityQuestionnaire}
+      />
+
       {/* Template Library Modal */}
       {showTemplateLibrary && (
         <TemplateLibrary
