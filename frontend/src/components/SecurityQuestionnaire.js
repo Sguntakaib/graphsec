@@ -16,7 +16,10 @@ const SecurityQuestionnaire = ({
   onComplete, 
   onCancel, 
   existingValues = {},
-  isVisible = false 
+  isVisible = false,
+  sourceNode = null,
+  currentNodes = [],
+  onCreateLinkedNodes = null
 }) => {
   const [prompts, setPrompts] = useState([]);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
