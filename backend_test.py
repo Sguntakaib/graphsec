@@ -1354,7 +1354,7 @@ class SecurityModelingAPITester:
             try:
                 response = self.session.post(
                     f"{self.base_url}/intelligent-nodes/{subtype}/calculate-risk",
-                    json={"branch_values": branch_values},
+                    json=branch_values,  # Direct branch_values object
                     headers={"Content-Type": "application/json"}
                 )
                 
