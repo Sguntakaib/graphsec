@@ -615,6 +615,7 @@ function AppContent() {
               onClick={clearAttackPathHighlighting}
               disabled={highlightedPaths.length === 0}
               className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              title="Clear Attack Path Highlights (Esc)"
             >
               <EyeOff className="h-4 w-4" />
               <span>Clear Highlights</span>
