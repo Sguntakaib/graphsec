@@ -36,6 +36,427 @@ simulation_engine = AdvancedSimulationEngine()
 mitre_db = MitreAttackDatabase()
 executor = ThreadPoolExecutor(max_workers=4)
 
+# Default Security Templates Data
+def get_default_templates():
+    """Get pre-built security templates for common architectures"""
+    return [
+        {
+            "name": "Web Application Security Model",
+            "description": "Comprehensive security model for a modern web application with database backend",
+            "category": TemplateCategory.WEB_APPLICATION,
+            "use_case": "Model security threats for web applications exposed to the internet",
+            "complexity": "Intermediate",
+            "tags": ["web", "database", "authentication", "WAF"],
+            "compliance_frameworks": ["NIST CSF", "OWASP Top 10"],
+            "estimated_time": "10-15 minutes",
+            "nodes": [
+                {
+                    "id": "internet-zone",
+                    "type": "Zone",
+                    "subtype": "Internet",
+                    "label": "Internet",
+                    "position": {"x": 100, "y": 50},
+                    "description": "Untrusted public internet space",
+                    "trust_level": "Untrusted"
+                },
+                {
+                    "id": "external-attacker",
+                    "type": "Actor",
+                    "subtype": "ExternalAttacker", 
+                    "label": "External Attacker",
+                    "position": {"x": 100, "y": 150},
+                    "sophistication": "Medium",
+                    "motivation": "Financial"
+                },
+                {
+                    "id": "waf",
+                    "type": "Control",
+                    "subtype": "WAF",
+                    "label": "Web Application Firewall",
+                    "position": {"x": 300, "y": 50},
+                    "effectiveness": 85,
+                    "control_type": "Preventive"
+                },
+                {
+                    "id": "web-app",
+                    "type": "Asset",
+                    "subtype": "WebApp",
+                    "label": "Web Application",
+                    "position": {"x": 500, "y": 150},
+                    "criticality": "High",
+                    "data_classification": "Confidential"
+                },
+                {
+                    "id": "sql-injection",
+                    "type": "Surface",
+                    "subtype": "SQLi",
+                    "label": "SQL Injection",
+                    "position": {"x": 400, "y": 250},
+                    "cvss_score": 9.8,
+                    "exploitability": "High"
+                },
+                {
+                    "id": "database",
+                    "type": "Asset",
+                    "subtype": "Database",
+                    "label": "Production Database",
+                    "position": {"x": 700, "y": 250},
+                    "criticality": "Critical",
+                    "data_classification": "Restricted"
+                }
+            ],
+            "edges": [
+                {
+                    "id": "attacker-to-waf",
+                    "source": "external-attacker",
+                    "target": "waf",
+                    "label": "Initial Access"
+                },
+                {
+                    "id": "waf-to-webapp",
+                    "source": "waf",
+                    "target": "web-app",
+                    "label": "Filtered Traffic"
+                },
+                {
+                    "id": "webapp-to-sqli",
+                    "source": "web-app",
+                    "target": "sql-injection",
+                    "label": "Contains Vulnerability"
+                },
+                {
+                    "id": "sqli-to-database",
+                    "source": "sql-injection",
+                    "target": "database",
+                    "label": "Data Access"
+                }
+            ]
+        },
+        {
+            "name": "Zero Trust Architecture",
+            "description": "Zero trust security model with identity verification and micro-segmentation",
+            "category": TemplateCategory.ZERO_TRUST,
+            "use_case": "Implement zero trust principles for enterprise environments",
+            "complexity": "Advanced",
+            "tags": ["zero-trust", "identity", "micro-segmentation", "continuous-verification"],
+            "compliance_frameworks": ["NIST Zero Trust", "CISA Zero Trust"],
+            "estimated_time": "20-25 minutes",
+            "nodes": [
+                {
+                    "id": "external-user",
+                    "type": "Actor",
+                    "subtype": "ExternalAttacker",
+                    "label": "External User",
+                    "position": {"x": 100, "y": 100},
+                    "sophistication": "Low",
+                    "motivation": "Access"
+                },
+                {
+                    "id": "identity-provider",
+                    "type": "Control",
+                    "subtype": "IAMPolicy",
+                    "label": "Identity Provider",
+                    "position": {"x": 300, "y": 100},
+                    "effectiveness": 95,
+                    "control_type": "Preventive"
+                },
+                {
+                    "id": "policy-engine",
+                    "type": "Control",
+                    "subtype": "IAMPolicy",
+                    "label": "Policy Decision Point",
+                    "position": {"x": 500, "y": 100},
+                    "effectiveness": 90,
+                    "control_type": "Preventive"
+                },
+                {
+                    "id": "secure-enclave",
+                    "type": "Zone",
+                    "subtype": "SecureEnclave",
+                    "label": "Secure Enclave",
+                    "position": {"x": 700, "y": 100},
+                    "trust_level": "High",
+                    "security_level": "Maximum"
+                },
+                {
+                    "id": "critical-asset",
+                    "type": "Asset",
+                    "subtype": "Database",
+                    "label": "Critical Data",
+                    "position": {"x": 700, "y": 250},
+                    "criticality": "Critical",
+                    "data_classification": "Restricted"
+                },
+                {
+                    "id": "network-segmentation",
+                    "type": "Control",
+                    "subtype": "NetworkACL",
+                    "label": "Micro-segmentation",
+                    "position": {"x": 500, "y": 250},
+                    "effectiveness": 80,
+                    "control_type": "Preventive"
+                }
+            ],
+            "edges": [
+                {
+                    "id": "user-to-identity",
+                    "source": "external-user",
+                    "target": "identity-provider",
+                    "label": "Authentication"
+                },
+                {
+                    "id": "identity-to-policy",
+                    "source": "identity-provider",
+                    "target": "policy-engine",
+                    "label": "Identity Verification"
+                },
+                {
+                    "id": "policy-to-enclave",
+                    "source": "policy-engine",
+                    "target": "secure-enclave",
+                    "label": "Access Decision"
+                },
+                {
+                    "id": "enclave-to-asset",
+                    "source": "secure-enclave",
+                    "target": "critical-asset",
+                    "label": "Protected Access"
+                },
+                {
+                    "id": "segmentation-protects-asset",
+                    "source": "network-segmentation",
+                    "target": "critical-asset",
+                    "label": "Network Protection"
+                }
+            ]
+        },
+        {
+            "name": "Cloud Native Security",
+            "description": "Container and Kubernetes security model with cloud-native controls",
+            "category": TemplateCategory.CLOUD_NATIVE,
+            "use_case": "Secure containerized applications in Kubernetes environments",
+            "complexity": "Advanced", 
+            "tags": ["kubernetes", "containers", "cloud", "microservices"],
+            "compliance_frameworks": ["CIS Kubernetes", "NIST SP 800-190"],
+            "estimated_time": "15-20 minutes",
+            "nodes": [
+                {
+                    "id": "developer",
+                    "type": "Actor",
+                    "subtype": "Insider",
+                    "label": "Developer",
+                    "position": {"x": 100, "y": 100},
+                    "sophistication": "Low",
+                    "motivation": "Productivity"
+                },
+                {
+                    "id": "container-registry",
+                    "type": "Asset",
+                    "subtype": "S3Bucket",
+                    "label": "Container Registry",
+                    "position": {"x": 300, "y": 100},
+                    "criticality": "High",
+                    "data_classification": "Internal"
+                },
+                {
+                    "id": "kubernetes-cluster",
+                    "type": "Asset",
+                    "subtype": "VM",
+                    "label": "Kubernetes Cluster",
+                    "position": {"x": 500, "y": 100},
+                    "criticality": "Critical",
+                    "data_classification": "Restricted"
+                },
+                {
+                    "id": "pod-security",
+                    "type": "Control",
+                    "subtype": "IAMPolicy",
+                    "label": "Pod Security Standards",
+                    "position": {"x": 400, "y": 200},
+                    "effectiveness": 85,
+                    "control_type": "Preventive"
+                },
+                {
+                    "id": "network-policies",
+                    "type": "Control",
+                    "subtype": "NetworkACL",
+                    "label": "Network Policies",
+                    "position": {"x": 600, "y": 200},
+                    "effectiveness": 90,
+                    "control_type": "Preventive"
+                },
+                {
+                    "id": "container-escape",
+                    "type": "Surface",
+                    "subtype": "RCE",
+                    "label": "Container Escape",
+                    "position": {"x": 500, "y": 300},
+                    "cvss_score": 8.4,
+                    "exploitability": "Medium"
+                }
+            ],
+            "edges": [
+                {
+                    "id": "dev-to-registry",
+                    "source": "developer",
+                    "target": "container-registry",
+                    "label": "Push Images"
+                },
+                {
+                    "id": "registry-to-cluster",
+                    "source": "container-registry",
+                    "target": "kubernetes-cluster",
+                    "label": "Pull Images"
+                },
+                {
+                    "id": "pod-security-protects",
+                    "source": "pod-security",
+                    "target": "kubernetes-cluster",
+                    "label": "Security Controls"
+                },
+                {
+                    "id": "network-policies-protect",
+                    "source": "network-policies",
+                    "target": "kubernetes-cluster",
+                    "label": "Network Isolation"
+                },
+                {
+                    "id": "cluster-has-vulnerability",
+                    "source": "kubernetes-cluster",
+                    "target": "container-escape",
+                    "label": "Contains Risk"
+                }
+            ]
+        },
+        {
+            "name": "API Security Gateway",
+            "description": "Comprehensive API security model with authentication, rate limiting, and threat protection",
+            "category": TemplateCategory.API_SECURITY,
+            "use_case": "Secure REST/GraphQL APIs with comprehensive protection layers",
+            "complexity": "Intermediate",
+            "tags": ["API", "authentication", "rate-limiting", "OAuth"],
+            "compliance_frameworks": ["OWASP API Top 10", "OAuth 2.0"],
+            "estimated_time": "12-18 minutes",
+            "nodes": [
+                {
+                    "id": "mobile-app",
+                    "type": "Actor",
+                    "subtype": "ExternalAttacker",
+                    "label": "Mobile App",
+                    "position": {"x": 100, "y": 100},
+                    "sophistication": "Low",
+                    "motivation": "Functionality"
+                },
+                {
+                    "id": "api-gateway",
+                    "type": "Asset",
+                    "subtype": "API",
+                    "label": "API Gateway",
+                    "position": {"x": 300, "y": 100},
+                    "criticality": "High",
+                    "data_classification": "Confidential"
+                },
+                {
+                    "id": "oauth-server",
+                    "type": "Control",
+                    "subtype": "IAMPolicy",
+                    "label": "OAuth Authorization Server",
+                    "position": {"x": 300, "y": 200},
+                    "effectiveness": 90,
+                    "control_type": "Preventive"
+                },
+                {
+                    "id": "rate-limiter",
+                    "type": "Control",
+                    "subtype": "WAF",
+                    "label": "Rate Limiting",
+                    "position": {"x": 400, "y": 50},
+                    "effectiveness": 80,
+                    "control_type": "Preventive"
+                },
+                {
+                    "id": "api-abuse",
+                    "type": "Surface",
+                    "subtype": "IDOR",
+                    "label": "API Abuse",
+                    "position": {"x": 500, "y": 150},
+                    "cvss_score": 7.5,
+                    "exploitability": "Medium"
+                },
+                {
+                    "id": "backend-service",
+                    "type": "Asset",
+                    "subtype": "WebApp",
+                    "label": "Backend Service",
+                    "position": {"x": 600, "y": 100},
+                    "criticality": "High",
+                    "data_classification": "Confidential"
+                }
+            ],
+            "edges": [
+                {
+                    "id": "app-to-gateway",
+                    "source": "mobile-app",
+                    "target": "api-gateway",
+                    "label": "API Requests"
+                },
+                {
+                    "id": "gateway-to-oauth",
+                    "source": "api-gateway",
+                    "target": "oauth-server",
+                    "label": "Token Validation"
+                },
+                {
+                    "id": "rate-limiter-protects-gateway",
+                    "source": "rate-limiter",
+                    "target": "api-gateway",
+                    "label": "DDoS Protection"
+                },
+                {
+                    "id": "gateway-has-vulnerability",
+                    "source": "api-gateway",
+                    "target": "api-abuse",
+                    "label": "Contains Risk"
+                },
+                {
+                    "id": "gateway-to-backend",
+                    "source": "api-gateway",
+                    "target": "backend-service",
+                    "label": "Processed Requests"
+                }
+            ]
+        }
+    ]
+
+async def initialize_default_templates():
+    """Initialize default templates if they don't exist"""
+    try:
+        # Check if templates already exist
+        existing_count = await db.templates.count_documents({})
+        if existing_count > 0:
+            logger.info(f"Templates already initialized: {existing_count} templates found")
+            return
+        
+        default_templates = get_default_templates()
+        template_docs = []
+        
+        for template_data in default_templates:
+            template = SecurityTemplate(**template_data)
+            prepared_data = prepare_for_mongo(template.dict())
+            template_docs.append(prepared_data)
+        
+        if template_docs:
+            await db.templates.insert_many(template_docs)
+            logger.info(f"Initialized {len(template_docs)} default templates")
+        
+    except Exception as e:
+        logger.error(f"Failed to initialize default templates: {e}")
+
+# Initialize templates on startup
+@app.on_event("startup")
+async def startup_event():
+    await initialize_default_templates()
+
 # Security Node Types
 class NodeType(str, Enum):
     ACTOR = "Actor"
