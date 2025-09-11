@@ -246,8 +246,100 @@ function AppContent() {
   };
 
   const highlightAttackPaths = (attackPaths) => {
-    // This would highlight the attack paths on the canvas
-    // For now, we'll store them for potential future use
+    if (!attackPaths || attackPaths.length === 0) {
+      setHighlightedPaths([]);
+      return;
+    }
+
+    // Update edges to highlight attack paths
+    setEdges((eds) =>
+      eds.map((edge) => {
+        // Check if this edge is part of any attack path
+        const isInAttackPath = attackPaths.some(path => 
+          path.steps?.some(step => 
+            step.source_node === edge.source && step.target_node === edge.target
+          )
+        );
+
+        if (isInAttackPath) {
+          return {
+            ...edge,
+            style: {
+              ...edge.style,
+              stroke: '#ef4444', // Red color for attack paths
+              strokeWidth: 3,
+              strokeDasharray: '5,5',
+            },
+            animated: true,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 20,
+              height: 20,
+              color: '#ef4444',
+            },
+            data: {
+              ...edge.data,
+              isHighlighted: true
+            }
+          };
+        }
+
+        return {
+          ...edge,
+          style: {
+            ...edge.style,
+            stroke: edge.data?.isHighlighted ? '#6b7280' : (edge.style?.stroke || '#6b7280'),
+            strokeWidth: edge.data?.isHighlighted ? 1 : (edge.style?.strokeWidth || 1),
+            strokeDasharray: edge.data?.isHighlighted ? 'none' : (edge.style?.strokeDasharray || 'none'),
+          },
+          animated: false,
+          data: {
+            ...edge.data,
+            isHighlighted: false
+          }
+        };
+      })
+    );
+
+    // Update nodes to highlight those involved in attack paths
+    setNodes((nds) =>
+      nds.map((node) => {
+        const isInAttackPath = attackPaths.some(path =>
+          path.steps?.some(step =>
+            step.source_node === node.id || step.target_node === node.id
+          )
+        );
+
+        if (isInAttackPath) {
+          return {
+            ...node,
+            style: {
+              ...node.style,
+              border: '2px solid #ef4444',
+              boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)',
+            },
+            data: {
+              ...node.data,
+              isHighlighted: true
+            }
+          };
+        }
+
+        return {
+          ...node,
+          style: {
+            ...node.style,
+            border: node.data?.isHighlighted ? 'none' : (node.style?.border || 'none'),
+            boxShadow: node.data?.isHighlighted ? 'none' : (node.style?.boxShadow || 'none'),
+          },
+          data: {
+            ...node.data,
+            isHighlighted: false
+          }
+        };
+      })
+    );
+
     setHighlightedPaths(attackPaths);
   };
 
