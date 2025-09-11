@@ -2692,7 +2692,13 @@ class SecurityModelingAPITester:
             self.test_security_rules_categories,
             self.test_security_rules_statistics,
             self.test_specific_security_rule,
-            self.test_dsl_rule_scenarios
+            self.test_dsl_rule_scenarios,
+            # Phase 3: Probabilistic Simulation Engine Tests
+            self.test_probabilistic_simulation_engine,
+            self.test_what_if_scenario_engine,
+            self.test_defense_effectiveness_modeling,
+            self.test_historical_probabilistic_simulations,
+            self.test_historical_scenario_analyses
         ]
         
         passed = 0
