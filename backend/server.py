@@ -333,10 +333,10 @@ async def simulate_attack_paths(diagram_id: str):
     
     return enhanced_result
 
-@api_router.get("/diagrams/{diagram_id}/simulations", response_model=List[SimulationResult])
+@api_router.get("/diagrams/{diagram_id}/simulations", response_model=List[EnhancedSimulationResult])
 async def get_simulations(diagram_id: str):
     simulations = await db.simulations.find({"diagram_id": diagram_id}).to_list(1000)
-    return [SimulationResult(**parse_from_mongo(sim)) for sim in simulations]
+    return [EnhancedSimulationResult(**parse_from_mongo(sim)) for sim in simulations]
 
 # Include the router in the main app
 app.include_router(api_router)
