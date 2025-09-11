@@ -910,6 +910,206 @@ async def get_risk_analysis(diagram_id: str):
     
     return risk_analysis
 
+def _smart_hierarchical_layout(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Dict[str, float]]:
+    """Smart hierarchical layout based on security model semantics"""
+    
+    # Define security layer hierarchy
+    layer_order = {
+        "Zone": 0,      # Network zones at the top
+        "Actor": 1,     # Threat actors 
+        "Surface": 2,   # Attack surfaces
+        "Asset": 3,     # Protected assets
+        "Control": 4,   # Security controls
+        "Signal": 5     # Detection signals
+    }
+    
+    # Group nodes by type and layer
+    layers = {}
+    for node in nodes:
+        node_type = node.get("type", "Unknown")
+        layer = layer_order.get(node_type, 3)  # Default to asset layer
+        
+        if layer not in layers:
+            layers[layer] = []
+        layers[layer].append(node)
+    
+    layout_positions = {}
+    layer_height = 200
+    base_y = 100
+    
+    for layer_idx, layer_nodes in layers.items():
+        y_pos = base_y + (layer_idx * layer_height)
+        
+        # Calculate spacing for nodes in this layer
+        total_width = max(1200, len(layer_nodes) * 250)
+        node_spacing = total_width / max(len(layer_nodes), 1)
+        start_x = -(total_width / 2) + (node_spacing / 2)
+        
+        # Position nodes in layer with smart grouping by subtype
+        subtype_groups = {}
+        for node in layer_nodes:
+            subtype = node.get("subtype", "default")
+            if subtype not in subtype_groups:
+                subtype_groups[subtype] = []
+            subtype_groups[subtype].append(node)
+        
+        x_offset = start_x
+        for subtype, subtype_nodes in subtype_groups.items():
+            for i, node in enumerate(subtype_nodes):
+                layout_positions[node["id"]] = {
+                    "x": x_offset + (i * 150),
+                    "y": y_pos
+                }
+            x_offset += len(subtype_nodes) * 150 + 100  # Gap between subtypes
+    
+    return layout_positions
+
+def _circular_layout_by_type(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Dict[str, float]]:
+    """Circular layout with nodes grouped by type"""
+    
+    # Group nodes by type
+    type_groups = {}
+    for node in nodes:
+        node_type = node.get("type", "Unknown")
+        if node_type not in type_groups:
+            type_groups[node_type] = []
+        type_groups[node_type].append(node)
+    
+    layout_positions = {}
+    center_x, center_y = 400, 300
+    
+    if len(type_groups) == 1:
+        # Single type - simple circle
+        radius = 200
+        nodes_list = list(type_groups.values())[0]
+        for i, node in enumerate(nodes_list):
+            angle = 2 * math.pi * i / len(nodes_list)
+            layout_positions[node["id"]] = {
+                "x": center_x + radius * math.cos(angle),
+                "y": center_y + radius * math.sin(angle)
+            }
+    else:
+        # Multiple types - concentric circles
+        base_radius = 150
+        for type_idx, (node_type, type_nodes) in enumerate(type_groups.items()):
+            radius = base_radius + (type_idx * 120)
+            for i, node in enumerate(type_nodes):
+                angle = 2 * math.pi * i / len(type_nodes)
+                layout_positions[node["id"]] = {
+                    "x": center_x + radius * math.cos(angle),
+                    "y": center_y + radius * math.sin(angle)
+                }
+    
+    return layout_positions
+
+def _layered_security_layout(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Dict[str, float]]:
+    """Security-focused layered layout (Outside-In approach)"""
+    
+    # Define security perimeter layers (outside to inside)
+    security_layers = {
+        "Internet": 0,
+        "ExternalAttacker": 0,
+        "DMZ": 1,
+        "WAF": 1,
+        "EgressProxy": 1,
+        "Internal": 2,
+        "WebApp": 2,
+        "API": 2,
+        "SecureEnclave": 3,
+        "Database": 3,
+        "ActiveDirectory": 3
+    }
+    
+    # Group nodes by security layer
+    layers = {}
+    for node in nodes:
+        subtype = node.get("subtype", "default")
+        layer = security_layers.get(subtype, 2)  # Default to internal layer
+        
+        if layer not in layers:
+            layers[layer] = []
+        layers[layer].append(node)
+    
+    layout_positions = {}
+    center_x, center_y = 400, 300
+    base_radius = 100
+    
+    for layer_idx, layer_nodes in layers.items():
+        radius = base_radius + (layer_idx * 150)
+        
+        for i, node in enumerate(layer_nodes):
+            angle = 2 * math.pi * i / len(layer_nodes)
+            layout_positions[node["id"]] = {
+                "x": center_x + radius * math.cos(angle),
+                "y": center_y + radius * math.sin(angle)
+            }
+    
+    return layout_positions
+
+def _network_topology_layout(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Dict[str, float]]:
+    """Network topology-aware layout using graph structure"""
+    
+    if len(nodes) <= 1:
+        return {nodes[0]["id"]: {"x": 400, "y": 300}} if nodes else {}
+    
+    # Use NetworkX's hierarchical layout if graph is a DAG
+    try:
+        if nx.is_directed_acyclic_graph(G):
+            # Layered layout for DAGs
+            layers = list(nx.topological_generations(G))
+            layout_positions = {}
+            
+            layer_height = 200
+            for layer_idx, layer_nodes in enumerate(layers):
+                y_pos = 100 + (layer_idx * layer_height)
+                node_spacing = 800 / max(len(layer_nodes), 1)
+                
+                for i, node_id in enumerate(layer_nodes):
+                    layout_positions[node_id] = {
+                        "x": 100 + (i * node_spacing),
+                        "y": y_pos
+                    }
+            
+            return layout_positions
+        else:
+            # Use spring layout for cyclic graphs
+            pos = nx.spring_layout(G, k=2, iterations=50)
+            return _scale_layout(pos, 800, 600)
+            
+    except:
+        # Fallback to spring layout
+        pos = nx.spring_layout(G, k=2, iterations=50)
+        return _scale_layout(pos, 800, 600)
+
+def _scale_layout(pos: Dict, width: int, height: int) -> Dict[str, Dict[str, float]]:
+    """Scale NetworkX layout to desired dimensions"""
+    if not pos:
+        return {}
+    
+    # Get min/max coordinates
+    x_coords = [coord[0] for coord in pos.values()]
+    y_coords = [coord[1] for coord in pos.values()]
+    
+    min_x, max_x = min(x_coords), max(x_coords)
+    min_y, max_y = min(y_coords), max(y_coords)
+    
+    # Avoid division by zero
+    x_range = max_x - min_x if max_x != min_x else 1
+    y_range = max_y - min_y if max_y != min_y else 1
+    
+    # Scale and center
+    layout_positions = {}
+    for node_id, (x, y) in pos.items():
+        scaled_x = ((x - min_x) / x_range) * (width - 100) + 50
+        scaled_y = ((y - min_y) / y_range) * (height - 100) + 50
+        
+        layout_positions[node_id] = {
+            "x": scaled_x,
+            "y": scaled_y
+        }
+    
+    return layout_positions
+
 @api_router.post("/diagrams/{diagram_id}/auto-layout")
 async def auto_layout_diagram(diagram_id: str):
     """Generate automatic layout for diagram nodes"""
