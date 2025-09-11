@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://intelnode-tests.preview.emergentagent.com/api"
+BASE_URL = "https://next-milestone-1.preview.emergentagent.com/api"
 
 class SecurityModelingAPITester:
     def __init__(self):
