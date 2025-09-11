@@ -1981,6 +1981,678 @@ class SecurityModelingAPITester:
         
         return True
 
+    # ============================================================================
+    # PHASE 3: PROBABILISTIC SIMULATION ENGINE TESTS
+    # ============================================================================
+    
+    def create_probabilistic_test_diagram(self):
+        """Create comprehensive security diagram for probabilistic simulation testing"""
+        diagram_id = str(uuid.uuid4())
+        
+        nodes = [
+            # Diverse Threat Actors
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Actor",
+                "subtype": "ExternalAttacker",
+                "label": "Advanced Persistent Threat",
+                "position": {"x": 50, "y": 100},
+                "data": {
+                    "description": "Nation-state sponsored threat actor",
+                    "sophistication": "Very High",
+                    "motivation": "Espionage",
+                    "resources": "Unlimited"
+                },
+                "mitre_ids": ["T1190", "T1566", "T1078"],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Actor",
+                "subtype": "Insider",
+                "label": "Malicious Insider",
+                "position": {"x": 50, "y": 200},
+                "data": {
+                    "description": "Privileged insider with legitimate access",
+                    "sophistication": "Medium",
+                    "motivation": "Financial",
+                    "access_level": "High"
+                },
+                "mitre_ids": ["T1078", "T1484", "T1552"],
+                "cve_ids": []
+            },
+            
+            # Critical Assets with varying criticality
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Asset",
+                "subtype": "Database",
+                "label": "Customer PII Database",
+                "position": {"x": 700, "y": 150},
+                "data": {
+                    "description": "PostgreSQL database containing customer personal information",
+                    "criticality": "Critical",
+                    "data_classification": "Restricted",
+                    "compliance_requirements": ["GDPR", "CCPA"],
+                    "public_access": False
+                },
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Asset",
+                "subtype": "WebApp",
+                "label": "Customer Portal",
+                "position": {"x": 500, "y": 100},
+                "data": {
+                    "description": "Customer-facing web application",
+                    "criticality": "High",
+                    "data_classification": "Confidential",
+                    "public_access": True
+                },
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Asset",
+                "subtype": "API",
+                "label": "Payment Processing API",
+                "position": {"x": 500, "y": 250},
+                "data": {
+                    "description": "REST API for payment processing",
+                    "criticality": "High",
+                    "data_classification": "Confidential",
+                    "public_access": True
+                },
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            
+            # Attack Surfaces with CVSS scores
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Surface",
+                "subtype": "SQLi",
+                "label": "SQL Injection Vulnerability",
+                "position": {"x": 300, "y": 150},
+                "data": {
+                    "description": "SQL injection in search functionality",
+                    "severity": "Critical",
+                    "exploitability": "High"
+                },
+                "cvss_score": 9.8,
+                "mitre_ids": ["T1190", "T1213"],
+                "cve_ids": ["CVE-2021-44228"]
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Surface",
+                "subtype": "WeakIAM",
+                "label": "Weak Authentication Controls",
+                "position": {"x": 300, "y": 250},
+                "data": {
+                    "description": "Insufficient access controls on admin endpoints",
+                    "severity": "High",
+                    "exploitability": "Medium"
+                },
+                "cvss_score": 7.5,
+                "mitre_ids": ["T1078", "T1484"],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Surface",
+                "subtype": "RCE",
+                "label": "Remote Code Execution",
+                "position": {"x": 300, "y": 350},
+                "data": {
+                    "description": "RCE via deserialization vulnerability",
+                    "severity": "Critical",
+                    "exploitability": "Medium"
+                },
+                "cvss_score": 9.0,
+                "mitre_ids": ["T1059", "T1203"],
+                "cve_ids": []
+            },
+            
+            # Security Controls with effectiveness ratings
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Control",
+                "subtype": "WAF",
+                "label": "Web Application Firewall",
+                "position": {"x": 150, "y": 50},
+                "data": {
+                    "description": "AWS WAF with OWASP Core Rule Set",
+                    "effectiveness": "High",
+                    "control_type": "Preventive",
+                    "coverage": ["Web Applications", "API Endpoints"]
+                },
+                "effectiveness": 85,
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Control",
+                "subtype": "EDR",
+                "label": "Endpoint Detection & Response",
+                "position": {"x": 300, "y": 50},
+                "data": {
+                    "description": "CrowdStrike Falcon EDR solution",
+                    "effectiveness": "High",
+                    "control_type": "Detective",
+                    "coverage": ["Endpoints", "Servers"]
+                },
+                "effectiveness": 90,
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Control",
+                "subtype": "IAMPolicy",
+                "label": "Identity Access Management",
+                "position": {"x": 450, "y": 50},
+                "data": {
+                    "description": "Azure AD with conditional access policies",
+                    "effectiveness": "Medium",
+                    "control_type": "Preventive",
+                    "coverage": ["User Access", "Privilege Management"]
+                },
+                "effectiveness": 75,
+                "mitre_ids": [],
+                "cve_ids": []
+            }
+        ]
+        
+        # Create attack path edges with realistic likelihood and impact
+        edges = [
+            # External Attacker -> SQL Injection -> Database
+            {
+                "id": str(uuid.uuid4()),
+                "source": nodes[0]["id"],  # APT
+                "target": nodes[5]["id"],  # SQL Injection
+                "type": "attack",
+                "label": "Exploits SQLi",
+                "data": {"likelihood": "High", "impact": "Critical"}
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "source": nodes[5]["id"],  # SQL Injection
+                "target": nodes[2]["id"],  # Database
+                "type": "attack",
+                "label": "Data Exfiltration",
+                "data": {"likelihood": "High", "impact": "Critical"}
+            },
+            
+            # Insider -> Weak IAM -> Web App -> Database
+            {
+                "id": str(uuid.uuid4()),
+                "source": nodes[1]["id"],  # Insider
+                "target": nodes[6]["id"],  # Weak IAM
+                "type": "attack",
+                "label": "Exploits Weak Auth",
+                "data": {"likelihood": "Medium", "impact": "High"}
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "source": nodes[6]["id"],  # Weak IAM
+                "target": nodes[3]["id"],  # Web App
+                "type": "attack",
+                "label": "Privilege Escalation",
+                "data": {"likelihood": "High", "impact": "High"}
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "source": nodes[3]["id"],  # Web App
+                "target": nodes[2]["id"],  # Database
+                "type": "attack",
+                "label": "Lateral Movement",
+                "data": {"likelihood": "Medium", "impact": "Critical"}
+            },
+            
+            # APT -> RCE -> Payment API
+            {
+                "id": str(uuid.uuid4()),
+                "source": nodes[0]["id"],  # APT
+                "target": nodes[7]["id"],  # RCE
+                "type": "attack",
+                "label": "Exploits RCE",
+                "data": {"likelihood": "Medium", "impact": "High"}
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "source": nodes[7]["id"],  # RCE
+                "target": nodes[4]["id"],  # Payment API
+                "type": "attack",
+                "label": "API Compromise",
+                "data": {"likelihood": "High", "impact": "High"}
+            }
+        ]
+        
+        return {
+            "id": diagram_id,
+            "title": "Probabilistic Security Threat Model",
+            "description": "Comprehensive security model for testing probabilistic simulation engine with diverse threat actors, critical assets, attack surfaces, and security controls",
+            "nodes": nodes,
+            "edges": edges
+        }
+    
+    def test_probabilistic_simulation_engine(self):
+        """Test POST /api/diagrams/{diagram_id}/probabilistic-simulation"""
+        try:
+            # Create comprehensive diagram for probabilistic testing
+            prob_diagram_data = self.create_probabilistic_test_diagram()
+            
+            # Create diagram
+            response = self.session.post(
+                f"{self.base_url}/diagrams",
+                json={"title": prob_diagram_data["title"], "description": prob_diagram_data["description"]},
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                self.log_test("Probabilistic Simulation - Create Diagram", False, f"Failed to create diagram: {response.status_code}")
+                return False
+            
+            diagram_id = response.json()["id"]
+            prob_diagram_data["id"] = diagram_id
+            
+            # Update with comprehensive probabilistic data
+            response = self.session.put(
+                f"{self.base_url}/diagrams/{diagram_id}",
+                json=prob_diagram_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                self.log_test("Probabilistic Simulation - Update Diagram", False, f"Failed to update diagram: {response.status_code}")
+                return False
+            
+            # Run probabilistic simulation
+            response = self.session.post(f"{self.base_url}/diagrams/{diagram_id}/probabilistic-simulation")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required probabilistic simulation fields
+                required_fields = [
+                    "diagram_id", "probabilistic_paths", "simulation_summary", "simulation_timestamp"
+                ]
+                
+                missing_fields = [f for f in required_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Probabilistic Simulation", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Validate probabilistic paths structure
+                prob_paths = data.get("probabilistic_paths", [])
+                if not prob_paths:
+                    self.log_test("Probabilistic Simulation", False, "No probabilistic paths generated")
+                    return False
+                
+                # Check first path structure
+                first_path = prob_paths[0]
+                path_required_fields = [
+                    "path_id", "steps", "overall_probability", "risk_score", 
+                    "impact_score", "detection_score", "kill_chain_stages", 
+                    "mitre_techniques", "uncertainty_band"
+                ]
+                
+                path_missing_fields = [f for f in path_required_fields if f not in first_path]
+                if path_missing_fields:
+                    self.log_test("Probabilistic Simulation", False, f"Path missing fields: {path_missing_fields}")
+                    return False
+                
+                # Validate probability values are in valid range (0-1)
+                overall_prob = first_path.get("overall_probability", 0)
+                if not (0 <= overall_prob <= 1):
+                    self.log_test("Probabilistic Simulation", False, f"Invalid probability: {overall_prob}")
+                    return False
+                
+                # Validate uncertainty band
+                uncertainty_band = first_path.get("uncertainty_band", {})
+                if "min_probability" not in uncertainty_band or "max_probability" not in uncertainty_band:
+                    self.log_test("Probabilistic Simulation", False, "Missing uncertainty band values")
+                    return False
+                
+                # Check simulation summary
+                summary = data.get("simulation_summary", {})
+                summary_required_fields = [
+                    "total_paths", "average_success_probability", "kill_chain_coverage", "risk_distribution"
+                ]
+                
+                summary_missing_fields = [f for f in summary_required_fields if f not in summary]
+                if summary_missing_fields:
+                    self.log_test("Probabilistic Simulation", False, f"Summary missing fields: {summary_missing_fields}")
+                    return False
+                
+                # Validate kill chain mapping
+                kill_chain_stages = summary.get("kill_chain_coverage", [])
+                expected_stages = ["reconnaissance", "weaponization", "delivery", "exploitation", "installation", "command_control", "actions_objectives"]
+                valid_stages = all(stage in expected_stages for stage in kill_chain_stages)
+                
+                if not valid_stages:
+                    self.log_test("Probabilistic Simulation", False, f"Invalid kill chain stages: {kill_chain_stages}")
+                    return False
+                
+                # Validate risk distribution
+                risk_dist = summary.get("risk_distribution", {})
+                risk_categories = ["critical", "high", "medium", "low"]
+                if not all(cat in risk_dist for cat in risk_categories):
+                    self.log_test("Probabilistic Simulation", False, "Missing risk distribution categories")
+                    return False
+                
+                self.log_test("Probabilistic Simulation", True, 
+                            f"Generated {len(prob_paths)} probabilistic paths, "
+                            f"avg probability: {summary.get('average_success_probability', 0):.4f}, "
+                            f"kill chain stages: {len(kill_chain_stages)}, "
+                            f"risk distribution: {risk_dist}")
+                return True
+            else:
+                self.log_test("Probabilistic Simulation", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Probabilistic Simulation", False, f"Error: {str(e)}")
+            return False
+    
+    def test_what_if_scenario_engine(self):
+        """Test POST /api/diagrams/{diagram_id}/what-if-scenario"""
+        try:
+            # Use existing diagram or create one
+            if not self.test_diagram_id:
+                self.log_test("What-If Scenario Engine", False, "No test diagram available")
+                return False
+            
+            # Define scenario configuration with control toggles
+            scenario_config = {
+                "scenario_name": "Enhanced Security Controls",
+                "control_changes": {
+                    "waf_control": True,      # Enable WAF
+                    "edr_control": True,      # Enable EDR
+                    "iam_control": False,     # Disable IAM (test risk increase)
+                    "network_acl": True       # Enable Network ACL
+                }
+            }
+            
+            # Run what-if scenario
+            response = self.session.post(
+                f"{self.base_url}/diagrams/{self.test_diagram_id}/what-if-scenario",
+                json=scenario_config,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required scenario fields
+                required_fields = [
+                    "diagram_id", "scenario_id", "scenario_name", "control_changes",
+                    "risk_analysis", "affected_paths", "recommendations", "roi_analysis",
+                    "analysis_timestamp"
+                ]
+                
+                missing_fields = [f for f in required_fields if f not in data]
+                if missing_fields:
+                    self.log_test("What-If Scenario Engine", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Validate risk analysis structure
+                risk_analysis = data.get("risk_analysis", {})
+                risk_required_fields = [
+                    "original_risk_score", "modified_risk_score", "risk_change", "risk_change_percentage"
+                ]
+                
+                risk_missing_fields = [f for f in risk_required_fields if f not in risk_analysis]
+                if risk_missing_fields:
+                    self.log_test("What-If Scenario Engine", False, f"Risk analysis missing fields: {risk_missing_fields}")
+                    return False
+                
+                # Validate ROI analysis
+                roi_analysis = data.get("roi_analysis", {})
+                roi_required_fields = ["estimated_cost", "risk_reduction_value", "roi_percentage", "payback_period_months"]
+                
+                roi_missing_fields = [f for f in roi_required_fields if f not in roi_analysis]
+                if roi_missing_fields:
+                    self.log_test("What-If Scenario Engine", False, f"ROI analysis missing fields: {roi_missing_fields}")
+                    return False
+                
+                # Validate control changes were applied
+                control_changes = data.get("control_changes", {})
+                if control_changes != scenario_config["control_changes"]:
+                    self.log_test("What-If Scenario Engine", False, "Control changes not properly applied")
+                    return False
+                
+                # Check that recommendations are provided
+                recommendations = data.get("recommendations", [])
+                if not recommendations:
+                    self.log_test("What-If Scenario Engine", False, "No recommendations provided")
+                    return False
+                
+                # Validate risk change calculation
+                original_risk = risk_analysis.get("original_risk_score", 0)
+                modified_risk = risk_analysis.get("modified_risk_score", 0)
+                risk_change = risk_analysis.get("risk_change", 0)
+                
+                expected_change = modified_risk - original_risk
+                if abs(risk_change - expected_change) > 0.01:  # Allow small floating point differences
+                    self.log_test("What-If Scenario Engine", False, f"Risk change calculation error: expected {expected_change}, got {risk_change}")
+                    return False
+                
+                self.log_test("What-If Scenario Engine", True, 
+                            f"Scenario '{data.get('scenario_name')}': "
+                            f"risk change {risk_change:.2f}, "
+                            f"ROI {roi_analysis.get('roi_percentage', 0):.1f}%, "
+                            f"{len(recommendations)} recommendations")
+                return True
+            else:
+                self.log_test("What-If Scenario Engine", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("What-If Scenario Engine", False, f"Error: {str(e)}")
+            return False
+    
+    def test_defense_effectiveness_modeling(self):
+        """Test POST /api/diagrams/{diagram_id}/defense-effectiveness"""
+        try:
+            if not self.test_diagram_id:
+                self.log_test("Defense Effectiveness Modeling", False, "No test diagram available")
+                return False
+            
+            # Run defense effectiveness analysis
+            response = self.session.post(f"{self.base_url}/diagrams/{self.test_diagram_id}/defense-effectiveness")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                required_fields = [
+                    "diagram_id", "defense_models", "analysis_summary", "analysis_timestamp"
+                ]
+                
+                missing_fields = [f for f in required_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Defense Effectiveness Modeling", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Validate defense models structure
+                defense_models = data.get("defense_models", [])
+                if defense_models:  # Only validate if controls exist
+                    first_model = defense_models[0]
+                    model_required_fields = [
+                        "control_id", "control_type", "effectiveness_rating", "coverage_areas",
+                        "interaction_effects", "degradation_over_time", "false_positive_rate", "false_negative_rate"
+                    ]
+                    
+                    model_missing_fields = [f for f in model_required_fields if f not in first_model]
+                    if model_missing_fields:
+                        self.log_test("Defense Effectiveness Modeling", False, f"Defense model missing fields: {model_missing_fields}")
+                        return False
+                    
+                    # Validate effectiveness rating is in valid range (0-1)
+                    effectiveness = first_model.get("effectiveness_rating", 0)
+                    if not (0 <= effectiveness <= 1):
+                        self.log_test("Defense Effectiveness Modeling", False, f"Invalid effectiveness rating: {effectiveness}")
+                        return False
+                    
+                    # Validate false positive/negative rates
+                    fp_rate = first_model.get("false_positive_rate", 0)
+                    fn_rate = first_model.get("false_negative_rate", 0)
+                    if not (0 <= fp_rate <= 1) or not (0 <= fn_rate <= 1):
+                        self.log_test("Defense Effectiveness Modeling", False, f"Invalid FP/FN rates: FP={fp_rate}, FN={fn_rate}")
+                        return False
+                
+                # Validate analysis summary
+                summary = data.get("analysis_summary", {})
+                summary_required_fields = [
+                    "total_controls", "average_effectiveness", "strongest_control", 
+                    "weakest_control", "synergy_opportunities"
+                ]
+                
+                summary_missing_fields = [f for f in summary_required_fields if f not in summary]
+                if summary_missing_fields:
+                    self.log_test("Defense Effectiveness Modeling", False, f"Summary missing fields: {summary_missing_fields}")
+                    return False
+                
+                # Check synergy opportunities structure
+                synergies = summary.get("synergy_opportunities", [])
+                if synergies:
+                    first_synergy = synergies[0]
+                    synergy_fields = ["control_1", "control_2", "synergy_effect"]
+                    if not all(field in first_synergy for field in synergy_fields):
+                        self.log_test("Defense Effectiveness Modeling", False, "Invalid synergy opportunity structure")
+                        return False
+                
+                total_controls = summary.get("total_controls", 0)
+                avg_effectiveness = summary.get("average_effectiveness", 0)
+                
+                self.log_test("Defense Effectiveness Modeling", True, 
+                            f"Analyzed {total_controls} controls, "
+                            f"avg effectiveness: {avg_effectiveness:.3f}, "
+                            f"{len(synergies)} synergy opportunities")
+                return True
+            else:
+                self.log_test("Defense Effectiveness Modeling", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Defense Effectiveness Modeling", False, f"Error: {str(e)}")
+            return False
+    
+    def test_historical_probabilistic_simulations(self):
+        """Test GET /api/diagrams/{diagram_id}/probabilistic-simulations"""
+        try:
+            if not self.test_diagram_id:
+                self.log_test("Historical Probabilistic Simulations", False, "No test diagram available")
+                return False
+            
+            # Get historical probabilistic simulations
+            response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}/probabilistic-simulations")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                required_fields = ["diagram_id", "simulations", "total_count"]
+                missing_fields = [f for f in required_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Historical Probabilistic Simulations", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                simulations = data.get("simulations", [])
+                total_count = data.get("total_count", 0)
+                
+                # Validate count consistency
+                if len(simulations) != total_count:
+                    self.log_test("Historical Probabilistic Simulations", False, f"Count mismatch: {len(simulations)} vs {total_count}")
+                    return False
+                
+                # If simulations exist, validate structure
+                if simulations:
+                    first_sim = simulations[0]
+                    sim_required_fields = ["diagram_id", "simulation_summary", "simulation_timestamp"]
+                    sim_missing_fields = [f for f in sim_required_fields if f not in first_sim]
+                    if sim_missing_fields:
+                        self.log_test("Historical Probabilistic Simulations", False, f"Simulation missing fields: {sim_missing_fields}")
+                        return False
+                    
+                    # Check that detailed paths are removed for summary view
+                    if "probabilistic_paths" in first_sim:
+                        self.log_test("Historical Probabilistic Simulations", False, "Detailed paths should be removed in summary view")
+                        return False
+                    
+                    # Check for path_count field instead
+                    if "path_count" not in first_sim:
+                        self.log_test("Historical Probabilistic Simulations", False, "Missing path_count in summary")
+                        return False
+                
+                self.log_test("Historical Probabilistic Simulations", True, 
+                            f"Retrieved {total_count} historical simulations")
+                return True
+            else:
+                self.log_test("Historical Probabilistic Simulations", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Historical Probabilistic Simulations", False, f"Error: {str(e)}")
+            return False
+    
+    def test_historical_scenario_analyses(self):
+        """Test GET /api/diagrams/{diagram_id}/scenario-analyses"""
+        try:
+            if not self.test_diagram_id:
+                self.log_test("Historical Scenario Analyses", False, "No test diagram available")
+                return False
+            
+            # Get historical scenario analyses
+            response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}/scenario-analyses")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                required_fields = ["diagram_id", "scenarios", "total_count"]
+                missing_fields = [f for f in required_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Historical Scenario Analyses", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                scenarios = data.get("scenarios", [])
+                total_count = data.get("total_count", 0)
+                
+                # Validate count consistency
+                if len(scenarios) != total_count:
+                    self.log_test("Historical Scenario Analyses", False, f"Count mismatch: {len(scenarios)} vs {total_count}")
+                    return False
+                
+                # If scenarios exist, validate structure
+                if scenarios:
+                    first_scenario = scenarios[0]
+                    scenario_required_fields = [
+                        "diagram_id", "scenario_id", "scenario_name", "control_changes",
+                        "risk_analysis", "roi_analysis", "analysis_timestamp"
+                    ]
+                    scenario_missing_fields = [f for f in scenario_required_fields if f not in first_scenario]
+                    if scenario_missing_fields:
+                        self.log_test("Historical Scenario Analyses", False, f"Scenario missing fields: {scenario_missing_fields}")
+                        return False
+                
+                self.log_test("Historical Scenario Analyses", True, 
+                            f"Retrieved {total_count} historical scenario analyses")
+                return True
+            else:
+                self.log_test("Historical Scenario Analyses", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Historical Scenario Analyses", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
