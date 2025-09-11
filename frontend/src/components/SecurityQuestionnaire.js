@@ -70,7 +70,7 @@ const SecurityQuestionnaire = ({
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ branches })
+          body: JSON.stringify(branches)
         }
       );
 
