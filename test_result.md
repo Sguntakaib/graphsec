@@ -651,3 +651,27 @@ agent_communication:
       - working: "NA"
         agent: "main"
         comment: "Phase 3 Probabilistic Simulation Engine - GET /api/diagrams/{id}/probabilistic-simulations and GET /api/diagrams/{id}/scenario-analyses endpoints for historical analysis and trend tracking"
+
+  - task: "Threat Modeling Wizard Recommendations API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/wizard/recommendations endpoint implemented - provides contextual recommendations for different wizard steps (systemOverview, assetInventory, boundaries, dataflows, threats, surfaces, controls, risk, compliance, implementation)"
+
+  - task: "Threat Modeling Wizard Model Generation API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/wizard/generate-model endpoint implemented - generates complete threat models from wizard data including nodes, edges, recommendations, and implementation plans"
