@@ -157,4 +157,72 @@ export const autoLayoutDiagram = async (diagramId) => {
   }
 };
 
+// Template API functions
+export const getTemplates = async (category, complexity) => {
+  try {
+    const params = new URLSearchParams();
+    if (category && category !== 'all') params.append('category', category);
+    if (complexity && complexity !== 'all') params.append('complexity', complexity);
+    
+    const response = await apiClient.get(`/templates?${params.toString()}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to fetch templates: ${error.message}`);
+  }
+};
+
+export const getTemplate = async (templateId) => {
+  try {
+    const response = await apiClient.get(`/templates/${templateId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to fetch template: ${error.message}`);
+  }
+};
+
+export const createTemplate = async (templateData) => {
+  try {
+    const response = await apiClient.post('/templates', templateData);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to create template: ${error.message}`);
+  }
+};
+
+export const updateTemplate = async (templateId, templateData) => {
+  try {
+    const response = await apiClient.put(`/templates/${templateId}`, templateData);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to update template: ${error.message}`);
+  }
+};
+
+export const deleteTemplate = async (templateId) => {
+  try {
+    const response = await apiClient.delete(`/templates/${templateId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to delete template: ${error.message}`);
+  }
+};
+
+export const applyTemplateToCurrentDiagram = async (templateId, diagramId) => {
+  try {
+    const response = await apiClient.post(`/templates/${templateId}/apply/${diagramId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to apply template: ${error.message}`);
+  }
+};
+
+export const getTemplateCategories = async () => {
+  try {
+    const response = await apiClient.get('/templates/categories');
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to fetch template categories: ${error.message}`);
+  }
+};
+
 export default apiClient;
