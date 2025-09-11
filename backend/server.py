@@ -1827,6 +1827,357 @@ async def run_comprehensive_security_analysis(diagram_id: str):
         "analysis_timestamp": datetime.now(timezone.utc).isoformat()
     }
 
+# ============================================================================
+# PHASE 3: PROBABILISTIC SIMULATION ENGINE API ENDPOINTS
+# ============================================================================
+
+@api_router.post("/diagrams/{diagram_id}/probabilistic-simulation")
+async def run_probabilistic_simulation(diagram_id: str):
+    """Run probabilistic attack path simulation with weighted graph analysis"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    if not nodes or not edges:
+        return {
+            "diagram_id": diagram_id,
+            "probabilistic_paths": [],
+            "simulation_summary": {
+                "total_paths": 0,
+                "average_success_probability": 0.0,
+                "highest_risk_path": None,
+                "kill_chain_coverage": []
+            },
+            "error": "Insufficient nodes or edges for probabilistic analysis"
+        }
+    
+    # Run probabilistic simulation in thread pool
+    loop = asyncio.get_event_loop()
+    
+    def run_prob_simulation():
+        try:
+            # Build probabilistic graph
+            probabilistic_engine.build_probabilistic_graph(nodes, edges)
+            
+            # Find probabilistic attack paths
+            prob_paths = probabilistic_engine.find_probabilistic_attack_paths(max_paths=15, max_length=8)
+            
+            # Format results for frontend
+            formatted_paths = []
+            for path in prob_paths:
+                formatted_path = {
+                    "path_id": path.path_id,
+                    "steps": [{"node_id": node_id, "node_label": _get_node_label(node_id, nodes)} 
+                             for node_id in path.steps],
+                    "overall_probability": round(path.overall_probability, 4),
+                    "risk_score": round(path.risk_score, 2),
+                    "impact_score": round(path.impact_score, 2),
+                    "detection_score": round(path.detection_score, 4),
+                    "kill_chain_stages": path.kill_chain_stages,
+                    "mitre_techniques": path.mitre_techniques,
+                    "time_to_compromise": path.time_to_compromise,
+                    "uncertainty_band": {
+                        "min_probability": round(path.uncertainty_band[0], 4),
+                        "max_probability": round(path.uncertainty_band[1], 4)
+                    }
+                }
+                formatted_paths.append(formatted_path)
+            
+            # Calculate simulation summary
+            if prob_paths:
+                avg_probability = sum(p.overall_probability for p in prob_paths) / len(prob_paths)
+                highest_risk_path = max(prob_paths, key=lambda p: p.risk_score)
+                all_kill_chain_stages = set()
+                for path in prob_paths:
+                    all_kill_chain_stages.update(path.kill_chain_stages)
+            else:
+                avg_probability = 0.0
+                highest_risk_path = None
+                all_kill_chain_stages = set()
+            
+            summary = {
+                "total_paths": len(prob_paths),
+                "average_success_probability": round(avg_probability, 4),
+                "highest_risk_path": {
+                    "path_id": highest_risk_path.path_id,
+                    "risk_score": round(highest_risk_path.risk_score, 2),
+                    "probability": round(highest_risk_path.overall_probability, 4)
+                } if highest_risk_path else None,
+                "kill_chain_coverage": sorted(list(all_kill_chain_stages)),
+                "risk_distribution": {
+                    "critical": len([p for p in prob_paths if p.risk_score >= 8]),
+                    "high": len([p for p in prob_paths if 6 <= p.risk_score < 8]),
+                    "medium": len([p for p in prob_paths if 4 <= p.risk_score < 6]),
+                    "low": len([p for p in prob_paths if p.risk_score < 4])
+                }
+            }
+            
+            return {
+                "probabilistic_paths": formatted_paths,
+                "simulation_summary": summary
+            }
+            
+        except Exception as e:
+            logger.error(f"Probabilistic simulation error: {str(e)}")
+            return {
+                "probabilistic_paths": [],
+                "simulation_summary": {
+                    "total_paths": 0,
+                    "average_success_probability": 0.0,
+                    "highest_risk_path": None,
+                    "kill_chain_coverage": []
+                },
+                "error": f"Simulation failed: {str(e)}"
+            }
+    
+    simulation_result = await loop.run_in_executor(executor, run_prob_simulation)
+    
+    # Add diagram ID and timestamp
+    result = {
+        "diagram_id": diagram_id,
+        **simulation_result,
+        "simulation_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Save simulation result to database
+    result_dict = prepare_for_mongo(result)
+    await db.probabilistic_simulations.insert_one(result_dict)
+    
+    return result
+
+def _get_node_label(node_id: str, nodes: List[Dict]) -> str:
+    """Get node label by ID"""
+    for node in nodes:
+        if node.get("id") == node_id:
+            return node.get("label", node_id)
+    return node_id
+
+@api_router.post("/diagrams/{diagram_id}/what-if-scenario")
+async def run_what_if_scenario(diagram_id: str, scenario_config: Dict[str, Any]):
+    """Run what-if scenario analysis by toggling security controls"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    # Extract control changes from scenario config
+    control_changes = scenario_config.get("control_changes", {})
+    scenario_name = scenario_config.get("scenario_name", "Unnamed Scenario")
+    
+    if not control_changes:
+        raise HTTPException(status_code=400, detail="No control changes specified in scenario")
+    
+    # Run scenario analysis in thread pool
+    loop = asyncio.get_event_loop()
+    
+    def run_scenario():
+        try:
+            # Build probabilistic graph
+            probabilistic_engine.build_probabilistic_graph(nodes, edges)
+            
+            # Get original attack paths
+            original_paths = probabilistic_engine.find_probabilistic_attack_paths(max_paths=10)
+            
+            # Run what-if scenario
+            scenario_result = probabilistic_engine.run_what_if_scenario(control_changes, original_paths)
+            scenario_result.scenario_name = scenario_name
+            
+            # Format result for frontend
+            return {
+                "scenario_id": scenario_result.scenario_id,
+                "scenario_name": scenario_result.scenario_name,
+                "control_changes": scenario_result.modified_controls,
+                "risk_analysis": {
+                    "original_risk_score": round(scenario_result.original_risk_score, 2),
+                    "modified_risk_score": round(scenario_result.modified_risk_score, 2),
+                    "risk_change": round(scenario_result.risk_change, 2),
+                    "risk_change_percentage": round((scenario_result.risk_change / max(scenario_result.original_risk_score, 0.1)) * 100, 1)
+                },
+                "affected_paths": scenario_result.affected_paths,
+                "recommendations": scenario_result.recommendations,
+                "roi_analysis": scenario_result.roi_analysis
+            }
+            
+        except Exception as e:
+            logger.error(f"What-if scenario error: {str(e)}")
+            return {
+                "scenario_id": f"failed-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
+                "error": f"Scenario analysis failed: {str(e)}"
+            }
+    
+    scenario_result = await loop.run_in_executor(executor, run_scenario)
+    
+    # Add metadata
+    result = {
+        "diagram_id": diagram_id,
+        **scenario_result,
+        "analysis_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Save scenario result
+    result_dict = prepare_for_mongo(result)
+    await db.scenario_analyses.insert_one(result_dict)
+    
+    return result
+
+@api_router.post("/diagrams/{diagram_id}/defense-effectiveness")
+async def analyze_defense_effectiveness(diagram_id: str):
+    """Analyze effectiveness of defense controls with interaction modeling"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    
+    # Filter control nodes
+    control_nodes = [n for n in nodes if n.get("type") == "Control"]
+    
+    if not control_nodes:
+        return {
+            "diagram_id": diagram_id,
+            "defense_models": [],
+            "analysis_summary": {
+                "total_controls": 0,
+                "average_effectiveness": 0.0,
+                "strongest_control": None,
+                "weakest_control": None,
+                "synergy_opportunities": []
+            },
+            "message": "No security controls found in diagram"
+        }
+    
+    # Run defense analysis in thread pool
+    loop = asyncio.get_event_loop()
+    
+    def analyze_defenses():
+        try:
+            # Analyze defense effectiveness
+            defense_models = probabilistic_engine.analyze_defense_effectiveness(nodes)
+            
+            # Format for frontend
+            formatted_models = []
+            for model in defense_models:
+                formatted_model = {
+                    "control_id": model.control_id,
+                    "control_type": model.control_type,
+                    "effectiveness_rating": round(model.effectiveness_rating, 3),
+                    "coverage_areas": model.coverage_areas,
+                    "interaction_effects": {k: round(v, 3) for k, v in model.interaction_effects.items()},
+                    "degradation_over_time": round(model.degradation_over_time, 3),
+                    "false_positive_rate": round(model.false_positive_rate, 3),
+                    "false_negative_rate": round(model.false_negative_rate, 3)
+                }
+                formatted_models.append(formatted_model)
+            
+            # Calculate summary statistics
+            if defense_models:
+                effectiveness_scores = [m.effectiveness_rating for m in defense_models]
+                avg_effectiveness = sum(effectiveness_scores) / len(effectiveness_scores)
+                strongest = max(defense_models, key=lambda m: m.effectiveness_rating)
+                weakest = min(defense_models, key=lambda m: m.effectiveness_rating)
+                
+                # Find synergy opportunities
+                synergies = []
+                for model in defense_models:
+                    for other_control, effect in model.interaction_effects.items():
+                        if effect > 0.1:  # Significant synergy
+                            synergies.append({
+                                "control_1": model.control_id,
+                                "control_2": other_control,
+                                "synergy_effect": round(effect, 3)
+                            })
+            else:
+                avg_effectiveness = 0.0
+                strongest = weakest = None
+                synergies = []
+            
+            summary = {
+                "total_controls": len(defense_models),
+                "average_effectiveness": round(avg_effectiveness, 3),
+                "strongest_control": {
+                    "control_id": strongest.control_id,
+                    "control_type": strongest.control_type,
+                    "effectiveness": round(strongest.effectiveness_rating, 3)
+                } if strongest else None,
+                "weakest_control": {
+                    "control_id": weakest.control_id,
+                    "control_type": weakest.control_type,
+                    "effectiveness": round(weakest.effectiveness_rating, 3)
+                } if weakest else None,
+                "synergy_opportunities": synergies[:5]  # Top 5 synergies
+            }
+            
+            return {
+                "defense_models": formatted_models,
+                "analysis_summary": summary
+            }
+            
+        except Exception as e:
+            logger.error(f"Defense effectiveness analysis error: {str(e)}")
+            return {
+                "defense_models": [],
+                "analysis_summary": {
+                    "total_controls": 0,
+                    "average_effectiveness": 0.0,
+                    "strongest_control": None,
+                    "weakest_control": None,
+                    "synergy_opportunities": []
+                },
+                "error": f"Analysis failed: {str(e)}"
+            }
+    
+    analysis_result = await loop.run_in_executor(executor, analyze_defenses)
+    
+    # Add metadata
+    result = {
+        "diagram_id": diagram_id,
+        **analysis_result,
+        "analysis_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    return result
+
+@api_router.get("/diagrams/{diagram_id}/probabilistic-simulations")
+async def get_probabilistic_simulations(diagram_id: str):
+    """Get historical probabilistic simulation results"""
+    simulations = await db.probabilistic_simulations.find({"diagram_id": diagram_id}).sort("simulation_timestamp", -1).to_list(20)
+    
+    formatted_simulations = []
+    for sim in simulations:
+        formatted_sim = parse_from_mongo(sim)
+        # Remove large arrays for summary view
+        if "probabilistic_paths" in formatted_sim:
+            formatted_sim["path_count"] = len(formatted_sim["probabilistic_paths"])
+            del formatted_sim["probabilistic_paths"]  # Remove detailed paths for summary
+        formatted_simulations.append(formatted_sim)
+    
+    return {
+        "diagram_id": diagram_id,
+        "simulations": formatted_simulations,
+        "total_count": len(formatted_simulations)
+    }
+
+@api_router.get("/diagrams/{diagram_id}/scenario-analyses")
+async def get_scenario_analyses(diagram_id: str):
+    """Get historical what-if scenario analyses"""
+    scenarios = await db.scenario_analyses.find({"diagram_id": diagram_id}).sort("analysis_timestamp", -1).to_list(20)
+    
+    formatted_scenarios = []
+    for scenario in scenarios:
+        formatted_scenario = parse_from_mongo(scenario)
+        formatted_scenarios.append(formatted_scenario)
+    
+    return {
+        "diagram_id": diagram_id,
+        "scenarios": formatted_scenarios,
+        "total_count": len(formatted_scenarios)
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
