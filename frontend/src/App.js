@@ -605,6 +605,15 @@ function AppContent() {
             </button>
             
             <button
+              onClick={clearAttackPathHighlighting}
+              disabled={highlightedPaths.length === 0}
+              className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+            >
+              <EyeOff className="h-4 w-4" />
+              <span>Clear Highlights</span>
+            </button>
+            
+            <button
               onClick={() => setShowAdvancedControls(!showAdvancedControls)}
               className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm"
               title="Advanced Controls"
