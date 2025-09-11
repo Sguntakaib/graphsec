@@ -71,6 +71,29 @@ function AppContent() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
+
+  // Track zoom level changes
+  const onMoveEnd = useCallback((event, viewport) => {
+    setZoomLevel(Math.round(viewport.zoom * 100) / 100);
+  }, []);
+
+  // Performance monitoring
+  const [performance, setPerformance] = useState({
+    nodeCount: 0,
+    edgeCount: 0,
+    renderTime: 0
+  });
+
+  useEffect(() => {
+    const startTime = performance.now ? performance.now() : Date.now();
+    
+    setPerformance(prev => ({
+      ...prev,
+      nodeCount: nodes.length,
+      edgeCount: edges.length,
+      renderTime: Math.round((performance.now ? performance.now() : Date.now()) - startTime)
+    }));
+  }, [nodes, edges]);
   
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
