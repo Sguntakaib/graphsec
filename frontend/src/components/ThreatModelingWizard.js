@@ -20,6 +20,10 @@ import {
   X
 } from 'lucide-react';
 
+// Import wizard step components
+import SystemOverviewStep from './wizard-steps/SystemOverviewStep';
+import AssetIdentificationStep from './wizard-steps/AssetIdentificationStep';
+
 const ThreatModelingWizard = ({ 
   isVisible, 
   onClose, 
