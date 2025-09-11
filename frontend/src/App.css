@@ -1,34 +1,287 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #111827;
+  color: #ffffff;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-.App-link {
-    color: #61dafb;
+::-webkit-scrollbar-track {
+  background: #374151;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+::-webkit-scrollbar-thumb {
+  background: #6B7280;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* React Flow customizations */
+.react-flow__node-custom {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: #1F2937;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  min-width: 120px;
+  text-align: center;
+}
+
+.react-flow__node-custom:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.react-flow__node-custom.selected {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Node type specific colors */
+.node-actor {
+  background: linear-gradient(135deg, #DC2626, #B91C1C);
+  border-color: #EF4444;
+}
+
+.node-asset {
+  background: linear-gradient(135deg, #059669, #047857);
+  border-color: #10B981;
+}
+
+.node-surface {
+  background: linear-gradient(135deg, #D97706, #B45309);
+  border-color: #F59E0B;
+}
+
+.node-control {
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  border-color: #3B82F6;
+}
+
+.node-zone {
+  background: linear-gradient(135deg, #7C3AED, #6D28D9);
+  border-color: #8B5CF6;
+}
+
+.node-signal {
+  background: linear-gradient(135deg, #0891B2, #0E7490);
+  border-color: #06B6D4;
+}
+
+/* React Flow controls */
+.react-flow__controls {
+  background: #374151;
+  border: 1px solid #4B5563;
+}
+
+.react-flow__controls-button {
+  background: #374151;
+  color: #D1D5DB;
+  border-bottom: 1px solid #4B5563;
+}
+
+.react-flow__controls-button:hover {
+  background: #4B5563;
+}
+
+.react-flow__minimap {
+  background: #374151;
+  border: 1px solid #4B5563;
+}
+
+/* Edge styles */
+.react-flow__edge-path {
+  stroke: #9CA3AF;
+  stroke-width: 2;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3B82F6;
+  stroke-width: 3;
+}
+
+.react-flow__edge-text {
+  fill: #D1D5DB;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Animation for node creation */
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.react-flow__node-custom {
+  animation: nodeAppear 0.2s ease-out;
+}
+
+/* Drag preview */
+.drag-preview {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Security node library styles */
+.security-node-item {
+  transition: all 0.2s ease;
+  cursor: grab;
+}
+
+.security-node-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.security-node-item:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+/* Properties panel */
+.properties-panel input,
+.properties-panel textarea,
+.properties-panel select {
+  background: #374151;
+  border: 1px solid #4B5563;
+  color: #D1D5DB;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.properties-panel input:focus,
+.properties-panel textarea:focus,
+.properties-panel select:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Simulation panel */
+.attack-path {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(185, 28, 28, 0.05));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.attack-path-step {
+  background: rgba(55, 65, 81, 0.5);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-left: 3px solid #EF4444;
+}
+
+.recommendation {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+/* Risk score indicator */
+.risk-score {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-score.low {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22C55E;
+}
+
+.risk-score.medium {
+  background: rgba(245, 158, 11, 0.2);
+  color: #F59E0B;
+}
+
+.risk-score.high {
+  background: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #374151;
+  border-top: 2px solid #3B82F6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Accessibility improvements */
+.react-flow__node-custom:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .react-flow__node-custom {
+    border-width: 3px;
+  }
+  
+  .react-flow__edge-path {
+    stroke-width: 3;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__node-custom,
+  .security-node-item {
+    animation: none;
+    transition: none;
+  }
 }
