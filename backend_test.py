@@ -3157,7 +3157,14 @@ class SecurityModelingAPITester:
             self.test_what_if_scenario_engine,
             self.test_defense_effectiveness_modeling,
             self.test_historical_probabilistic_simulations,
-            self.test_historical_scenario_analyses
+            self.test_historical_scenario_analyses,
+            # Threat Modeling Wizard Tests
+            self.test_wizard_recommendations_system_overview,
+            self.test_wizard_recommendations_asset_inventory,
+            self.test_wizard_recommendations_invalid_step,
+            self.test_wizard_generate_model_complete,
+            self.test_wizard_generate_model_minimal,
+            self.test_wizard_generate_model_error_handling
         ]
         
         passed = 0
