@@ -19,7 +19,7 @@ import { PropertiesPanel } from './components/PropertiesPanel';
 import { EnhancedSimulationPanel } from './components/EnhancedSimulationPanel';
 import { CustomNode } from './components/CustomNode';
 import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram } from './services/api';
-import { 
+  import { 
   Shield, 
   Play, 
   Save, 
@@ -31,7 +31,9 @@ import {
   BarChart3,
   Download,
   Upload,
-  Layers
+  Layers,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 const nodeTypes = {
