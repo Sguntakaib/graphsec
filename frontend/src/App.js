@@ -44,7 +44,8 @@ import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLay
   Copy,
   Trash2,
   Edit,
-  MoreVertical
+  MoreVertical,
+  BookOpen
 } from 'lucide-react';
 
 const nodeTypes = {
