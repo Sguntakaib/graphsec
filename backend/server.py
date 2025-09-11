@@ -2184,6 +2184,360 @@ async def get_scenario_analyses(diagram_id: str):
         "total_count": len(formatted_scenarios)
     }
 
+# ============================================================================
+# THREAT MODELING WIZARD ENDPOINTS
+# ============================================================================
+
+class WizardRecommendationRequest(BaseModel):
+    step: str = Field(..., description="Current wizard step ID")
+    wizardData: Dict[str, Any] = Field(default_factory=dict, description="Current wizard data")
+    existingNodes: List[Dict[str, Any]] = Field(default_factory=list, description="Existing diagram nodes")
+    existingEdges: List[Dict[str, Any]] = Field(default_factory=list, description="Existing diagram edges")
+
+class WizardGenerationRequest(BaseModel):
+    wizardData: Dict[str, Any] = Field(..., description="Complete wizard data")
+    diagramId: Optional[str] = Field(None, description="Existing diagram ID to update")
+
+@api_router.post("/wizard/recommendations")
+async def get_wizard_recommendations(request: WizardRecommendationRequest):
+    """Get contextual recommendations for current wizard step"""
+    try:
+        step = request.step
+        wizard_data = request.wizardData
+        existing_nodes = request.existingNodes
+        existing_edges = request.existingEdges
+        
+        # Generate contextual recommendations based on step and current data
+        recommendations = []
+        
+        if step == "systemOverview":
+            recommendations = generate_system_overview_recommendations(wizard_data)
+        elif step == "assetInventory":
+            recommendations = generate_asset_recommendations(wizard_data, existing_nodes)
+        elif step == "boundaries":
+            recommendations = generate_boundary_recommendations(wizard_data)
+        elif step == "dataflows":
+            recommendations = generate_dataflow_recommendations(wizard_data)
+        elif step == "threats":
+            recommendations = generate_threat_recommendations(wizard_data)
+        elif step == "surfaces":
+            recommendations = generate_attack_surface_recommendations(wizard_data)
+        elif step == "controls":
+            recommendations = generate_control_recommendations(wizard_data)
+        elif step == "risk":
+            recommendations = generate_risk_recommendations(wizard_data)
+        elif step == "compliance":
+            recommendations = generate_compliance_recommendations(wizard_data)
+        elif step == "implementation":
+            recommendations = generate_implementation_recommendations(wizard_data)
+        else:
+            recommendations = ["Continue with the current step to receive specific recommendations."]
+        
+        return {
+            "step": step,
+            "recommendations": recommendations,
+            "recommendation_count": len(recommendations)
+        }
+        
+    except Exception as e:
+        logger.error(f"Wizard recommendations error: {str(e)}")
+        # Fallback recommendations
+        fallback_recommendations = {
+            "systemOverview": [
+                "Define clear system boundaries and scope",
+                "Identify primary business objectives and stakeholders",
+                "Document key technical components and architecture"
+            ],
+            "assetInventory": [
+                "Classify assets by business criticality",
+                "Include both technical and business assets",
+                "Consider data assets, systems, and processes"
+            ],
+            "boundaries": [
+                "Define trust zones based on security requirements",
+                "Identify boundaries between internal and external systems",
+                "Consider network segmentation and access controls"
+            ]
+        }
+        
+        return {
+            "step": request.step,
+            "recommendations": fallback_recommendations.get(request.step, ["Continue with the current step."]),
+            "recommendation_count": len(fallback_recommendations.get(request.step, []))
+        }
+
+@api_router.post("/wizard/generate-model")
+async def generate_threat_model_from_wizard(request: WizardGenerationRequest):
+    """Generate a complete threat model based on wizard data"""
+    try:
+        wizard_data = request.wizardData
+        diagram_id = request.diagramId
+        
+        # Generate nodes and edges based on wizard data
+        generated_nodes = []
+        generated_edges = []
+        recommendations = []
+        
+        # Process system overview
+        if "systemOverview" in wizard_data:
+            system_overview = wizard_data["systemOverview"]
+            
+            # Create system node if it doesn't exist
+            system_node = {
+                "id": f"system-{uuid.uuid4()}",
+                "type": "custom",
+                "position": {"x": 400, "y": 200},
+                "data": {
+                    "type": "Asset",
+                    "subtype": "System",
+                    "label": system_overview.get("systemName", "System"),
+                    "description": system_overview.get("systemDescription", ""),
+                    "criticality": system_overview.get("businessCriticality", "medium"),
+                    "securityObjectives": system_overview.get("securityObjectives", {})
+                }
+            }
+            generated_nodes.append(system_node)
+        
+        # Process assets
+        if "assetInventory" in wizard_data and "assets" in wizard_data["assetInventory"]:
+            assets = wizard_data["assetInventory"]["assets"]
+            
+            for i, asset in enumerate(assets):
+                asset_node = {
+                    "id": f"asset-{uuid.uuid4()}",
+                    "type": "custom", 
+                    "position": {"x": 200 + (i * 150), "y": 400},
+                    "data": {
+                        "type": "Asset",
+                        "subtype": asset.get("category", asset.get("type", "Asset")),
+                        "label": asset.get("name", f"Asset {i+1}"),
+                        "description": asset.get("description", ""),
+                        "criticality": asset.get("criticality", "medium"),
+                        "dataClassification": asset.get("dataClassification", ""),
+                        "owner": asset.get("owner", "")
+                    }
+                }
+                generated_nodes.append(asset_node)
+        
+        # Generate basic threat actors
+        external_attacker = {
+            "id": f"attacker-{uuid.uuid4()}",
+            "type": "custom",
+            "position": {"x": 100, "y": 100},
+            "data": {
+                "type": "Actor",
+                "subtype": "ExternalAttacker",
+                "label": "External Attacker",
+                "description": "External threat actor attempting to compromise the system"
+            }
+        }
+        generated_nodes.append(external_attacker)
+        
+        # Generate recommendations based on wizard data
+        recommendations = generate_comprehensive_recommendations(wizard_data)
+        
+        # Create implementation plan
+        implementation_plan = {
+            "priority_actions": recommendations[:5] if recommendations else [],
+            "timeline": "2-4 weeks for initial implementation",
+            "success_metrics": [
+                "Reduced attack surface area",
+                "Improved security control coverage",
+                "Enhanced threat detection capabilities"
+            ]
+        }
+        
+        return {
+            "success": True,
+            "generatedNodes": generated_nodes,
+            "generatedEdges": generated_edges,
+            "recommendations": recommendations,
+            "implementationPlan": implementation_plan,
+            "summary": {
+                "total_nodes": len(generated_nodes),
+                "total_edges": len(generated_edges),
+                "recommendations_count": len(recommendations)
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Model generation error: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "generatedNodes": [],
+            "generatedEdges": [],
+            "recommendations": ["Error generating model. Please try again."],
+            "implementationPlan": {}
+        }
+
+# Helper functions for recommendations
+def generate_system_overview_recommendations(wizard_data):
+    recommendations = []
+    system_data = wizard_data.get("systemOverview", {})
+    
+    if not system_data.get("systemName"):
+        recommendations.append("Provide a clear, descriptive system name")
+    
+    if not system_data.get("businessContext"):
+        recommendations.append("Document the business context and value proposition")
+    
+    if system_data.get("businessCriticality") == "critical":
+        recommendations.append("Consider implementing additional security controls for critical systems")
+        recommendations.append("Ensure comprehensive monitoring and incident response procedures")
+    
+    security_objectives = system_data.get("securityObjectives", {})
+    if security_objectives.get("confidentiality") == "high":
+        recommendations.append("Implement strong encryption and access controls")
+    
+    if security_objectives.get("availability") == "high":
+        recommendations.append("Design for high availability with redundancy and failover")
+    
+    return recommendations
+
+def generate_asset_recommendations(wizard_data, existing_nodes):
+    recommendations = []
+    asset_data = wizard_data.get("assetInventory", {})
+    assets = asset_data.get("assets", [])
+    
+    if len(assets) == 0:
+        recommendations.append("Add at least 3-5 key assets to create a meaningful threat model")
+        return recommendations
+    
+    critical_assets = [a for a in assets if a.get("criticality") == "critical"]
+    if critical_assets:
+        recommendations.append(f"Focus additional security controls on {len(critical_assets)} critical assets")
+    
+    # Check for common asset types
+    data_assets = [a for a in assets if a.get("type") == "data"]
+    if data_assets:
+        recommendations.append("Ensure data assets have appropriate encryption and access controls")
+    
+    applications = [a for a in assets if a.get("type") == "application"]
+    if applications:
+        recommendations.append("Implement secure coding practices and regular security testing for applications")
+    
+    return recommendations
+
+def generate_boundary_recommendations(wizard_data):
+    recommendations = []
+    boundary_data = wizard_data.get("boundaries", {})
+    
+    recommendations.extend([
+        "Define clear trust boundaries between different security zones",
+        "Implement network segmentation to isolate critical assets",
+        "Consider zero-trust principles for boundary controls"
+    ])
+    
+    return recommendations
+
+def generate_dataflow_recommendations(wizard_data):
+    recommendations = []
+    
+    recommendations.extend([
+        "Encrypt data in transit between all components",
+        "Implement data loss prevention (DLP) controls",
+        "Monitor and log all data flows for security analysis"
+    ])
+    
+    return recommendations
+
+def generate_threat_recommendations(wizard_data):
+    recommendations = []
+    
+    recommendations.extend([
+        "Consider both internal and external threat actors",
+        "Assess threat actor capabilities and motivations",
+        "Map threats to specific attack techniques (MITRE ATT&CK)"
+    ])
+    
+    return recommendations
+
+def generate_attack_surface_recommendations(wizard_data):
+    recommendations = []
+    
+    recommendations.extend([
+        "Minimize exposed services and interfaces",
+        "Implement input validation and sanitization",
+        "Regular vulnerability scanning and penetration testing"
+    ])
+    
+    return recommendations
+
+def generate_control_recommendations(wizard_data):
+    recommendations = []
+    
+    recommendations.extend([
+        "Implement defense-in-depth security controls",
+        "Ensure controls cover prevention, detection, and response",
+        "Regular testing and validation of security controls"
+    ])
+    
+    return recommendations
+
+def generate_risk_recommendations(wizard_data):
+    recommendations = []
+    
+    recommendations.extend([
+        "Conduct quantitative risk assessments where possible",
+        "Prioritize risks based on business impact",
+        "Develop risk treatment plans for high-priority risks"
+    ])
+    
+    return recommendations
+
+def generate_compliance_recommendations(wizard_data):
+    recommendations = []
+    
+    recommendations.extend([
+        "Map security controls to relevant compliance frameworks",
+        "Implement continuous compliance monitoring",
+        "Document compliance evidence and audit trails"
+    ])
+    
+    return recommendations
+
+def generate_implementation_recommendations(wizard_data):
+    recommendations = []
+    
+    recommendations.extend([
+        "Develop phased implementation roadmap",
+        "Assign clear ownership and accountability",
+        "Establish metrics and KPIs for success measurement"
+    ])
+    
+    return recommendations
+
+def generate_comprehensive_recommendations(wizard_data):
+    """Generate comprehensive recommendations based on all wizard data"""
+    recommendations = []
+    
+    # System-level recommendations
+    system_data = wizard_data.get("systemOverview", {})
+    if system_data.get("deploymentModel") == "cloud_public":
+        recommendations.append("Implement cloud security best practices and shared responsibility model")
+    
+    # Asset-based recommendations
+    asset_data = wizard_data.get("assetInventory", {})
+    assets = asset_data.get("assets", [])
+    
+    if any(a.get("dataClassification") == "Confidential" for a in assets):
+        recommendations.append("Implement data loss prevention (DLP) controls")
+    
+    if any(a.get("type") == "application" for a in assets):
+        recommendations.append("Conduct regular application security assessments")
+    
+    # General security recommendations
+    recommendations.extend([
+        "Implement multi-factor authentication for all user accounts",
+        "Deploy network segmentation and micro-segmentation",
+        "Establish comprehensive logging and monitoring",
+        "Create incident response and disaster recovery plans",
+        "Conduct regular security awareness training"
+    ])
+    
+    return recommendations[:10]  # Limit to top 10 recommendations
+
 # Include the router in the main app
 app.include_router(api_router)
 
