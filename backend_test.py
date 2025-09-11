@@ -464,9 +464,530 @@ class SecurityModelingAPITester:
             self.log_test("Simulation Logic Validation", False, f"Error: {str(e)}")
             return False
     
+    def create_comprehensive_security_diagram(self):
+        """Create comprehensive security diagram with multiple threat actors, assets, and controls"""
+        diagram_id = str(uuid.uuid4())
+        
+        nodes = [
+            # Multiple Threat Actors
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Actor",
+                "subtype": "ExternalAttacker",
+                "label": "External Threat Actor",
+                "position": {"x": 50, "y": 100},
+                "data": {"description": "Advanced persistent threat group targeting cloud infrastructure"},
+                "mitre_ids": ["T1190", "T1566"],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Actor",
+                "subtype": "Insider",
+                "label": "Malicious Insider",
+                "position": {"x": 50, "y": 200},
+                "data": {"description": "Privileged insider with legitimate access"},
+                "mitre_ids": ["T1078", "T1484"],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Actor",
+                "subtype": "ServiceAccount",
+                "label": "Nation State Actor",
+                "position": {"x": 50, "y": 300},
+                "data": {"description": "State-sponsored advanced threat actor"},
+                "mitre_ids": ["T1552.001", "T1003"],
+                "cve_ids": []
+            },
+            
+            # Critical Assets
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Asset",
+                "subtype": "Database",
+                "label": "Customer Database",
+                "position": {"x": 600, "y": 150},
+                "data": {"description": "PostgreSQL database with customer PII", "criticality": "Critical"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Asset",
+                "subtype": "API",
+                "label": "Payment API",
+                "position": {"x": 600, "y": 250},
+                "data": {"description": "REST API for payment processing", "criticality": "High"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Asset",
+                "subtype": "IMDS",
+                "label": "EC2 Instance Metadata",
+                "position": {"x": 600, "y": 350},
+                "data": {"description": "AWS EC2 instance metadata service", "criticality": "High"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Asset",
+                "subtype": "S3Bucket",
+                "label": "Active Directory",
+                "position": {"x": 600, "y": 450},
+                "data": {"description": "Windows Active Directory domain controller", "criticality": "Critical"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            
+            # Attack Surfaces
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Surface",
+                "subtype": "SSRF",
+                "label": "SSRF Vulnerability",
+                "position": {"x": 300, "y": 100},
+                "data": {"description": "Server-side request forgery in image processing", "severity": "High"},
+                "mitre_ids": ["T1190"],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Surface",
+                "subtype": "SQLi",
+                "label": "SQL Injection",
+                "position": {"x": 300, "y": 200},
+                "data": {"description": "SQL injection in search functionality", "severity": "Critical"},
+                "mitre_ids": ["T1190", "T1213"],
+                "cve_ids": ["CVE-2021-44228"]
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Surface",
+                "subtype": "RCE",
+                "label": "Remote Code Execution",
+                "position": {"x": 300, "y": 300},
+                "data": {"description": "RCE via deserialization vulnerability", "severity": "Critical"},
+                "mitre_ids": ["T1059"],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Surface",
+                "subtype": "WeakIAM",
+                "label": "Weak IAM Controls",
+                "position": {"x": 300, "y": 400},
+                "data": {"description": "Insufficient access controls and privilege escalation", "severity": "High"},
+                "mitre_ids": ["T1078", "T1484"],
+                "cve_ids": []
+            },
+            
+            # Security Controls
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Control",
+                "subtype": "WAF",
+                "label": "Web Application Firewall",
+                "position": {"x": 150, "y": 50},
+                "data": {"description": "AWS WAF with OWASP rules", "effectiveness": "High"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Control",
+                "subtype": "EDR",
+                "label": "Endpoint Detection & Response",
+                "position": {"x": 300, "y": 50},
+                "data": {"description": "CrowdStrike Falcon EDR", "effectiveness": "High"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Control",
+                "subtype": "EgressProxy",
+                "label": "SIEM System",
+                "position": {"x": 450, "y": 50},
+                "data": {"description": "Splunk SIEM with threat intelligence", "effectiveness": "Medium"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            
+            # Network Zones
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Zone",
+                "subtype": "DMZ",
+                "label": "DMZ Network",
+                "position": {"x": 400, "y": 500},
+                "data": {"description": "Demilitarized zone for public services"},
+                "mitre_ids": [],
+                "cve_ids": []
+            },
+            
+            # Detection Signals
+            {
+                "id": str(uuid.uuid4()),
+                "type": "Signal",
+                "subtype": "NetworkAnomaly",
+                "label": "Network Anomaly Detection",
+                "position": {"x": 500, "y": 500},
+                "data": {"description": "ML-based network anomaly detection"},
+                "mitre_ids": [],
+                "cve_ids": []
+            }
+        ]
+        
+        # Create complex attack path edges
+        edges = []
+        node_ids = [node["id"] for node in nodes]
+        
+        # External Attacker -> SSRF -> Database
+        edges.append({
+            "id": str(uuid.uuid4()),
+            "source": node_ids[0],  # External Attacker
+            "target": node_ids[7],  # SSRF
+            "type": "attack",
+            "label": "Exploits SSRF",
+            "data": {"likelihood": "High", "impact": "High"}
+        })
+        
+        edges.append({
+            "id": str(uuid.uuid4()),
+            "source": node_ids[7],  # SSRF
+            "target": node_ids[3],  # Database
+            "type": "attack",
+            "label": "Accesses Database",
+            "data": {"likelihood": "Medium", "impact": "Critical"}
+        })
+        
+        # Insider -> Weak IAM -> Active Directory
+        edges.append({
+            "id": str(uuid.uuid4()),
+            "source": node_ids[1],  # Insider
+            "target": node_ids[10], # Weak IAM
+            "type": "attack",
+            "label": "Exploits IAM",
+            "data": {"likelihood": "High", "impact": "High"}
+        })
+        
+        edges.append({
+            "id": str(uuid.uuid4()),
+            "source": node_ids[10], # Weak IAM
+            "target": node_ids[6],  # Active Directory
+            "type": "attack",
+            "label": "Escalates to AD",
+            "data": {"likelihood": "Medium", "impact": "Critical"}
+        })
+        
+        # Nation State -> RCE -> IMDS
+        edges.append({
+            "id": str(uuid.uuid4()),
+            "source": node_ids[2],  # Nation State
+            "target": node_ids[9],  # RCE
+            "type": "attack",
+            "label": "Exploits RCE",
+            "data": {"likelihood": "Medium", "impact": "High"}
+        })
+        
+        edges.append({
+            "id": str(uuid.uuid4()),
+            "source": node_ids[9],  # RCE
+            "target": node_ids[5],  # IMDS
+            "type": "attack",
+            "label": "Accesses IMDS",
+            "data": {"likelihood": "High", "impact": "High"}
+        })
+        
+        return {
+            "id": diagram_id,
+            "title": "Comprehensive Security Threat Model",
+            "description": "Advanced security model with multiple threat actors, critical assets, attack surfaces, and security controls for testing enhanced simulation capabilities",
+            "nodes": nodes,
+            "edges": edges
+        }
+    
+    def test_advanced_simulation_endpoint(self):
+        """Test POST /api/diagrams/{id}/simulate with complex security diagram"""
+        try:
+            # Create comprehensive diagram
+            comprehensive_data = self.create_comprehensive_security_diagram()
+            
+            # Create diagram first
+            response = self.session.post(
+                f"{self.base_url}/diagrams",
+                json={"title": comprehensive_data["title"], "description": comprehensive_data["description"]},
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                self.log_test("Advanced Simulation - Create Diagram", False, f"Failed to create diagram: {response.status_code}")
+                return False
+            
+            diagram_id = response.json()["id"]
+            comprehensive_data["id"] = diagram_id
+            
+            # Update with comprehensive data
+            response = self.session.put(
+                f"{self.base_url}/diagrams/{diagram_id}",
+                json=comprehensive_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                self.log_test("Advanced Simulation - Update Diagram", False, f"Failed to update diagram: {response.status_code}")
+                return False
+            
+            # Run advanced simulation
+            response = self.session.post(f"{self.base_url}/diagrams/{diagram_id}/simulate")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for enhanced simulation features
+                required_fields = [
+                    "attack_paths", "recommendations", "mitre_techniques", "mitre_coverage",
+                    "risk_score", "overall_risk_level", "detection_coverage", 
+                    "technique_details", "suggested_controls"
+                ]
+                
+                missing_fields = [f for f in required_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Advanced Simulation", False, f"Missing enhanced fields: {missing_fields}")
+                    return False
+                
+                # Validate enhanced features
+                attack_paths = data.get("attack_paths", [])
+                mitre_coverage = data.get("mitre_coverage", {})
+                technique_details = data.get("technique_details", {})
+                
+                # Check for graph-based attack path analysis
+                if len(attack_paths) == 0:
+                    self.log_test("Advanced Simulation", False, "No attack paths generated")
+                    return False
+                
+                # Validate attack path structure with NetworkX algorithms
+                path_has_steps = any("steps" in path for path in attack_paths)
+                if not path_has_steps:
+                    self.log_test("Advanced Simulation", False, "Attack paths missing step details")
+                    return False
+                
+                # Check MITRE coverage analysis
+                if not mitre_coverage or "tactics_covered" not in mitre_coverage:
+                    self.log_test("Advanced Simulation", False, "Missing MITRE coverage analysis")
+                    return False
+                
+                # Check technique details
+                if not technique_details:
+                    self.log_test("Advanced Simulation", False, "Missing technique details")
+                    return False
+                
+                self.log_test("Advanced Simulation", True, 
+                            f"Enhanced simulation: {len(attack_paths)} paths, "
+                            f"{len(mitre_coverage.get('tactics_covered', []))} tactics covered, "
+                            f"{len(technique_details)} technique details, "
+                            f"risk level: {data.get('overall_risk_level')}")
+                return True
+            else:
+                self.log_test("Advanced Simulation", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Advanced Simulation", False, f"Error: {str(e)}")
+            return False
+    
+    def test_mitre_technique_endpoints(self):
+        """Test MITRE technique endpoints"""
+        test_techniques = ["T1190", "T1078", "T1552.001"]
+        
+        for technique_id in test_techniques:
+            try:
+                response = self.session.get(f"{self.base_url}/mitre/technique/{technique_id}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    required_fields = [
+                        "technique_id", "name", "description", "tactics", 
+                        "platforms", "detection_methods", "mitigations"
+                    ]
+                    
+                    missing_fields = [f for f in required_fields if f not in data]
+                    if missing_fields:
+                        self.log_test(f"MITRE Technique {technique_id}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    self.log_test(f"MITRE Technique {technique_id}", True, 
+                                f"Retrieved: {data.get('name')} with {len(data.get('tactics', []))} tactics")
+                else:
+                    self.log_test(f"MITRE Technique {technique_id}", False, f"HTTP {response.status_code}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"MITRE Technique {technique_id}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+    
+    def test_techniques_by_tactic(self):
+        """Test GET /api/mitre/techniques/by-tactic/{tactic}"""
+        try:
+            response = self.session.get(f"{self.base_url}/mitre/techniques/by-tactic/Initial Access")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if not isinstance(data, list):
+                    self.log_test("Techniques by Tactic", False, f"Expected list, got {type(data)}")
+                    return False
+                
+                if len(data) == 0:
+                    self.log_test("Techniques by Tactic", False, "No techniques returned for Initial Access")
+                    return False
+                
+                # Check structure of returned techniques
+                first_technique = data[0]
+                required_fields = ["technique_id", "name", "description"]
+                missing_fields = [f for f in required_fields if f not in first_technique]
+                
+                if missing_fields:
+                    self.log_test("Techniques by Tactic", False, f"Missing fields in technique: {missing_fields}")
+                    return False
+                
+                self.log_test("Techniques by Tactic", True, 
+                            f"Retrieved {len(data)} techniques for Initial Access tactic")
+                return True
+            else:
+                self.log_test("Techniques by Tactic", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Techniques by Tactic", False, f"Error: {str(e)}")
+            return False
+    
+    def test_analyze_coverage_endpoint(self):
+        """Test POST /api/diagrams/{id}/analyze-coverage"""
+        if not self.test_diagram_id:
+            self.log_test("Analyze Coverage", False, "No test diagram ID available")
+            return False
+            
+        try:
+            response = self.session.post(f"{self.base_url}/diagrams/{self.test_diagram_id}/analyze-coverage")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for coverage analysis fields
+                expected_fields = [
+                    "tactics_covered", "techniques_analyzed", "detection_difficulty",
+                    "recommended_mitigations", "data_sources_needed"
+                ]
+                
+                missing_fields = [f for f in expected_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Analyze Coverage", False, f"Missing coverage fields: {missing_fields}")
+                    return False
+                
+                tactics_count = len(data.get("tactics_covered", []))
+                techniques_count = data.get("techniques_analyzed", 0)
+                
+                self.log_test("Analyze Coverage", True, 
+                            f"Coverage analysis: {tactics_count} tactics, {techniques_count} techniques analyzed")
+                return True
+            else:
+                self.log_test("Analyze Coverage", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Analyze Coverage", False, f"Error: {str(e)}")
+            return False
+    
+    def test_risk_analysis_endpoint(self):
+        """Test GET /api/diagrams/{id}/risk-analysis"""
+        if not self.test_diagram_id:
+            self.log_test("Risk Analysis", False, "No test diagram ID available")
+            return False
+            
+        try:
+            response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}/risk-analysis")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for risk analysis fields
+                expected_fields = [
+                    "overall_risk_score", "risk_level", "attack_paths_count",
+                    "risk_distribution", "top_attack_vectors", "coverage_gaps"
+                ]
+                
+                missing_fields = [f for f in expected_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Risk Analysis", False, f"Missing risk analysis fields: {missing_fields}")
+                    return False
+                
+                risk_score = data.get("overall_risk_score", 0)
+                risk_level = data.get("risk_level", "Unknown")
+                paths_count = data.get("attack_paths_count", 0)
+                
+                self.log_test("Risk Analysis", True, 
+                            f"Risk analysis: score {risk_score}, level {risk_level}, {paths_count} attack paths")
+                return True
+            elif response.status_code == 404:
+                self.log_test("Risk Analysis", False, "No simulation results found for risk analysis")
+                return False
+            else:
+                self.log_test("Risk Analysis", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Risk Analysis", False, f"Error: {str(e)}")
+            return False
+    
+    def test_auto_layout_endpoint(self):
+        """Test POST /api/diagrams/{id}/auto-layout"""
+        if not self.test_diagram_id:
+            self.log_test("Auto Layout", False, "No test diagram ID available")
+            return False
+            
+        try:
+            response = self.session.post(f"{self.base_url}/diagrams/{self.test_diagram_id}/auto-layout")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for layout response fields
+                expected_fields = ["layout_positions", "algorithm", "node_count"]
+                
+                missing_fields = [f for f in expected_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Auto Layout", False, f"Missing layout fields: {missing_fields}")
+                    return False
+                
+                layout_positions = data.get("layout_positions", {})
+                algorithm = data.get("algorithm", "unknown")
+                node_count = data.get("node_count", 0)
+                
+                if not layout_positions:
+                    self.log_test("Auto Layout", False, "No layout positions generated")
+                    return False
+                
+                self.log_test("Auto Layout", True, 
+                            f"Auto layout: {algorithm} algorithm, {node_count} nodes positioned")
+                return True
+            else:
+                self.log_test("Auto Layout", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Auto Layout", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
-        print(f"🚀 Starting Security Modeling Platform API Tests")
+        print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
         print(f"📡 Testing against: {self.base_url}")
         print("=" * 80)
         
@@ -478,7 +999,14 @@ class SecurityModelingAPITester:
             self.test_update_diagram_with_security_data,
             self.test_simulate_attack_paths,
             self.test_get_simulations,
-            self.test_simulation_logic_validation
+            self.test_simulation_logic_validation,
+            # Enhanced/Advanced tests
+            self.test_advanced_simulation_endpoint,
+            self.test_mitre_technique_endpoints,
+            self.test_techniques_by_tactic,
+            self.test_analyze_coverage_endpoint,
+            self.test_risk_analysis_endpoint,
+            self.test_auto_layout_endpoint
         ]
         
         passed = 0
