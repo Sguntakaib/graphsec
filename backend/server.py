@@ -1351,6 +1351,154 @@ async def get_template_categories():
     """Get available template categories"""
     return [{"id": cat.value, "name": cat.value} for cat in TemplateCategory]
 
+# Intelligent Node System APIs - Phase 1
+@api_router.get("/intelligent-nodes/{node_subtype}/template")
+async def get_node_template(node_subtype: str):
+    """Get intelligent template for a specific node subtype"""
+    template = intelligent_node_engine.get_node_template(node_subtype)
+    if not template:
+        raise HTTPException(status_code=404, detail=f"No intelligent template found for {node_subtype}")
+    
+    return {
+        "node_type": template.node_type,
+        "node_subtype": template.node_subtype,
+        "required_branches": [branch.value for branch in template.required_branches],
+        "security_prompts": [
+            {
+                "id": prompt.id,
+                "question": prompt.question,
+                "type": prompt.type.value,
+                "options": prompt.options,
+                "default_value": prompt.default_value,
+                "help_text": prompt.help_text,
+                "related_branch": prompt.related_branch.value
+            } for prompt in template.security_prompts
+        ],
+        "risk_factors": template.risk_factors
+    }
+
+@api_router.get("/intelligent-nodes/{node_subtype}/prompts")
+async def get_security_prompts(node_subtype: str):
+    """Get security prompts for guided node configuration"""
+    prompts = intelligent_node_engine.get_security_prompts(node_subtype)
+    if not prompts:
+        raise HTTPException(status_code=404, detail=f"No security prompts found for {node_subtype}")
+    
+    return {
+        "node_subtype": node_subtype,
+        "prompts": [
+            {
+                "id": prompt.id,
+                "question": prompt.question,
+                "type": prompt.type.value,
+                "options": prompt.options,
+                "default_value": prompt.default_value,
+                "help_text": prompt.help_text,
+                "related_branch": prompt.related_branch.value,
+                "validation_rules": prompt.validation_rules
+            } for prompt in prompts
+        ]
+    }
+
+@api_router.post("/intelligent-nodes/{node_subtype}/create-branches")
+async def create_security_branches(node_subtype: str):
+    """Create required security branches for a node"""
+    branches = intelligent_node_engine.create_security_branches(node_subtype)
+    if not branches:
+        return {"message": f"No required branches for {node_subtype}", "branches": []}
+    
+    return {
+        "node_subtype": node_subtype,
+        "branches": [
+            {
+                "id": branch.id,
+                "name": branch.name,
+                "type": branch.type.value,
+                "required": branch.required,
+                "completed": branch.completed,
+                "value": branch.value,
+                "description": branch.description
+            } for branch in branches
+        ]
+    }
+
+@api_router.post("/intelligent-nodes/{node_subtype}/validate-completeness")
+async def validate_node_completeness(
+    node_subtype: str, 
+    branches: List[Dict[str, Any]]
+):
+    """Validate if a node configuration is complete"""
+    # Convert dict branches to SecurityBranch objects
+    security_branches = []
+    for branch_data in branches:
+        branch = SecurityBranch(
+            id=branch_data.get("id", ""),
+            name=branch_data.get("name", ""),
+            type=branch_data.get("type", "LOGIN"),
+            required=branch_data.get("required", True),
+            completed=branch_data.get("completed", False),
+            value=branch_data.get("value"),
+            description=branch_data.get("description", "")
+        )
+        security_branches.append(branch)
+    
+    validation_result = intelligent_node_engine.validate_node_completeness(node_subtype, security_branches)
+    
+    return {
+        "node_subtype": node_subtype,
+        "validation": validation_result,
+        "recommendations": intelligent_node_engine.generate_security_recommendations(node_subtype, security_branches)
+    }
+
+@api_router.post("/intelligent-nodes/{node_subtype}/calculate-risk")
+async def calculate_node_risk(
+    node_subtype: str,
+    branch_values: Dict[str, Any]
+):
+    """Calculate risk score based on node configuration"""
+    risk_score = intelligent_node_engine.calculate_node_risk_score(node_subtype, branch_values)
+    
+    risk_level = "Low"
+    if risk_score >= 8.0:
+        risk_level = "Critical"
+    elif risk_score >= 6.0:
+        risk_level = "High"
+    elif risk_score >= 4.0:
+        risk_level = "Medium"
+    
+    return {
+        "node_subtype": node_subtype,
+        "risk_score": risk_score,
+        "risk_level": risk_level,
+        "branch_values": branch_values,
+        "recommendations": intelligent_node_engine.generate_security_recommendations(
+            node_subtype, 
+            [SecurityBranch(id="temp", name="temp", type="LOGIN", completed=True, value=v) for k, v in branch_values.items()]
+        )
+    }
+
+@api_router.get("/intelligent-nodes/supported-types")
+async def get_supported_intelligent_types():
+    """Get list of node types that support intelligent expansion"""
+    supported_types = list(intelligent_node_engine.node_templates.keys())
+    
+    type_info = []
+    for node_subtype in supported_types:
+        template = intelligent_node_engine.get_node_template(node_subtype)
+        if template:
+            type_info.append({
+                "node_subtype": node_subtype,
+                "node_type": template.node_type,
+                "required_branches_count": len(template.required_branches),
+                "security_prompts_count": len(template.security_prompts),
+                "has_risk_factors": len(template.risk_factors) > 0
+            })
+    
+    return {
+        "supported_types": type_info,
+        "total_count": len(supported_types)
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
