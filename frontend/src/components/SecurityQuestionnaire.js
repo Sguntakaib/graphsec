@@ -36,6 +36,13 @@ const SecurityQuestionnaire = ({
     }
   }, [isVisible, nodeSubtype]);
 
+  // Additional effect to reset state when the modal is closed and reopened
+  useEffect(() => {
+    if (isVisible) {
+      setCurrentPromptIndex(0);
+    }
+  }, [isVisible]);
+
   const fetchSecurityPrompts = async () => {
     try {
       setLoading(true);
