@@ -475,6 +475,7 @@ function AppContent() {
     setSelectedNode(null);
     setHighlightedPaths([]);
     setViewMode('modeling');
+    clearAttackPathHighlighting();
   };
 
   // Keyboard shortcuts
