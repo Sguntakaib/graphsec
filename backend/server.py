@@ -18,6 +18,7 @@ import math
 # Import advanced simulation modules
 from advanced_simulation import AdvancedSimulationEngine
 from mitre_integration import MitreAttackDatabase
+from intelligent_nodes import intelligent_node_engine, SecurityBranch, SecurityPrompt, IntelligentNodeTemplate
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
