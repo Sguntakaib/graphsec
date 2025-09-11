@@ -1322,6 +1322,18 @@ function AppContent() {
           onClose={() => setShowTemplateLibrary(false)}
         />
       )}
+
+      {/* Threat Modeling Wizard Modal */}
+      {showThreatModelingWizard && (
+        <ThreatModelingWizard
+          isVisible={showThreatModelingWizard}
+          onClose={handleThreatModelingWizardCancel}
+          onComplete={handleThreatModelingWizardComplete}
+          currentDiagram={currentDiagram}
+          existingNodes={nodes}
+          existingEdges={edges}
+        />
+      )}
     </div>
   );
 }
