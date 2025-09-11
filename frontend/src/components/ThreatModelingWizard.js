@@ -51,14 +51,14 @@ const ThreatModelingWizard = ({
 
   const wizardSteps = [
     {
-      id: 'overview',
+      id: 'systemOverview',
       title: 'System Overview',
       description: 'Define your system context and objectives',
       icon: Target,
       component: SystemOverviewStep
     },
     {
-      id: 'assets',
+      id: 'assetInventory',
       title: 'Asset Identification',
       description: 'Identify and classify critical assets',
       icon: Database,
