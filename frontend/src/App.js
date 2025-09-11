@@ -624,6 +624,76 @@ function AppContent() {
     clearAttackPathHighlighting();
   };
 
+  const handleApplyTemplate = async (template) => {
+    try {
+      setIsLoading(true);
+      
+      // Ensure we have a current diagram to apply template to
+      let diagramId = currentDiagram?.id;
+      
+      if (!diagramId) {
+        // Create a new diagram if none exists
+        const newDiagram = await createDiagram({
+          title: `${template.name} - Applied Template`,
+          description: `Created from template: ${template.description}`
+        });
+        diagramId = newDiagram.id;
+        setCurrentDiagram(newDiagram);
+      }
+      
+      // Apply template to diagram
+      const result = await applyTemplateToCurrentDiagram(template.id, diagramId);
+      
+      // Reload the updated diagram
+      const updatedDiagram = await updateDiagram(diagramId, {
+        title: currentDiagram?.title || `${template.name} - Applied Template`,
+        description: currentDiagram?.description || template.description
+      });
+      
+      // Update the canvas with new nodes and edges
+      const templateNodes = template.nodes.map(node => ({
+        id: `template-${node.id}-${Date.now()}`,
+        type: 'custom',
+        position: node.position || { x: Math.random() * 500, y: Math.random() * 500 },
+        data: {
+          ...node,
+          label: node.label
+        }
+      }));
+      
+      const templateEdges = template.edges.map(edge => ({
+        id: `template-edge-${edge.id}-${Date.now()}`,
+        source: `template-${edge.source}-${Date.now()}`,
+        target: `template-${edge.target}-${Date.now()}`,
+        label: edge.label || '',
+        type: 'smoothstep',
+        markerEnd: {
+          type: 'arrowclosed',
+          color: '#9CA3AF',
+        },
+        style: {
+          strokeWidth: 2,
+          stroke: '#9CA3AF',
+        }
+      }));
+      
+      // Add template nodes and edges to existing ones
+      setNodes(prevNodes => [...prevNodes, ...templateNodes]);
+      setEdges(prevEdges => [...prevEdges, ...templateEdges]);
+      
+      // Save state for undo functionality
+      saveStateToUndoStack();
+      
+      alert(`Template "${template.name}" applied successfully! Added ${result.nodes_added} nodes and ${result.edges_added} edges.`);
+      
+    } catch (error) {
+      console.error('Error applying template:', error);
+      alert('Failed to apply template. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event) => {
