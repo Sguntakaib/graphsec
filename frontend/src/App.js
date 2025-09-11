@@ -54,6 +54,13 @@ function AppContent() {
   const [viewMode, setViewMode] = useState('modeling'); // 'modeling' or 'analysis'
   const [highlightedPaths, setHighlightedPaths] = useState([]);
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+  const [snapToGrid, setSnapToGrid] = useState(true);
+  const [gridSize, setGridSize] = useState(20);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
+  const [contextMenu, setContextMenu] = useState(null);
   
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
