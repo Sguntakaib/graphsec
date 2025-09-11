@@ -963,6 +963,15 @@ function AppContent() {
               <span>Templates</span>
             </button>
             
+            <button
+              onClick={() => setShowThreatModelingWizard(true)}
+              className="px-3 py-2 bg-purple-700 text-white rounded hover:bg-purple-600 flex items-center space-x-2 text-sm"
+              title="Guided Threat Modeling - Step-by-step security assessment wizard"
+            >
+              <Shield className="h-4 w-4" />
+              <span>Wizard</span>
+            </button>
+            
             <div className="relative">
               <input
                 type="file"
