@@ -1500,6 +1500,332 @@ async def get_supported_intelligent_types():
         "total_count": len(supported_types)
     }
 
+# DSL Rule Engine APIs - Phase 2
+@api_router.post("/diagrams/{diagram_id}/evaluate-rules")
+async def evaluate_security_rules(diagram_id: str):
+    """Evaluate DSL security rules against a diagram"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    if not nodes:
+        return {
+            "diagram_id": diagram_id,
+            "rule_results": [],
+            "total_rules_triggered": 0,
+            "overall_risk_score": 0.0,
+            "highest_impact": "Low"
+        }
+    
+    # Evaluate rules using DSL engine
+    rule_results = dsl_rule_engine.evaluate_rules(nodes, edges)
+    
+    # Calculate overall metrics
+    total_triggered = len(rule_results)
+    overall_risk = sum(result.risk_score for result in rule_results) / max(total_triggered, 1)
+    
+    # Determine highest impact
+    impact_levels = [result.impact_level.value for result in rule_results]
+    if "Critical" in impact_levels:
+        highest_impact = "Critical"
+    elif "High" in impact_levels:
+        highest_impact = "High"
+    elif "Medium" in impact_levels:
+        highest_impact = "Medium"
+    else:
+        highest_impact = "Low"
+    
+    # Format results for frontend
+    formatted_results = []
+    for result in rule_results:
+        formatted_results.append({
+            "rule_id": result.rule_id,
+            "rule_name": result.rule_name,
+            "triggered": result.triggered,
+            "matching_nodes": result.matching_nodes,
+            "attack_path": result.attack_path,
+            "impact_level": result.impact_level.value,
+            "risk_score": result.risk_score,
+            "recommendations": result.recommendations,
+            "mitre_techniques": result.mitre_techniques
+        })
+    
+    return {
+        "diagram_id": diagram_id,
+        "rule_results": formatted_results,
+        "total_rules_triggered": total_triggered,
+        "overall_risk_score": round(overall_risk, 2),
+        "highest_impact": highest_impact,
+        "evaluation_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.post("/diagrams/{diagram_id}/detect-gaps")
+async def detect_security_gaps(diagram_id: str):
+    """Detect security control gaps in a diagram"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    # Detect gaps using DSL engine
+    gaps = dsl_rule_engine.detect_security_gaps(nodes, edges)
+    
+    # Format gaps for frontend
+    formatted_gaps = []
+    for gap in gaps:
+        formatted_gaps.append({
+            "gap_id": gap.gap_id,
+            "node_id": gap.node_id,
+            "node_type": gap.node_type,
+            "missing_control": gap.missing_control,
+            "severity": gap.severity.value,
+            "description": gap.description,
+            "recommendations": gap.recommendations,
+            "affected_attack_paths": gap.affected_attack_paths
+        })
+    
+    # Group gaps by severity
+    gaps_by_severity = {
+        "Critical": len([g for g in gaps if g.severity.value == "Critical"]),
+        "High": len([g for g in gaps if g.severity.value == "High"]),
+        "Medium": len([g for g in gaps if g.severity.value == "Medium"]),
+        "Low": len([g for g in gaps if g.severity.value == "Low"])
+    }
+    
+    return {
+        "diagram_id": diagram_id,
+        "security_gaps": formatted_gaps,
+        "total_gaps": len(gaps),
+        "gaps_by_severity": gaps_by_severity,
+        "analysis_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.post("/diagrams/{diagram_id}/completeness-analysis")
+async def analyze_security_completeness(diagram_id: str):
+    """Analyze security completeness of a diagram"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    # Calculate completeness using DSL engine
+    analysis = dsl_rule_engine.calculate_completeness_score(nodes, edges)
+    
+    return {
+        "diagram_id": diagram_id,
+        "overall_score": analysis.overall_score,
+        "completeness_percentage": analysis.completeness_percentage,
+        "total_gaps": analysis.total_gaps,
+        "gaps_by_severity": {
+            "critical_gaps": analysis.critical_gaps,
+            "high_gaps": analysis.high_gaps,
+            "medium_gaps": analysis.medium_gaps,
+            "low_gaps": analysis.low_gaps
+        },
+        "gaps_by_category": analysis.gaps_by_category,
+        "improvement_recommendations": analysis.improvement_recommendations,
+        "analysis_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/security-rules")
+async def get_security_rules(category: Optional[str] = None, enabled_only: bool = True):
+    """Get available security rules"""
+    if category:
+        try:
+            from dsl_rule_engine import RuleCategory
+            cat_enum = RuleCategory(category)
+            rules = dsl_rule_engine.get_rules_by_category(cat_enum)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid category: {category}")
+    else:
+        rules = dsl_rule_engine.rules
+    
+    if enabled_only:
+        rules = [rule for rule in rules if rule.enabled]
+    
+    # Format rules for frontend
+    formatted_rules = []
+    for rule in rules:
+        formatted_rules.append({
+            "id": rule.id,
+            "name": rule.name,
+            "description": rule.description,
+            "category": rule.category.value,
+            "enabled": rule.enabled,
+            "priority": rule.priority,
+            "mitre_techniques": rule.mitre_techniques,
+            "references": rule.references,
+            "conditions_count": len(rule.conditions),
+            "impact": rule.outcome.get("impact", "Unknown"),
+            "risk_score": rule.outcome.get("risk_score", 0.0)
+        })
+    
+    return {
+        "rules": formatted_rules,
+        "total_count": len(formatted_rules),
+        "filter_applied": {"category": category, "enabled_only": enabled_only}
+    }
+
+@api_router.get("/security-rules/{rule_id}")
+async def get_security_rule(rule_id: str):
+    """Get detailed information about a specific security rule"""
+    rule = dsl_rule_engine.get_rule_by_id(rule_id)
+    if not rule:
+        raise HTTPException(status_code=404, detail="Security rule not found")
+    
+    # Format conditions for frontend
+    formatted_conditions = []
+    for condition in rule.conditions:
+        formatted_conditions.append({
+            "field": condition.field,
+            "operator": condition.operator,
+            "value": condition.value,
+            "negated": condition.negated
+        })
+    
+    return {
+        "id": rule.id,
+        "name": rule.name,
+        "description": rule.description,
+        "category": rule.category.value,
+        "conditions": formatted_conditions,
+        "outcome": rule.outcome,
+        "enabled": rule.enabled,
+        "priority": rule.priority,
+        "mitre_techniques": rule.mitre_techniques,
+        "references": rule.references
+    }
+
+@api_router.get("/security-rules/categories")
+async def get_security_rule_categories():
+    """Get available security rule categories"""
+    from dsl_rule_engine import RuleCategory
+    
+    categories = []
+    for category in RuleCategory:
+        rule_count = len(dsl_rule_engine.get_rules_by_category(category))
+        categories.append({
+            "id": category.value,
+            "name": category.value.replace("_", " ").title(),
+            "rule_count": rule_count
+        })
+    
+    return {
+        "categories": categories,
+        "total_categories": len(categories)
+    }
+
+@api_router.get("/security-rules/statistics")
+async def get_rule_engine_statistics():
+    """Get statistics about the rule engine"""
+    return dsl_rule_engine.get_rule_statistics()
+
+@api_router.post("/diagrams/{diagram_id}/comprehensive-analysis")
+async def run_comprehensive_security_analysis(diagram_id: str):
+    """Run comprehensive security analysis combining rules, gaps, and completeness"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    if not nodes:
+        return {
+            "diagram_id": diagram_id,
+            "analysis_summary": {
+                "overall_risk_score": 0.0,
+                "completeness_percentage": 0.0,
+                "total_rules_triggered": 0,
+                "total_gaps": 0,
+                "recommendations": ["Add security nodes to begin analysis"]
+            },
+            "rule_evaluation": {"rule_results": []},
+            "gap_analysis": {"security_gaps": []},
+            "completeness_analysis": {"improvement_recommendations": []}
+        }
+    
+    # Run all analyses
+    rule_results = dsl_rule_engine.evaluate_rules(nodes, edges)
+    gaps = dsl_rule_engine.detect_security_gaps(nodes, edges)
+    completeness = dsl_rule_engine.calculate_completeness_score(nodes, edges)
+    
+    # Calculate overall metrics
+    overall_risk = sum(result.risk_score for result in rule_results) / max(len(rule_results), 1)
+    
+    # Combine recommendations
+    all_recommendations = []
+    all_recommendations.extend(completeness.improvement_recommendations)
+    
+    # Add top rule recommendations
+    for result in rule_results[:3]:  # Top 3 triggered rules
+        all_recommendations.extend(result.recommendations[:2])  # Top 2 recommendations each
+    
+    # Remove duplicates and limit
+    unique_recommendations = list(dict.fromkeys(all_recommendations))[:10]
+    
+    # Format comprehensive results
+    formatted_rule_results = []
+    for result in rule_results:
+        formatted_rule_results.append({
+            "rule_id": result.rule_id,
+            "rule_name": result.rule_name,
+            "impact_level": result.impact_level.value,
+            "risk_score": result.risk_score,
+            "matching_nodes": result.matching_nodes,
+            "attack_path": result.attack_path,
+            "recommendations": result.recommendations
+        })
+    
+    formatted_gaps = []
+    for gap in gaps:
+        formatted_gaps.append({
+            "gap_id": gap.gap_id,
+            "node_id": gap.node_id,
+            "missing_control": gap.missing_control,
+            "severity": gap.severity.value,
+            "description": gap.description,
+            "recommendations": gap.recommendations
+        })
+    
+    return {
+        "diagram_id": diagram_id,
+        "analysis_summary": {
+            "overall_risk_score": round(overall_risk, 2),
+            "completeness_percentage": completeness.completeness_percentage,
+            "total_rules_triggered": len(rule_results),
+            "total_gaps": len(gaps),
+            "critical_issues": completeness.critical_gaps + len([r for r in rule_results if r.impact_level.value == "Critical"]),
+            "recommendations": unique_recommendations
+        },
+        "rule_evaluation": {
+            "rule_results": formatted_rule_results,
+            "total_triggered": len(rule_results)
+        },
+        "gap_analysis": {
+            "security_gaps": formatted_gaps,
+            "gaps_by_severity": {
+                "Critical": completeness.critical_gaps,
+                "High": completeness.high_gaps,
+                "Medium": completeness.medium_gaps,
+                "Low": completeness.low_gaps
+            }
+        },
+        "completeness_analysis": {
+            "overall_score": completeness.overall_score,
+            "completeness_percentage": completeness.completeness_percentage,
+            "improvement_recommendations": completeness.improvement_recommendations
+        },
+        "analysis_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
