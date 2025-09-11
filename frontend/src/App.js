@@ -802,6 +802,15 @@ function AppContent() {
               <span>New</span>
             </button>
             
+            <button
+              onClick={() => setShowTemplateLibrary(true)}
+              className="px-3 py-2 bg-blue-700 text-white rounded hover:bg-blue-600 flex items-center space-x-2 text-sm"
+              title="Template Library - Apply pre-built security patterns"
+            >
+              <BookOpen className="h-4 w-4" />
+              <span>Templates</span>
+            </button>
+            
             <div className="relative">
               <input
                 type="file"
