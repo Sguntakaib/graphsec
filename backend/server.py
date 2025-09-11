@@ -31,6 +31,11 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Initialize advanced components
+simulation_engine = AdvancedSimulationEngine()
+mitre_db = MitreAttackDatabase()
+executor = ThreadPoolExecutor(max_workers=4)
+
 # Security Node Types
 class NodeType(str, Enum):
     ACTOR = "Actor"
