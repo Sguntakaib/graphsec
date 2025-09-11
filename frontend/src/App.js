@@ -17,8 +17,9 @@ import './App.css';
 import { AdvancedNodeLibrary } from './components/AdvancedNodeLibrary';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { EnhancedSimulationPanel } from './components/EnhancedSimulationPanel';
+import { TemplateLibrary } from './components/TemplateLibrary';
 import { CustomNode } from './components/CustomNode';
-import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram } from './services/api';
+import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram, applyTemplateToCurrentDiagram } from './services/api';
   import { 
   Shield, 
   Play, 
