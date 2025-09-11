@@ -27,6 +27,11 @@ const SecurityQuestionnaire = ({
 
   useEffect(() => {
     if (isVisible && nodeSubtype) {
+      // Reset state when opening questionnaire for a new node
+      setCurrentPromptIndex(0);
+      setAnswers(existingValues);
+      setValidation(null);
+      setError(null);
       fetchSecurityPrompts();
     }
   }, [isVisible, nodeSubtype]);
