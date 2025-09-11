@@ -10,6 +10,12 @@ from typing import List, Dict, Any, Optional
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+
+# Import advanced simulation modules
+from advanced_simulation import AdvancedSimulationEngine
+from mitre_integration import MitreAttackDatabase
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
