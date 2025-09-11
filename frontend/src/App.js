@@ -343,6 +343,50 @@ function AppContent() {
     setHighlightedPaths(attackPaths);
   };
 
+  const clearAttackPathHighlighting = () => {
+    // Reset all edge styles
+    setEdges((eds) =>
+      eds.map((edge) => ({
+        ...edge,
+        style: {
+          ...edge.style,
+          stroke: '#6b7280',
+          strokeWidth: 1,
+          strokeDasharray: 'none',
+        },
+        animated: false,
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: '#6b7280',
+        },
+        data: {
+          ...edge.data,
+          isHighlighted: false
+        }
+      }))
+    );
+
+    // Reset all node styles
+    setNodes((nds) =>
+      nds.map((node) => ({
+        ...node,
+        style: {
+          ...node.style,
+          border: 'none',
+          boxShadow: 'none',
+        },
+        data: {
+          ...node.data,
+          isHighlighted: false
+        }
+      }))
+    );
+
+    setHighlightedPaths([]);
+  };
+
   const handleAutoLayout = async () => {
     if (!currentDiagram) return;
     
