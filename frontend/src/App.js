@@ -41,7 +41,7 @@ const nodeTypes = {
 const initialNodes = [];
 const initialEdges = [];
 
-function App() {
+function AppContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState(null);
