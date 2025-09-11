@@ -48,6 +48,38 @@ function App() {
   const [simulationResult, setSimulationResult] = useState(null);
   const [diagrams, setDiagrams] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('modeling'); // 'modeling' or 'analysis'
+  const [highlightedPaths, setHighlightedPaths] = useState([]);
+  const [showAdvancedControls, setShowAdvancedControls] = useState(false);
+  
+  const { fitView, zoomIn, zoomOut } = useReactFlow();
+
+  // Enhanced edge styles for attack paths
+  const defaultEdgeOptions = useMemo(() => ({
+    type: 'smoothstep',
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#9CA3AF',
+    },
+    style: {
+      strokeWidth: 2,
+      stroke: '#9CA3AF',
+    },
+  }), []);
+
+  const attackPathEdgeOptions = useMemo(() => ({
+    type: 'smoothstep',
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#EF4444',
+    },
+    style: {
+      strokeWidth: 3,
+      stroke: '#EF4444',
+      strokeDasharray: '5,5',
+    },
+    animated: true,
+  }), []);
 
   useEffect(() => {
     loadDiagrams();
