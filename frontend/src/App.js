@@ -76,6 +76,9 @@ function AppContent() {
   const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
+  const [showSecurityQuestionnaire, setShowSecurityQuestionnaire] = useState(false);
+  const [currentQuestionnaireNode, setCurrentQuestionnaireNode] = useState(null);
+  const [nodeBranches, setNodeBranches] = useState({}); // Store security branches for each node
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
