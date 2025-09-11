@@ -1451,6 +1451,519 @@ class SecurityModelingAPITester:
         
         return True
 
+    # Phase 2 DSL Rule Engine Tests
+    def test_dsl_rule_evaluation(self):
+        """Test POST /api/diagrams/{diagram_id}/evaluate-rules"""
+        if not self.test_diagram_id:
+            self.log_test("DSL Rule Evaluation", False, "No test diagram ID available")
+            return False
+            
+        try:
+            response = self.session.post(f"{self.base_url}/diagrams/{self.test_diagram_id}/evaluate-rules")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["diagram_id", "rule_results", "total_rules_triggered", "overall_risk_score", "highest_impact"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("DSL Rule Evaluation", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                rule_results = data.get("rule_results", [])
+                total_triggered = data.get("total_rules_triggered", 0)
+                overall_risk = data.get("overall_risk_score", 0)
+                highest_impact = data.get("highest_impact", "Low")
+                
+                # Verify rule result structure if any rules triggered
+                if rule_results:
+                    first_result = rule_results[0]
+                    required_result_fields = ["rule_id", "rule_name", "triggered", "matching_nodes", "impact_level", "risk_score", "recommendations", "mitre_techniques"]
+                    missing_result_fields = [f for f in required_result_fields if f not in first_result]
+                    
+                    if missing_result_fields:
+                        self.log_test("DSL Rule Evaluation", False, f"Missing rule result fields: {missing_result_fields}")
+                        return False
+                
+                self.log_test("DSL Rule Evaluation", True, 
+                            f"Evaluated rules: {total_triggered} triggered, risk score: {overall_risk}, highest impact: {highest_impact}")
+                return True
+            else:
+                self.log_test("DSL Rule Evaluation", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("DSL Rule Evaluation", False, f"Error: {str(e)}")
+            return False
+
+    def test_security_gap_detection(self):
+        """Test POST /api/diagrams/{diagram_id}/detect-gaps"""
+        if not self.test_diagram_id:
+            self.log_test("Security Gap Detection", False, "No test diagram ID available")
+            return False
+            
+        try:
+            response = self.session.post(f"{self.base_url}/diagrams/{self.test_diagram_id}/detect-gaps")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["diagram_id", "security_gaps", "total_gaps", "gaps_by_severity"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Security Gap Detection", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                security_gaps = data.get("security_gaps", [])
+                total_gaps = data.get("total_gaps", 0)
+                gaps_by_severity = data.get("gaps_by_severity", {})
+                
+                # Verify gap structure if any gaps found
+                if security_gaps:
+                    first_gap = security_gaps[0]
+                    required_gap_fields = ["gap_id", "node_id", "node_type", "missing_control", "severity", "description", "recommendations"]
+                    missing_gap_fields = [f for f in required_gap_fields if f not in first_gap]
+                    
+                    if missing_gap_fields:
+                        self.log_test("Security Gap Detection", False, f"Missing gap fields: {missing_gap_fields}")
+                        return False
+                
+                # Verify severity breakdown
+                expected_severities = ["Critical", "High", "Medium", "Low"]
+                missing_severities = [s for s in expected_severities if s not in gaps_by_severity]
+                
+                if missing_severities:
+                    self.log_test("Security Gap Detection", False, f"Missing severity levels: {missing_severities}")
+                    return False
+                
+                self.log_test("Security Gap Detection", True, 
+                            f"Gap analysis: {total_gaps} total gaps, severity breakdown: {gaps_by_severity}")
+                return True
+            else:
+                self.log_test("Security Gap Detection", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Security Gap Detection", False, f"Error: {str(e)}")
+            return False
+
+    def test_completeness_analysis(self):
+        """Test POST /api/diagrams/{diagram_id}/completeness-analysis"""
+        if not self.test_diagram_id:
+            self.log_test("Completeness Analysis", False, "No test diagram ID available")
+            return False
+            
+        try:
+            response = self.session.post(f"{self.base_url}/diagrams/{self.test_diagram_id}/completeness-analysis")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["diagram_id", "overall_score", "completeness_percentage", "total_gaps", "gaps_by_severity", "gaps_by_category", "improvement_recommendations"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Completeness Analysis", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                overall_score = data.get("overall_score", 0)
+                completeness_percentage = data.get("completeness_percentage", 0)
+                total_gaps = data.get("total_gaps", 0)
+                gaps_by_severity = data.get("gaps_by_severity", {})
+                improvement_recommendations = data.get("improvement_recommendations", [])
+                
+                # Verify score ranges
+                if not (0 <= overall_score <= 10):
+                    self.log_test("Completeness Analysis", False, f"Invalid overall score: {overall_score} (should be 0-10)")
+                    return False
+                
+                if not (0 <= completeness_percentage <= 100):
+                    self.log_test("Completeness Analysis", False, f"Invalid completeness percentage: {completeness_percentage} (should be 0-100)")
+                    return False
+                
+                # Verify gaps by severity structure
+                required_severity_fields = ["critical_gaps", "high_gaps", "medium_gaps", "low_gaps"]
+                missing_severity_fields = [f for f in required_severity_fields if f not in gaps_by_severity]
+                
+                if missing_severity_fields:
+                    self.log_test("Completeness Analysis", False, f"Missing severity fields: {missing_severity_fields}")
+                    return False
+                
+                self.log_test("Completeness Analysis", True, 
+                            f"Completeness: {completeness_percentage}% ({overall_score}/10), {total_gaps} gaps, {len(improvement_recommendations)} recommendations")
+                return True
+            else:
+                self.log_test("Completeness Analysis", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Completeness Analysis", False, f"Error: {str(e)}")
+            return False
+
+    def test_comprehensive_analysis(self):
+        """Test POST /api/diagrams/{diagram_id}/comprehensive-analysis (combined analysis)"""
+        if not self.test_diagram_id:
+            self.log_test("Comprehensive Analysis", False, "No test diagram ID available")
+            return False
+            
+        try:
+            response = self.session.post(f"{self.base_url}/diagrams/{self.test_diagram_id}/comprehensive-analysis")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Should contain results from all three analysis types
+                expected_sections = ["rule_evaluation", "gap_detection", "completeness_analysis"]
+                
+                # Check if it's a combined response or individual analysis
+                if any(section in data for section in expected_sections):
+                    # Combined response format
+                    self.log_test("Comprehensive Analysis", True, 
+                                f"Combined analysis completed with sections: {[s for s in expected_sections if s in data]}")
+                    return True
+                else:
+                    # Individual analysis format (like completeness analysis)
+                    if "overall_score" in data and "completeness_percentage" in data:
+                        self.log_test("Comprehensive Analysis", True, 
+                                    f"Comprehensive analysis: {data.get('completeness_percentage', 0)}% complete")
+                        return True
+                    else:
+                        self.log_test("Comprehensive Analysis", False, f"Unexpected response format: {list(data.keys())}")
+                        return False
+            else:
+                self.log_test("Comprehensive Analysis", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Comprehensive Analysis", False, f"Error: {str(e)}")
+            return False
+
+    def test_security_rules_management(self):
+        """Test GET /api/security-rules and related endpoints"""
+        try:
+            # Test basic rules listing
+            response = self.session.get(f"{self.base_url}/security-rules")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["rules", "total_count"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Security Rules Management", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                rules = data.get("rules", [])
+                total_count = data.get("total_count", 0)
+                
+                if not rules:
+                    self.log_test("Security Rules Management", False, "No security rules returned")
+                    return False
+                
+                # Verify rule structure
+                first_rule = rules[0]
+                required_rule_fields = ["id", "name", "description", "category", "enabled", "priority", "mitre_techniques"]
+                missing_rule_fields = [f for f in required_rule_fields if f not in first_rule]
+                
+                if missing_rule_fields:
+                    self.log_test("Security Rules Management", False, f"Missing rule fields: {missing_rule_fields}")
+                    return False
+                
+                # Test category filtering
+                response_filtered = self.session.get(f"{self.base_url}/security-rules?category=web_security&enabled_only=true")
+                
+                if response_filtered.status_code == 200:
+                    filtered_data = response_filtered.json()
+                    filtered_rules = filtered_data.get("rules", [])
+                    
+                    # Verify filtering worked
+                    if filtered_rules:
+                        web_security_rules = [r for r in filtered_rules if r.get("category") == "web_security"]
+                        if len(web_security_rules) != len(filtered_rules):
+                            self.log_test("Security Rules Management", False, "Category filtering not working correctly")
+                            return False
+                    
+                    self.log_test("Security Rules Management", True, 
+                                f"Rules management: {total_count} total rules, {len(filtered_rules)} web security rules")
+                    return True
+                else:
+                    self.log_test("Security Rules Management", False, f"Category filtering failed: HTTP {response_filtered.status_code}")
+                    return False
+            else:
+                self.log_test("Security Rules Management", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Security Rules Management", False, f"Error: {str(e)}")
+            return False
+
+    def test_security_rules_categories(self):
+        """Test GET /api/security-rules/categories"""
+        try:
+            response = self.session.get(f"{self.base_url}/security-rules/categories")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Should return list of categories
+                if not isinstance(data, list):
+                    self.log_test("Security Rules Categories", False, f"Expected list, got {type(data)}")
+                    return False
+                
+                # Verify expected categories are present
+                expected_categories = ["web_security", "database_security", "api_security", "network_security", "identity_access", "cloud_security"]
+                found_categories = [cat.get("id") if isinstance(cat, dict) else cat for cat in data]
+                
+                missing_categories = [cat for cat in expected_categories if cat not in found_categories]
+                if missing_categories:
+                    self.log_test("Security Rules Categories", False, f"Missing categories: {missing_categories}")
+                    return False
+                
+                self.log_test("Security Rules Categories", True, f"Retrieved {len(data)} rule categories: {found_categories}")
+                return True
+            else:
+                self.log_test("Security Rules Categories", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Security Rules Categories", False, f"Error: {str(e)}")
+            return False
+
+    def test_security_rules_statistics(self):
+        """Test GET /api/security-rules/statistics"""
+        try:
+            response = self.session.get(f"{self.base_url}/security-rules/statistics")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required statistics fields
+                expected_fields = ["total_rules", "enabled_rules", "rules_by_category", "rules_by_priority"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Security Rules Statistics", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                total_rules = data.get("total_rules", 0)
+                enabled_rules = data.get("enabled_rules", 0)
+                rules_by_category = data.get("rules_by_category", {})
+                rules_by_priority = data.get("rules_by_priority", {})
+                
+                # Verify statistics make sense
+                if total_rules < enabled_rules:
+                    self.log_test("Security Rules Statistics", False, f"Invalid statistics: total_rules ({total_rules}) < enabled_rules ({enabled_rules})")
+                    return False
+                
+                if not rules_by_category:
+                    self.log_test("Security Rules Statistics", False, "No rules by category statistics")
+                    return False
+                
+                self.log_test("Security Rules Statistics", True, 
+                            f"Statistics: {total_rules} total, {enabled_rules} enabled, {len(rules_by_category)} categories")
+                return True
+            else:
+                self.log_test("Security Rules Statistics", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Security Rules Statistics", False, f"Error: {str(e)}")
+            return False
+
+    def test_specific_security_rule(self):
+        """Test GET /api/security-rules/{rule_id}"""
+        # Test with known rule IDs from the DSL engine
+        test_rule_ids = ["rule.web.sql_injection", "rule.api.broken_authentication", "rule.cloud.s3_public_bucket"]
+        
+        for rule_id in test_rule_ids:
+            try:
+                response = self.session.get(f"{self.base_url}/security-rules/{rule_id}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required rule fields
+                    expected_fields = ["id", "name", "description", "category", "enabled", "conditions", "outcome"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Specific Rule - {rule_id}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    # Verify rule ID matches
+                    if data.get("id") != rule_id:
+                        self.log_test(f"Specific Rule - {rule_id}", False, f"Rule ID mismatch: expected {rule_id}, got {data.get('id')}")
+                        return False
+                    
+                    self.log_test(f"Specific Rule - {rule_id}", True, f"Retrieved rule: {data.get('name')}")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Specific Rule - {rule_id}", False, f"Rule not found: {rule_id}")
+                    return False
+                else:
+                    self.log_test(f"Specific Rule - {rule_id}", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Specific Rule - {rule_id}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def create_dsl_test_scenarios(self):
+        """Create specific test scenarios for DSL rule engine testing"""
+        scenarios = []
+        
+        # Scenario A: SQL Injection Test
+        sql_injection_scenario = {
+            "id": str(uuid.uuid4()),
+            "title": "SQL Injection Test Scenario",
+            "description": "WebApp connected to Database without InputValidation control",
+            "nodes": [
+                {
+                    "id": "webapp-node",
+                    "type": "Asset",
+                    "subtype": "WebApp",
+                    "label": "Web Application",
+                    "position": {"x": 200, "y": 100},
+                    "data": {"criticality": "High"}
+                },
+                {
+                    "id": "database-node",
+                    "type": "Asset",
+                    "subtype": "Database",
+                    "label": "Customer Database",
+                    "position": {"x": 400, "y": 100},
+                    "data": {"criticality": "Critical", "data_classification": "Confidential"}
+                }
+            ],
+            "edges": [
+                {
+                    "id": "webapp-to-db",
+                    "source": "webapp-node",
+                    "target": "database-node",
+                    "label": "Database Connection"
+                }
+            ]
+        }
+        scenarios.append(sql_injection_scenario)
+        
+        # Scenario B: Cloud Security Test
+        cloud_security_scenario = {
+            "id": str(uuid.uuid4()),
+            "title": "Cloud Security Test Scenario",
+            "description": "S3 Bucket with public access enabled",
+            "nodes": [
+                {
+                    "id": "s3-bucket-node",
+                    "type": "Asset",
+                    "subtype": "S3Bucket",
+                    "label": "Public S3 Bucket",
+                    "position": {"x": 200, "y": 100},
+                    "data": {"public_access": True, "criticality": "High"}
+                }
+            ],
+            "edges": []
+        }
+        scenarios.append(cloud_security_scenario)
+        
+        # Scenario C: API Security Test
+        api_security_scenario = {
+            "id": str(uuid.uuid4()),
+            "title": "API Security Test Scenario",
+            "description": "API without IAM Policy control",
+            "nodes": [
+                {
+                    "id": "api-node",
+                    "type": "Asset",
+                    "subtype": "API",
+                    "label": "Payment API",
+                    "position": {"x": 200, "y": 100},
+                    "data": {"criticality": "High"}
+                }
+            ],
+            "edges": []
+        }
+        scenarios.append(api_security_scenario)
+        
+        return scenarios
+
+    def test_dsl_rule_scenarios(self):
+        """Test DSL rule engine with specific security scenarios"""
+        scenarios = self.create_dsl_test_scenarios()
+        
+        for scenario in scenarios:
+            try:
+                # Create diagram for scenario
+                response = self.session.post(
+                    f"{self.base_url}/diagrams",
+                    json={"title": scenario["title"], "description": scenario["description"]},
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code != 200:
+                    self.log_test(f"DSL Scenario - {scenario['title']}", False, f"Failed to create diagram: {response.status_code}")
+                    continue
+                
+                diagram_id = response.json()["id"]
+                scenario["id"] = diagram_id
+                
+                # Update with scenario data
+                response = self.session.put(
+                    f"{self.base_url}/diagrams/{diagram_id}",
+                    json=scenario,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code != 200:
+                    self.log_test(f"DSL Scenario - {scenario['title']}", False, f"Failed to update diagram: {response.status_code}")
+                    continue
+                
+                # Test rule evaluation
+                response = self.session.post(f"{self.base_url}/diagrams/{diagram_id}/evaluate-rules")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    rule_results = data.get("rule_results", [])
+                    total_triggered = data.get("total_rules_triggered", 0)
+                    
+                    # Verify expected rules triggered based on scenario
+                    expected_rules = {
+                        "SQL Injection Test Scenario": ["rule.web.sql_injection"],
+                        "Cloud Security Test Scenario": ["rule.cloud.s3_public_bucket"],
+                        "API Security Test Scenario": ["rule.api.broken_authentication"]
+                    }
+                    
+                    expected_rule_ids = expected_rules.get(scenario["title"], [])
+                    triggered_rule_ids = [r.get("rule_id") for r in rule_results]
+                    
+                    # Check if expected rules were triggered
+                    found_expected = any(rule_id in triggered_rule_ids for rule_id in expected_rule_ids)
+                    
+                    if found_expected or total_triggered > 0:
+                        self.log_test(f"DSL Scenario - {scenario['title']}", True, 
+                                    f"Rules triggered: {total_triggered}, expected rules found: {found_expected}")
+                    else:
+                        self.log_test(f"DSL Scenario - {scenario['title']}", False, 
+                                    f"No rules triggered for scenario that should trigger: {expected_rule_ids}")
+                        return False
+                else:
+                    self.log_test(f"DSL Scenario - {scenario['title']}", False, f"Rule evaluation failed: {response.status_code}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"DSL Scenario - {scenario['title']}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
