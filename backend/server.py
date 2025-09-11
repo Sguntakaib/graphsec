@@ -1111,8 +1111,10 @@ def _scale_layout(pos: Dict, width: int, height: int) -> Dict[str, Dict[str, flo
     return layout_positions
 
 @api_router.post("/diagrams/{diagram_id}/auto-layout")
-async def auto_layout_diagram(diagram_id: str):
-    """Generate automatic layout for diagram nodes"""
+async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = "smart_hierarchical"):
+    """Generate automatic layout for diagram nodes with advanced algorithms"""
+    from typing import Dict, List, Tuple
+    
     diagram = await db.diagrams.find_one({"id": diagram_id})
     if not diagram:
         raise HTTPException(status_code=404, detail="Diagram not found")
@@ -1120,37 +1122,67 @@ async def auto_layout_diagram(diagram_id: str):
     nodes = diagram.get("nodes", [])
     edges = diagram.get("edges", [])
     
-    # Simple hierarchical layout algorithm
+    if not nodes:
+        return {"layout_positions": {}, "algorithm": algorithm, "node_count": 0}
+    
+    # Create NetworkX graph
+    G = nx.DiGraph()
+    
+    # Add nodes with attributes
+    for node in nodes:
+        G.add_node(node["id"], 
+                  type=node.get("type", "Unknown"),
+                  subtype=node.get("subtype", ""),
+                  label=node.get("label", ""))
+    
+    # Add edges
+    for edge in edges:
+        source = edge.get("source")
+        target = edge.get("target")
+        if source and target and G.has_node(source) and G.has_node(target):
+            G.add_edge(source, target)
+    
     layout_positions = {}
     
-    # Group nodes by type
-    node_groups = {}
-    for node in nodes:
-        node_type = node.get("type", "Unknown")
-        if node_type not in node_groups:
-            node_groups[node_type] = []
-        node_groups[node_type].append(node)
-    
-    # Position groups in layers
-    y_offset = 0
-    layer_height = 150
-    node_spacing = 200
-    
-    for node_type, type_nodes in node_groups.items():
-        x_offset = 0
-        for i, node in enumerate(type_nodes):
-            layout_positions[node["id"]] = {
-                "x": x_offset,
-                "y": y_offset
-            }
-            x_offset += node_spacing
-        y_offset += layer_height
+    if algorithm == "smart_hierarchical":
+        # Enhanced hierarchical layout based on security relationships
+        layout_positions = _smart_hierarchical_layout(G, nodes)
+        
+    elif algorithm == "force_directed":
+        # Spring layout with custom parameters
+        if len(nodes) > 1:
+            pos = nx.spring_layout(G, k=3, iterations=50, seed=42)
+            # Scale and center the layout
+            layout_positions = _scale_layout(pos, 800, 600)
+        else:
+            layout_positions = {nodes[0]["id"]: {"x": 400, "y": 300}}
+            
+    elif algorithm == "circular":
+        # Circular layout with node type grouping
+        layout_positions = _circular_layout_by_type(G, nodes)
+        
+    elif algorithm == "layered_security":
+        # Security-focused layered layout
+        layout_positions = _layered_security_layout(G, nodes)
+        
+    elif algorithm == "network_topology":
+        # Network topology-aware layout
+        layout_positions = _network_topology_layout(G, nodes)
+        
+    else:
+        # Default to smart hierarchical
+        layout_positions = _smart_hierarchical_layout(G, nodes)
     
     return {
         "layout_positions": layout_positions,
-        "algorithm": "hierarchical",
+        "algorithm": algorithm,
         "node_count": len(nodes),
-        "group_count": len(node_groups)
+        "edge_count": len(edges),
+        "graph_info": {
+            "is_connected": nx.is_connected(G.to_undirected()),
+            "node_types": list(set(node.get("type", "Unknown") for node in nodes)),
+            "density": nx.density(G) if len(nodes) > 1 else 0
+        }
     }
 
 # Template Management APIs
