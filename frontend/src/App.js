@@ -723,6 +723,97 @@ function AppContent() {
     }
   };
 
+  // Security Questionnaire Handlers
+  const handleSecurityQuestionnaireComplete = async (result) => {
+    try {
+      if (!currentQuestionnaireNode) return;
+
+      // Create security branches for the node
+      const branchResponse = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${currentQuestionnaireNode.subtype}/create-branches`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (branchResponse.ok) {
+        const branchData = await branchResponse.json();
+        
+        // Update branches with user answers
+        const updatedBranches = branchData.branches.map(branch => {
+          const answer = result.answers[branch.id] || result.answers[Object.keys(result.answers).find(key => key.includes(branch.type.toLowerCase()))];
+          return {
+            ...branch,
+            completed: answer !== undefined && answer !== null,
+            value: answer
+          };
+        });
+
+        // Store branches for this node
+        setNodeBranches(prev => ({
+          ...prev,
+          [currentQuestionnaireNode.id]: updatedBranches
+        }));
+
+        // Update node data with security information
+        setNodes(nds => nds.map(node => {
+          if (node.id === currentQuestionnaireNode.id) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                securityBranches: updatedBranches,
+                completionStatus: result.validation,
+                recommendations: result.recommendations,
+                intelligentNode: true
+              }
+            };
+          }
+          return node;
+        }));
+
+        // Show completion status
+        const completionPercentage = result.validation?.completion_percentage || 0;
+        alert(`Security configuration completed!\n\nCompletion: ${completionPercentage}%\nRecommendations: ${result.recommendations?.length || 0}`);
+      }
+
+    } catch (error) {
+      console.error('Error completing security questionnaire:', error);
+    } finally {
+      setShowSecurityQuestionnaire(false);
+      setCurrentQuestionnaireNode(null);
+    }
+  };
+
+  const handleSecurityQuestionnaireCancel = () => {
+    setShowSecurityQuestionnaire(false);
+    setCurrentQuestionnaireNode(null);
+  };
+
+  const handleNodeBranchUpdate = (nodeId, updatedBranches) => {
+    setNodeBranches(prev => ({
+      ...prev,
+      [nodeId]: updatedBranches
+    }));
+
+    // Update node data
+    setNodes(nds => nds.map(node => {
+      if (node.id === nodeId) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            securityBranches: updatedBranches
+          }
+        };
+      }
+      return node;
+    }));
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event) => {
