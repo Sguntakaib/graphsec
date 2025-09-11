@@ -1993,7 +1993,17 @@ class SecurityModelingAPITester:
             self.test_intelligent_nodes_create_branches,
             self.test_intelligent_nodes_validate_completeness,
             self.test_intelligent_nodes_calculate_risk,
-            self.test_intelligent_nodes_invalid_subtypes
+            self.test_intelligent_nodes_invalid_subtypes,
+            # Phase 2 DSL Rule Engine Tests
+            self.test_dsl_rule_evaluation,
+            self.test_security_gap_detection,
+            self.test_completeness_analysis,
+            self.test_comprehensive_analysis,
+            self.test_security_rules_management,
+            self.test_security_rules_categories,
+            self.test_security_rules_statistics,
+            self.test_specific_security_rule,
+            self.test_dsl_rule_scenarios
         ]
         
         passed = 0
