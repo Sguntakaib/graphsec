@@ -260,11 +260,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "MITRE Technique Lookup API"
-    - "MITRE Techniques by Tactic API"
-    - "MITRE Coverage Analysis API"
-    - "Advanced Risk Analysis API"
-    - "Auto Layout API"
+    - "Template Library System"
+    - "Default Security Templates"
+    - "Enhanced Auto Layout Algorithms"
+    - "Compliance Framework Mapping"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
