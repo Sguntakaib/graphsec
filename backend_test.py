@@ -1712,21 +1712,38 @@ class SecurityModelingAPITester:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Should return list of categories
-                if not isinstance(data, list):
-                    self.log_test("Security Rules Categories", False, f"Expected list, got {type(data)}")
+                # Should return dict with categories list
+                if not isinstance(data, dict) or "categories" not in data:
+                    self.log_test("Security Rules Categories", False, f"Expected dict with 'categories' key, got {type(data)}")
+                    return False
+                
+                categories = data.get("categories", [])
+                total_categories = data.get("total_categories", 0)
+                
+                if not isinstance(categories, list):
+                    self.log_test("Security Rules Categories", False, f"Expected categories to be list, got {type(categories)}")
                     return False
                 
                 # Verify expected categories are present
                 expected_categories = ["web_security", "database_security", "api_security", "network_security", "identity_access", "cloud_security"]
-                found_categories = [cat.get("id") if isinstance(cat, dict) else cat for cat in data]
+                found_categories = [cat.get("id") for cat in categories]
                 
                 missing_categories = [cat for cat in expected_categories if cat not in found_categories]
                 if missing_categories:
                     self.log_test("Security Rules Categories", False, f"Missing categories: {missing_categories}")
                     return False
                 
-                self.log_test("Security Rules Categories", True, f"Retrieved {len(data)} rule categories: {found_categories}")
+                # Verify category structure
+                if categories:
+                    first_category = categories[0]
+                    required_fields = ["id", "name", "rule_count"]
+                    missing_fields = [f for f in required_fields if f not in first_category]
+                    
+                    if missing_fields:
+                        self.log_test("Security Rules Categories", False, f"Missing category fields: {missing_fields}")
+                        return False
+                
+                self.log_test("Security Rules Categories", True, f"Retrieved {total_categories} rule categories: {found_categories}")
                 return True
             else:
                 self.log_test("Security Rules Categories", False, f"HTTP {response.status_code}: {response.text}")
