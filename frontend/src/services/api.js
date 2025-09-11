@@ -111,4 +111,48 @@ export const healthCheck = async () => {
   }
 };
 
-export default apiClient;
+// Advanced Analysis API functions
+export const getMitreTechnique = async (techniqueId) => {
+  try {
+    const response = await apiClient.get(`/mitre/technique/${techniqueId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to fetch MITRE technique: ${error.message}`);
+  }
+};
+
+export const getTechniquesByTactic = async (tactic) => {
+  try {
+    const response = await apiClient.get(`/mitre/techniques/by-tactic/${tactic}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to fetch techniques by tactic: ${error.message}`);
+  }
+};
+
+export const analyzeMitreCoverage = async (diagramId) => {
+  try {
+    const response = await apiClient.post(`/diagrams/${diagramId}/analyze-coverage`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to analyze MITRE coverage: ${error.message}`);
+  }
+};
+
+export const getRiskAnalysis = async (diagramId) => {
+  try {
+    const response = await apiClient.get(`/diagrams/${diagramId}/risk-analysis`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to get risk analysis: ${error.message}`);
+  }
+};
+
+export const autoLayoutDiagram = async (diagramId) => {
+  try {
+    const response = await apiClient.post(`/diagrams/${diagramId}/auto-layout`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to auto-layout diagram: ${error.message}`);
+  }
+};
