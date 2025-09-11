@@ -19,6 +19,7 @@ import { PropertiesPanel } from './components/PropertiesPanel';
 import { EnhancedSimulationPanel } from './components/EnhancedSimulationPanel';
 import { TemplateLibrary } from './components/TemplateLibrary';
 import { CustomNode } from './components/CustomNode';
+import SecurityQuestionnaire from './components/SecurityQuestionnaire';
 import SmartNodeConnector from './components/SmartNodeConnector';
 import NodeBranchVisualizer from './components/NodeBranchVisualizer';
 import ThreatModelingWizard from './components/ThreatModelingWizard';
