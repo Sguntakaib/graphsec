@@ -21,6 +21,7 @@ import { TemplateLibrary } from './components/TemplateLibrary';
 import { CustomNode } from './components/CustomNode';
 import SecurityQuestionnaire from './components/SecurityQuestionnaire';
 import NodeBranchVisualizer from './components/NodeBranchVisualizer';
+import ThreatModelingWizard from './components/ThreatModelingWizard';
 import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram, applyTemplateToCurrentDiagram } from './services/api';
   import { 
   Shield, 
