@@ -72,6 +72,7 @@ function AppContent() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
+  const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
