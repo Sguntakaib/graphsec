@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -8,15 +8,30 @@ import {
   useEdgesState,
   addEdge,
   Panel,
+  useReactFlow,
+  MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './App.css';
-import { SecurityNodeLibrary } from './components/SecurityNodeLibrary';
+import { AdvancedNodeLibrary } from './components/AdvancedNodeLibrary';
 import { PropertiesPanel } from './components/PropertiesPanel';
-import { SimulationPanel } from './components/SimulationPanel';
+import { EnhancedSimulationPanel } from './components/EnhancedSimulationPanel';
 import { CustomNode } from './components/CustomNode';
-import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths } from './services/api';
-import { Shield, Play, Save, FolderOpen } from 'lucide-react';
+import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram } from './services/api';
+import { 
+  Shield, 
+  Play, 
+  Save, 
+  FolderOpen, 
+  Maximize2, 
+  RotateCcw, 
+  Settings,
+  Zap,
+  BarChart3,
+  Download,
+  Upload,
+  Layers
+} from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
