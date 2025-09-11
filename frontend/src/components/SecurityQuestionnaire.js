@@ -123,10 +123,21 @@ const SecurityQuestionnaire = ({
     const validationResult = await validateAnswers();
     
     if (validationResult) {
+      // Trigger smart node creation if callback is provided
+      let smartNodeResult = null;
+      if (onCreateLinkedNodes && sourceNode && currentNodes) {
+        try {
+          smartNodeResult = await onCreateLinkedNodes(sourceNode.id, nodeSubtype, answers, currentNodes);
+        } catch (error) {
+          console.error('Error creating linked nodes:', error);
+        }
+      }
+
       onComplete({
         answers,
         validation: validationResult.validation,
-        recommendations: validationResult.recommendations
+        recommendations: validationResult.recommendations,
+        smartNodeResult
       });
     }
   };
