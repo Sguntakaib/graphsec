@@ -171,7 +171,60 @@ function AppContent() {
 
   const onNodeClick = useCallback((event, node) => {
     setSelectedNode(node);
+    setContextMenu(null); // Close context menu when clicking node
   }, []);
+
+  const onEdgeClick = (event, edge) => {
+    setSelectedNode(null);
+    setContextMenu(null);
+  };
+
+  const onPaneClick = () => {
+    setSelectedNode(null);
+    setContextMenu(null);
+  };
+
+  // Context menu handlers
+  const handleContextMenu = (event, node = null) => {
+    event.preventDefault();
+    
+    const rect = event.currentTarget.getBoundingClientRect();
+    setContextMenu({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+      node: node,
+      visible: true
+    });
+  };
+
+  const duplicateNode = (node) => {
+    if (!node) return;
+    
+    saveStateToUndoStack();
+    
+    const newNode = {
+      ...node,
+      id: `${node.id}-copy-${Date.now()}`,
+      position: {
+        x: node.position.x + 50,
+        y: node.position.y + 50
+      }
+    };
+    
+    setNodes((nds) => [...nds, newNode]);
+    setContextMenu(null);
+  };
+
+  const deleteNode = (node) => {
+    if (!node) return;
+    
+    saveStateToUndoStack();
+    
+    setNodes((nds) => nds.filter((n) => n.id !== node.id));
+    setEdges((eds) => eds.filter((e) => e.source !== node.id && e.target !== node.id));
+    setSelectedNode(null);
+    setContextMenu(null);
+  };
 
   const onDrop = useCallback(
     (event) => {
