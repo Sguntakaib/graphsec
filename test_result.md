@@ -655,24 +655,30 @@ agent_communication:
 
   - task: "Threat Modeling Wizard Recommendations API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/wizard/recommendations endpoint implemented - provides contextual recommendations for different wizard steps (systemOverview, assetInventory, boundaries, dataflows, threats, surfaces, controls, risk, compliance, implementation)"
+      - working: true
+        agent: "testing"
+        comment: "✅ POST /api/wizard/recommendations endpoint working correctly - tested systemOverview step with E-commerce Platform data (2 contextual recommendations), assetInventory step with 3 assets (3 asset-specific recommendations), and invalid step handling (1 fallback recommendation). All responses include proper step validation, recommendation count matching, and contextual security-relevant content."
 
   - task: "Threat Modeling Wizard Model Generation API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/wizard/generate-model endpoint implemented - generates complete threat models from wizard data including nodes, edges, recommendations, and implementation plans"
+      - working: true
+        agent: "testing"
+        comment: "✅ POST /api/wizard/generate-model endpoint working correctly - tested complete wizard data generation (5 nodes, 8 recommendations), minimal data handling (2 nodes, 5 recommendations), and error handling (graceful empty data processing). All responses include proper success status, generated nodes with correct structure (id, type, position, data), recommendations, implementation plans, and accurate summary counts."
