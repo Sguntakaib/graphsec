@@ -1133,7 +1133,7 @@ class SecurityModelingAPITester:
                         return False
                     
                     # Verify prompt types are valid
-                    valid_types = ["SINGLE_CHOICE", "MULTIPLE_CHOICE", "TEXT_INPUT", "BOOLEAN", "NUMERIC"]
+                    valid_types = ["single_choice", "multiple_choice", "text", "boolean", "number"]
                     prompt_types = [p.get("type") for p in prompts]
                     invalid_types = [t for t in prompt_types if t not in valid_types]
                     
