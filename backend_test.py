@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://probsim-engine.preview.emergentagent.com/api"
+BASE_URL = "https://threat-expert.preview.emergentagent.com/api"
 
 class SecurityModelingAPITester:
     def __init__(self):
