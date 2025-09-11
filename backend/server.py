@@ -530,6 +530,127 @@ async def auto_layout_diagram(diagram_id: str):
         "group_count": len(node_groups)
     }
 
+# Template Management APIs
+@api_router.get("/templates", response_model=List[SecurityTemplate])
+async def get_templates(category: Optional[str] = None, complexity: Optional[str] = None):
+    """Get all security templates with optional filtering"""
+    query = {}
+    if category:
+        query["category"] = category
+    if complexity:
+        query["complexity"] = complexity
+    
+    templates = await db.templates.find(query).to_list(length=None)
+    return [parse_from_mongo(template) for template in templates]
+
+@api_router.get("/templates/{template_id}", response_model=SecurityTemplate)
+async def get_template(template_id: str):
+    """Get a specific template by ID"""
+    template = await db.templates.find_one({"id": template_id})
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+    return parse_from_mongo(template)
+
+@api_router.post("/templates", response_model=SecurityTemplate)
+async def create_template(template: TemplateCreate):
+    """Create a new security template"""
+    template_data = SecurityTemplate(**template.dict())
+    prepared_data = prepare_for_mongo(template_data.dict())
+    await db.templates.insert_one(prepared_data)
+    return template_data
+
+@api_router.put("/templates/{template_id}", response_model=SecurityTemplate)
+async def update_template(template_id: str, template: TemplateCreate):
+    """Update an existing template"""
+    existing = await db.templates.find_one({"id": template_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    updated_data = template.dict()
+    updated_data["updated_at"] = datetime.now(timezone.utc)
+    prepared_data = prepare_for_mongo(updated_data)
+    
+    await db.templates.update_one({"id": template_id}, {"$set": prepared_data})
+    
+    # Return the updated template
+    updated_template = await db.templates.find_one({"id": template_id})
+    return parse_from_mongo(updated_template)
+
+@api_router.delete("/templates/{template_id}")
+async def delete_template(template_id: str):
+    """Delete a template"""
+    result = await db.templates.delete_one({"id": template_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Template not found")
+    return {"message": "Template deleted successfully"}
+
+@api_router.post("/templates/{template_id}/apply/{diagram_id}")
+async def apply_template_to_diagram(template_id: str, diagram_id: str):
+    """Apply a template to an existing diagram"""
+    # Get template
+    template = await db.templates.find_one({"id": template_id})
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    # Get diagram
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    # Apply template nodes and edges to diagram
+    template_nodes = template.get("nodes", [])
+    template_edges = template.get("edges", [])
+    
+    # Generate new IDs for template nodes to avoid conflicts
+    node_id_mapping = {}
+    new_nodes = []
+    
+    for node in template_nodes:
+        old_id = node["id"]
+        new_id = f"template-{old_id}-{uuid.uuid4().hex[:8]}"
+        node_id_mapping[old_id] = new_id
+        
+        new_node = node.copy()
+        new_node["id"] = new_id
+        new_nodes.append(new_node)
+    
+    # Update edge IDs to match new node IDs
+    new_edges = []
+    for edge in template_edges:
+        new_edge = edge.copy()
+        new_edge["id"] = f"template-edge-{uuid.uuid4().hex[:8]}"
+        new_edge["source"] = node_id_mapping.get(edge["source"], edge["source"])
+        new_edge["target"] = node_id_mapping.get(edge["target"], edge["target"])
+        new_edges.append(new_edge)
+    
+    # Combine with existing diagram nodes and edges
+    existing_nodes = diagram.get("nodes", [])
+    existing_edges = diagram.get("edges", [])
+    
+    updated_nodes = existing_nodes + new_nodes
+    updated_edges = existing_edges + new_edges
+    
+    # Update diagram
+    update_data = {
+        "nodes": updated_nodes,
+        "edges": updated_edges,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.diagrams.update_one({"id": diagram_id}, {"$set": update_data})
+    
+    return {
+        "message": "Template applied successfully",
+        "nodes_added": len(new_nodes),
+        "edges_added": len(new_edges),
+        "template_name": template.get("name", "Unknown")
+    }
+
+@api_router.get("/templates/categories")
+async def get_template_categories():
+    """Get available template categories"""
+    return [{"id": cat.value, "name": cat.value} for cat in TemplateCategory]
+
 # Include the router in the main app
 app.include_router(api_router)
 
