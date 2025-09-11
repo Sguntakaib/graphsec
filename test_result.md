@@ -229,6 +229,68 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+  - task: "MITRE Technique Lookup API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Advanced MITRE integration endpoints implemented - need testing for technique lookup functionality"
+
+  - task: "MITRE Techniques by Tactic API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Advanced MITRE integration endpoints implemented - need testing for tactic-based technique filtering"
+
+  - task: "MITRE Coverage Analysis API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Advanced coverage analysis endpoint implemented - need testing for MITRE ATT&CK coverage analysis"
+
+  - task: "Advanced Risk Analysis API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced risk analysis endpoint implemented with advanced algorithms - need testing"
+
+  - task: "Auto Layout API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Auto-layout algorithm endpoint implemented using NetworkX - need testing"
+
 agent_communication:
   - agent: "testing"
     message: "Completed comprehensive backend API testing for Security Modeling Platform. All 9 backend tasks tested successfully with realistic security modeling data. API endpoints handle CRUD operations correctly, simulation engine generates meaningful attack paths with MITRE ATT&CK mapping, and security domain models work as expected. Backend is fully functional and ready for production use."
+  - agent: "main"
+    message: "Phase 1 critical issues: Added 5 advanced backend endpoints for testing - MITRE technique lookup, tactic filtering, coverage analysis, enhanced risk analysis, and auto-layout algorithms. All endpoints are implemented with NetworkX and advanced simulation modules. Dependencies installed and backend restarted. Ready for advanced endpoint testing."
