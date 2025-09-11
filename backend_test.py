@@ -1221,27 +1221,28 @@ class SecurityModelingAPITester:
 
     def test_intelligent_nodes_validate_completeness(self):
         """Test POST /api/intelligent-nodes/{node_subtype}/validate-completeness"""
+        # CRITICAL: API expects direct list format, NOT object with "branches" property
         test_cases = [
             {
                 "subtype": "WebApp",
                 "branches": [
                     {
-                        "id": "auth-branch",
-                        "name": "Authentication",
-                        "type": "AUTHENTICATION",
+                        "id": "webapp_login",
+                        "name": "Login",
+                        "type": "LOGIN",
                         "required": True,
                         "completed": True,
-                        "value": "OAuth2",
-                        "description": "OAuth2 authentication implemented"
+                        "value": "Password Only",
+                        "description": "Authentication method"
                     },
                     {
-                        "id": "encrypt-branch",
-                        "name": "Encryption",
-                        "type": "ENCRYPTION",
+                        "id": "webapp_api_endpoints",
+                        "name": "API",
+                        "type": "API",
                         "required": True,
                         "completed": False,
                         "value": None,
-                        "description": "Data encryption not configured"
+                        "description": "API endpoints not configured"
                     }
                 ]
             },
@@ -1249,13 +1250,13 @@ class SecurityModelingAPITester:
                 "subtype": "Database",
                 "branches": [
                     {
-                        "id": "backup-branch",
-                        "name": "Backup",
-                        "type": "BACKUP",
+                        "id": "db_encryption_at_rest",
+                        "name": "Encryption",
+                        "type": "ENCRYPTION",
                         "required": True,
                         "completed": True,
-                        "value": "Daily automated backups",
-                        "description": "Automated backup system configured"
+                        "value": "AES-256",
+                        "description": "Encryption at rest enabled"
                     }
                 ]
             }
@@ -1266,9 +1267,10 @@ class SecurityModelingAPITester:
             branches = test_case["branches"]
             
             try:
+                # CRITICAL: Send branches as direct list, not wrapped in object
                 response = self.session.post(
                     f"{self.base_url}/intelligent-nodes/{subtype}/validate-completeness",
-                    json={"branches": branches},
+                    json=branches,  # Direct list format as per API contract
                     headers={"Content-Type": "application/json"}
                 )
                 
