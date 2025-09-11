@@ -33,7 +33,17 @@ import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLay
   Upload,
   Layers,
   Eye,
-  EyeOff
+  EyeOff,
+  Undo,
+  Redo,
+  Grid,
+  ZoomIn,
+  ZoomOut,
+  Monitor,
+  Copy,
+  Trash2,
+  Edit,
+  MoreVertical
 } from 'lucide-react';
 
 const nodeTypes = {
