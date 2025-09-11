@@ -20,6 +20,7 @@ from advanced_simulation import AdvancedSimulationEngine
 from mitre_integration import MitreAttackDatabase
 from intelligent_nodes import intelligent_node_engine, SecurityBranch, SecurityPrompt, IntelligentNodeTemplate
 from dsl_rule_engine import dsl_rule_engine, RuleEvaluationResult, SecurityGap, CompletenessAnalysis
+from probabilistic_simulation import probabilistic_engine, ProbabilisticAttackPath, ScenarioAnalysis, DefenseEffectivenessModel
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
