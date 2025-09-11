@@ -781,9 +781,14 @@ function AppContent() {
           return node;
         }));
 
-        // Show completion status
-        const completionPercentage = result.validation?.completion_percentage || 0;
-        alert(`Security configuration completed!\n\nCompletion: ${completionPercentage}%\nRecommendations: ${result.recommendations?.length || 0}`);
+        // Show completion status with smart node creation info
+        let statusMessage = `Security configuration completed!\n\nCompletion: ${result.validation?.completion_percentage || 0}%\nRecommendations: ${result.recommendations?.length || 0}`;
+        
+        if (result.smartNodeResult) {
+          statusMessage += `\n\nSmart Links Created:\n• ${result.smartNodeResult.nodesCreated} new nodes\n• ${result.smartNodeResult.edgesCreated} connections`;
+        }
+        
+        alert(statusMessage);
       }
 
     } catch (error) {
@@ -792,6 +797,11 @@ function AppContent() {
       setShowSecurityQuestionnaire(false);
       setCurrentQuestionnaireNode(null);
     }
+  };
+
+  // Handler for smart node creation
+  const handleCreateLinkedNodes = (sourceNodeId, nodeSubtype, answers, currentNodes) => {
+    return smartNodeConnector.processQuestionnaireAnswers(sourceNodeId, nodeSubtype, answers, currentNodes);
   };
 
   const handleSecurityQuestionnaireCancel = () => {
