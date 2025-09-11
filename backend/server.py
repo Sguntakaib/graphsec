@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from enum import Enum
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+import networkx as nx
+import math
 
 # Import advanced simulation modules
 from advanced_simulation import AdvancedSimulationEngine
