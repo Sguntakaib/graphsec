@@ -1131,6 +1131,14 @@ function AppContent() {
           )}
         </div>
       </div>
+      
+      {/* Template Library Modal */}
+      {showTemplateLibrary && (
+        <TemplateLibrary
+          onApplyTemplate={handleApplyTemplate}
+          onClose={() => setShowTemplateLibrary(false)}
+        />
+      )}
     </div>
   );
 }
