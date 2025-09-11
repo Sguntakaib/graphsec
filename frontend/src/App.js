@@ -121,6 +121,9 @@ function AppContent() {
     setRedoStack([]); // Clear redo stack when new action is performed
   }, [nodes, edges]);
 
+  // Smart Node Connector instance (initialized after saveStateToUndoStack)
+  const smartNodeConnector = new SmartNodeConnector(setNodes, setEdges, saveStateToUndoStack);
+
   // Undo functionality
   const handleUndo = useCallback(() => {
     if (undoStack.length === 0) return;
