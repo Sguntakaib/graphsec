@@ -2022,9 +2022,12 @@ async def run_what_if_scenario(diagram_id: str, scenario_config: Dict[str, Any])
         "analysis_timestamp": datetime.now(timezone.utc).isoformat()
     }
     
-    # Save scenario result
-    result_dict = prepare_for_mongo(result)
-    await db.scenario_analyses.insert_one(result_dict)
+    # Save scenario result (in background to avoid serialization issues)
+    try:
+        result_dict = prepare_for_mongo(result.copy())
+        await db.scenario_analyses.insert_one(result_dict)
+    except Exception as e:
+        logger.error(f"Failed to save scenario analysis to database: {e}")
     
     return result
 
