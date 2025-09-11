@@ -985,6 +985,465 @@ class SecurityModelingAPITester:
             self.log_test("Auto Layout", False, f"Error: {str(e)}")
             return False
 
+    # Phase 1 Intelligent Node System Tests
+    def test_intelligent_nodes_supported_types(self):
+        """Test GET /api/intelligent-nodes/supported-types"""
+        try:
+            response = self.session.get(f"{self.base_url}/intelligent-nodes/supported-types")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["supported_types", "total_count"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Intelligent Nodes - Supported Types", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                supported_types = data.get("supported_types", [])
+                total_count = data.get("total_count", 0)
+                
+                # Verify expected node types are supported
+                expected_types = ["WebApp", "Database", "API", "ExternalAttacker"]
+                found_types = [t.get("node_subtype") for t in supported_types]
+                
+                missing_types = [t for t in expected_types if t not in found_types]
+                if missing_types:
+                    self.log_test("Intelligent Nodes - Supported Types", False, 
+                                f"Missing expected types: {missing_types}. Found: {found_types}")
+                    return False
+                
+                # Verify structure of type info
+                if supported_types:
+                    first_type = supported_types[0]
+                    required_type_fields = ["node_subtype", "node_type", "required_branches_count", "security_prompts_count"]
+                    missing_type_fields = [f for f in required_type_fields if f not in first_type]
+                    
+                    if missing_type_fields:
+                        self.log_test("Intelligent Nodes - Supported Types", False, 
+                                    f"Missing type info fields: {missing_type_fields}")
+                        return False
+                
+                self.log_test("Intelligent Nodes - Supported Types", True, 
+                            f"Retrieved {total_count} supported types: {found_types}")
+                return True
+            else:
+                self.log_test("Intelligent Nodes - Supported Types", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Intelligent Nodes - Supported Types", False, f"Error: {str(e)}")
+            return False
+
+    def test_intelligent_nodes_templates(self):
+        """Test GET /api/intelligent-nodes/{node_subtype}/template"""
+        test_subtypes = ["WebApp", "Database", "API", "ExternalAttacker"]
+        
+        for subtype in test_subtypes:
+            try:
+                response = self.session.get(f"{self.base_url}/intelligent-nodes/{subtype}/template")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required template fields
+                    expected_fields = ["node_type", "node_subtype", "required_branches", "security_prompts", "risk_factors"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Intelligent Template - {subtype}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    # Verify template structure
+                    required_branches = data.get("required_branches", [])
+                    security_prompts = data.get("security_prompts", [])
+                    risk_factors = data.get("risk_factors", {})
+                    
+                    if not required_branches:
+                        self.log_test(f"Intelligent Template - {subtype}", False, "No required branches defined")
+                        return False
+                    
+                    if not security_prompts:
+                        self.log_test(f"Intelligent Template - {subtype}", False, "No security prompts defined")
+                        return False
+                    
+                    # Verify security prompt structure
+                    if security_prompts:
+                        first_prompt = security_prompts[0]
+                        required_prompt_fields = ["id", "question", "type", "options", "related_branch"]
+                        missing_prompt_fields = [f for f in required_prompt_fields if f not in first_prompt]
+                        
+                        if missing_prompt_fields:
+                            self.log_test(f"Intelligent Template - {subtype}", False, 
+                                        f"Missing prompt fields: {missing_prompt_fields}")
+                            return False
+                    
+                    self.log_test(f"Intelligent Template - {subtype}", True, 
+                                f"Template: {len(required_branches)} branches, {len(security_prompts)} prompts")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Intelligent Template - {subtype}", False, f"Template not found for {subtype}")
+                    return False
+                else:
+                    self.log_test(f"Intelligent Template - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Intelligent Template - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_intelligent_nodes_prompts(self):
+        """Test GET /api/intelligent-nodes/{node_subtype}/prompts"""
+        test_subtypes = ["WebApp", "Database", "API"]
+        
+        for subtype in test_subtypes:
+            try:
+                response = self.session.get(f"{self.base_url}/intelligent-nodes/{subtype}/prompts")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_subtype", "prompts"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Intelligent Prompts - {subtype}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    prompts = data.get("prompts", [])
+                    if not prompts:
+                        self.log_test(f"Intelligent Prompts - {subtype}", False, "No security prompts returned")
+                        return False
+                    
+                    # Verify prompt structure with validation rules
+                    first_prompt = prompts[0]
+                    required_prompt_fields = ["id", "question", "type", "options", "related_branch", "validation_rules"]
+                    missing_prompt_fields = [f for f in required_prompt_fields if f not in first_prompt]
+                    
+                    if missing_prompt_fields:
+                        self.log_test(f"Intelligent Prompts - {subtype}", False, 
+                                    f"Missing prompt fields: {missing_prompt_fields}")
+                        return False
+                    
+                    # Verify prompt types are valid
+                    valid_types = ["SINGLE_CHOICE", "MULTIPLE_CHOICE", "TEXT_INPUT", "BOOLEAN", "NUMERIC"]
+                    prompt_types = [p.get("type") for p in prompts]
+                    invalid_types = [t for t in prompt_types if t not in valid_types]
+                    
+                    if invalid_types:
+                        self.log_test(f"Intelligent Prompts - {subtype}", False, 
+                                    f"Invalid prompt types: {invalid_types}")
+                        return False
+                    
+                    self.log_test(f"Intelligent Prompts - {subtype}", True, 
+                                f"Retrieved {len(prompts)} security prompts with validation")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Intelligent Prompts - {subtype}", False, f"Prompts not found for {subtype}")
+                    return False
+                else:
+                    self.log_test(f"Intelligent Prompts - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Intelligent Prompts - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_intelligent_nodes_create_branches(self):
+        """Test POST /api/intelligent-nodes/{node_subtype}/create-branches"""
+        test_subtypes = ["WebApp", "Database", "API"]
+        
+        for subtype in test_subtypes:
+            try:
+                response = self.session.post(f"{self.base_url}/intelligent-nodes/{subtype}/create-branches")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_subtype", "branches"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Create Branches - {subtype}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    branches = data.get("branches", [])
+                    
+                    # Some subtypes might not have required branches
+                    if not branches:
+                        self.log_test(f"Create Branches - {subtype}", True, f"No required branches for {subtype}")
+                        continue
+                    
+                    # Verify branch structure
+                    first_branch = branches[0]
+                    required_branch_fields = ["id", "name", "type", "required", "completed", "description"]
+                    missing_branch_fields = [f for f in required_branch_fields if f not in first_branch]
+                    
+                    if missing_branch_fields:
+                        self.log_test(f"Create Branches - {subtype}", False, 
+                                    f"Missing branch fields: {missing_branch_fields}")
+                        return False
+                    
+                    # Verify branch types are valid
+                    valid_branch_types = ["LOGIN", "AUTHENTICATION", "AUTHORIZATION", "ENCRYPTION", "MONITORING", "BACKUP"]
+                    branch_types = [b.get("type") for b in branches]
+                    invalid_branch_types = [t for t in branch_types if t not in valid_branch_types]
+                    
+                    if invalid_branch_types:
+                        self.log_test(f"Create Branches - {subtype}", False, 
+                                    f"Invalid branch types: {invalid_branch_types}")
+                        return False
+                    
+                    self.log_test(f"Create Branches - {subtype}", True, 
+                                f"Created {len(branches)} security branches")
+                    
+                else:
+                    self.log_test(f"Create Branches - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Create Branches - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_intelligent_nodes_validate_completeness(self):
+        """Test POST /api/intelligent-nodes/{node_subtype}/validate-completeness"""
+        test_cases = [
+            {
+                "subtype": "WebApp",
+                "branches": [
+                    {
+                        "id": "auth-branch",
+                        "name": "Authentication",
+                        "type": "AUTHENTICATION",
+                        "required": True,
+                        "completed": True,
+                        "value": "OAuth2",
+                        "description": "OAuth2 authentication implemented"
+                    },
+                    {
+                        "id": "encrypt-branch",
+                        "name": "Encryption",
+                        "type": "ENCRYPTION",
+                        "required": True,
+                        "completed": False,
+                        "value": None,
+                        "description": "Data encryption not configured"
+                    }
+                ]
+            },
+            {
+                "subtype": "Database",
+                "branches": [
+                    {
+                        "id": "backup-branch",
+                        "name": "Backup",
+                        "type": "BACKUP",
+                        "required": True,
+                        "completed": True,
+                        "value": "Daily automated backups",
+                        "description": "Automated backup system configured"
+                    }
+                ]
+            }
+        ]
+        
+        for test_case in test_cases:
+            subtype = test_case["subtype"]
+            branches = test_case["branches"]
+            
+            try:
+                response = self.session.post(
+                    f"{self.base_url}/intelligent-nodes/{subtype}/validate-completeness",
+                    json={"branches": branches},
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_subtype", "validation", "recommendations"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Validate Completeness - {subtype}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    validation = data.get("validation", {})
+                    recommendations = data.get("recommendations", [])
+                    
+                    # Verify validation structure
+                    if "is_complete" not in validation:
+                        self.log_test(f"Validate Completeness - {subtype}", False, "Missing is_complete in validation")
+                        return False
+                    
+                    is_complete = validation.get("is_complete", False)
+                    
+                    # For WebApp test case, should not be complete due to incomplete encryption branch
+                    if subtype == "WebApp" and is_complete:
+                        self.log_test(f"Validate Completeness - {subtype}", False, 
+                                    "Expected incomplete validation due to missing encryption")
+                        return False
+                    
+                    self.log_test(f"Validate Completeness - {subtype}", True, 
+                                f"Validation: complete={is_complete}, {len(recommendations)} recommendations")
+                    
+                else:
+                    self.log_test(f"Validate Completeness - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Validate Completeness - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_intelligent_nodes_calculate_risk(self):
+        """Test POST /api/intelligent-nodes/{node_subtype}/calculate-risk"""
+        test_cases = [
+            {
+                "subtype": "WebApp",
+                "branch_values": {
+                    "authentication": "basic",
+                    "encryption": "none",
+                    "input_validation": "minimal",
+                    "access_control": "weak"
+                }
+            },
+            {
+                "subtype": "Database",
+                "branch_values": {
+                    "encryption_at_rest": "enabled",
+                    "access_control": "strong",
+                    "backup_frequency": "daily",
+                    "monitoring": "comprehensive"
+                }
+            },
+            {
+                "subtype": "API",
+                "branch_values": {
+                    "authentication": "oauth2",
+                    "rate_limiting": "enabled",
+                    "input_validation": "comprehensive",
+                    "logging": "detailed"
+                }
+            }
+        ]
+        
+        for test_case in test_cases:
+            subtype = test_case["subtype"]
+            branch_values = test_case["branch_values"]
+            
+            try:
+                response = self.session.post(
+                    f"{self.base_url}/intelligent-nodes/{subtype}/calculate-risk",
+                    json={"branch_values": branch_values},
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_subtype", "risk_score", "risk_level", "branch_values", "recommendations"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Calculate Risk - {subtype}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    risk_score = data.get("risk_score", 0)
+                    risk_level = data.get("risk_level", "Unknown")
+                    recommendations = data.get("recommendations", [])
+                    
+                    # Verify risk score is valid (0-10 scale)
+                    if not (0 <= risk_score <= 10):
+                        self.log_test(f"Calculate Risk - {subtype}", False, 
+                                    f"Invalid risk score: {risk_score} (should be 0-10)")
+                        return False
+                    
+                    # Verify risk level is valid
+                    valid_risk_levels = ["Low", "Medium", "High", "Critical"]
+                    if risk_level not in valid_risk_levels:
+                        self.log_test(f"Calculate Risk - {subtype}", False, 
+                                    f"Invalid risk level: {risk_level}")
+                        return False
+                    
+                    # WebApp with weak security should have higher risk
+                    if subtype == "WebApp" and risk_score < 5.0:
+                        self.log_test(f"Calculate Risk - {subtype}", False, 
+                                    f"Expected higher risk for weak WebApp security, got {risk_score}")
+                        return False
+                    
+                    # Database with strong security should have lower risk
+                    if subtype == "Database" and risk_score > 5.0:
+                        self.log_test(f"Calculate Risk - {subtype}", False, 
+                                    f"Expected lower risk for strong Database security, got {risk_score}")
+                        return False
+                    
+                    self.log_test(f"Calculate Risk - {subtype}", True, 
+                                f"Risk: {risk_score}/10 ({risk_level}), {len(recommendations)} recommendations")
+                    
+                else:
+                    self.log_test(f"Calculate Risk - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Calculate Risk - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_intelligent_nodes_invalid_subtypes(self):
+        """Test intelligent node endpoints with invalid/unsupported subtypes"""
+        invalid_subtypes = ["InvalidType", "NonExistent", "UnsupportedNode"]
+        
+        for subtype in invalid_subtypes:
+            try:
+                # Test template endpoint with invalid subtype
+                response = self.session.get(f"{self.base_url}/intelligent-nodes/{subtype}/template")
+                
+                if response.status_code == 404:
+                    self.log_test(f"Invalid Subtype Template - {subtype}", True, 
+                                f"Correctly returned 404 for invalid subtype")
+                else:
+                    self.log_test(f"Invalid Subtype Template - {subtype}", False, 
+                                f"Expected 404, got {response.status_code}")
+                    return False
+                
+                # Test prompts endpoint with invalid subtype
+                response = self.session.get(f"{self.base_url}/intelligent-nodes/{subtype}/prompts")
+                
+                if response.status_code == 404:
+                    self.log_test(f"Invalid Subtype Prompts - {subtype}", True, 
+                                f"Correctly returned 404 for invalid subtype")
+                else:
+                    self.log_test(f"Invalid Subtype Prompts - {subtype}", False, 
+                                f"Expected 404, got {response.status_code}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Invalid Subtype - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
