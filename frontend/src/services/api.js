@@ -156,3 +156,5 @@ export const autoLayoutDiagram = async (diagramId) => {
     throw new Error(`Failed to auto-layout diagram: ${error.message}`);
   }
 };
+
+export default apiClient;
