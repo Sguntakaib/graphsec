@@ -400,7 +400,7 @@ class IntelligentNodeEngine:
         completion_percentage = (len(completed_branches) / len(required_branches) * 100) if required_branches else 100
         
         return {
-            "complete": len(missing_branches) == 0,
+            "is_complete": len(missing_branches) == 0,
             "missing_branches": [branch.value for branch in missing_branches],
             "completion_percentage": round(completion_percentage, 1),
             "completed_count": len(completed_branches),
