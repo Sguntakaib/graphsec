@@ -1,50 +1,346 @@
 ================================================================================================
-SECURITY MODELING PLATFORM - ARCHITECTURE-ALIGNED ROADMAP
+SECURITY MODELING PLATFORM - CORE VISION ALIGNED ROADMAP
 ================================================================================================
 
-Blueprint Alignment Status: PROTOTYPE COMPLETE ✅ | MVP IN PROGRESS 🚧 | ENTERPRISE PLANNED 📋
+🎯 **CORE VISION**: Intelligent Security Modeling Assistant
+An expert system that understands security concepts and guides users through realistic threat modeling
 
 ================================================================================================
-CURRENT STATE ASSESSMENT (Based on arch.txt Blueprint)
+CURRENT STATE vs CORE VISION ANALYSIS
 ================================================================================================
 
-✅ **COMPLETED - Prototype Phase Items:**
-- Basic node-based canvas with security elements
-- Core simulation engine with MITRE mapping
-- Template library system with 4 pre-built templates
+✅ **FOUNDATION COMPLETED (Traditional Threat Modeling)**
+- Basic security node types (Actor, Asset, Surface, Control, Zone, Signal)
+- Canvas-based diagram creation with drag-and-drop
+- Attack path simulation with MITRE ATT&CK mapping
+- Template library with 4 pre-built security models
 - Enhanced auto-layout algorithms (5 variants)
-- Basic CRUD APIs for diagrams
-- Attack path visualization and highlighting
+- Risk analysis and coverage analysis APIs
+- Basic graph-based relationships and edges
 
-🚧 **IN PROGRESS - Needs Testing:**
-- Advanced simulation endpoints (MITRE integration, coverage analysis)
-- Template Library frontend integration
-- Enhanced auto-layout API testing
+❌ **CRITICAL GAPS (Intelligent Assistant Features)**
+- **No Guided Branching**: System doesn't prompt security questions when nodes are added
+- **No Interactive Intelligence**: Doesn't act like a threat modeling specialist
+- **No Smart Node Expansion**: Nodes don't auto-expand into security branches
+- **No DSL Rule Engine**: No declarative threat rules with if/then logic
+- **No Control Gap Detection**: No systematic analysis of missing security controls
+- **No Probabilistic Simulation**: No weighted attack success probabilities
+- **No Required Branches Validation**: No enforcement of mandatory security considerations
 
-❌ **CRITICAL GAPS - Required for MVP (per arch.txt):**
-- Multi-tenant architecture (Org → Workspaces → Projects → Diagrams)
-- Real-time collaboration with CRDT
-- Authentication & authorization (OIDC, RBAC)
-- Proper data architecture (PostgreSQL + Neo4j + Redis)
-- Advanced inference engine
-- Enterprise integrations foundation
+🔴 **PARADIGM SHIFT REQUIRED**: From "Drawing Tool" → "Security Expert Assistant"
 
 ================================================================================================
-PHASE 1: COMPLETE CURRENT IMPLEMENTATION (IMMEDIATE - 1 Week)
+PHASE 1: INTELLIGENT NODE SYSTEM (2-3 Weeks) 🚀 HIGHEST PRIORITY
 ================================================================================================
 
-🎯 **Test & Stabilize Recent Features**
-1. ✅ Backend: Test enhanced auto-layout algorithms (5 variants)
-2. ✅ Backend: Test MITRE integration endpoints
-3. ✅ Backend: Test advanced risk analysis and coverage analysis
-4. ✅ Frontend: Test Template Library integration
-5. ✅ End-to-end: Validate all advanced simulation workflows
+🎯 **A. Smart Node Expansion Engine**
+1. ⏳ **Website Node Intelligence**
+   - When user drops "Website" → Auto-prompt: "Login type? (Password/SSO/MFA)"
+   - Auto-expand branches: Login, API, Database, Input Validation, WAF
+   - Create visual sub-nodes for each security aspect
 
-🎯 **Fix Integration Issues**
-1. ⏳ Resolve any import/dependency issues
-2. ⏳ Complete frontend component integration
-3. ⏳ Performance testing with larger diagrams (100+ nodes)
-4. ⏳ Bug fixes and error handling improvements
+2. ⏳ **Database Node Intelligence** 
+   - Auto-prompt: "Database type? (SQL/NoSQL)" 
+   - Auto-expand: Encryption, Access Control, Input Validation
+   - Check for data classification (PII/PHI/PCI)
+
+3. ⏳ **API Node Intelligence**
+   - Auto-prompt: "Authentication required? Rate limiting enabled?"
+   - Auto-expand: Auth methods, Input validation, Rate limiting, CORS
+
+4. ⏳ **Required Branches Validation System**
+   - Enforce mandatory security considerations per node type
+   - Block simulation until all required branches are specified
+   - Visual indicators for incomplete security models
+
+🎯 **B. Interactive Security Prompting**
+1. ⏳ **Context-Aware Question Engine**
+   - Smart prompts based on node relationships
+   - Example: Website → Database connection → "Input validation enabled?"
+   - Progressive disclosure of security considerations
+
+2. ⏳ **Security Branch Autocomplete**
+   - Suggest common security patterns
+   - Auto-populate typical configurations
+   - Learn from user patterns to improve suggestions
+
+================================================================================================
+PHASE 2: DSL RULE ENGINE (3-4 Weeks) 🚀 CORE INTELLIGENCE
+================================================================================================
+
+🎯 **A. Declarative Threat Rules System**
+1. ⏳ **YAML-based Rule Definition**
+   ```yaml
+   rules:
+     - id: rule.web.sql_injection
+       when:
+         - node.subtype == "Website"
+         - connected_to.subtype == "Database"
+         - missing_control: "InputValidation"
+       outcome:
+         impact: High
+         attack_path: "SQLi → Database Exfiltration"
+         recommendations:
+           - "Enable input validation"
+           - "Deploy WAF for SQLi coverage"
+   ```
+
+2. ⏳ **Rule Engine Implementation**
+   - Parse YAML rules into executable logic
+   - Graph traversal with rule evaluation
+   - Dynamic rule loading and updating
+
+3. ⏳ **Built-in Security Rule Library**
+   - 50+ common attack scenarios (SQLi, SSRF, IDOR, etc.)
+   - OWASP Top 10 coverage
+   - MITRE ATT&CK technique mapping
+
+🎯 **B. Control Gap Detection System**
+1. ⏳ **Systematic Gap Analysis**
+   - Identify missing required controls for each node
+   - Highlight control gaps visually on canvas
+   - Prioritize gaps by risk impact
+
+2. ⏳ **Security Completeness Scoring**
+   - Calculate completeness percentage per diagram
+   - Track security coverage across attack surfaces
+   - Generate gap remediation roadmaps
+
+================================================================================================
+PHASE 3: PROBABILISTIC SIMULATION ENGINE (4-5 Weeks) 🎯 ADVANCED INTELLIGENCE
+================================================================================================
+
+🎯 **A. Weighted Attack Path Analysis**
+1. ⏳ **Probabilistic Graph Traversal**
+   - Edge weights based on vulnerability likelihood
+   - Control coverage reduces attack probability
+   - Example: `P(success) = Vulnerability × (1 - ControlCoverage)`
+
+2. ⏳ **Dynamic Risk Calculation**
+   - Real-time risk scores as users modify diagrams
+   - Impact assessment based on asset criticality
+   - Uncertainty bands for attack probabilities
+
+3. ⏳ **What-If Scenario Engine**
+   - Toggle controls on/off to see risk changes
+   - Compare security postures side-by-side
+   - ROI analysis for security investments
+
+🎯 **B. Advanced Attack Simulation**
+1. ⏳ **Multi-Step Attack Chains**
+   - Complex attack sequences across multiple nodes
+   - Lateral movement simulation
+   - Kill chain progression tracking
+
+2. ⏳ **Defense Effectiveness Modeling**
+   - Control interaction effects
+   - Defense-in-depth analysis
+   - Coverage overlap detection
+
+================================================================================================
+PHASE 4: EXPERT ASSISTANT INTERFACE (5-6 Weeks) 🧠 USER EXPERIENCE
+================================================================================================
+
+🎯 **A. Guided Threat Modeling Workflow**
+1. ⏳ **Step-by-Step Security Assessment**
+   - Wizard-like interface for comprehensive threat modeling
+   - Progressive security question sequence
+   - Context-sensitive help and explanations
+
+2. ⏳ **Security Best Practices Integration**
+   - Real-time suggestions based on industry standards
+   - Compliance framework guidance (SOC2, ISO 27001)
+   - Automatic security control recommendations
+
+🎯 **B. Intelligent Recommendations Engine**
+1. ⏳ **ML-Powered Suggestions**
+   - Learn from successful threat models
+   - Suggest likely attack paths based on architecture
+   - Recommend optimal control combinations
+
+2. ⏳ **Contextual Security Guidance**
+   - Explain security concepts in plain language
+   - Provide examples and case studies
+   - Link to relevant security documentation
+
+================================================================================================
+PHASE 5: ADVANCED INTEGRATIONS (6-8 Weeks) 🔗 ECOSYSTEM
+================================================================================================
+
+🎯 **A. Threat Intelligence Integration**
+1. ⏳ **Real-Time Vulnerability Feeds**
+   - CVE/NVD integration for known vulnerabilities
+   - CISA KEV (Known Exploited Vulnerabilities)
+   - Vendor-specific threat intelligence
+
+2. ⏳ **Dynamic Risk Updates**
+   - Update attack probabilities based on current threats
+   - Alert users to new vulnerabilities affecting their models
+   - Trending attack techniques integration
+
+🎯 **B. Security Tool Ecosystem**
+1. ⏳ **SIEM/SOAR Integration**
+   - Export attack paths as detection rules
+   - Generate SIEM queries for monitoring
+   - Create incident response playbooks
+
+2. ⏳ **DevSecOps Pipeline Integration**
+   - Infrastructure-as-Code parsing (Terraform → threat model)
+   - CI/CD security gate integration
+   - Automated threat modeling for code changes
+
+================================================================================================
+CORE FEATURES IMPLEMENTATION DETAILS
+================================================================================================
+
+🔧 **1. Security-Aware Building Blocks**
+```typescript
+interface SecurityNode {
+  id: string;
+  type: 'Asset' | 'Attacker' | 'Control' | 'Vulnerability';
+  subtype: string; // Website, Database, WAF, SQLi, etc.
+  requiredBranches: SecurityBranch[];
+  securityAttributes: SecurityAttributes;
+  intelligentPrompts: SecurityPrompt[];
+}
+
+interface SecurityBranch {
+  id: string;
+  name: string; // "Login", "API", "Database", "Encryption"
+  required: boolean;
+  completed: boolean;
+  value?: any; // User's answer to security question
+}
+```
+
+🔧 **2. Guided Branching System**
+```typescript
+class NodeIntelligence {
+  onNodeAdded(node: SecurityNode): void {
+    const prompts = this.getSecurityPrompts(node.subtype);
+    this.showSecurityQuestionnaire(prompts);
+    this.createRequiredBranches(node);
+  }
+  
+  getSecurityPrompts(nodeType: string): SecurityPrompt[] {
+    switch(nodeType) {
+      case 'Website':
+        return [
+          { question: "Authentication type?", options: ["Password", "SSO", "MFA"] },
+          { question: "API endpoints present?", type: "boolean" },
+          { question: "Database connection?", type: "boolean" }
+        ];
+    }
+  }
+}
+```
+
+🔧 **3. DSL Rule Engine**
+```python
+class ThreatRuleEngine:
+    def evaluate_threats(self, graph: SecurityGraph) -> List[ThreatResult]:
+        results = []
+        for rule in self.rules:
+            if self.matches_conditions(rule.when, graph):
+                threat = self.calculate_threat(rule, graph)
+                results.append(threat)
+        return results
+    
+    def calculate_threat_probability(self, path: AttackPath) -> float:
+        probability = 1.0
+        for edge in path.edges:
+            vuln_factor = edge.vulnerability_likelihood
+            control_coverage = edge.control_effectiveness
+            probability *= vuln_factor * (1 - control_coverage)
+        return probability
+```
+
+================================================================================================
+SUCCESS METRICS & VALIDATION
+================================================================================================
+
+📊 **Phase 1 Success Criteria (Intelligent Nodes)**
+🎯 User drops "Website" node → System automatically prompts 5 security questions
+🎯 Required branches visually expand with completion indicators
+🎯 Simulation blocked until all mandatory security aspects specified
+🎯 90% reduction in incomplete threat models
+
+📊 **Phase 2 Success Criteria (DSL Rule Engine)**  
+🎯 50+ security rules automatically evaluate threat scenarios
+🎯 Control gap detection identifies 95% of missing security controls
+🎯 Real-time rule evaluation during diagram construction
+🎯 Users create complete threat models 3x faster
+
+📊 **Phase 3 Success Criteria (Probabilistic Simulation)**
+🎯 Attack path probabilities update in real-time as controls change
+🎯 What-if scenarios show quantified risk reduction
+🎯 Uncertainty bands provide confidence levels for risk assessments
+🎯 ROI analysis helps prioritize security investments
+
+📊 **Phase 4 Success Criteria (Expert Assistant)**
+🎯 Guided workflow increases threat model completeness by 80%
+🎯 Users without security expertise create professional-grade models
+🎯 Real-time recommendations accepted by users 70% of the time
+🎯 Time to create comprehensive threat model reduced by 60%
+
+================================================================================================
+TECHNICAL ARCHITECTURE CHANGES REQUIRED
+================================================================================================
+
+🏗️ **Backend Extensions Needed**
+1. **Node Intelligence Engine** - Smart node expansion and prompting
+2. **DSL Rule Parser** - YAML rule processing and evaluation  
+3. **Probabilistic Engine** - Weighted graph traversal and risk calculation
+4. **Gap Analysis Engine** - Systematic security control validation
+5. **Question Engine** - Context-aware security prompting system
+
+🏗️ **Frontend Extensions Needed**
+1. **Interactive Node Expansion** - Visual branch creation and completion tracking
+2. **Security Questionnaire UI** - Progressive disclosure forms
+3. **Real-time Gap Indicators** - Visual feedback for incomplete models
+4. **Probabilistic Visualization** - Risk heatmaps and probability displays
+5. **Guided Workflow Interface** - Step-by-step threat modeling wizard
+
+🏗️ **New Data Models Required**
+```typescript
+interface SecurityModel {
+  nodes: SecurityNode[];
+  branches: SecurityBranch[];
+  rules: ThreatRule[];
+  gaps: SecurityGap[];
+  probabilities: AttackProbability[];
+  completeness: CompletenessScore;
+}
+```
+
+================================================================================================
+IMMEDIATE NEXT ACTIONS
+================================================================================================
+
+⚡ **THIS WEEK (Phase 1 Start)**
+1. Design SecurityNode interface with required branches
+2. Create Node Intelligence Engine architecture  
+3. Implement Website node with guided branching
+4. Build security questionnaire UI component
+5. Test interactive node expansion workflow
+
+⚡ **NEXT 2 WEEKS (Phase 1 Complete)**
+1. Implement all major node types (Database, API, Attacker, Controls)
+2. Build required branches validation system
+3. Create visual completion indicators
+4. Test end-to-end guided threat modeling workflow
+
+⚡ **NEXT MONTH (Phase 2 Start)**
+1. Design and implement DSL rule engine
+2. Create comprehensive security rule library
+3. Build control gap detection system
+4. Implement real-time threat evaluation
+
+🎯 **STRATEGIC PRIORITY**: Transform from "diagram tool" to "security expert assistant"
+
+This roadmap aligns with the core vision of creating an intelligent system that understands security and guides users like an expert would.
+
+================================================================================================
 
 ================================================================================================
 PHASE 2: MVP FOUNDATION - MULTI-TENANCY & AUTH (2-3 Weeks)
