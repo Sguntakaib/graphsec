@@ -515,26 +515,33 @@ function App() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar - Node Library */}
+        {/* Left Sidebar - Advanced Node Library */}
         <div className="w-80 bg-gray-800 border-r border-gray-700 overflow-y-auto">
-          <SecurityNodeLibrary />
+          <AdvancedNodeLibrary />
           
           {/* Diagram List */}
           <div className="p-4 border-t border-gray-700">
             <div className="flex items-center space-x-2 mb-4">
               <FolderOpen className="h-5 w-5 text-gray-400" />
-              <h3 className="text-white font-medium">Saved Diagrams</h3>
+              <h3 className="text-white font-medium">Saved Models</h3>
             </div>
             <div className="space-y-2">
               {diagrams.map((diagram) => (
                 <button
                   key={diagram.id}
                   onClick={() => handleLoadDiagram(diagram)}
-                  className="w-full text-left p-3 bg-gray-700 rounded hover:bg-gray-600 text-white text-sm"
+                  className={`w-full text-left p-3 rounded text-white text-sm transition-colors ${
+                    currentDiagram?.id === diagram.id
+                      ? 'bg-blue-700 border border-blue-500'
+                      : 'bg-gray-700 hover:bg-gray-600'
+                  }`}
                 >
                   <div className="font-medium">{diagram.title}</div>
                   <div className="text-gray-400 text-xs">
                     {diagram.nodes?.length || 0} nodes, {diagram.edges?.length || 0} edges
+                  </div>
+                  <div className="text-gray-500 text-xs">
+                    {new Date(diagram.updated_at || diagram.created_at).toLocaleDateString()}
                   </div>
                 </button>
               ))}
@@ -554,29 +561,100 @@ function App() {
             onDrop={onDrop}
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
+            defaultEdgeOptions={defaultEdgeOptions}
             className="bg-gray-900"
             fitView
+            snapToGrid
+            snapGrid={[20, 20]}
           >
-            <Controls className="bg-gray-800 border-gray-700" />
+            <Controls 
+              className="bg-gray-800 border-gray-700"
+              showZoom={true}
+              showFitView={true}
+              showInteractive={true}
+            />
             <MiniMap 
               className="bg-gray-800 border-gray-700" 
-              nodeColor="#4F46E5"
+              nodeColor={(node) => {
+                const colorMap = {
+                  'Actor': '#DC2626',
+                  'Asset': '#059669', 
+                  'Surface': '#D97706',
+                  'Control': '#2563EB',
+                  'Zone': '#7C3AED',
+                  'Signal': '#0891B2'
+                };
+                return colorMap[node.data?.type] || '#6B7280';
+              }}
               maskColor="rgba(0, 0, 0, 0.6)"
+              pannable
+              zoomable
             />
-            <Background variant="dots" gap={20} size={1} color="#374151" />
+            <Background 
+              variant="dots" 
+              gap={20} 
+              size={1} 
+              color="#374151" 
+            />
             
+            {/* Canvas Info Panels */}
             {currentDiagram && (
-              <Panel position="top-left" className="bg-gray-800 border border-gray-700 rounded p-2">
+              <Panel position="top-left" className="bg-gray-800 border border-gray-700 rounded p-3">
                 <div className="text-white text-sm font-medium">{currentDiagram.title}</div>
+                <div className="text-gray-400 text-xs mt-1">
+                  {viewMode === 'analysis' ? 'Analysis Mode' : 'Modeling Mode'}
+                </div>
+              </Panel>
+            )}
+            
+            {simulationResult && viewMode === 'analysis' && (
+              <Panel position="top-right" className="bg-gray-800 border border-gray-700 rounded p-3">
+                <div className="text-white text-sm font-medium">
+                  Risk Level: <span className={`${
+                    simulationResult.overall_risk_level === 'Critical' ? 'text-red-400' :
+                    simulationResult.overall_risk_level === 'High' ? 'text-orange-400' :
+                    simulationResult.overall_risk_level === 'Medium' ? 'text-yellow-400' :
+                    'text-green-400'
+                  }`}>{simulationResult.overall_risk_level}</span>
+                </div>
+                <div className="text-gray-400 text-xs">
+                  {simulationResult.attack_paths?.length || 0} attack paths found
+                </div>
+              </Panel>
+            )}
+            
+            {isLoading && (
+              <Panel position="bottom-center" className="bg-gray-800 border border-gray-700 rounded p-3">
+                <div className="text-white text-sm flex items-center space-x-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+                  <span>Processing advanced simulation...</span>
+                </div>
               </Panel>
             )}
           </ReactFlow>
         </div>
 
-        {/* Right Sidebar - Properties and Simulation */}
+        {/* Right Sidebar - Properties and Analysis */}
         <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
-          {selectedNode && <PropertiesPanel node={selectedNode} />}
-          {simulationResult && <SimulationPanel result={simulationResult} />}
+          {viewMode === 'modeling' && selectedNode && (
+            <PropertiesPanel node={selectedNode} />
+          )}
+          {viewMode === 'analysis' && simulationResult && (
+            <EnhancedSimulationPanel 
+              result={simulationResult} 
+              onHighlightPath={highlightAttackPaths}
+            />
+          )}
+          {!selectedNode && !simulationResult && (
+            <div className="p-4 text-center">
+              <div className="text-gray-400 text-sm">
+                {viewMode === 'modeling' 
+                  ? 'Select a node to view properties'
+                  : 'Run a simulation to see analysis results'
+                }
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
