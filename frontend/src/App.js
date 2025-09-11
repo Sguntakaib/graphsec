@@ -1286,19 +1286,32 @@ function AppContent() {
 
         {/* Right Sidebar - Properties and Analysis */}
         <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
-          {viewMode === 'modeling' && selectedNode && (
+          {viewMode === 'modeling' && (
             <>
-              <PropertiesPanel node={selectedNode} />
+              {/* Simulation Debugger */}
+              <SimulationDebugger
+                nodes={nodes}
+                edges={edges}
+                onRunSimulation={handleRunSimulation}
+                simulationResult={simulationResult}
+                isLoading={isLoading}
+              />
               
-              {/* Security Branches Visualizer */}
-              {selectedNode.data?.intelligentNode && (
-                <NodeBranchVisualizer
-                  nodeId={selectedNode.id}
-                  nodeSubtype={selectedNode.data.subtype}
-                  branches={nodeBranches[selectedNode.id] || []}
-                  onBranchUpdate={handleNodeBranchUpdate}
-                  isExpanded={true}
-                />
+              {selectedNode && (
+                <>
+                  <PropertiesPanel node={selectedNode} />
+                  
+                  {/* Security Branches Visualizer */}
+                  {selectedNode.data?.intelligentNode && (
+                    <NodeBranchVisualizer
+                      nodeId={selectedNode.id}
+                      nodeSubtype={selectedNode.data.subtype}
+                      branches={nodeBranches[selectedNode.id] || []}
+                      onBranchUpdate={handleNodeBranchUpdate}
+                      isExpanded={true}
+                    />
+                  )}
+                </>
               )}
             </>
           )}
