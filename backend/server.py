@@ -338,6 +338,158 @@ async def get_simulations(diagram_id: str):
     simulations = await db.simulations.find({"diagram_id": diagram_id}).to_list(1000)
     return [EnhancedSimulationResult(**parse_from_mongo(sim)) for sim in simulations]
 
+# Advanced Analysis Routes
+@api_router.get("/mitre/technique/{technique_id}")
+async def get_mitre_technique(technique_id: str):
+    """Get detailed information about a MITRE ATT&CK technique"""
+    technique = mitre_db.get_technique(technique_id)
+    if not technique:
+        raise HTTPException(status_code=404, detail="MITRE technique not found")
+    
+    return {
+        "technique_id": technique.technique_id,
+        "name": technique.name,
+        "description": technique.description,
+        "tactics": technique.tactics,
+        "platforms": technique.platforms,
+        "data_sources": technique.data_sources,
+        "detection_methods": technique.detection_methods,
+        "mitigations": technique.mitigations,
+        "references": technique.references,
+        "impact_level": technique.impact_level,
+        "complexity": technique.complexity,
+        "detection_difficulty": technique.detection_difficulty
+    }
+
+@api_router.get("/mitre/techniques/by-tactic/{tactic}")
+async def get_techniques_by_tactic(tactic: str):
+    """Get all MITRE techniques for a specific tactic"""
+    techniques = mitre_db.get_techniques_by_tactic(tactic)
+    return [
+        {
+            "technique_id": tech.technique_id,
+            "name": tech.name,
+            "description": tech.description[:200] + "..." if len(tech.description) > 200 else tech.description,
+            "impact_level": tech.impact_level,
+            "complexity": tech.complexity
+        }
+        for tech in techniques
+    ]
+
+@api_router.post("/diagrams/{diagram_id}/analyze-coverage")
+async def analyze_mitre_coverage(diagram_id: str):
+    """Analyze MITRE ATT&CK coverage of a security diagram"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    # Extract MITRE techniques from diagram nodes
+    nodes = diagram.get("nodes", [])
+    all_techniques = []
+    
+    for node in nodes:
+        mitre_ids = node.get("mitre_ids", [])
+        all_techniques.extend(mitre_ids)
+    
+    # Analyze coverage
+    coverage = mitre_db.analyze_attack_coverage(all_techniques)
+    
+    # Add node type suggestions
+    node_types = [node.get("subtype", "") for node in nodes if node.get("type") == "Asset"]
+    suggested_techniques = mitre_db.suggest_additional_techniques(all_techniques, node_types)
+    
+    coverage["suggested_additional_techniques"] = [
+        {
+            "technique_id": tech_id,
+            "name": mitre_db.get_technique(tech_id).name if mitre_db.get_technique(tech_id) else "Unknown",
+            "reason": "Based on asset types in diagram"
+        }
+        for tech_id in suggested_techniques
+    ]
+    
+    return coverage
+
+@api_router.get("/diagrams/{diagram_id}/risk-analysis")
+async def get_risk_analysis(diagram_id: str):
+    """Get comprehensive risk analysis for a diagram"""
+    # Get latest simulation
+    latest_sim = await db.simulations.find_one(
+        {"diagram_id": diagram_id}, 
+        sort=[("created_at", -1)]
+    )
+    
+    if not latest_sim:
+        raise HTTPException(status_code=404, detail="No simulation results found")
+    
+    simulation = EnhancedSimulationResult(**parse_from_mongo(latest_sim))
+    
+    # Calculate additional risk metrics
+    risk_analysis = {
+        "overall_risk_score": simulation.risk_score,
+        "risk_level": simulation.overall_risk_level,
+        "attack_paths_count": len(simulation.attack_paths),
+        "mitre_techniques_count": len(simulation.mitre_techniques),
+        "detection_coverage": simulation.detection_coverage,
+        "recommendations_count": len(simulation.recommendations),
+        "risk_distribution": {
+            "critical": len([p for p in simulation.attack_paths if p.get("risk_score", 0) >= 8]),
+            "high": len([p for p in simulation.attack_paths if 6 <= p.get("risk_score", 0) < 8]),
+            "medium": len([p for p in simulation.attack_paths if 4 <= p.get("risk_score", 0) < 6]),
+            "low": len([p for p in simulation.attack_paths if p.get("risk_score", 0) < 4])
+        },
+        "top_attack_vectors": simulation.attack_paths[:5],  # Top 5 most dangerous
+        "critical_mitre_techniques": [
+            tech_id for tech_id, details in simulation.technique_details.items()
+            if details.get("impact_level") == "HIGH"
+        ],
+        "coverage_gaps": simulation.mitre_coverage.get("recommended_mitigations", [])[:5]
+    }
+    
+    return risk_analysis
+
+@api_router.post("/diagrams/{diagram_id}/auto-layout")
+async def auto_layout_diagram(diagram_id: str):
+    """Generate automatic layout for diagram nodes"""
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    # Simple hierarchical layout algorithm
+    layout_positions = {}
+    
+    # Group nodes by type
+    node_groups = {}
+    for node in nodes:
+        node_type = node.get("type", "Unknown")
+        if node_type not in node_groups:
+            node_groups[node_type] = []
+        node_groups[node_type].append(node)
+    
+    # Position groups in layers
+    y_offset = 0
+    layer_height = 150
+    node_spacing = 200
+    
+    for node_type, type_nodes in node_groups.items():
+        x_offset = 0
+        for i, node in enumerate(type_nodes):
+            layout_positions[node["id"]] = {
+                "x": x_offset,
+                "y": y_offset
+            }
+            x_offset += node_spacing
+        y_offset += layer_height
+    
+    return {
+        "layout_positions": layout_positions,
+        "algorithm": "hierarchical",
+        "node_count": len(nodes),
+        "group_count": len(node_groups)
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
