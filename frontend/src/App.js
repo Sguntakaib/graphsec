@@ -231,11 +231,101 @@ function App() {
     try {
       const result = await simulateAttackPaths(currentDiagram.id);
       setSimulationResult(result);
+      setViewMode('analysis');
+      
+      // Highlight attack paths on the canvas
+      if (result.attack_paths && result.attack_paths.length > 0) {
+        highlightAttackPaths(result.attack_paths);
+      }
     } catch (error) {
       console.error('Failed to run simulation:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const highlightAttackPaths = (attackPaths) => {
+    // This would highlight the attack paths on the canvas
+    // For now, we'll store them for potential future use
+    setHighlightedPaths(attackPaths);
+  };
+
+  const handleAutoLayout = async () => {
+    if (!currentDiagram) return;
+    
+    setIsLoading(true);
+    try {
+      const layoutData = await autoLayoutDiagram(currentDiagram.id);
+      
+      // Apply the new positions
+      setNodes((nds) =>
+        nds.map((node) => {
+          const newPosition = layoutData.layout_positions[node.id];
+          return newPosition
+            ? { ...node, position: newPosition }
+            : node;
+        })
+      );
+      
+      // Fit view to show all nodes
+      setTimeout(() => fitView(), 100);
+    } catch (error) {
+      console.error('Failed to auto-layout diagram:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleExportDiagram = () => {
+    if (!currentDiagram) return;
+    
+    const exportData = {
+      diagram: currentDiagram,
+      nodes: nodes,
+      edges: edges,
+      simulation: simulationResult,
+      exportedAt: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${currentDiagram.title || 'diagram'}-export.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportDiagram = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importData = JSON.parse(e.target.result);
+        
+        if (importData.diagram && importData.nodes && importData.edges) {
+          setCurrentDiagram(importData.diagram);
+          setNodes(importData.nodes);
+          setEdges(importData.edges);
+          if (importData.simulation) {
+            setSimulationResult(importData.simulation);
+          }
+        } else {
+          alert('Invalid diagram file format');
+        }
+      } catch (error) {
+        console.error('Failed to import diagram:', error);
+        alert('Failed to import diagram');
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleNewDiagram = () => {
