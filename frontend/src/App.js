@@ -498,6 +498,12 @@ function AppContent() {
           default:
             break;
         }
+      } else if (event.key === 'Escape') {
+        // Clear attack path highlighting
+        if (highlightedPaths.length > 0) {
+          event.preventDefault();
+          clearAttackPathHighlighting();
+        }
       }
     };
 
