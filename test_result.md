@@ -260,8 +260,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Threat Modeling Wizard Recommendations API"
-    - "Threat Modeling Wizard Model Generation API"
+    - "Threat Modeling Wizard endpoints testing completed successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
