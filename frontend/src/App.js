@@ -74,6 +74,56 @@ function AppContent() {
   
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
+  // Save state for undo/redo
+  const saveStateToUndoStack = useCallback(() => {
+    const currentState = {
+      nodes: [...nodes],
+      edges: [...edges],
+      timestamp: Date.now()
+    };
+    
+    setUndoStack(prev => [...prev.slice(-19), currentState]); // Keep last 20 states
+    setRedoStack([]); // Clear redo stack when new action is performed
+  }, [nodes, edges]);
+
+  // Undo functionality
+  const handleUndo = useCallback(() => {
+    if (undoStack.length === 0) return;
+    
+    const currentState = {
+      nodes: [...nodes],
+      edges: [...edges],
+      timestamp: Date.now()
+    };
+    
+    const previousState = undoStack[undoStack.length - 1];
+    
+    setRedoStack(prev => [currentState, ...prev.slice(0, 19)]);
+    setUndoStack(prev => prev.slice(0, -1));
+    
+    setNodes(previousState.nodes);
+    setEdges(previousState.edges);
+  }, [undoStack, nodes, edges, setNodes, setEdges]);
+
+  // Redo functionality
+  const handleRedo = useCallback(() => {
+    if (redoStack.length === 0) return;
+    
+    const currentState = {
+      nodes: [...nodes],
+      edges: [...edges],
+      timestamp: Date.now()
+    };
+    
+    const nextState = redoStack[0];
+    
+    setUndoStack(prev => [...prev, currentState]);
+    setRedoStack(prev => prev.slice(1));
+    
+    setNodes(nextState.nodes);
+    setEdges(nextState.edges);
+  }, [redoStack, nodes, edges, setNodes, setEdges]);
+
   // Enhanced edge styles for attack paths
   const defaultEdgeOptions = useMemo(() => ({
     type: 'smoothstep',
