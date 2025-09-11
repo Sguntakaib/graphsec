@@ -1673,6 +1673,30 @@ async def get_security_rules(category: Optional[str] = None, enabled_only: bool 
         "filter_applied": {"category": category, "enabled_only": enabled_only}
     }
 
+@api_router.get("/security-rules/categories")
+async def get_security_rule_categories():
+    """Get available security rule categories"""
+    from dsl_rule_engine import RuleCategory
+    
+    categories = []
+    for category in RuleCategory:
+        rule_count = len(dsl_rule_engine.get_rules_by_category(category))
+        categories.append({
+            "id": category.value,
+            "name": category.value.replace("_", " ").title(),
+            "rule_count": rule_count
+        })
+    
+    return {
+        "categories": categories,
+        "total_categories": len(categories)
+    }
+
+@api_router.get("/security-rules/statistics")
+async def get_rule_engine_statistics():
+    """Get statistics about the rule engine"""
+    return dsl_rule_engine.get_rule_statistics()
+
 @api_router.get("/security-rules/{rule_id}")
 async def get_security_rule(rule_id: str):
     """Get detailed information about a specific security rule"""
@@ -1702,30 +1726,6 @@ async def get_security_rule(rule_id: str):
         "mitre_techniques": rule.mitre_techniques,
         "references": rule.references
     }
-
-@api_router.get("/security-rules/categories")
-async def get_security_rule_categories():
-    """Get available security rule categories"""
-    from dsl_rule_engine import RuleCategory
-    
-    categories = []
-    for category in RuleCategory:
-        rule_count = len(dsl_rule_engine.get_rules_by_category(category))
-        categories.append({
-            "id": category.value,
-            "name": category.value.replace("_", " ").title(),
-            "rule_count": rule_count
-        })
-    
-    return {
-        "categories": categories,
-        "total_categories": len(categories)
-    }
-
-@api_router.get("/security-rules/statistics")
-async def get_rule_engine_statistics():
-    """Get statistics about the rule engine"""
-    return dsl_rule_engine.get_rule_statistics()
 
 @api_router.post("/diagrams/{diagram_id}/comprehensive-analysis")
 async def run_comprehensive_security_analysis(diagram_id: str):
