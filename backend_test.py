@@ -1229,7 +1229,7 @@ class SecurityModelingAPITester:
                     {
                         "id": "webapp_login",
                         "name": "Login",
-                        "type": "LOGIN",
+                        "type": "Login",
                         "required": True,
                         "completed": True,
                         "value": "Password Only",
@@ -1252,7 +1252,7 @@ class SecurityModelingAPITester:
                     {
                         "id": "db_encryption_at_rest",
                         "name": "Encryption",
-                        "type": "ENCRYPTION",
+                        "type": "Encryption",
                         "required": True,
                         "completed": True,
                         "value": "AES-256",
