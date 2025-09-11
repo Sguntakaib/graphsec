@@ -152,7 +152,7 @@ class AdvancedEndpointsTest:
         print("\n🎯 Testing MITRE Techniques by Tactic API")
         
         # Test with specific MITRE tactics mentioned in review request
-        test_tactics = ["initial-access", "persistence", "defense-evasion"]
+        test_tactics = ["Initial Access", "Persistence", "Defense Evasion"]
         
         for tactic in test_tactics:
             try:
