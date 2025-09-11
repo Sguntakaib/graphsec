@@ -2653,6 +2653,465 @@ class SecurityModelingAPITester:
             self.log_test("Historical Scenario Analyses", False, f"Error: {str(e)}")
             return False
 
+    # Threat Modeling Wizard Tests
+    def test_wizard_recommendations_system_overview(self):
+        """Test POST /api/wizard/recommendations with systemOverview step"""
+        try:
+            test_data = {
+                "step": "systemOverview",
+                "wizardData": {
+                    "systemOverview": {
+                        "systemName": "E-commerce Platform",
+                        "systemType": "web_application",
+                        "businessCriticality": "high",
+                        "deploymentModel": "cloud_public",
+                        "businessContext": "Online retail platform handling customer transactions",
+                        "securityObjectives": {
+                            "confidentiality": "high",
+                            "integrity": "high", 
+                            "availability": "high"
+                        }
+                    }
+                },
+                "existingNodes": [],
+                "existingEdges": []
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/wizard/recommendations",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["step", "recommendations", "recommendation_count"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Wizard Recommendations - System Overview", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Verify step matches
+                if data.get("step") != "systemOverview":
+                    self.log_test("Wizard Recommendations - System Overview", False, f"Step mismatch: expected systemOverview, got {data.get('step')}")
+                    return False
+                
+                recommendations = data.get("recommendations", [])
+                recommendation_count = data.get("recommendation_count", 0)
+                
+                # Verify recommendations are contextual and relevant
+                if not recommendations:
+                    self.log_test("Wizard Recommendations - System Overview", False, "No recommendations returned")
+                    return False
+                
+                if recommendation_count != len(recommendations):
+                    self.log_test("Wizard Recommendations - System Overview", False, f"Count mismatch: expected {len(recommendations)}, got {recommendation_count}")
+                    return False
+                
+                # Check for security-relevant recommendations
+                security_keywords = ["security", "control", "encryption", "access", "monitoring", "critical"]
+                relevant_recommendations = [r for r in recommendations if any(keyword.lower() in r.lower() for keyword in security_keywords)]
+                
+                if not relevant_recommendations:
+                    self.log_test("Wizard Recommendations - System Overview", False, "No security-relevant recommendations found")
+                    return False
+                
+                self.log_test("Wizard Recommendations - System Overview", True, 
+                            f"Retrieved {recommendation_count} contextual recommendations for system overview")
+                return True
+            else:
+                self.log_test("Wizard Recommendations - System Overview", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Wizard Recommendations - System Overview", False, f"Error: {str(e)}")
+            return False
+
+    def test_wizard_recommendations_asset_inventory(self):
+        """Test POST /api/wizard/recommendations with assetInventory step"""
+        try:
+            test_data = {
+                "step": "assetInventory",
+                "wizardData": {
+                    "assetInventory": {
+                        "assets": [
+                            {
+                                "name": "Customer Database",
+                                "type": "data",
+                                "category": "Database",
+                                "criticality": "critical",
+                                "dataClassification": "Confidential",
+                                "description": "PostgreSQL database containing customer PII and payment information",
+                                "owner": "Data Team"
+                            },
+                            {
+                                "name": "Web Application",
+                                "type": "application",
+                                "category": "WebApp",
+                                "criticality": "high",
+                                "dataClassification": "Internal",
+                                "description": "Customer-facing e-commerce web application",
+                                "owner": "Development Team"
+                            },
+                            {
+                                "name": "Payment API",
+                                "type": "application",
+                                "category": "API",
+                                "criticality": "high",
+                                "dataClassification": "Confidential",
+                                "description": "REST API for processing payments",
+                                "owner": "Payment Team"
+                            }
+                        ]
+                    }
+                },
+                "existingNodes": [
+                    {
+                        "id": "existing-node-1",
+                        "type": "Asset",
+                        "subtype": "WebApp",
+                        "label": "Existing Web App"
+                    }
+                ],
+                "existingEdges": []
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/wizard/recommendations",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["step", "recommendations", "recommendation_count"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Wizard Recommendations - Asset Inventory", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Verify step matches
+                if data.get("step") != "assetInventory":
+                    self.log_test("Wizard Recommendations - Asset Inventory", False, f"Step mismatch: expected assetInventory, got {data.get('step')}")
+                    return False
+                
+                recommendations = data.get("recommendations", [])
+                recommendation_count = data.get("recommendation_count", 0)
+                
+                # Verify recommendations are contextual for assets
+                if not recommendations:
+                    self.log_test("Wizard Recommendations - Asset Inventory", False, "No recommendations returned")
+                    return False
+                
+                # Check for asset-specific recommendations
+                asset_keywords = ["asset", "critical", "data", "application", "encryption", "access control", "security testing"]
+                relevant_recommendations = [r for r in recommendations if any(keyword.lower() in r.lower() for keyword in asset_keywords)]
+                
+                if not relevant_recommendations:
+                    self.log_test("Wizard Recommendations - Asset Inventory", False, "No asset-relevant recommendations found")
+                    return False
+                
+                self.log_test("Wizard Recommendations - Asset Inventory", True, 
+                            f"Retrieved {recommendation_count} asset-specific recommendations")
+                return True
+            else:
+                self.log_test("Wizard Recommendations - Asset Inventory", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Wizard Recommendations - Asset Inventory", False, f"Error: {str(e)}")
+            return False
+
+    def test_wizard_recommendations_invalid_step(self):
+        """Test POST /api/wizard/recommendations with invalid step name"""
+        try:
+            test_data = {
+                "step": "invalidStep",
+                "wizardData": {},
+                "existingNodes": [],
+                "existingEdges": []
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/wizard/recommendations",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Should still return a response with fallback recommendations
+                if "recommendations" not in data:
+                    self.log_test("Wizard Recommendations - Invalid Step", False, "No recommendations field in response")
+                    return False
+                
+                recommendations = data.get("recommendations", [])
+                if not recommendations:
+                    self.log_test("Wizard Recommendations - Invalid Step", False, "No fallback recommendations provided")
+                    return False
+                
+                self.log_test("Wizard Recommendations - Invalid Step", True, 
+                            f"Handled invalid step gracefully with {len(recommendations)} fallback recommendations")
+                return True
+            else:
+                self.log_test("Wizard Recommendations - Invalid Step", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Wizard Recommendations - Invalid Step", False, f"Error: {str(e)}")
+            return False
+
+    def test_wizard_generate_model_complete(self):
+        """Test POST /api/wizard/generate-model with complete wizard data"""
+        try:
+            test_data = {
+                "wizardData": {
+                    "systemOverview": {
+                        "systemName": "E-commerce Platform",
+                        "systemType": "web_application",
+                        "businessCriticality": "high",
+                        "deploymentModel": "cloud_public",
+                        "businessContext": "Online retail platform handling customer transactions",
+                        "systemDescription": "Comprehensive e-commerce platform with payment processing",
+                        "securityObjectives": {
+                            "confidentiality": "high",
+                            "integrity": "high",
+                            "availability": "high"
+                        }
+                    },
+                    "assetInventory": {
+                        "assets": [
+                            {
+                                "name": "Customer Database",
+                                "type": "data",
+                                "category": "Database",
+                                "criticality": "critical",
+                                "dataClassification": "Confidential",
+                                "description": "PostgreSQL database containing customer PII",
+                                "owner": "Data Team"
+                            },
+                            {
+                                "name": "Web Application",
+                                "type": "application",
+                                "category": "WebApp",
+                                "criticality": "high",
+                                "dataClassification": "Internal",
+                                "description": "Customer-facing web application",
+                                "owner": "Development Team"
+                            },
+                            {
+                                "name": "Payment API",
+                                "type": "application",
+                                "category": "API",
+                                "criticality": "high",
+                                "dataClassification": "Confidential",
+                                "description": "REST API for payment processing",
+                                "owner": "Payment Team"
+                            }
+                        ]
+                    }
+                },
+                "diagramId": None
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/wizard/generate-model",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["success", "generatedNodes", "generatedEdges", "recommendations", "implementationPlan", "summary"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Wizard Generate Model - Complete", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Verify success status
+                if not data.get("success", False):
+                    error_msg = data.get("error", "Unknown error")
+                    self.log_test("Wizard Generate Model - Complete", False, f"Generation failed: {error_msg}")
+                    return False
+                
+                generated_nodes = data.get("generatedNodes", [])
+                generated_edges = data.get("generatedEdges", [])
+                recommendations = data.get("recommendations", [])
+                implementation_plan = data.get("implementationPlan", {})
+                summary = data.get("summary", {})
+                
+                # Verify nodes were generated
+                if not generated_nodes:
+                    self.log_test("Wizard Generate Model - Complete", False, "No nodes generated")
+                    return False
+                
+                # Verify node structure
+                first_node = generated_nodes[0]
+                required_node_fields = ["id", "type", "position", "data"]
+                missing_node_fields = [f for f in required_node_fields if f not in first_node]
+                
+                if missing_node_fields:
+                    self.log_test("Wizard Generate Model - Complete", False, f"Missing node fields: {missing_node_fields}")
+                    return False
+                
+                # Verify node data structure
+                node_data = first_node.get("data", {})
+                if "type" not in node_data or "label" not in node_data:
+                    self.log_test("Wizard Generate Model - Complete", False, "Node data missing type or label")
+                    return False
+                
+                # Verify recommendations are provided
+                if not recommendations:
+                    self.log_test("Wizard Generate Model - Complete", False, "No recommendations generated")
+                    return False
+                
+                # Verify implementation plan structure
+                if not implementation_plan:
+                    self.log_test("Wizard Generate Model - Complete", False, "No implementation plan generated")
+                    return False
+                
+                # Verify summary structure
+                expected_summary_fields = ["total_nodes", "total_edges", "recommendations_count"]
+                missing_summary_fields = [f for f in expected_summary_fields if f not in summary]
+                
+                if missing_summary_fields:
+                    self.log_test("Wizard Generate Model - Complete", False, f"Missing summary fields: {missing_summary_fields}")
+                    return False
+                
+                # Verify summary counts match actual data
+                if summary.get("total_nodes") != len(generated_nodes):
+                    self.log_test("Wizard Generate Model - Complete", False, f"Node count mismatch: summary={summary.get('total_nodes')}, actual={len(generated_nodes)}")
+                    return False
+                
+                if summary.get("recommendations_count") != len(recommendations):
+                    self.log_test("Wizard Generate Model - Complete", False, f"Recommendations count mismatch: summary={summary.get('recommendations_count')}, actual={len(recommendations)}")
+                    return False
+                
+                self.log_test("Wizard Generate Model - Complete", True, 
+                            f"Generated {len(generated_nodes)} nodes, {len(generated_edges)} edges, {len(recommendations)} recommendations")
+                return True
+            else:
+                self.log_test("Wizard Generate Model - Complete", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Wizard Generate Model - Complete", False, f"Error: {str(e)}")
+            return False
+
+    def test_wizard_generate_model_minimal(self):
+        """Test POST /api/wizard/generate-model with minimal wizard data"""
+        try:
+            test_data = {
+                "wizardData": {
+                    "systemOverview": {
+                        "systemName": "Basic System",
+                        "businessCriticality": "medium"
+                    }
+                },
+                "diagramId": None
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/wizard/generate-model",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Should still succeed with minimal data
+                if not data.get("success", False):
+                    error_msg = data.get("error", "Unknown error")
+                    self.log_test("Wizard Generate Model - Minimal", False, f"Generation failed: {error_msg}")
+                    return False
+                
+                generated_nodes = data.get("generatedNodes", [])
+                recommendations = data.get("recommendations", [])
+                
+                # Should generate at least basic nodes (system + attacker)
+                if len(generated_nodes) < 2:
+                    self.log_test("Wizard Generate Model - Minimal", False, f"Too few nodes generated: {len(generated_nodes)}")
+                    return False
+                
+                # Should provide basic recommendations
+                if not recommendations:
+                    self.log_test("Wizard Generate Model - Minimal", False, "No recommendations generated for minimal data")
+                    return False
+                
+                self.log_test("Wizard Generate Model - Minimal", True, 
+                            f"Generated {len(generated_nodes)} nodes and {len(recommendations)} recommendations from minimal data")
+                return True
+            else:
+                self.log_test("Wizard Generate Model - Minimal", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Wizard Generate Model - Minimal", False, f"Error: {str(e)}")
+            return False
+
+    def test_wizard_generate_model_error_handling(self):
+        """Test POST /api/wizard/generate-model error handling with invalid data"""
+        try:
+            # Test with empty wizard data
+            test_data = {
+                "wizardData": {},
+                "diagramId": None
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/wizard/generate-model",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Should handle gracefully - either succeed with minimal generation or fail gracefully
+                if data.get("success", False):
+                    # If successful, should still generate basic structure
+                    generated_nodes = data.get("generatedNodes", [])
+                    if not generated_nodes:
+                        self.log_test("Wizard Generate Model - Error Handling", False, "Success claimed but no nodes generated")
+                        return False
+                    
+                    self.log_test("Wizard Generate Model - Error Handling", True, 
+                                f"Handled empty data gracefully, generated {len(generated_nodes)} nodes")
+                    return True
+                else:
+                    # If failed, should provide error message and empty arrays
+                    error_msg = data.get("error", "")
+                    if not error_msg:
+                        self.log_test("Wizard Generate Model - Error Handling", False, "Failed but no error message provided")
+                        return False
+                    
+                    # Should provide empty arrays for failed generation
+                    if data.get("generatedNodes") != [] or data.get("generatedEdges") != []:
+                        self.log_test("Wizard Generate Model - Error Handling", False, "Failed generation should return empty arrays")
+                        return False
+                    
+                    self.log_test("Wizard Generate Model - Error Handling", True, 
+                                f"Handled error gracefully: {error_msg}")
+                    return True
+            else:
+                self.log_test("Wizard Generate Model - Error Handling", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Wizard Generate Model - Error Handling", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
