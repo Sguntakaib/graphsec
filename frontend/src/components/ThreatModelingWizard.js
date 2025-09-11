@@ -486,13 +486,6 @@ const ThreatModelingWizard = ({
 };
 
 // Placeholder step components - will be implemented individually
-const SystemOverviewStep = ({ data, onUpdate }) => (
-  <div className="text-white">System Overview Step - Coming next...</div>
-);
-
-const AssetIdentificationStep = ({ data, onUpdate }) => (
-  <div className="text-white">Asset Identification Step - Coming next...</div>
-);
 
 const TrustBoundariesStep = ({ data, onUpdate }) => (
   <div className="text-white">Trust Boundaries Step - Coming next...</div>
