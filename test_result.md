@@ -224,7 +224,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All backend API endpoints tested and validated"
+    - "MITRE Technique Lookup API"
+    - "MITRE Techniques by Tactic API"
+    - "MITRE Coverage Analysis API"
+    - "Advanced Risk Analysis API"
+    - "Auto Layout API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
