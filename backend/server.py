@@ -1942,9 +1942,12 @@ async def run_probabilistic_simulation(diagram_id: str):
         "simulation_timestamp": datetime.now(timezone.utc).isoformat()
     }
     
-    # Save simulation result to database
-    result_dict = prepare_for_mongo(result)
-    await db.probabilistic_simulations.insert_one(result_dict)
+    # Save simulation result to database (in background to avoid serialization issues)
+    try:
+        result_dict = prepare_for_mongo(result.copy())
+        await db.probabilistic_simulations.insert_one(result_dict)
+    except Exception as e:
+        logger.error(f"Failed to save probabilistic simulation to database: {e}")
     
     return result
 
