@@ -1196,7 +1196,7 @@ class SecurityModelingAPITester:
                         return False
                     
                     # Verify branch types are valid
-                    valid_branch_types = ["LOGIN", "AUTHENTICATION", "AUTHORIZATION", "ENCRYPTION", "MONITORING", "BACKUP"]
+                    valid_branch_types = ["Login", "API", "Database", "InputValidation", "WAF", "Encryption", "AccessControl", "Authentication", "Authorization", "RateLimiting", "CORS", "DataClassification", "Backup", "Monitoring", "Logging"]
                     branch_types = [b.get("type") for b in branches]
                     invalid_branch_types = [t for t in branch_types if t not in valid_branch_types]
                     
