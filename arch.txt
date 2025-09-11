@@ -1,0 +1,480 @@
+Detailed Technical Roadmap (end-to-end blueprint)
+A. Product & UX Architecture
+A.1 User roles & tenancy
+
+Tenants: Org → Workspaces → Projects → Diagrams.
+
+Roles: OrgOwner, Admin, Modeler, Viewer, Auditor.
+
+Permissions: Row-level + graph-level (node/edge access lists, “confidential” nodes).
+
+A.2 Core objects & taxonomy (domain-constrained)
+
+Node categories:
+
+Actors: Attacker, Insider, Third-party, Service Account.
+
+Targets/Assets: WebApp, API, Database, S3/Blob, VM/Container, Mobile, SaaS app (O365, GDrive).
+
+Surfaces/Vulns: SSRF, SQLi, IDOR, CSRF, RCE, XXE, Deserialization, Misconfig (S3 public), Weak IAM Policy.
+
+Vectors: Phishing, Supply chain, Credential stuffing, OAuth misuse.
+
+Controls: WAF, EDR, CSP, IAM policy, Network ACL, DLP, Egress proxy, Secret manager, Token binding, mTLS.
+
+Zones: Internet, DMZ, Corp, Prod, PCI, Cloud VPC/Subnet.
+
+Signals: Alert, Detection rule, Telemetry stream.
+
+Edge types: connects_to, trust_boundary, data_flow, exfil_path, authenticates_as, exploits, mitigates, observes.
+
+Attributes: CIA impact scores, likelihood, exposure, tags (MITRE IDs, CVE/CWE), data classification (PII/PHI/PCI).
+
+A.3 Canvas UX (React)
+
+Left rail: Security element library with search + favorites.
+
+Center: Node-based canvas (pan/zoom, snap-to-grid, auto-layout).
+
+Right panel: Properties (node/edge), MITRE/CVE lookups, controls recommendations, simulation outcomes.
+
+Bottom: Simulation timeline (steps, probabilities, triggered alerts).
+
+Collab: Cursors, comments, change history, presence, @mentions.
+
+Accessibility: WCAG 2.2 AA, keyboard-only editing, high-contrast palette.
+
+B. System Architecture (C4-style)
+B.1 System Context (Mermaid)
+flowchart LR
+  User[Security Teams / Architects] -->|Browser| Frontend
+  Frontend -->|GraphQL/REST, WS| API[API Gateway]
+  API --> Auth[OIDC Provider]
+  API --> SvcModel[Model Service]
+  API --> SvcSim[Simulation Service]
+  API --> SvcInf[Inference Service]
+  API --> SvcInt[Integrations Service]
+  SvcModel --> PG[(PostgreSQL)]
+  SvcModel --> Neo[(Neo4j Graph)]
+  SvcSim --> Neo
+  SvcInf --> Neo
+  SvcInt --> Cache[(Redis)]
+  SvcInt --> Obj[(Object Storage)]
+  API --> Bus[(Event Bus)]
+  Frontend <-->|WS| Collab[Collab/CRDT Gateway]
+  Collab --> Cache
+
+B.2 Containers & data flow
+
+Frontend (Next.js + React): SPA/SSR hybrid, connects to GraphQL/REST and WebSocket gateways.
+
+API Gateway: Envoy/Nginx Ingress with WAF, request authz, rate limits, JWT verification.
+
+Model Service: CRUD for projects/diagrams; versioning, diff, export/import (JSON, STIX/TAXII).
+
+Simulation Service: Executes threat rules and attack-path computations on the graph; returns stepwise outcomes & probabilities.
+
+Inference Service: Suggests likely paths/mitigations; maps to MITRE, recommends controls.
+
+Integrations Service: Pulls CVE/NVD feeds, MITRE ATT&CK, vendor connectors (read-only to start).
+
+Collab/CRDT Gateway: Real-time document state sync (yjs/automerge), presence, comments, replay.
+
+Event Bus: NATS/Kafka for: diagram.updated, simulation.ran, intel.updated, audit.logged.
+
+Data stores:
+
+PostgreSQL: tenancy, users, RBAC, billing, audits.
+
+Neo4j: nodes/edges, versions, computed paths.
+
+Redis: sessions, CRDT snapshots, short-lived sim caches.
+
+Object storage: exports, assets (icons, logos).
+
+C. Data & Domain Modeling
+C.1 Relational (PostgreSQL)
+
+tenants(id, name, created_at, kms_key_ref)
+
+workspaces(id, tenant_id, name)
+
+users(id, email, sub, status)
+
+memberships(user_id, workspace_id, role)
+
+projects(id, workspace_id, name, tags, visibility)
+
+diagrams(id, project_id, title, version, created_by, updated_at)
+
+audits(id, actor_id, action, target_type, target_id, ip, created_at)
+
+billing_subscriptions(id, tenant_id, plan, status, stripe_ref)
+
+Security: RLS on tenant_id; per-tenant KMS data keys.
+
+C.2 Graph (Neo4j)
+
+Labels: Actor, Asset, Surface, Vector, Control, Zone, Signal.
+
+Example relationships:
+
+(Actor)-[:EXPLOITS {technique: 'T1190', confidence:0.7}]->(Surface)
+
+(Surface)-[:IMPACTS {cia:'C'}]->(Asset)
+
+(Control)-[:MITIGATES {coverage:0.6}]->(Vector)
+
+(Asset)-[:DATA_FLOW {proto:'HTTP', direction:'egress'}]->(Asset)
+
+Versioning: diagram_id, rev, valid_from/to on nodes/edges; soft-delete for history.
+
+C.3 Search index (OpenSearch)
+
+Documents for quick lookup: attack techniques, CVEs, nodes by tag, saved patterns.
+
+D. Simulation & Inference Design
+D.1 Threat Rule DSL (declarative)
+id: rule.surf.ssrf.basic
+when:
+  - node.type == "Surface"
+  - node.subtype == "SSRF"
+  - exists(edge from Actor to node)
+evaluate:
+  steps:
+    - name: "Trigger SSRF request"
+      effect:
+        - follow: edges(DATA_FLOW where direction == "egress" and zone == "internal")
+        - set(prob += 0.2 if Control[egress_proxy].coverage < 0.5)
+    - name: "Pivot to internal metadata"
+      condition: target.asset.subtype == "IMDS" 
+      effect:
+        - set(confidentiality_impact = "High")
+        - recommend(Control: "IMDSv2 + metadata firewall")
+outputs:
+  mitre: ["T1190", "T1552.001"]
+  signals: ["WAF.alert", "Proxy.logs"]
+
+D.2 Attack-path computation
+
+Core algorithm: constrained path search (multi-criteria Dijkstra/A* on the graph) with:
+
+Edge weights from likelihood, exposure, control coverage.
+
+Cutsets for trust boundaries.
+
+Dominance pruning to avoid combinatorial explosion.
+
+Outputs:
+
+Sequence of steps with probability bands (Low/Med/High).
+
+Affected assets and data classes.
+
+Control coverage gaps + ranked mitigations.
+
+D.3 Inference service
+
+Combines: rules outputs + MITRE mappings + org’s current controls.
+
+Suggests:
+
+Missing detections (e.g., “Add egress DNS logging on prod VPC”).
+
+Top-3 “bang-for-buck” mitigations (coverage vs. cost).
+
+Alternative paths a skilled attacker might take (what-if).
+
+E. APIs & Contracts
+E.1 GraphQL (primary for UI)
+type Query {
+  diagram(id: ID!): Diagram
+  searchNodes(q: String!, limit: Int = 20): [Node!]
+  simulate(diagramId: ID!, scenario: ScenarioInput!): SimulationRun!
+}
+
+type Mutation {
+  upsertNode(input: NodeInput!): Node!
+  linkNodes(input: EdgeInput!): Edge!
+  runInference(diagramId: ID!): InferenceResult!
+  importIntel(source: IntelSource!): IntelImportReceipt!
+}
+
+E.2 REST (automation/integrations)
+
+POST /v1/diagrams/:id/simulations
+
+GET /v1/diagrams/:id/export?format=stix
+
+POST /v1/integrations/cve/ingest
+
+GET /v1/inference/:diagramId/recommendations
+
+E.3 Events (NATS/Kafka)
+
+diagram.updated {diagramId, rev, actor, changedPaths}
+
+simulation.completed {diagramId, runId, summary}
+
+intel.updated {source, items, at}
+
+audit.logged {...}
+
+F. Frontend Engineering
+
+Stack: Next.js (App Router) + TypeScript, React 18, React Query/Apollo, Zustand or Jotai for local state.
+
+Canvas: React Flow Pro (node types, custom edges, groups, minimap, auto-layout).
+
+CRDT: yjs + y-websocket for shared state; awareness API for presence.
+
+Theming: Tailwind + Radix UI; dark mode; SOC-friendly density toggle.
+
+Perf: Virtualized node rendering, workerized layout, INP < 200ms target on 1k-node graphs.
+
+Testing: Playwright for e2e (canvas ops), Jest/Vitest unit tests, Axe for a11y.
+
+G. Platform, DevOps & SRE
+G.1 CI/CD
+
+GitHub Actions:
+
+Build (lint/typecheck/test → SBOM → image sign with cosign).
+
+Preview environments per PR (Vercel/Cloud Run previews).
+
+SAST (CodeQL/semgrep), DAST (OWASP ZAP in preview).
+
+IaC scan (Checkov/Terraform Validate).
+
+Versioning: Conventional commits, semantic-release, changelog.
+
+G.2 Runtime & Infra
+
+Kubernetes (GKE/EKS) with:
+
+Namespaces per env, NetworkPolicies, PodSecurity admission.
+
+HPA & VPA; node pools for sim workers.
+
+Ingress: Cloud Load Balancer + WAF + mTLS to services.
+
+Data:
+
+PostgreSQL HA (Cloud SQL/Aurora), point-in-time restore.
+
+Neo4j Enterprise causal cluster.
+
+Redis (Managed) with TLS.
+
+Object storage (S3/GCS) with bucket policies.
+
+Edge: CDN for static assets, WebSocket over ALB/NLB, sticky sessions avoided (token-based routing).
+
+G.3 Observability
+
+OpenTelemetry end-to-end → OTEL Collector →
+
+Metrics: Prometheus; Dashboards: Grafana.
+
+Traces: Tempo/Jaeger.
+
+Logs: Loki/ELK; correlation IDs propagated via headers and context.
+
+SLOs:
+
+API p99 latency < 300ms.
+
+Canvas sync median < 150ms roundtrip.
+
+Simulation 95th percentile < 8s for 10k-edge graphs.
+
+Availability: 99.9% (MVP), 99.95% (GA).
+
+On-call: PagerDuty schedules, runbooks, chaos drills quarterly.
+
+G.4 Security Engineering
+
+AuthN: OIDC (Auth0/Okta/Azure AD/GSuite), PKCE; SCIM for user provisioning.
+
+AuthZ: Policy engine (OPA/Topaz) for ABAC over RBAC (attrs: tenant, workspace, role, clearance).
+
+Secrets: Cloud KMS + Secret Manager, short-lived tokens.
+
+Data: Per-tenant envelope encryption; RLS in Postgres; attribute-based filtering in Neo4j queries.
+
+AppSec: CSP, Trusted Types (to protect canvas UI), strict DOMPurify for notes, SSRF guards on any URL fetchers, file-type validation for uploads.
+
+Supply chain: Dependency pinning, Renovate, provenance (SLSA L3).
+
+Compliance: SOC2 Type II roadmap; audit trails immutable (WORM storage for 1y+).
+
+H. Reference Diagrams
+H.1 Request lifecycle (Sequence)
+sequenceDiagram
+  participant U as User
+  participant FE as Frontend
+  participant AP as API Gateway
+  participant MS as Model Svc
+  participant SS as Sim Svc
+  participant N as Neo4j
+
+  U->>FE: Drag SSRF node, connect to IMDS asset
+  FE->>AP: upsertNode & linkNodes
+  AP->>MS: Validate, persist (RLS, version)
+  MS->>N: Write nodes/edges (rev=n+1)
+  U->>FE: Click "Run Simulation"
+  FE->>AP: POST /simulate
+  AP->>SS: Execute rule set
+  SS->>N: Path search (constraints)
+  SS-->>AP: Run results (steps, scores)
+  AP-->>FE: Stream updates (WS)
+  FE-->>U: Render timeline & recommendations
+
+H.2 Data ingestion (CVE/MITRE)
+sequenceDiagram
+  participant IS as Integrations Svc
+  participant OS as OpenSearch
+  participant PG as Postgres
+  IS->>IS: Poll NVD/MITRE (hourly)
+  IS->>PG: Upsert intel catalog (normalized)
+  IS->>OS: Update search index
+  Note over IS: Trigger cache invalidation events
+
+I. Security-Focused Element Library (starter spec)
+{
+  "nodes": [
+    {"type":"Actor","subtype":"ExternalAttacker","icon":"attacker"},
+    {"type":"Surface","subtype":"SSRF","mitre":["T1190"],"cwe":["918"]},
+    {"type":"Asset","subtype":"IMDS","zone":"CloudInternal"},
+    {"type":"Control","subtype":"EgressProxy","coverage":0.4},
+    {"type":"Signal","subtype":"WAF.Alert"}
+  ],
+  "edges": [
+    {"from":"Actor","to":"Surface","kind":"exploits"},
+    {"from":"Surface","to":"Asset","kind":"data_flow","attrs":{"direction":"egress"}},
+    {"from":"Control","to":"Surface","kind":"mitigates"}
+  ]
+}
+
+J. Enterprise Integrations (phaseable)
+
+Intel: MITRE ATT&CK, NVD/CVE (NIST API), CWE/CAPEC, CISA KEV.
+
+SOC/SIEM: Splunk/Elastic query templates; not ingesting logs at MVP, but allow linkage.
+
+IdP: SSO + SCIM.
+
+Ticketing: Jira/ServiceNow actions (“Create remediation task from recommendation”).
+
+CMDB: ServiceNow/Device42 import for assets.
+
+Cloud: Read-only descriptors (VPCs, SGs, IAM policies) → auto-seed models (opt-in).
+
+K. Performance & Cost Guardrails
+
+Graph scale: Target 50k nodes / 200k edges per workspace; shard by project; read replicas.
+
+Compute: Sim Svc with job queue (Argo/KEDA) scaling to N workers; max graph slice/window per run to bound cost.
+
+Caching: Memoize common subpaths; LRU on Redis; nightly precompute for popular models.
+
+FinOps: Tagging, budget alerts, per-tenant cost meters; archive cold diagrams to cheaper storage.
+
+L. Delivery Plan
+L.1 Phases
+
+Prototype (0–6 weeks)
+
+React canvas with 25 curated node types, basic edges.
+
+Local sim engine with 10 rules (SSRF, IDOR, S3 public, weak IAM, egress DNS).
+
+Neo4j + Postgres schemas; single-tenant dev.
+
+MVP (6–14 weeks)
+
+Multi-tenant auth (OIDC), RBAC, RLS.
+
+CRDT collab (yjs), comments, history.
+
+Simulation v1: constrained paths, probability bands, control suggestions.
+
+MITRE/CVE ingestion; export JSON/STIX.
+
+SLOs, dashboards, SOC2-lite controls.
+
+GA (14–24+ weeks)
+
+Inference v2 (coverage optimizer, what-if diffs).
+
+Marketplace integrations (Jira, Splunk, cloud import).
+
+Neo4j cluster + read replicas; HA Postgres.
+
+Feature flags, canary, multi-region DR.
+
+Compliance pack (SOC2 Type I/II plan).
+
+L.2 Acceptance metrics
+
+Create diagram with 100 nodes, simulate in < 5s p95.
+
+Concurrent editing by 10 users, update latency < 150ms median.
+
+Recommendation relevance rated ≥ 4/5 by pilot users.
+
+3) Recommendations & Creative Enhancements
+
+Guided Playbooks: Prebuilt templates (e.g., “SSRF to IMDS exfil”), one-click “simulate & compare” with/without a control.
+
+Coverage Optimizer: Slider for budget → recommends set of controls maximizing risk reduction (knapsack-like).
+
+Story Mode: Turn a simulation into an executive narrative with slides (auto-generated).
+
+Pattern Mining: Learn common subgraphs across diagrams (e.g., “Your architecture resembles Pattern X often exploited via TTPs Y/Z”).
+
+Auto-seed Models: Read cloud IaC manifests (Terraform plan) → suggest initial nodes/edges.
+
+Red/Blue drills: Time-boxed tabletop exercises with scoreboards; export IR action items to Jira.
+
+4) (Optional) Codebase Review
+
+When you have an initial repo, I’ll review:
+
+Canvas performance (profiling large graphs, workerization).
+
+Security of note fields (XSS), link fetchers (SSRF), icon uploads.
+
+Neo4j query plans (avoid Cartesian explosions; use path-length constraints).
+
+API idempotency & optimistic concurrency (ETags, If-Match).
+
+CRDT storage & replay correctness; history compaction.
+
+Appendices
+A. Minimal GraphQL schema seed
+enum NodeType { Actor Asset Surface Vector Control Zone Signal }
+type Node { id: ID! type: NodeType! subtype: String! attrs: JSON }
+type Edge { id: ID! from: ID! to: ID! kind: String! attrs: JSON }
+type Diagram { id: ID! title: String! nodes: [Node!]! edges: [Edge!]! rev: Int! }
+
+B. Terraform/IaC highlights
+
+VPC with private subnets, NAT, egress proxy where applicable.
+
+SGs least-privilege; restrict DBs to services; no public DB.
+
+OIDC workload identity for pods; no long-lived static creds.
+
+C. Risk register (top 5)
+
+Overconfident simulations → communicate uncertainty bands; allow user-tuned priors.
+
+Graph bloat → archive versions; subgraph focus windows.
+
+Vendor logos/IP → licensing policy + user-uploaded assets only at MVP.
+
+Real-time scale → shard by workspace, backpressure, WS autoscaling.
+
+Multi-tenant isolation → RLS + OPA policies, tenancy fuzz tests.
