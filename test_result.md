@@ -260,10 +260,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Template Library System"
-    - "Default Security Templates"
-    - "Enhanced Auto Layout Algorithms"
-    - "Compliance Framework Mapping"
+    - "Intelligent Node System Phase 1"
+    - "Smart Node Expansion Engine"
+    - "Security Prompting System"
+    - "Required Branches Validation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
