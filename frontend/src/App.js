@@ -1327,6 +1327,9 @@ function AppContent() {
         onComplete={handleSecurityQuestionnaireComplete}
         onCancel={handleSecurityQuestionnaireCancel}
         isVisible={showSecurityQuestionnaire}
+        sourceNode={currentQuestionnaireNode}
+        currentNodes={nodes}
+        onCreateLinkedNodes={handleCreateLinkedNodes}
       />
 
       {/* Template Library Modal */}
