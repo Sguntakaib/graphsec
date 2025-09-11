@@ -213,6 +213,42 @@ backend:
         agent: "testing"
         comment: "✅ Simulation engine working correctly - generates meaningful attack paths from actors through attack surfaces to assets, produces security-focused recommendations (WAF deployment, EDR implementation), maps to valid MITRE techniques, calculates appropriate risk scores"
 
+  - task: "Advanced Attack Path Highlighting"
+    implemented: true
+    working: true
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ Advanced attack path highlighting implemented - nodes and edges highlight in red with pulsing animations, visual feedback for attack paths with MITRE technique mapping"
+
+  - task: "Enhanced Keyboard Shortcuts"
+    implemented: true
+    working: true
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ Enhanced keyboard shortcuts implemented - Ctrl+S (Save), Ctrl+N (New), Ctrl+R (Simulate), Escape (Clear Highlights)"
+
+  - task: "Advanced UI Controls"
+    implemented: true
+    working: true
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ Advanced UI controls implemented - Clear Highlights button, Auto-Layout, Advanced Controls toggle, View Mode switching with proper state management"
+
 frontend:
   # Frontend testing not performed as per instructions
 
