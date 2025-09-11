@@ -195,80 +195,143 @@ async def delete_diagram(diagram_id: str):
     return {"message": "Diagram deleted successfully"}
 
 # Simulation Routes
-@api_router.post("/diagrams/{diagram_id}/simulate", response_model=SimulationResult)
+@api_router.post("/diagrams/{diagram_id}/simulate", response_model=EnhancedSimulationResult)
 async def simulate_attack_paths(diagram_id: str):
     diagram = await db.diagrams.find_one({"id": diagram_id})
     if not diagram:
         raise HTTPException(status_code=404, detail="Diagram not found")
     
-    # Basic simulation logic
-    nodes = diagram.get("nodes", [])
-    edges = diagram.get("edges", [])
+    # Run advanced simulation in thread pool to avoid blocking
+    loop = asyncio.get_event_loop()
     
-    # Find attack paths (simplified)
-    attack_paths = []
-    recommendations = []
-    mitre_techniques = []
-    
-    # Look for common attack patterns
-    actors = [n for n in nodes if n.get("type") == "Actor"]
-    surfaces = [n for n in nodes if n.get("type") == "Surface"]
-    assets = [n for n in nodes if n.get("type") == "Asset"]
-    controls = [n for n in nodes if n.get("type") == "Control"]
-    
-    # Generate attack paths from actors through surfaces to assets
-    for actor in actors:
-        for surface in surfaces:
-            for asset in assets:
-                # Check if there's a path from actor -> surface -> asset
-                actor_to_surface = any(e.get("source") == actor["id"] and e.get("target") == surface["id"] for e in edges)
-                surface_to_asset = any(e.get("source") == surface["id"] and e.get("target") == asset["id"] for e in edges)
-                
-                if actor_to_surface and surface_to_asset:
-                    path = {
-                        "steps": [
-                            {"node": actor["label"], "action": "initiates attack"},
-                            {"node": surface["label"], "action": f"exploits {surface['subtype']}"},
-                            {"node": asset["label"], "action": "compromises asset"}
-                        ],
-                        "likelihood": "Medium",
-                        "impact": "High" if asset["subtype"] in ["Database", "S3Bucket"] else "Medium"
+    def run_simulation():
+        try:
+            # Build security graph
+            nodes = diagram.get("nodes", [])
+            edges = diagram.get("edges", [])
+            
+            simulation_engine.build_security_graph(nodes, edges)
+            
+            # Find attack paths using advanced algorithms
+            attack_paths = simulation_engine.find_attack_paths(max_paths=15, max_length=8)
+            
+            # Generate recommendations
+            recommendations = simulation_engine.generate_recommendations(attack_paths, nodes)
+            
+            # Calculate overall risk score
+            overall_risk_score = simulation_engine.calculate_overall_risk_score(attack_paths)
+            
+            # Get MITRE techniques from attack paths
+            all_mitre_techniques = []
+            for path in attack_paths:
+                all_mitre_techniques.extend(path.mitre_techniques)
+            unique_techniques = list(set(all_mitre_techniques))
+            
+            # Analyze MITRE coverage
+            mitre_coverage = mitre_db.analyze_attack_coverage(unique_techniques)
+            
+            # Get technique details
+            technique_details = {}
+            for tech_id in unique_techniques:
+                technique = mitre_db.get_technique(tech_id)
+                if technique:
+                    technique_details[tech_id] = {
+                        "name": technique.name,
+                        "description": technique.description,
+                        "tactics": technique.tactics,
+                        "impact_level": technique.impact_level,
+                        "complexity": technique.complexity,
+                        "detection_methods": technique.detection_methods[:3],  # Top 3
+                        "mitigations": technique.mitigations[:3]  # Top 3
                     }
-                    attack_paths.append(path)
-                    
-                    # Add MITRE techniques based on surface type
-                    if surface["subtype"] == "SSRF":
-                        mitre_techniques.extend(["T1190", "T1552.001"])
-                    elif surface["subtype"] == "SQLi":
-                        mitre_techniques.extend(["T1190", "T1213"])
-                    elif surface["subtype"] == "WeakIAM":
-                        mitre_techniques.extend(["T1078", "T1484"])
+            
+            # Determine overall risk level
+            if overall_risk_score >= 8.0:
+                risk_level = "Critical"
+            elif overall_risk_score >= 6.0:
+                risk_level = "High"
+            elif overall_risk_score >= 4.0:
+                risk_level = "Medium"
+            else:
+                risk_level = "Low"
+            
+            # Calculate detection coverage
+            detection_coverage = mitre_coverage.get("detection_difficulty", 0.0)
+            
+            # Suggest additional controls
+            node_types = [node.get("subtype", "") for node in nodes if node.get("type") == "Asset"]
+            additional_techniques = mitre_db.suggest_additional_techniques(unique_techniques, node_types)
+            suggested_controls = []
+            
+            for tech_id in additional_techniques:
+                mitigations = mitre_db.get_mitigations(tech_id)
+                suggested_controls.extend(mitigations[:2])  # Top 2 per technique
+            
+            suggested_controls = list(set(suggested_controls))[:10]  # Top 10 unique
+            
+            # Format attack paths for frontend
+            formatted_paths = []
+            for path in attack_paths:
+                formatted_path = {
+                    "steps": [
+                        {
+                            "node": step.source_node,
+                            "action": f"{step.technique} -> {step.target_node}",
+                            "mitre_id": step.mitre_id,
+                            "complexity": step.complexity.name,
+                            "impact": step.impact.name,
+                            "detection_likelihood": round(step.detection_likelihood * 100, 1)
+                        }
+                        for step in path.steps
+                    ],
+                    "likelihood": path.likelihood,
+                    "risk_score": round(path.risk_score, 2),
+                    "total_impact": round(path.total_impact, 2),
+                    "detection_score": round(path.detection_score * 100, 1),
+                    "mitre_techniques": path.mitre_techniques
+                }
+                formatted_paths.append(formatted_path)
+            
+            return {
+                "attack_paths": formatted_paths,
+                "recommendations": recommendations,
+                "mitre_techniques": unique_techniques,
+                "mitre_coverage": mitre_coverage,
+                "risk_score": round(overall_risk_score, 2),
+                "overall_risk_level": risk_level,
+                "detection_coverage": round(detection_coverage * 100, 1),
+                "technique_details": technique_details,
+                "suggested_controls": suggested_controls
+            }
+            
+        except Exception as e:
+            logger.error(f"Simulation error: {str(e)}")
+            # Fallback to basic simulation
+            return {
+                "attack_paths": [],
+                "recommendations": ["Unable to complete advanced analysis. Please check diagram connectivity."],
+                "mitre_techniques": [],
+                "mitre_coverage": {},
+                "risk_score": 0.0,
+                "overall_risk_level": "Unknown",
+                "detection_coverage": 0.0,
+                "technique_details": {},
+                "suggested_controls": []
+            }
     
-    # Generate recommendations based on missing controls
-    control_types = {c["subtype"] for c in controls}
-    if not any("WAF" in ct for ct in control_types) and surfaces:
-        recommendations.append("Deploy Web Application Firewall (WAF) to protect against common web attacks")
-    if not any("EDR" in ct for ct in control_types) and assets:
-        recommendations.append("Implement Endpoint Detection and Response (EDR) for asset monitoring")
-    if not any("EgressProxy" in ct for ct in control_types):
-        recommendations.append("Configure egress proxy to control outbound connections")
+    simulation_result = await loop.run_in_executor(executor, run_simulation)
     
-    # Calculate risk score
-    risk_score = min(len(attack_paths) * 2.5, 10.0)
-    
-    simulation = SimulationResult(
+    # Create and save simulation result
+    enhanced_result = EnhancedSimulationResult(
         diagram_id=diagram_id,
-        attack_paths=attack_paths,
-        recommendations=recommendations,
-        mitre_techniques=list(set(mitre_techniques)),
-        risk_score=risk_score
+        **simulation_result
     )
     
-    # Save simulation result
-    simulation_dict = prepare_for_mongo(simulation.dict())
-    await db.simulations.insert_one(simulation_dict)
+    # Save simulation result to database
+    result_dict = prepare_for_mongo(enhanced_result.dict())
+    await db.simulations.insert_one(result_dict)
     
-    return simulation
+    return enhanced_result
 
 @api_router.get("/diagrams/{diagram_id}/simulations", response_model=List[SimulationResult])
 async def get_simulations(diagram_id: str):
