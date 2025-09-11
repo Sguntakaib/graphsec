@@ -1473,7 +1473,7 @@ async def calculate_node_risk(
         "branch_values": branch_values,
         "recommendations": intelligent_node_engine.generate_security_recommendations(
             node_subtype, 
-            [SecurityBranch(id="temp", name="temp", type="LOGIN", completed=True, value=v) for k, v in branch_values.items()]
+            []  # Pass empty list since we only have branch_values, not SecurityBranch objects
         )
     }
 
