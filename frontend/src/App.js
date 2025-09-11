@@ -799,38 +799,108 @@ function AppContent() {
         
         {/* Advanced Controls Bar */}
         {showAdvancedControls && (
-          <div className="mt-3 pt-3 border-t border-gray-700 flex items-center space-x-3">
-            <button
-              onClick={handleAutoLayout}
-              disabled={isLoading || nodes.length === 0}
-              className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-            >
-              <Zap className="h-4 w-4" />
-              <span>Auto-Layout</span>
-            </button>
-            
-            <button
-              onClick={() => fitView({ padding: 0.1 })}
-              className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 flex items-center space-x-2 text-sm"
-            >
-              <Maximize2 className="h-4 w-4" />
-              <span>Fit View</span>
-            </button>
-            
-            <button
-              onClick={() => {
-                setNodes([]);
-                setEdges([]);
-              }}
-              className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 flex items-center space-x-2 text-sm"
-            >
-              <RotateCcw className="h-4 w-4" />
-              <span>Clear Canvas</span>
-            </button>
-            
-            <div className="text-xs text-gray-400">
-              Nodes: {nodes.length} | Edges: {edges.length} | 
-              {simulationResult && ` Risk: ${simulationResult.overall_risk_level}`}
+          <div className="mt-3 pt-3 border-t border-gray-700 space-y-3">
+            {/* First Row - Layout & Navigation */}
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleAutoLayout}
+                disabled={isLoading || nodes.length === 0}
+                className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              >
+                <Zap className="h-4 w-4" />
+                <span>Auto-Layout</span>
+              </button>
+              
+              <button
+                onClick={() => fitView({ padding: 0.1 })}
+                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 flex items-center space-x-2 text-sm"
+              >
+                <Maximize2 className="h-4 w-4" />
+                <span>Fit View</span>
+              </button>
+
+              <button
+                onClick={handleUndo}
+                disabled={undoStack.length === 0}
+                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                title="Undo (Ctrl+Z)"
+              >
+                <Undo className="h-4 w-4" />
+                <span>Undo</span>
+              </button>
+
+              <button
+                onClick={handleRedo}
+                disabled={redoStack.length === 0}
+                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                title="Redo (Ctrl+Y)"
+              >
+                <Redo className="h-4 w-4" />
+                <span>Redo</span>
+              </button>
+
+              <div className="flex items-center space-x-2 px-3 py-1 bg-gray-700 rounded text-sm text-gray-300">
+                <ZoomIn className="h-4 w-4" />
+                <span>{Math.round(zoomLevel * 100)}%</span>
+              </div>
+            </div>
+
+            {/* Second Row - Grid & View Options */}
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setSnapToGrid(!snapToGrid)}
+                className={`px-3 py-1 rounded flex items-center space-x-2 text-sm ${
+                  snapToGrid 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-600 text-white hover:bg-gray-500'
+                }`}
+              >
+                <Grid className="h-4 w-4" />
+                <span>Snap {snapToGrid ? 'On' : 'Off'}</span>
+              </button>
+
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-gray-400">Grid:</span>
+                <select
+                  value={gridSize}
+                  onChange={(e) => setGridSize(Number(e.target.value))}
+                  className="bg-gray-700 border border-gray-600 rounded text-white text-xs px-2 py-1"
+                >
+                  <option value={10}>10px</option>
+                  <option value={20}>20px</option>
+                  <option value={30}>30px</option>
+                  <option value={50}>50px</option>
+                </select>
+              </div>
+
+              <button
+                onClick={() => setShowPerformanceMonitor(!showPerformanceMonitor)}
+                className={`px-3 py-1 rounded flex items-center space-x-2 text-sm ${
+                  showPerformanceMonitor
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-600 text-white hover:bg-gray-500'
+                }`}
+              >
+                <Monitor className="h-4 w-4" />
+                <span>Performance</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setNodes([]);
+                  setEdges([]);
+                  setSelectedNode(null);
+                  setSimulationResult(null);
+                  setHighlightedPaths([]);
+                  setUndoStack([]);
+                  setRedoStack([]);
+                  clearAttackPathHighlighting();
+                }}
+                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 flex items-center space-x-2 text-sm"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>Clear All</span>
+              </button>
             </div>
           </div>
         )}
