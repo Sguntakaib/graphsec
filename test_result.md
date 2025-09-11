@@ -260,7 +260,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All Phase 2 DSL Rule Engine tasks completed and tested successfully"
+    - "Threat Modeling Wizard Recommendations API"
+    - "Threat Modeling Wizard Model Generation API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
