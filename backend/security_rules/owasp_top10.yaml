@@ -1,0 +1,254 @@
+rules:
+  - id: rule.owasp.a01_broken_access_control
+    name: "OWASP A01: Broken Access Control"
+    description: "Asset accessible without proper access controls"
+    category: identity_access
+    conditions:
+      - field: node.type
+        operator: "=="
+        value: Asset
+      - field: node.criticality
+        operator: in
+        value: ["High", "Critical"]
+      - field: missing_control
+        operator: "=="
+        value: IAMPolicy
+    outcome:
+      impact: High
+      attack_path: "Unauthorized Access → Privilege Escalation → Data Breach"
+      recommendations:
+        - "Implement role-based access control (RBAC)"
+        - "Apply principle of least privilege"
+        - "Use access control lists (ACLs)"
+        - "Regular access reviews and audits"
+      risk_score: 8.1
+    mitre_techniques: ["T1078", "T1068"]
+    priority: 1
+
+  - id: rule.owasp.a02_cryptographic_failures
+    name: "OWASP A02: Cryptographic Failures"
+    description: "Sensitive data transmitted or stored without encryption"
+    category: database_security
+    conditions:
+      - field: node.type
+        operator: "=="
+        value: Asset
+      - field: node.data_classification
+        operator: in
+        value: ["Confidential", "Restricted"]
+      - field: missing_control
+        operator: "=="
+        value: Encryption
+    outcome:
+      impact: High
+      attack_path: "Data Interception → Unencrypted Data → Information Disclosure"
+      recommendations:
+        - "Encrypt sensitive data at rest and in transit"
+        - "Use strong encryption algorithms (AES-256)"
+        - "Implement proper key management"
+        - "Regular cryptographic reviews"
+      risk_score: 7.9
+    mitre_techniques: ["T1040", "T1005", "T1213"]
+    priority: 1
+
+  - id: rule.owasp.a03_injection
+    name: "OWASP A03: Injection Attacks"
+    description: "Application vulnerable to injection attacks"
+    category: web_security
+    conditions:
+      - field: node.subtype
+        operator: in
+        value: ["WebApp", "API"]
+      - field: connected_to.subtype
+        operator: "=="
+        value: Database
+      - field: missing_control
+        operator: "=="
+        value: InputValidation
+    outcome:
+      impact: Critical
+      attack_path: "Malicious Input → Injection Attack → System Compromise"
+      recommendations:
+        - "Use parameterized queries and prepared statements"
+        - "Implement input validation and sanitization"
+        - "Use stored procedures with proper validation"
+        - "Deploy Web Application Firewall (WAF)"
+      risk_score: 9.2
+    mitre_techniques: ["T1190", "T1213"]
+    priority: 1
+
+  - id: rule.owasp.a04_insecure_design
+    name: "OWASP A04: Insecure Design"
+    description: "System design lacks security considerations"
+    category: network_security
+    conditions:
+      - field: node.type
+        operator: "=="
+        value: Asset
+      - field: node.criticality
+        operator: "=="
+        value: Critical
+      - field: exposed_to
+        operator: "=="
+        value: Internet
+      - field: missing_control
+        operator: "=="
+        value: WAF
+    outcome:
+      impact: High
+      attack_path: "Internet Exposure → Unprotected Asset → Direct Attack"
+      recommendations:
+        - "Implement security by design principles"
+        - "Add security controls at design phase"
+        - "Use threat modeling during design"
+        - "Apply defense in depth strategy"
+      risk_score: 7.6
+    mitre_techniques: ["T1190", "T1499"]
+    priority: 2
+
+  - id: rule.owasp.a05_security_misconfiguration
+    name: "OWASP A05: Security Misconfiguration"
+    description: "Security control with low effectiveness"
+    category: network_security
+    conditions:
+      - field: node.type
+        operator: "=="
+        value: Control
+      - field: node.effectiveness
+        operator: "<"
+        value: 50
+    outcome:
+      impact: Medium
+      attack_path: "Misconfigured Control → Security Bypass → Asset Compromise"
+      recommendations:
+        - "Review and improve security configurations"
+        - "Use security configuration baselines"
+        - "Regular security configuration audits" 
+        - "Implement configuration management"
+      risk_score: 6.3
+    mitre_techniques: ["T1562", "T1211"]
+    priority: 3
+
+  - id: rule.owasp.a06_vulnerable_components
+    name: "OWASP A06: Vulnerable and Outdated Components"
+    description: "System using components with known vulnerabilities"
+    category: web_security
+    conditions:
+      - field: node.type
+        operator: "=="
+        value: Asset
+      - field: node.cve_ids
+        operator: exists
+        value: true
+    outcome:
+      impact: High
+      attack_path: "Known Vulnerability → Exploit → System Compromise"
+      recommendations:
+        - "Regular vulnerability scanning and patching"
+        - "Maintain inventory of components and versions"
+        - "Remove unused dependencies and features"
+        - "Use software composition analysis tools"
+      risk_score: 8.0
+    mitre_techniques: ["T1190", "T1068"]
+    priority: 1
+
+  - id: rule.owasp.a07_authentication_failures
+    name: "OWASP A07: Identification and Authentication Failures"
+    description: "Weak authentication mechanisms for critical assets"
+    category: identity_access
+    conditions:
+      - field: node.criticality
+        operator: in
+        value: ["Critical", "High"]
+      - field: authentication_type
+        operator: "=="
+        value: Password
+      - field: missing_control
+        operator: "=="
+        value: MFA
+    outcome:
+      impact: High
+      attack_path: "Weak Authentication → Credential Attack → Account Takeover"
+      recommendations:
+        - "Implement multi-factor authentication (MFA)"
+        - "Use strong password policies"
+        - "Implement account lockout mechanisms"
+        - "Monitor for authentication anomalies"
+      risk_score: 7.7
+    mitre_techniques: ["T1110", "T1078", "T1621"]
+    priority: 1
+
+  - id: rule.owasp.a08_software_integrity_failures
+    name: "OWASP A08: Software and Data Integrity Failures"
+    description: "Lack of integrity verification for critical components"
+    category: web_security
+    conditions:
+      - field: node.type
+        operator: "=="
+        value: Asset
+      - field: node.subtype
+        operator: in
+        value: ["WebApp", "API"]
+      - field: missing_control
+        operator: "=="
+        value: IntegrityCheck
+    outcome:
+      impact: Medium
+      attack_path: "Tampered Code → Integrity Bypass → Malicious Execution"
+      recommendations:
+        - "Implement code signing and verification"
+        - "Use checksums and digital signatures"
+        - "Secure CI/CD pipeline with integrity checks"
+        - "Regular integrity monitoring"
+      risk_score: 6.8
+    mitre_techniques: ["T1195", "T1554"]
+    priority: 2
+
+  - id: rule.owasp.a09_logging_monitoring_failures
+    name: "OWASP A09: Security Logging and Monitoring Failures"
+    description: "Lack of security monitoring and logging"
+    category: network_security
+    conditions:
+      - field: node.type
+        operator: "=="
+        value: Asset
+      - field: node.criticality
+        operator: in
+        value: ["Critical", "High"]
+      - field: missing_control
+        operator: "=="
+        value: SIEM
+    outcome:
+      impact: Medium
+      attack_path: "Security Event → No Detection → Undetected Breach"
+      recommendations:
+        - "Implement comprehensive security logging"
+        - "Deploy SIEM/SOAR solutions"
+        - "Set up real-time monitoring and alerting"
+        - "Regular log review and analysis"
+      risk_score: 6.2
+    mitre_techniques: ["T1562.006", "T1070"]
+    priority: 2
+
+  - id: rule.owasp.a10_ssrf
+    name: "OWASP A10: Server-Side Request Forgery"
+    description: "SSRF vulnerability enabling internal resource access"
+    category: web_security
+    conditions:
+      - field: node.subtype
+        operator: "=="
+        value: SSRF
+      - field: connected_to.subtype
+        operator: in
+        value: ["IMDS", "Database", "VM"]
+    outcome:
+      impact: High
+      attack_path: "SSRF Exploit → Internal Network Access → Data Exfiltration"
+      recommendations:
+        - "Implement URL validation and allow-listing"
+        - "Use network segmentation and firewalls"
+        - "Deploy egress filtering and monitoring"
+        - "Disable unnecessary protocols and services"
+      risk_score: 8.3
+    mitre_techniques: ["T1190", "T1082", "T1613"]
+    priority: 1
