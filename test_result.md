@@ -526,6 +526,8 @@ test_plan:
         agent: "main"
         comment: "Phase 2 DSL Rule Engine - Comprehensive built-in rule library: 8 base security rules + 10 OWASP Top 10 rules + 10 cloud security rules. Categories: web_security, database_security, api_security, network_security, identity_access, cloud_security. YAML-based external rule loading supported."
 
+frontend:
+
 agent_communication:
   - agent: "testing"
     message: "Completed comprehensive backend API testing for Security Modeling Platform. All 9 backend tasks tested successfully with realistic security modeling data. API endpoints handle CRUD operations correctly, simulation engine generates meaningful attack paths with MITRE ATT&CK mapping, and security domain models work as expected. Backend is fully functional and ready for production use."
