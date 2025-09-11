@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timezone
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://threat-expert.preview.emergentagent.com/api"
+BASE_URL = "https://roadmap-review-1.preview.emergentagent.com/api"
 
 class AdvancedEndpointsTest:
     def __init__(self):
