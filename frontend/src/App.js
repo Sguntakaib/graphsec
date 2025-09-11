@@ -1231,12 +1231,26 @@ function AppContent() {
         {/* Right Sidebar - Properties and Analysis */}
         <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
           {viewMode === 'modeling' && selectedNode && (
-            <PropertiesPanel node={selectedNode} />
+            <>
+              <PropertiesPanel node={selectedNode} />
+              
+              {/* Security Branches Visualizer */}
+              {selectedNode.data?.intelligentNode && (
+                <NodeBranchVisualizer
+                  nodeId={selectedNode.id}
+                  nodeSubtype={selectedNode.data.subtype}
+                  branches={nodeBranches[selectedNode.id] || []}
+                  onBranchUpdate={handleNodeBranchUpdate}
+                  isExpanded={true}
+                />
+              )}
+            </>
           )}
           {viewMode === 'analysis' && simulationResult && (
             <EnhancedSimulationPanel 
               result={simulationResult} 
               onHighlightPath={highlightAttackPaths}
+              onClearHighlights={clearAttackPathHighlighting}
             />
           )}
           {!selectedNode && !simulationResult && (
