@@ -125,6 +125,46 @@ class EnhancedSimulationResult(BaseModel):
 # Alias for backward compatibility
 SimulationResult = EnhancedSimulationResult
 
+# Template System Models
+class TemplateCategory(str, Enum):
+    WEB_APPLICATION = "Web Application"
+    CLOUD_NATIVE = "Cloud Native"
+    ZERO_TRUST = "Zero Trust"
+    ENTERPRISE = "Enterprise Network"
+    IOT_DEVICE = "IoT Device"
+    API_SECURITY = "API Security"
+    DEVSECOPS = "DevSecOps"
+    FINANCIAL = "Financial Services"
+
+class SecurityTemplate(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    category: TemplateCategory
+    use_case: str
+    complexity: str  # Basic, Intermediate, Advanced
+    nodes: List[SecurityNode] = []
+    edges: List[SecurityEdge] = []
+    tags: List[str] = []
+    author: str = "System"
+    version: str = "1.0"
+    preview_image: Optional[str] = None
+    compliance_frameworks: List[str] = []  # NIST, ISO27001, etc.
+    estimated_time: str = "5-10 minutes"  # Setup time estimate
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TemplateCreate(BaseModel):
+    name: str
+    description: str
+    category: TemplateCategory
+    use_case: str
+    complexity: str = "Basic"
+    tags: List[str] = []
+    nodes: List[SecurityNode] = []
+    edges: List[SecurityEdge] = []
+    compliance_frameworks: List[str] = []
+
 # Helper functions
 def prepare_for_mongo(data):
     """Prepare data for MongoDB storage"""
