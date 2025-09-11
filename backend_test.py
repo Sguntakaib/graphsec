@@ -1467,7 +1467,15 @@ class SecurityModelingAPITester:
             self.test_techniques_by_tactic,
             self.test_analyze_coverage_endpoint,
             self.test_risk_analysis_endpoint,
-            self.test_auto_layout_endpoint
+            self.test_auto_layout_endpoint,
+            # Phase 1 Intelligent Node System Tests
+            self.test_intelligent_nodes_supported_types,
+            self.test_intelligent_nodes_templates,
+            self.test_intelligent_nodes_prompts,
+            self.test_intelligent_nodes_create_branches,
+            self.test_intelligent_nodes_validate_completeness,
+            self.test_intelligent_nodes_calculate_risk,
+            self.test_intelligent_nodes_invalid_subtypes
         ]
         
         passed = 0
