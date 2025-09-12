@@ -943,8 +943,15 @@ function AppContent() {
         });
         
         if (result.triggerDependentQuestionnaires && result.dependentNodes?.length > 0) {
-          console.log('🚀 Triggering dependent node creation for:', result.dependentNodes);
-          await handleDependentNodeCreation(result.dependentNodes, result.answers);
+          // Filter out dependencies that are already COMPLETED
+          const incompleteDependencies = getIncompleteDependencies(currentQuestionnaireNode.id, result.dependentNodes);
+          
+          if (incompleteDependencies.length > 0) {
+            console.log('🚀 Triggering dependent node creation for incomplete dependencies:', incompleteDependencies);
+            await handleDependentNodeCreation(incompleteDependencies, result.answers);
+          } else {
+            console.log('✅ All dependencies already completed, skipping dependent node creation');
+          }
         }
 
         // Show completion status with smart node creation info
