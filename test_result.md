@@ -611,6 +611,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🎯 QUESTIONNAIRE NAVIGATION FIX: Fixed critical issues with questionnaire flow navigation reported by user. PROBLEMS FIXED: 1) API questionnaire starting from question 3 instead of question 1 - root cause was resumeFromPromptIndex being passed to ALL questionnaires instead of only the parent being resumed. Fixed by conditionally passing resumeFromPromptIndex/partialAnswers only when currentQuestionnaireNode.id matches parentQuestionnaireState.nodeId. 2) Parent questionnaire not resuming after dependent questionnaire completion - fixed completion flow logic to properly check for parent resumption after dependent questionnaires finish. 3) Enhanced parent state management to clear parent state only when the actual parent questionnaire completes. FLOW NOW CORRECT: WebApp Q1-Q2 → API dependency → API Q1-Q5 (starts from Q1) → Resume WebApp Q3-Q5. Ready for testing."
+      - working: "NA"
+        agent: "main"
+        comment: "🎯 REACT KEY DUPLICATION FIX: Fixed React key duplication errors that emerged after navigation fix. PROBLEMS FIXED: 1) Both enhanced and legacy questionnaire systems running simultaneously - added conditional rendering to prevent old SecurityQuestionnaire from rendering when enhanced system is active. 2) Duplicate modal creation in QuestionnaireManager - added duplicate prevention check to avoid creating multiple modals for same nodeId. 3) Enhanced system now properly cleans up legacy system state when it starts successfully. TECHNICAL FIXES: Enhanced QuestionnaireManager with duplicate modal detection, conditional SecurityQuestionnaire rendering based on questionnaireState.isFlowActive, and proper state cleanup in startEnhancedQuestionnaire. React key conflicts resolved."
 
 agent_communication:
   - agent: "testing"
