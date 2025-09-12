@@ -925,7 +925,8 @@ function AppContent() {
       }
 
       // Check if we need to resume a parent questionnaire
-      if (parentQuestionnaireState && questionnaireQueue.length === 0) {
+      // Only resume if there are no questionnaires in queue and no dependent questionnaires are active
+      if (parentQuestionnaireState && questionnaireQueue.length === 0 && currentQueueIndex === 0) {
         console.log('🔄 Resuming parent questionnaire:', parentQuestionnaireState);
         
         // Resume the parent questionnaire
