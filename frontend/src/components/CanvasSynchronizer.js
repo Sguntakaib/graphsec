@@ -212,17 +212,19 @@ const CanvasSynchronizer = ({
       const timeout = setTimeout(applyCanvasUpdates, 100);
       return () => clearTimeout(timeout);
     }
-  }, [state.canvasUpdates, applyCanvasUpdates]);
+  }, [state.canvasUpdates.pendingNodeUpdates.length, state.canvasUpdates.pendingEdgeCreations.length, applyCanvasUpdates]);
   
   // Apply highlights when they change
   useEffect(() => {
     applyHighlights();
   }, [state.canvasUpdates.highlightedNodes, applyHighlights]);
   
-  // Visualize flow progress
+  // Visualize flow progress - with proper dependencies
   useEffect(() => {
-    visualizeFlowProgress();
-  }, [state.questionnaires, visualizeFlowProgress]);
+    if (state.isFlowActive && Object.keys(state.questionnaires).length > 0) {
+      visualizeFlowProgress();
+    }
+  }, [state.isFlowActive, Object.keys(state.questionnaires).join(','), visualizeFlowProgress]);
   
   // Clean up on unmount
   useEffect(() => {
