@@ -67,7 +67,7 @@ const initialEdges = [];
 function AppContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const { actions: questionnaireActions } = useQuestionnaire();
+  const { state: questionnaireState, actions: questionnaireActions } = useQuestionnaire();
   const [selectedNode, setSelectedNode] = useState(null);
   const [currentDiagram, setCurrentDiagram] = useState(null);
   const [simulationResult, setSimulationResult] = useState(null);
