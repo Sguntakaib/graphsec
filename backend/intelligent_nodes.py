@@ -214,6 +214,9 @@ class IntelligentNodeEngine:
                 SecurityBranchType.INPUT_VALIDATION,
                 SecurityBranchType.CORS
             ],
+            dependencies={
+                # API might depend on authentication services
+            },
             security_prompts=[
                 SecurityPrompt(
                     id="api_auth_method",
