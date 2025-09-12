@@ -931,6 +931,14 @@ function AppContent() {
   const handleSecurityQuestionnaireCancel = () => {
     setShowSecurityQuestionnaire(false);
     setCurrentQuestionnaireNode(null);
+    setQuestionnaireQueue([]);
+    setCurrentQueueIndex(0);
+  };
+
+  const handleQuestionnaireOverviewEdit = (node) => {
+    setShowQuestionnaireOverview(false);
+    setCurrentQuestionnaireNode(node);
+    setShowSecurityQuestionnaire(true);
   };
 
   const handleNodeBranchUpdate = (nodeId, updatedBranches) => {
