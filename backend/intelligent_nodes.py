@@ -84,6 +84,10 @@ class IntelligentNodeEngine:
                 SecurityBranchType.INPUT_VALIDATION,
                 SecurityBranchType.WAF
             ],
+            dependencies={
+                "webapp_api_endpoints": "API",
+                "webapp_database_connection": "Database"
+            },
             security_prompts=[
                 SecurityPrompt(
                     id="webapp_login",
