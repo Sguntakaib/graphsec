@@ -387,10 +387,12 @@ const QuestionnaireManager = ({
         if (modal.type !== 'questionnaire') return null;
         
         const zIndex = 1000 + index * 10; // Ensure proper stacking
+        // Use a more unique key to prevent React key conflicts
+        const uniqueKey = `questionnaire-${modal.nodeId}-${modal.nodeSubtype}-${index}`;
         
         return (
           <EnhancedSecurityQuestionnaire
-            key={modal.id}
+            key={uniqueKey}
             nodeId={modal.nodeId}
             nodeSubtype={modal.nodeSubtype}
             parentNodeId={modal.parentId}
