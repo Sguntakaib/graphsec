@@ -1795,6 +1795,9 @@ function AppContent() {
           );
         }}
         currentDiagram={currentDiagram}
+        setDependencyState={setDependencyState}
+        getDependencyState={getDependencyState}
+        getIncompleteDependencies={getIncompleteDependencies}
       />
 
       {/* Canvas Synchronizer - Temporarily disabled to fix infinite loop */}
