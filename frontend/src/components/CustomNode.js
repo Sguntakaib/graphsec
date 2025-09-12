@@ -54,7 +54,10 @@ const CustomNode = ({ data, selected, id }) => {
   };
 
   return (
-    <div className={`react-flow__node-custom ${nodeClass} ${selected ? 'selected' : ''}`}>
+    <div 
+      className={`react-flow__node-custom ${nodeClass} ${selected ? 'selected' : ''} cursor-pointer`}
+      onClick={handleNodeClick}
+    >
       <Handle type="target" position={Position.Top} />
       
       <div className="flex items-center justify-center space-x-2">
