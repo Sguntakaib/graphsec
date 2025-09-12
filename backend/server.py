@@ -14,6 +14,11 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import networkx as nx
 import math
+import pydantic
+from bson import ObjectId
+
+# Fix ObjectId serialization for FastAPI/Pydantic
+pydantic.json.ENCODERS_BY_TYPE[ObjectId] = str
 
 # Import advanced simulation modules
 from advanced_simulation import AdvancedSimulationEngine
