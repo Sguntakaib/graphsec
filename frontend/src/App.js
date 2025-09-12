@@ -1074,6 +1074,8 @@ function AppContent() {
         // Node already exists, just add it to the questionnaire queue
         console.log(`✅ Found existing ${nodeType} node created by SmartNodeConnector:`, existingNode.id);
         allDependentNodes.push(existingNode);
+        // Set dependency state to CREATED since node exists but questionnaire not necessarily completed
+        setDependencyState(sourceNode.id, nodeType, 'CREATED');
       } else {
         // Node doesn't exist, create it
         console.log(`🔄 Creating new ${nodeType} node via conditional dependency`);
@@ -1097,6 +1099,8 @@ function AppContent() {
         
         newNodes.push(newNode);
         allDependentNodes.push(newNode);
+        // Set dependency state to CREATED since we're creating the node
+        setDependencyState(sourceNode.id, nodeType, 'CREATED');
 
         // Create edge connecting parent to dependent node
         const newEdge = {
