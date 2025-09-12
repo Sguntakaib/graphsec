@@ -1505,6 +1505,287 @@ async def get_supported_intelligent_types():
         "total_count": len(supported_types)
     }
 
+# ============================================================================
+# EXPANDED INTELLIGENT NODES ENDPOINTS - PHASE 1 ENHANCEMENT
+# ============================================================================
+
+@api_router.get("/expanded-nodes/supported-types")
+async def get_expanded_supported_types():
+    """Get all supported node types from expanded intelligent node system"""
+    supported_types = expanded_node_engine.get_supported_node_types()
+    
+    type_info = []
+    for node_type in supported_types:
+        template = expanded_node_engine.node_templates.get(node_type, {})
+        if template:
+            type_info.append({
+                "node_subtype": node_type,
+                "node_type": template.get("node_type", "Asset"),
+                "category": template.get("category", "Unknown"),
+                "description": template.get("description", ""),
+                "threat_intelligence": {
+                    "cve_count": template.get("threat_intelligence", {}).cve_count if hasattr(template.get("threat_intelligence", {}), 'cve_count') else 0,
+                    "recent_threat_count": len(template.get("threat_intelligence", {}).recent_threats) if hasattr(template.get("threat_intelligence", {}), 'recent_threats') else 0
+                },
+                "questionnaire_levels": list(template.get("questionnaires", {}).keys()),
+                "required_branches_count": len(template.get("required_branches", [])),
+                "has_dependencies": len(template.get("dependencies", {})) > 0
+            })
+    
+    # Group by category
+    categories = {}
+    for info in type_info:
+        category = info["category"]
+        if category not in categories:
+            categories[category] = []
+        categories[category].append(info)
+    
+    return {
+        "supported_types": type_info,
+        "by_category": categories,
+        "total_count": len(supported_types),
+        "categories": list(categories.keys())
+    }
+
+@api_router.get("/expanded-nodes/{node_subtype}/questionnaire/{level}")
+async def get_expanded_questionnaire(node_subtype: str, level: str):
+    """Get questionnaire for specific node type and level (basic/advanced/expert)"""
+    try:
+        questionnaire_level = QuestionnaireLevel(level.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid questionnaire level. Must be one of: {[l.value for l in QuestionnaireLevel]}")
+    
+    questionnaire = expanded_node_engine.get_questionnaire_by_level(node_subtype, questionnaire_level)
+    
+    if not questionnaire:
+        raise HTTPException(status_code=404, detail=f"Questionnaire not found for node type '{node_subtype}' at level '{level}'")
+    
+    template = expanded_node_engine.node_templates.get(node_subtype, {})
+    
+    return {
+        "node_subtype": node_subtype,
+        "questionnaire_level": level,
+        "questions": questionnaire,
+        "question_count": len(questionnaire),
+        "estimated_time": f"{len(questionnaire) * 1.5:.0f}-{len(questionnaire) * 2:.0f} minutes",
+        "node_info": {
+            "category": template.get("category", "Unknown"),
+            "description": template.get("description", ""),
+            "required_branches": [branch.value for branch in template.get("required_branches", [])]
+        },
+        "threat_intelligence": expanded_node_engine._get_threat_intelligence_summary(node_subtype)
+    }
+
+@api_router.post("/expanded-nodes/{node_subtype}/calculate-risk")
+async def calculate_expanded_risk(node_subtype: str, request: Dict[str, Any]):
+    """Calculate comprehensive risk assessment using enhanced probabilistic model"""
+    responses = request.get("responses", {})
+    business_context = request.get("business_context", {})
+    
+    # Add business context to responses for risk calculation
+    enhanced_responses = {**responses, **business_context}
+    
+    try:
+        risk_assessment = expanded_node_engine.calculate_comprehensive_risk(node_subtype, enhanced_responses)
+        recommendations = expanded_node_engine.generate_security_recommendations(
+            node_subtype, 
+            enhanced_responses, 
+            risk_assessment["composite_risk_score"]
+        )
+        
+        return {
+            "node_subtype": node_subtype,
+            "risk_assessment": risk_assessment,
+            "security_recommendations": recommendations,
+            "calculation_timestamp": datetime.now(timezone.utc).isoformat(),
+            "input_summary": {
+                "response_count": len(responses),
+                "business_context_provided": len(business_context) > 0,
+                "risk_factors_analyzed": len([k for k, v in enhanced_responses.items() if v])
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Risk calculation error for {node_subtype}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Risk calculation failed: {str(e)}")
+
+@api_router.post("/expanded-nodes/bulk-risk-assessment")
+async def bulk_risk_assessment(request: Dict[str, Any]):
+    """Perform risk assessment for multiple nodes simultaneously"""
+    nodes_data = request.get("nodes", [])
+    business_context = request.get("business_context", {})
+    
+    if not nodes_data:
+        raise HTTPException(status_code=400, detail="No nodes provided for assessment")
+    
+    assessment_results = []
+    overall_risk_scores = []
+    
+    for node_data in nodes_data:
+        node_subtype = node_data.get("node_subtype")
+        responses = node_data.get("responses", {})
+        
+        if not node_subtype:
+            continue
+        
+        try:
+            # Add business context to responses
+            enhanced_responses = {**responses, **business_context}
+            
+            risk_assessment = expanded_node_engine.calculate_comprehensive_risk(node_subtype, enhanced_responses)
+            recommendations = expanded_node_engine.generate_security_recommendations(
+                node_subtype, 
+                enhanced_responses, 
+                risk_assessment["composite_risk_score"]
+            )
+            
+            assessment_results.append({
+                "node_id": node_data.get("node_id", f"node_{len(assessment_results)}"),
+                "node_subtype": node_subtype,
+                "risk_assessment": risk_assessment,
+                "security_recommendations": recommendations[:3]  # Top 3 recommendations for bulk view
+            })
+            
+            overall_risk_scores.append(risk_assessment["composite_risk_score"])
+            
+        except Exception as e:
+            logger.error(f"Bulk risk calculation error for {node_subtype}: {str(e)}")
+            assessment_results.append({
+                "node_id": node_data.get("node_id", f"node_{len(assessment_results)}"),
+                "node_subtype": node_subtype,
+                "error": str(e),
+                "risk_assessment": {
+                    "composite_risk_score": 5.0,
+                    "risk_level": "Medium",
+                    "risk_components": {},
+                    "threat_intelligence": {}
+                },
+                "security_recommendations": []
+            })
+    
+    # Calculate overall statistics
+    if overall_risk_scores:
+        average_risk = sum(overall_risk_scores) / len(overall_risk_scores)
+        max_risk = max(overall_risk_scores)
+        min_risk = min(overall_risk_scores)
+        
+        # Risk distribution
+        risk_distribution = {
+            "critical": len([r for r in overall_risk_scores if r >= 8.0]),
+            "high": len([r for r in overall_risk_scores if 6.0 <= r < 8.0]),
+            "medium": len([r for r in overall_risk_scores if 4.0 <= r < 6.0]),
+            "low": len([r for r in overall_risk_scores if 2.0 <= r < 4.0]),
+            "minimal": len([r for r in overall_risk_scores if r < 2.0])
+        }
+    else:
+        average_risk = max_risk = min_risk = 0.0
+        risk_distribution = {"critical": 0, "high": 0, "medium": 0, "low": 0, "minimal": 0}
+    
+    return {
+        "assessment_results": assessment_results,
+        "summary_statistics": {
+            "total_nodes_assessed": len(assessment_results),
+            "average_risk_score": round(average_risk, 2),
+            "highest_risk_score": round(max_risk, 2),
+            "lowest_risk_score": round(min_risk, 2),
+            "risk_distribution": risk_distribution
+        },
+        "calculation_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/expanded-nodes/categories")
+async def get_node_categories():
+    """Get all available node categories with descriptions"""
+    categories_info = {}
+    
+    for node_type in expanded_node_engine.get_supported_node_types():
+        template = expanded_node_engine.node_templates.get(node_type, {})
+        category = template.get("category", "Unknown")
+        
+        if category not in categories_info:
+            categories_info[category] = {
+                "category": category,
+                "node_types": [],
+                "total_nodes": 0,
+                "avg_cve_count": 0,
+                "common_threats": set()
+            }
+        
+        categories_info[category]["node_types"].append(node_type)
+        categories_info[category]["total_nodes"] += 1
+        
+        # Add threat intelligence
+        threat_intel = template.get("threat_intelligence", {})
+        if hasattr(threat_intel, 'cve_count'):
+            categories_info[category]["avg_cve_count"] += threat_intel.cve_count
+        if hasattr(threat_intel, 'recent_threats'):
+            categories_info[category]["common_threats"].update(threat_intel.recent_threats)
+    
+    # Calculate averages and convert sets to lists
+    for category_info in categories_info.values():
+        if category_info["total_nodes"] > 0:
+            category_info["avg_cve_count"] = round(category_info["avg_cve_count"] / category_info["total_nodes"], 1)
+        category_info["common_threats"] = list(category_info["common_threats"])[:5]  # Top 5 common threats
+    
+    return {
+        "categories": list(categories_info.values()),
+        "total_categories": len(categories_info)
+    }
+
+@api_router.post("/expanded-nodes/threat-intelligence-summary")
+async def get_threat_intelligence_summary(request: Dict[str, Any]):
+    """Get aggregated threat intelligence for selected node types"""
+    node_types = request.get("node_types", [])
+    
+    if not node_types:
+        raise HTTPException(status_code=400, detail="No node types provided")
+    
+    aggregated_intelligence = {
+        "total_cve_count": 0,
+        "all_threats": set(),
+        "all_attack_vectors": set(),
+        "all_mitre_techniques": set(),
+        "all_threat_actors": set(),
+        "node_summaries": []
+    }
+    
+    for node_type in node_types:
+        if node_type in expanded_node_engine.node_templates:
+            threat_summary = expanded_node_engine._get_threat_intelligence_summary(node_type)
+            template = expanded_node_engine.node_templates[node_type]
+            
+            aggregated_intelligence["total_cve_count"] += threat_summary["cve_count"]
+            aggregated_intelligence["all_threats"].update(threat_summary["recent_threats"])
+            aggregated_intelligence["all_attack_vectors"].update(threat_summary["primary_attack_vectors"])
+            aggregated_intelligence["all_mitre_techniques"].update(threat_summary["mitre_techniques"])
+            aggregated_intelligence["all_threat_actors"].update(threat_summary["known_threat_actors"])
+            
+            aggregated_intelligence["node_summaries"].append({
+                "node_type": node_type,
+                "category": template.get("category", "Unknown"),
+                "threat_summary": threat_summary
+            })
+    
+    # Convert sets to lists and limit to top items
+    return {
+        "aggregated_intelligence": {
+            "total_cve_count": aggregated_intelligence["total_cve_count"],
+            "unique_threats": list(aggregated_intelligence["all_threats"])[:10],
+            "unique_attack_vectors": list(aggregated_intelligence["all_attack_vectors"])[:10],
+            "unique_mitre_techniques": list(aggregated_intelligence["all_mitre_techniques"])[:15],
+            "unique_threat_actors": list(aggregated_intelligence["all_threat_actors"])[:10]
+        },
+        "node_summaries": aggregated_intelligence["node_summaries"],
+        "summary_stats": {
+            "nodes_analyzed": len(node_types),
+            "total_unique_threats": len(aggregated_intelligence["all_threats"]),
+            "total_unique_attack_vectors": len(aggregated_intelligence["all_attack_vectors"]),
+            "total_mitre_techniques": len(aggregated_intelligence["all_mitre_techniques"]),
+            "total_threat_actors": len(aggregated_intelligence["all_threat_actors"])
+        },
+        "analysis_timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
 # DSL Rule Engine APIs - Phase 2
 @api_router.post("/diagrams/{diagram_id}/evaluate-rules")
 async def evaluate_security_rules(diagram_id: str):
