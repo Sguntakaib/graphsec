@@ -918,6 +918,7 @@ function AppContent() {
         const newNode = {
           id: `${nodeType.toLowerCase()}-${sourceNode.id}-${Date.now()}-${index}`,
           type: 'custom',
+          subtype: nodeType,  // Add subtype at top level for consistency
           position: {
             x: sourceNode.position.x + 200 + (index * 100),
             y: sourceNode.position.y + (index % 2 === 0 ? -100 : 100)
