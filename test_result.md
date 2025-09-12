@@ -582,6 +582,18 @@ frontend:
         agent: "testing"
         comment: "✅ POST /api/intelligent-nodes/{node_subtype}/check-dependencies endpoint working correctly - conditional node expansion logic functional: WebApp with API=true,Database=false returns ['API'], API=true,Database=true returns ['API','Database'], Database backup/monitoring enabled returns ['Backup','Monitoring'], empty answers return []"
 
+  - task: "Conditional Node Expansion Frontend Fix"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 CRITICAL FIX: Fixed duplicate node creation and missing questionnaire prompts in conditional node expansion. Updated handleDependentNodeCreation to detect existing SmartNodeConnector nodes, prevent duplication, and immediately trigger questionnaire modals for dependent nodes. Enhanced questionnaire completion flow to handle dependent questionnaire chaining without premature modal closure."
+
 agent_communication:
   - agent: "testing"
     message: "Completed comprehensive backend API testing for Security Modeling Platform. All 9 backend tasks tested successfully with realistic security modeling data. API endpoints handle CRUD operations correctly, simulation engine generates meaningful attack paths with MITRE ATT&CK mapping, and security domain models work as expected. Backend is fully functional and ready for production use."
