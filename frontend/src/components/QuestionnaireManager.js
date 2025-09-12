@@ -165,21 +165,68 @@ const QuestionnaireManager = ({
   
   // Start questionnaire for a specific node
   const startQuestionnaireForNode = useCallback(async (nodeId, nodeSubtype, parentNodeId = null, existingAnswers = {}) => {
-    console.log('🎬 Starting questionnaire for node:', {
+    console.log('🎬 QuestionnaireManager: Starting questionnaire for node:', {
       nodeId,
       nodeSubtype,
       parentNodeId
     });
     
-    // If this is the first questionnaire, start the flow
-    if (!state.isFlowActive && !parentNodeId) {
-      const rootNode = nodes.find(n => n.id === nodeId);
-      actions.startQuestionnaireFlow(rootNode, 1); // Will be updated as we discover dependencies
+    try {
+      // If this is the first questionnaire, start the flow
+      if (!state.isFlowActive && !parentNodeId) {
+        console.log('🚀 Starting new questionnaire flow');
+        const rootNode = nodes.find(n => n.id === nodeId);
+        actions.startQuestionnaireFlow(rootNode, 1);
+      }
+      
+      // Fetch the prompts for this node type
+      console.log('📋 Fetching prompts for', nodeSubtype);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch prompts: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      const prompts = data.prompts || [];
+      
+      console.log('✅ Prompts fetched:', prompts.length, 'questions');
+      
+      // Create questionnaire in context
+      actions.createQuestionnaire(nodeId, nodeSubtype, prompts, existingAnswers, parentNodeId);
+      
+      // Add to modal stack to trigger the modal display
+      actions.pushModal({
+        id: nodeId,
+        type: 'questionnaire',
+        nodeId,
+        nodeSubtype,
+        parentId: parentNodeId,
+        zIndex: 1000 + state.modalStack.length * 10,
+      });
+      
+      console.log('🎉 Questionnaire modal should now be visible!');
+      
+      return { 
+        nodeId, 
+        nodeSubtype, 
+        parentNodeId, 
+        existingAnswers,
+        success: true 
+      };
+      
+    } catch (error) {
+      console.error('❌ Failed to start questionnaire:', error);
+      return { 
+        nodeId, 
+        nodeSubtype, 
+        parentNodeId, 
+        existingAnswers,
+        success: false,
+        error: error.message 
+      };
     }
-    
-    // The EnhancedSecurityQuestionnaire will handle the rest of the initialization
-    return { nodeId, nodeSubtype, parentNodeId, existingAnswers };
-  }, [state.isFlowActive, nodes, actions]);
+  }, [state.isFlowActive, state.modalStack.length, nodes, actions]);
   
   // Save questionnaire responses to backend
   const saveQuestionnaireResponses = useCallback(async (nodeId, answers) => {
