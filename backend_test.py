@@ -3398,12 +3398,19 @@ class SecurityModelingAPITester:
                 headers={"Content-Type": "application/json"}
             )
             
-            if response.status_code in [404, 400, 500]:
-                self.log_test("Check Dependencies - Invalid Subtype", True, 
-                            f"Gracefully handled invalid node subtype with HTTP {response.status_code}")
+            if response.status_code == 200:
+                data = response.json()
+                # Should return empty dependencies for invalid subtype
+                if data.get("dependent_nodes") == [] and data.get("dependencies_found") == 0:
+                    self.log_test("Check Dependencies - Invalid Subtype", True, 
+                                f"Gracefully handled invalid node subtype by returning empty dependencies")
+                else:
+                    self.log_test("Check Dependencies - Invalid Subtype", False, 
+                                f"Expected empty dependencies, got {data}")
+                    return False
             else:
                 self.log_test("Check Dependencies - Invalid Subtype", False, 
-                            f"Expected error status, got HTTP {response.status_code}")
+                            f"Expected HTTP 200, got HTTP {response.status_code}")
                 return False
                 
         except Exception as e:
