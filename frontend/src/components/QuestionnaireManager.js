@@ -437,6 +437,7 @@ const QuestionnaireManager = ({
             zIndex={zIndex}
             onComplete={handleQuestionnaireComplete}
             onCancel={() => handleQuestionnaireCancel(modal.nodeId)}
+            getIncompleteDependencies={getIncompleteDependencies}
           />
         );
       })}
