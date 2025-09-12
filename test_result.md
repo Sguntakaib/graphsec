@@ -592,6 +592,14 @@ frontend:
     stuck_count: 1
     priority: "high"
     needs_retesting: true
+
+  - task: "Dependency Re-triggering Bug Fix"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/App.js, frontend/src/components/SecurityQuestionnaire.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
