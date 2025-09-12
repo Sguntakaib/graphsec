@@ -1641,8 +1641,8 @@ function AppContent() {
         currentDiagram={currentDiagram}
       />
 
-      {/* Canvas Synchronizer */}
-      <CanvasSynchronizer
+      {/* Canvas Synchronizer - Temporarily disabled to fix infinite loop */}
+      {/* <CanvasSynchronizer
         nodes={nodes}
         setNodes={setNodes}
         edges={edges}
@@ -1653,7 +1653,7 @@ function AppContent() {
         onEdgeCreate={(newEdge) => {
           console.log('Canvas sync: Edge created', newEdge);
         }}
-      />
+      /> */}
     </div>
   );
 }
