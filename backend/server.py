@@ -2595,6 +2595,95 @@ def generate_implementation_recommendations(wizard_data):
         "Create actionable timeline and ownership"
     ]
 
+# Questionnaire Management Routes
+@api_router.get("/diagrams/{diagram_id}/nodes/{node_id}/questionnaire")
+async def get_node_questionnaire_responses(diagram_id: str, node_id: str):
+    """Get questionnaire responses for a specific node"""
+    try:
+        diagram = await db.diagrams.find_one({"id": diagram_id})
+        if not diagram:
+            raise HTTPException(status_code=404, detail="Diagram not found")
+        
+        # Find the node in the diagram
+        node = None
+        for n in diagram.get("nodes", []):
+            if n.get("id") == node_id:
+                node = n
+                break
+        
+        if not node:
+            raise HTTPException(status_code=404, detail="Node not found")
+        
+        # Get questionnaire responses from node data
+        questionnaire_data = node.get("data", {}).get("questionnaireResponses", {})
+        node_subtype = node.get("subtype", "")
+        
+        # Get the original prompts for this node type
+        prompts = intelligent_node_engine.get_security_prompts(node_subtype)
+        
+        return {
+            "success": True,
+            "node_id": node_id,
+            "node_subtype": node_subtype,
+            "questionnaire_responses": questionnaire_data,
+            "prompts": [prompt.dict() for prompt in prompts],
+            "completed_questions": len([q for q in questionnaire_data.values() if q is not None]),
+            "total_questions": len(prompts)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting questionnaire responses: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/diagrams/{diagram_id}/nodes/{node_id}/questionnaire")
+async def update_node_questionnaire_responses(diagram_id: str, node_id: str, request: dict):
+    """Update questionnaire responses for a specific node"""
+    try:
+        responses = request.get("responses", {})
+        
+        # Update the node's questionnaire data
+        result = await db.diagrams.update_one(
+            {"id": diagram_id, "nodes.id": node_id},
+            {
+                "$set": {
+                    "nodes.$.data.questionnaireResponses": responses,
+                    "nodes.$.data.lastQuestionnaireUpdate": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Diagram or node not found")
+        
+        return {
+            "success": True,
+            "node_id": node_id,
+            "updated_responses": len(responses)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error updating questionnaire responses: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/intelligent-nodes/{node_subtype}/check-dependencies")
+async def check_node_dependencies(node_subtype: str, request: dict):
+    """Check which dependent nodes should be created based on questionnaire answers"""
+    try:
+        answers = request.get("answers", {})
+        
+        # Get dependent nodes that should be created
+        dependent_nodes = intelligent_node_engine.check_conditional_dependencies(node_subtype, answers)
+        
+        return {
+            "success": True,
+            "node_subtype": node_subtype,
+            "dependent_nodes": dependent_nodes,
+            "dependencies_found": len(dependent_nodes)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error checking dependencies: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 # Include the router in the main app
 app.include_router(api_router)
 
