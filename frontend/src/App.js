@@ -888,6 +888,12 @@ function AppContent() {
   };
 
   const handleDependentNodeCreation = async (dependentNodeTypes, parentAnswers) => {
+    console.log('🎯 handleDependentNodeCreation called with:', {
+      dependentNodeTypes,
+      sourceNodeId: currentQuestionnaireNode?.id,
+      sourceNodeSubtype: currentQuestionnaireNode?.data?.subtype
+    });
+    
     const sourceNode = currentQuestionnaireNode;
     const allDependentNodes = [];
     const newNodes = [];
