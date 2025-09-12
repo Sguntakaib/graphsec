@@ -911,12 +911,35 @@ function AppContent() {
         
         // If this is a partial completion (from immediate dependency trigger), store resume info
         if (result.partialCompletion && result.currentPromptIndex !== undefined) {
-          // Store current questionnaire state for resuming after dependency handling
-          console.log(`📝 Storing partial completion state - resume at prompt ${result.currentPromptIndex}`);
-          // The questionnaire modal should remain open and continue after dependency flow
+          // Store parent questionnaire state for resuming after dependency handling
+          console.log(`📝 Storing parent questionnaire state - resume at prompt ${result.currentPromptIndex}`);
+          setParentQuestionnaireState({
+            nodeId: currentQuestionnaireNode.id,
+            nodeSubtype: currentQuestionnaireNode.subtype || currentQuestionnaireNode.data?.subtype,
+            resumeFromPromptIndex: result.currentPromptIndex,
+            partialAnswers: result.answers
+          });
         }
         
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
+      }
+
+      // Check if we need to resume a parent questionnaire
+      if (parentQuestionnaireState && questionnaireQueue.length === 0) {
+        console.log('🔄 Resuming parent questionnaire:', parentQuestionnaireState);
+        
+        // Resume the parent questionnaire
+        setCurrentQuestionnaireNode({
+          id: parentQuestionnaireState.nodeId,
+          subtype: parentQuestionnaireState.nodeSubtype,
+          data: { subtype: parentQuestionnaireState.nodeSubtype }
+        });
+        
+        // Clear parent state as we're resuming it
+        setParentQuestionnaireState(null);
+        
+        // The questionnaire will resume from the stored prompt index
+        return; // Keep modal open for parent questionnaire resumption
       }
 
       // Check if there are more questionnaires in the queue
@@ -933,6 +956,7 @@ function AppContent() {
         setCurrentQuestionnaireNode(null);
         setQuestionnaireQueue([]);
         setCurrentQueueIndex(0);
+        setParentQuestionnaireState(null); // Clear any remaining parent state
       }
     }
   };
