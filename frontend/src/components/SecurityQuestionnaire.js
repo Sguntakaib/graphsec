@@ -32,14 +32,24 @@ const SecurityQuestionnaire = ({
 
   useEffect(() => {
     if (isVisible && nodeSubtype) {
-      // Reset state when opening questionnaire for a new node
-      setCurrentPromptIndex(0);
-      setAnswers(existingValues);
-      setValidation(null);
-      setError(null);
-      fetchSecurityPrompts();
+      // Check if we're resuming a parent questionnaire
+      if (resumeFromPromptIndex !== null && partialAnswers) {
+        console.log(`🔄 Resuming parent questionnaire from prompt ${resumeFromPromptIndex}`);
+        setCurrentPromptIndex(resumeFromPromptIndex);
+        setAnswers(partialAnswers);
+        setValidation(null);
+        setError(null);
+        fetchSecurityPrompts();
+      } else {
+        // Reset state when opening questionnaire for a new node
+        setCurrentPromptIndex(0);
+        setAnswers(existingValues);
+        setValidation(null);
+        setError(null);
+        fetchSecurityPrompts();
+      }
     }
-  }, [isVisible, nodeSubtype]);
+  }, [isVisible, nodeSubtype, resumeFromPromptIndex, partialAnswers]);
 
   // Additional effect to reset state when the modal is closed and reopened
   useEffect(() => {
