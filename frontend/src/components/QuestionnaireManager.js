@@ -85,8 +85,22 @@ const QuestionnaireManager = ({
           actions.pauseQuestionnaire(nodeId);
         }
         
+        // Filter out completed dependencies before creating nodes
+        const incompleteDependencies = getIncompleteDependencies ? 
+          getIncompleteDependencies(nodeId, dependentNodes) : 
+          dependentNodes;
+        
+        console.log('🔍 QuestionnaireManager dependency filtering:', {
+          allDependencies: dependentNodes,
+          incompleteDependencies
+        });
+        
         // Create dependent nodes and their questionnaires
-        await handleDependentNodeCreation(dependentNodes, nodeId, answers);
+        if (incompleteDependencies.length > 0) {
+          await handleDependentNodeCreation(incompleteDependencies, nodeId, answers);
+        } else {
+          console.log('✅ All dependencies completed, skipping node creation');
+        }
         
       } else {
         // Regular completion - continue with flow
