@@ -54,29 +54,10 @@ class SmartNodeConnector {
     const baseX = sourceNode.position.x;
     const baseY = sourceNode.position.y;
 
-    // Check if API endpoints exist
-    const hasAPI = answers['webapp_api_endpoints'] === true;
-    if (hasAPI) {
-      const apiNodeId = `api-${sourceNodeId}-${Date.now()}`;
-      const apiNode = this.createAPINode(apiNodeId, baseX + 200, baseY - 100);
-      nodesToCreate.push(apiNode);
-      
-      // Create edge from WebApp to API
-      const apiEdge = this.createEdge(sourceNodeId, apiNodeId, 'Exposes API');
-      edgesToCreate.push(apiEdge);
-    }
-
-    // Check if database connection exists
-    const hasDatabase = answers['webapp_database_connection'] === true;
-    if (hasDatabase) {
-      const dbNodeId = `database-${sourceNodeId}-${Date.now()}`;
-      const dbNode = this.createDatabaseNode(dbNodeId, baseX + 200, baseY + 100);
-      nodesToCreate.push(dbNode);
-      
-      // Create edge from WebApp to Database
-      const dbEdge = this.createEdge(sourceNodeId, dbNodeId, 'Connects to Database');
-      edgesToCreate.push(dbEdge);
-    }
+    // NOTE: API and Database node creation is now handled by the conditional dependency system
+    // This prevents duplicate node creation and ensures proper questionnaire chaining
+    // The conditional dependency system will check 'webapp_api_endpoints' and 'webapp_database_connection'
+    // and create nodes accordingly with proper questionnaire flow
 
     // Check WAF protection
     const wafProtection = answers['webapp_waf_protection'];
