@@ -3417,7 +3417,7 @@ class SecurityModelingAPITester:
         try:
             response = self.session.post(
                 f"{self.base_url}/intelligent-nodes/{subtype}/check-dependencies",
-                json=answers,  # Send answers directly as per API contract
+                json={"answers": answers},  # Wrap answers in "answers" object as per API contract
                 headers={"Content-Type": "application/json"}
             )
             
