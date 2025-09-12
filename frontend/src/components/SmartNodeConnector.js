@@ -121,27 +121,10 @@ class SmartNodeConnector {
     const baseX = sourceNode.position.x;
     const baseY = sourceNode.position.y;
 
-    // Create backup system if mentioned
-    const hasBackup = answers['db_backup_enabled'] === true;
-    if (hasBackup) {
-      const backupNodeId = `backup-${sourceNodeId}-${Date.now()}`;
-      const backupNode = this.createBackupNode(backupNodeId, baseX + 200, baseY + 100);
-      nodesToCreate.push(backupNode);
-      
-      const backupEdge = this.createEdge(sourceNodeId, backupNodeId, 'Backs up to');
-      edgesToCreate.push(backupEdge);
-    }
-
-    // Create monitoring system
-    const hasMonitoring = answers['db_monitoring_enabled'] === true;
-    if (hasMonitoring) {
-      const monitorNodeId = `monitor-${sourceNodeId}-${Date.now()}`;
-      const monitorNode = this.createMonitoringNode(monitorNodeId, baseX, baseY + 200);
-      nodesToCreate.push(monitorNode);
-      
-      const monitorEdge = this.createEdge(monitorNodeId, sourceNodeId, 'Monitors');
-      edgesToCreate.push(monitorEdge);
-    }
+    // NOTE: Backup and Monitoring node creation is now handled by the conditional dependency system
+    // This prevents duplicate node creation and ensures proper questionnaire chaining
+    // The conditional dependency system will check 'db_backup_enabled' and 'db_monitoring_enabled'
+    // and create nodes accordingly with proper questionnaire flow
   }
 
   // Node creation helper methods
