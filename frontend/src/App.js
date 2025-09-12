@@ -1527,7 +1527,7 @@ function AppContent() {
 
       {/* Security Questionnaire Modal */}
       <SecurityQuestionnaire
-        nodeSubtype={currentQuestionnaireNode?.subtype}
+        nodeSubtype={currentQuestionnaireNode?.subtype || currentQuestionnaireNode?.data?.subtype}
         onComplete={handleSecurityQuestionnaireComplete}
         onCancel={handleSecurityQuestionnaireCancel}
         isVisible={showSecurityQuestionnaire}
