@@ -25,6 +25,9 @@ import SmartNodeConnector from './components/SmartNodeConnector';
 import SimulationDebugger from './components/SimulationDebugger';
 import NodeBranchVisualizer from './components/NodeBranchVisualizer';
 import ThreatModelingWizard from './components/ThreatModelingWizard';
+import { QuestionnaireProvider } from './contexts/QuestionnaireContext';
+import QuestionnaireManager from './components/QuestionnaireManager';
+import CanvasSynchronizer from './components/CanvasSynchronizer';
 import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram, applyTemplateToCurrentDiagram } from './services/api';
   import { 
   Shield, 
