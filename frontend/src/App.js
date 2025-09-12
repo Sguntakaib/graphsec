@@ -385,7 +385,10 @@ function AppContent() {
                   // Make sure old system doesn't activate
                   setShowSecurityQuestionnaire(false);
                   setCurrentQuestionnaireNode(null);
+                  console.log('🎯 Enhanced system succeeded, skipping fallback');
                   return; // Success - exit early
+                } else {
+                  console.warn('⚠️ Enhanced system returned failure, using fallback');
                 }
               } else {
                 console.warn('⚠️ QuestionnaireManager not available, using fallback');
