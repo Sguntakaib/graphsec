@@ -929,23 +929,10 @@ function AppContent() {
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
       }
 
-      // Check if we need to resume a parent questionnaire
-      // Only resume if there are no questionnaires in queue and no dependent questionnaires are active
-      if (parentQuestionnaireState && questionnaireQueue.length === 0 && currentQueueIndex === 0) {
-        console.log('🔄 Resuming parent questionnaire:', parentQuestionnaireState);
-        
-        // Resume the parent questionnaire
-        setCurrentQuestionnaireNode({
-          id: parentQuestionnaireState.nodeId,
-          subtype: parentQuestionnaireState.nodeSubtype,
-          data: { subtype: parentQuestionnaireState.nodeSubtype }
-        });
-        
-        // Clear parent state as we're resuming it
+      // If this was a resumed parent questionnaire completion, clear the parent state
+      if (parentQuestionnaireState && currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId) {
+        console.log('✅ Parent questionnaire completed, clearing parent state');
         setParentQuestionnaireState(null);
-        
-        // The questionnaire will resume from the stored prompt index
-        return; // Keep modal open for parent questionnaire resumption
       }
 
       // Check if there are more questionnaires in the queue
