@@ -587,11 +587,11 @@ frontend:
 
   - task: "Conditional Node Expansion Frontend Fix"
     implemented: true
-    working: "NA"
+    working: true
     file: "frontend/src/App.js, frontend/src/components/SmartNodeConnector.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -605,6 +605,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🔧 MAJOR FIXES COMPLETED: 1) Fixed MongoDB ObjectId serialization errors with Pydantic v2 compatibility 2) Fixed ReactFlow drag-and-drop using screenToFlowPosition for proper coordinate handling 3) Fixed backend URL configuration (was pointing to wrong external URL) 4) Backend API now responding correctly (200 OK) 5) WebApp nodes now visible in Advanced Node Library under Critical Assets category 6) Category filtering working properly. Ready for comprehensive conditional dependency testing."
+      - working: true
+        agent: "testing"
+        comment: "✅ CONDITIONAL NODE EXPANSION TESTING COMPLETE: Comprehensive testing confirms the feature is working correctly! ✅ App Setup: Loads successfully, WebApp nodes visible in Critical Assets category ✅ Drag & Drop: WebApp node drag-and-drop working, questionnaire modal opens immediately ✅ Conditional Logic: API node created when questionnaire completed (1 WebApp + 1 API = 2 total nodes) ✅ No Duplicates: No duplicate node creation detected ✅ Questionnaire Flow: Security configuration modal functional with proper navigation ✅ Node Creation: Conditional dependency system creating appropriate nodes based on answers ✅ UI Integration: Proper visual feedback with 'has_dependency' edges and auto-generated labels. The previous duplicate node creation issue has been resolved. The conditional node expansion feature is fully functional and ready for production use."
 
 agent_communication:
   - agent: "testing"
