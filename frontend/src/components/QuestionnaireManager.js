@@ -386,8 +386,8 @@ const QuestionnaireManager = ({
   
   return (
     <>
-      {/* Progress Breadcrumbs */}
-      {state.isFlowActive && (
+      {/* Progress Breadcrumbs - Only show for root questionnaire (not dependent questionnaires) */}
+      {state.isFlowActive && state.modalStack.length === 1 && (
         <ProgressBreadcrumbs className="fixed top-0 left-0 right-0 z-40" />
       )}
       
