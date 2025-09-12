@@ -60,6 +60,7 @@ class IntelligentNodeTemplate(BaseModel):
     security_prompts: List[SecurityPrompt]
     auto_expand_rules: Dict[str, Any] = {}
     risk_factors: Dict[str, float] = {}
+    dependencies: Dict[str, str] = {}  # Maps question IDs to dependent node types
 
 class IntelligentNodeEngine:
     """Engine for handling intelligent node expansion and security prompting"""
