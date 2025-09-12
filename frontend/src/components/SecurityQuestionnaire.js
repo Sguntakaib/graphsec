@@ -208,13 +208,27 @@ const SecurityQuestionnaire = ({
         
         if (dependencyResponse.ok) {
           const dependencyData = await dependencyResponse.json();
-          dependentNodes = dependencyData.dependent_nodes || [];
-          console.log('🎯 Dependency check result:', {
-            nodeSubtype,
-            answers,
-            dependentNodes,
-            triggerRequired: dependentNodes.length > 0
-          });
+          const allDependentNodes = dependencyData.dependent_nodes || [];
+          
+          // Filter out dependencies that are already COMPLETED if filter function is provided
+          if (getIncompleteDependencies && sourceNode?.id) {
+            dependentNodes = getIncompleteDependencies(sourceNode.id, allDependentNodes);
+            console.log('🎯 Dependency check result (filtered):', {
+              nodeSubtype,
+              answers,
+              allDependentNodes,
+              incompleteDependentNodes: dependentNodes,
+              triggerRequired: dependentNodes.length > 0
+            });
+          } else {
+            dependentNodes = allDependentNodes;
+            console.log('🎯 Dependency check result (unfiltered):', {
+              nodeSubtype,
+              answers,
+              dependentNodes,
+              triggerRequired: dependentNodes.length > 0
+            });
+          }
         }
       } catch (error) {
         console.error('Error checking dependencies:', error);
