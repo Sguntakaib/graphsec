@@ -482,6 +482,24 @@ class IntelligentNodeEngine:
                     recommendations.append("Implement additional security controls for high-value data classification")
         
         return recommendations[:5]  # Limit to top 5 recommendations
+    
+    def get_node_dependencies(self, node_subtype: str) -> Dict[str, str]:
+        """Get dependency mapping for a node type"""
+        template = self.get_node_template(node_subtype)
+        return template.dependencies if template else {}
+    
+    def check_conditional_dependencies(self, node_subtype: str, questionnaire_answers: Dict[str, Any]) -> List[str]:
+        """Check which dependent nodes should be created based on questionnaire answers"""
+        dependencies = self.get_node_dependencies(node_subtype)
+        nodes_to_create = []
+        
+        for question_id, dependent_node_type in dependencies.items():
+            answer = questionnaire_answers.get(question_id)
+            # Create dependent node if answer is True/Yes
+            if answer is True or (isinstance(answer, str) and answer.lower() in ['yes', 'true']):
+                nodes_to_create.append(dependent_node_type)
+        
+        return nodes_to_create
 
 # Global instance
 intelligent_node_engine = IntelligentNodeEngine()
