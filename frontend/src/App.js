@@ -288,17 +288,17 @@ function AppContent() {
     async (event) => {
       event.preventDefault();
 
-      const reactFlowBounds = event.currentTarget.getBoundingClientRect();
       const type = event.dataTransfer.getData('application/reactflow');
 
       if (typeof type === 'undefined' || !type) {
         return;
       }
 
-      const position = {
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      };
+      // Use screenToFlowPosition to properly convert screen coordinates to flow coordinates
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
       const nodeData = JSON.parse(type);
       const newNode = {
@@ -337,7 +337,7 @@ function AppContent() {
         // Continue without intelligent features if API fails
       }
     },
-    [setNodes],
+    [setNodes, screenToFlowPosition],
   );
 
   const onDragOver = useCallback((event) => {
