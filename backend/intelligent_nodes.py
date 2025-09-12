@@ -273,6 +273,7 @@ class IntelligentNodeEngine:
             node_type="Actor",
             node_subtype="ExternalAttacker",
             required_branches=[],  # Attackers don't need security controls
+            dependencies={},
             security_prompts=[
                 SecurityPrompt(
                     id="attacker_sophistication",
