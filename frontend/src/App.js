@@ -962,7 +962,18 @@ function AppContent() {
       sourceNodeSubtype: currentQuestionnaireNode?.data?.subtype
     });
     
-    const sourceNode = currentQuestionnaireNode;
+    // Find the actual React Flow node with position data
+    const sourceNode = nodes.find(node => node.id === currentQuestionnaireNode?.id);
+    
+    if (!sourceNode) {
+      console.error('❌ Source node not found in nodes array:', currentQuestionnaireNode?.id);
+      return;
+    }
+    
+    if (!sourceNode.position) {
+      console.error('❌ Source node missing position property:', sourceNode);
+      return;
+    }
     const allDependentNodes = [];
     const newNodes = [];
     const newEdges = [];
