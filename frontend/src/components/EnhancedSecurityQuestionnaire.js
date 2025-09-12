@@ -306,8 +306,9 @@ const EnhancedSecurityQuestionnaire = ({
           const allDependentNodes = dependencyData.dependent_nodes || [];
           
           // Filter out dependencies that are already COMPLETED if filter function is provided
-          if (getIncompleteDependencies && parentNodeId) {
-            dependentNodes = getIncompleteDependencies(parentNodeId || nodeId, allDependentNodes);
+          // Use nodeId as the parent when checking dependencies (since this node is creating dependencies)
+          if (getIncompleteDependencies) {
+            dependentNodes = getIncompleteDependencies(nodeId, allDependentNodes);
             console.log('🎯 Enhanced dependency check result (filtered):', {
               nodeSubtype,
               answers,
