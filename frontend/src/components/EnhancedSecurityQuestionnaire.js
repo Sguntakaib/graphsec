@@ -303,7 +303,27 @@ const EnhancedSecurityQuestionnaire = ({
         
         if (dependencyResponse.ok) {
           const dependencyData = await dependencyResponse.json();
-          dependentNodes = dependencyData.dependent_nodes || [];
+          const allDependentNodes = dependencyData.dependent_nodes || [];
+          
+          // Filter out dependencies that are already COMPLETED if filter function is provided
+          if (getIncompleteDependencies && parentNodeId) {
+            dependentNodes = getIncompleteDependencies(parentNodeId || nodeId, allDependentNodes);
+            console.log('🎯 Enhanced dependency check result (filtered):', {
+              nodeSubtype,
+              answers,
+              allDependentNodes,
+              incompleteDependentNodes: dependentNodes,
+              triggerRequired: dependentNodes.length > 0
+            });
+          } else {
+            dependentNodes = allDependentNodes;
+            console.log('🎯 Enhanced dependency check result (unfiltered):', {
+              nodeSubtype,
+              answers,
+              dependentNodes,
+              triggerRequired: dependentNodes.length > 0
+            });
+          }
         }
       } catch (error) {
         console.error('Error checking dependencies:', error);
