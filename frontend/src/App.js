@@ -359,26 +359,51 @@ function AppContent() {
         );
 
         if (supportedType) {
-          // Start questionnaire flow using the new system
-          const node = nodes.find(n => n.id === nodeId);
-          if (node) {
-            questionnaireActions.startQuestionnaireFlow(node, 1);
-            
-            // The QuestionnaireManager will handle the rest
-            if (window.questionnaireManager) {
-              await window.questionnaireManager.startQuestionnaireForNode(
-                nodeId, 
-                nodeSubtype, 
-                parentNodeId, 
-                {}
-              );
+          console.log('✅ Node type supported, attempting enhanced questionnaire...');
+          
+          // Try enhanced system first
+          try {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+              console.log('🚀 Starting questionnaire flow...');
+              questionnaireActions.startQuestionnaireFlow(node, 1);
+              
+              // Check if QuestionnaireManager is available
+              if (window.questionnaireManager) {
+                console.log('📋 QuestionnaireManager available, starting questionnaire...');
+                const result = await window.questionnaireManager.startQuestionnaireForNode(
+                  nodeId, 
+                  nodeSubtype, 
+                  parentNodeId, 
+                  {}
+                );
+                console.log('✅ Enhanced questionnaire started:', result);
+                return; // Success - exit early
+              } else {
+                console.warn('⚠️ QuestionnaireManager not available, using fallback');
+              }
             }
+          } catch (enhancedError) {
+            console.error('❌ Enhanced questionnaire failed:', enhancedError);
           }
+          
+          // Fallback to old system
+          console.log('🔄 Falling back to old questionnaire system');
+          setCurrentQuestionnaireNode({
+            id: nodeId,
+            subtype: nodeSubtype,
+            data: { subtype: nodeSubtype }
+          });
+          setShowSecurityQuestionnaire(true);
+        } else {
+          console.log('❌ Node type not supported for questionnaire');
         }
       }
     } catch (error) {
-      console.error('Error starting enhanced questionnaire:', error);
-      // Fallback to old system if needed
+      console.error('❌ Error starting enhanced questionnaire:', error);
+      
+      // Always fallback to old system on error
+      console.log('🔄 Fallback: Using old questionnaire system');
       setCurrentQuestionnaireNode({
         id: nodeId,
         subtype: nodeSubtype,
