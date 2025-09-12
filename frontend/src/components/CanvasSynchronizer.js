@@ -143,67 +143,62 @@ const CanvasSynchronizer = ({
   
   // Handle questionnaire flow progress visualization
   const visualizeFlowProgress = useCallback(() => {
-    if (!state.isFlowActive) return;
+    if (!state.isFlowActive || Object.keys(state.questionnaires).length === 0) return;
     
-    const { rootNode } = state.questionnaireFlow;
     const { questionnaires } = state;
     
-    // Highlight nodes based on questionnaire status
-    const nodeUpdates = Object.values(questionnaires).map(questionnaire => {
-      let highlightColor = '#6B7280'; // Default gray
-      let pulseAnimation = false;
-      
-      switch (questionnaire.status) {
-        case 'active':
-          highlightColor = '#3B82F6'; // Blue
-          pulseAnimation = true;
-          break;
-        case 'completed':
-          highlightColor = '#10B981'; // Green
-          break;
-        case 'paused':
-          highlightColor = '#F59E0B'; // Yellow
-          break;
-      }
-      
-      return {
-        nodeId: questionnaire.nodeId,
-        style: {
-          border: `2px solid ${highlightColor}`,
-          boxShadow: `0 0 10px ${highlightColor}40`,
-          ...(pulseAnimation && {
-            animation: 'pulse 2s infinite',
-          }),
-        },
-        data: {
-          questionnaireStatus: questionnaire.status,
-          progress: questionnaire.progress,
-        },
-      };
-    });
+    // Only update if there are actually questionnaires to visualize
+    const activeQuestionnaires = Object.values(questionnaires);
+    if (activeQuestionnaires.length === 0) return;
     
-    // Apply node updates
-    nodeUpdates.forEach(update => {
-      setNodes(currentNodes => 
-        currentNodes.map(node => {
-          if (node.id === update.nodeId) {
-            return {
-              ...node,
-              style: {
-                ...node.style,
-                ...update.style,
-              },
-              data: {
-                ...node.data,
-                ...update.data,
-              },
-            };
-          }
-          return node;
-        })
-      );
+    // Batch all node updates into a single setNodes call to prevent multiple re-renders
+    setNodes(currentNodes => {
+      return currentNodes.map(node => {
+        const questionnaire = questionnaires[node.id];
+        if (!questionnaire) return node;
+        
+        let highlightColor = '#6B7280'; // Default gray
+        let pulseAnimation = false;
+        
+        switch (questionnaire.status) {
+          case 'active':
+            highlightColor = '#3B82F6'; // Blue
+            pulseAnimation = true;
+            break;
+          case 'completed':
+            highlightColor = '#10B981'; // Green
+            break;
+          case 'paused':
+            highlightColor = '#F59E0B'; // Yellow
+            break;
+        }
+        
+        // Only update if there's actually a change needed
+        const currentBorder = node.style?.border;
+        const newBorder = `2px solid ${highlightColor}`;
+        if (currentBorder === newBorder && node.data?.questionnaireStatus === questionnaire.status) {
+          return node; // No change needed
+        }
+        
+        return {
+          ...node,
+          style: {
+            ...node.style,
+            border: newBorder,
+            boxShadow: `0 0 10px ${highlightColor}40`,
+            ...(pulseAnimation && {
+              animation: 'pulse 2s infinite',
+            }),
+          },
+          data: {
+            ...node.data,
+            questionnaireStatus: questionnaire.status,
+            progress: questionnaire.progress,
+          },
+        };
+      });
     });
-  }, [state.isFlowActive, state.questionnaireFlow, state.questionnaires, setNodes]);
+  }, [state.isFlowActive, state.questionnaires, setNodes]);
   
   // Auto-apply canvas updates when they are queued
   useEffect(() => {
