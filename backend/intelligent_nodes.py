@@ -149,6 +149,10 @@ class IntelligentNodeEngine:
                 SecurityBranchType.MONITORING,
                 SecurityBranchType.DATA_CLASSIFICATION
             ],
+            dependencies={
+                "db_backup_enabled": "Backup",
+                "db_monitoring_enabled": "Monitoring"
+            },
             security_prompts=[
                 SecurityPrompt(
                     id="db_type",
