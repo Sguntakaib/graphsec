@@ -1105,6 +1105,7 @@ function AppContent() {
     setCurrentQuestionnaireNode(null);
     setQuestionnaireQueue([]);
     setCurrentQueueIndex(0);
+    setParentQuestionnaireState(null); // Clear parent state on cancel
   };
 
   const handleQuestionnaireOverviewEdit = (node) => {
