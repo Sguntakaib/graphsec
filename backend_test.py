@@ -3498,7 +3498,11 @@ class SecurityModelingAPITester:
             self.test_wizard_recommendations_invalid_step,
             self.test_wizard_generate_model_complete,
             self.test_wizard_generate_model_minimal,
-            self.test_wizard_generate_model_error_handling
+            self.test_wizard_generate_model_error_handling,
+            # Questionnaire Management and Conditional Dependencies Tests
+            self.test_questionnaire_get_responses,
+            self.test_questionnaire_update_responses,
+            self.test_check_dependencies
         ]
         
         passed = 0
