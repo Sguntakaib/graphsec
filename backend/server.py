@@ -5,8 +5,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List, Dict, Any, Optional
+from pydantic import BaseModel, Field, BeforeValidator, PlainSerializer
+from typing import List, Dict, Any, Optional, Annotated
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
@@ -14,11 +14,23 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import networkx as nx
 import math
-import pydantic
 from bson import ObjectId
 
-# Fix ObjectId serialization for FastAPI/Pydantic
-pydantic.json.ENCODERS_BY_TYPE[ObjectId] = str
+# Fix ObjectId serialization for Pydantic v2
+def check_object_id(value: ObjectId | str | None) -> ObjectId | None:
+    if value is None:
+        return None
+    if isinstance(value, ObjectId):
+        return value
+    if isinstance(value, str) and ObjectId.is_valid(value):
+        return ObjectId(value)
+    raise ValueError("Invalid ObjectId format")
+
+PyObjectId = Annotated[
+    ObjectId | None,
+    BeforeValidator(check_object_id),
+    PlainSerializer(func=lambda x: None if x is None else str(x), return_type=str | None),
+]
 
 # Import advanced simulation modules
 from advanced_simulation import AdvancedSimulationEngine
