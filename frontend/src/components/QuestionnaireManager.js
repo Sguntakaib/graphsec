@@ -179,9 +179,76 @@ const QuestionnaireManager = ({
         actions.startQuestionnaireFlow(rootNode, 1);
       }
       
+      // Check if questionnaire already exists in context
+      const existingQuestionnaire = state.questionnaires[nodeId];
+      if (existingQuestionnaire && existingQuestionnaire.prompts && existingQuestionnaire.prompts.length > 0) {
+        console.log('📋 Using existing prompts from context:', existingQuestionnaire.prompts.length);
+        
+        // Check if modal already exists in stack to prevent duplicates
+        const existingModal = state.modalStack.find(modal => modal.nodeId === nodeId);
+        if (!existingModal) {
+          actions.pushModal({
+            id: nodeId,
+            type: 'questionnaire',
+            nodeId,
+            nodeSubtype,
+            parentId: parentNodeId,
+            zIndex: 1000 + state.modalStack.length * 10,
+          });
+        }
+        
+        return { 
+          nodeId, 
+          nodeSubtype, 
+          parentNodeId, 
+          existingAnswers,
+          success: true 
+        };
+      }
+      
+      // Prevent duplicate API requests
+      const requestKey = `${nodeSubtype}-prompts`;
+      if (window.pendingPromptRequests && window.pendingPromptRequests.has(requestKey)) {
+        console.log('⏳ Prompt request already in progress for', nodeSubtype);
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Check if prompts are now available in context
+        const updatedQuestionnaire = state.questionnaires[nodeId];
+        if (updatedQuestionnaire && updatedQuestionnaire.prompts && updatedQuestionnaire.prompts.length > 0) {
+          const existingModal = state.modalStack.find(modal => modal.nodeId === nodeId);
+          if (!existingModal) {
+            actions.pushModal({
+              id: nodeId,
+              type: 'questionnaire',
+              nodeId,
+              nodeSubtype,
+              parentId: parentNodeId,
+              zIndex: 1000 + state.modalStack.length * 10,
+            });
+          }
+          
+          return { 
+            nodeId, 
+            nodeSubtype, 
+            parentNodeId, 
+            existingAnswers,
+            success: true 
+          };
+        }
+      }
+      
+      // Mark request as pending
+      if (!window.pendingPromptRequests) {
+        window.pendingPromptRequests = new Set();
+      }
+      window.pendingPromptRequests.add(requestKey);
+      
       // Fetch the prompts for this node type
       console.log('📋 Fetching prompts for', nodeSubtype);
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
+      
+      // Remove from pending requests
+      window.pendingPromptRequests.delete(requestKey);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch prompts: ${response.statusText}`);
@@ -223,6 +290,12 @@ const QuestionnaireManager = ({
       
     } catch (error) {
       console.error('❌ Failed to start questionnaire:', error);
+      
+      // Remove from pending requests on error
+      if (window.pendingPromptRequests) {
+        window.pendingPromptRequests.delete(`${nodeSubtype}-prompts`);
+      }
+      
       return { 
         nodeId, 
         nodeSubtype, 
@@ -232,7 +305,7 @@ const QuestionnaireManager = ({
         error: error.message 
       };
     }
-  }, [state.isFlowActive, state.modalStack.length, nodes, actions]);
+  }, [state.isFlowActive, state.modalStack, state.questionnaires, nodes, actions]);
   
   // Save questionnaire responses to backend
   const saveQuestionnaireResponses = useCallback(async (nodeId, answers) => {
