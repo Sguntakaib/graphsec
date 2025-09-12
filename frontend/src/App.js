@@ -1656,8 +1656,18 @@ function AppContent() {
         sourceNode={currentQuestionnaireNode}
         currentNodes={nodes}
         onCreateLinkedNodes={handleCreateLinkedNodes}
-        resumeFromPromptIndex={parentQuestionnaireState?.resumeFromPromptIndex}
-        partialAnswers={parentQuestionnaireState?.partialAnswers}
+        resumeFromPromptIndex={
+          parentQuestionnaireState && 
+          currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId 
+            ? parentQuestionnaireState.resumeFromPromptIndex 
+            : null
+        }
+        partialAnswers={
+          parentQuestionnaireState && 
+          currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId 
+            ? parentQuestionnaireState.partialAnswers 
+            : null
+        }
       />
 
       {/* Template Library Modal */}
