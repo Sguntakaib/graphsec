@@ -1015,19 +1015,22 @@ function AppContent() {
       setQuestionnaireQueue(allDependentNodes);
       setCurrentQueueIndex(0);
       
-      // Immediately show questionnaire for the first dependent node
-      console.log(`🚀 Setting questionnaire node:`, {
+      // Start enhanced questionnaire for the first dependent node
+      console.log(`🚀 Starting enhanced questionnaire for dependent node:`, {
         nodeId: allDependentNodes[0].id,
         nodeSubtype: allDependentNodes[0].subtype || allDependentNodes[0].data?.subtype,
-        nodeData: allDependentNodes[0].data
+        parentId: currentQuestionnaireNode?.id
       });
-      setCurrentQuestionnaireNode(allDependentNodes[0]);
-      setShowSecurityQuestionnaire(true);
       
-      // Small delay to ensure UI state is updated
-      setTimeout(() => {
-        console.log(`🚀 Opening questionnaire for first dependent node: ${allDependentNodes[0].data.subtype}`);
-      }, 100);
+      const firstNode = allDependentNodes[0];
+      const nodeSubtype = firstNode.subtype || firstNode.data?.subtype;
+      
+      // Use enhanced questionnaire system
+      startEnhancedQuestionnaire(
+        firstNode.id, 
+        nodeSubtype,
+        currentQuestionnaireNode?.id
+      );
     }
   };
 
