@@ -926,6 +926,15 @@ function AppContent() {
           return node;
         }));
 
+        // Mark dependency as COMPLETED if this node is a dependency of another node
+        const completedNode = currentQuestionnaireNode;
+        if (completedNode.data?.parentNode) {
+          const parentNodeId = completedNode.data.parentNode;
+          const dependencyType = completedNode.subtype || completedNode.data?.subtype;
+          console.log(`✅ Marking dependency as COMPLETED: ${parentNodeId} → ${dependencyType}`);
+          setDependencyState(parentNodeId, dependencyType, 'COMPLETED');
+        }
+
         // Handle dependent node questionnaires
         console.log('🔍 Checking for dependent questionnaires:', {
           triggerDependentQuestionnaires: result.triggerDependentQuestionnaires,
