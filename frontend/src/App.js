@@ -390,12 +390,17 @@ function AppContent() {
           
           // Fallback to old system
           console.log('🔄 Falling back to old questionnaire system');
+          console.log('🎯 Setting currentQuestionnaireNode to:', { id: nodeId, subtype: nodeSubtype });
+          console.log('🎯 Current showSecurityQuestionnaire state:', showSecurityQuestionnaire);
+          
           setCurrentQuestionnaireNode({
             id: nodeId,
             subtype: nodeSubtype,
             data: { subtype: nodeSubtype }
           });
           setShowSecurityQuestionnaire(true);
+          
+          console.log('🎯 After setting - showSecurityQuestionnaire should be true');
         } else {
           console.log('❌ Node type not supported for questionnaire');
         }
