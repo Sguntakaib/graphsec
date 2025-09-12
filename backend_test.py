@@ -3461,6 +3461,754 @@ class SecurityModelingAPITester:
             self.log_test(test_name, False, f"Error: {str(e)}")
             return False
 
+    # ============================================================================
+    # PHASE 1 ENHANCED APIS - EXPANDED INTELLIGENT NODES & THREAT INTELLIGENCE
+    # ============================================================================
+
+    def test_expanded_nodes_supported_types(self):
+        """Test GET /api/expanded-nodes/supported-types"""
+        try:
+            response = self.session.get(f"{self.base_url}/expanded-nodes/supported-types")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["supported_types", "by_category", "total_count", "categories"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Expanded Nodes - Supported Types", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                supported_types = data.get("supported_types", [])
+                total_count = data.get("total_count", 0)
+                categories = data.get("categories", [])
+                
+                # Verify we have comprehensive list of 25+ node types
+                if total_count < 25:
+                    self.log_test("Expanded Nodes - Supported Types", False, 
+                                f"Expected 25+ node types, got {total_count}")
+                    return False
+                
+                # Verify expected new node types are present
+                expected_types = ["EC2", "Lambda", "S3", "RDS", "VPC", "WAF", "IAM", "Kubernetes", "CICD"]
+                found_types = [t.get("node_subtype") for t in supported_types]
+                
+                missing_types = [t for t in expected_types if t not in found_types]
+                if missing_types:
+                    self.log_test("Expanded Nodes - Supported Types", False, 
+                                f"Missing expected new types: {missing_types}")
+                    return False
+                
+                # Verify categories are present
+                expected_categories = ["Cloud Infrastructure", "Security Controls", "Development Tools"]
+                missing_categories = [c for c in expected_categories if c not in categories]
+                if missing_categories:
+                    self.log_test("Expanded Nodes - Supported Types", False, 
+                                f"Missing expected categories: {missing_categories}")
+                    return False
+                
+                self.log_test("Expanded Nodes - Supported Types", True, 
+                            f"Retrieved {total_count} node types across {len(categories)} categories")
+                return True
+            else:
+                self.log_test("Expanded Nodes - Supported Types", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Expanded Nodes - Supported Types", False, f"Error: {str(e)}")
+            return False
+
+    def test_expanded_nodes_questionnaire_levels(self):
+        """Test GET /api/expanded-nodes/{node_subtype}/questionnaire/{level}"""
+        test_cases = [
+            {"node_subtype": "EC2", "level": "basic"},
+            {"node_subtype": "Lambda", "level": "advanced"},
+            {"node_subtype": "RDS", "level": "expert"},
+            {"node_subtype": "Kubernetes", "level": "basic"}
+        ]
+        
+        for test_case in test_cases:
+            node_subtype = test_case["node_subtype"]
+            level = test_case["level"]
+            
+            try:
+                response = self.session.get(f"{self.base_url}/expanded-nodes/{node_subtype}/questionnaire/{level}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_subtype", "questionnaire_level", "questions", "question_count", "estimated_time"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", False, 
+                                    f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    questions = data.get("questions", [])
+                    question_count = data.get("question_count", 0)
+                    
+                    # Verify appropriate complexity for level
+                    expected_min_questions = {"basic": 5, "advanced": 10, "expert": 15}
+                    min_questions = expected_min_questions.get(level, 5)
+                    
+                    if question_count < min_questions:
+                        self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", False, 
+                                    f"Expected at least {min_questions} questions for {level} level, got {question_count}")
+                        return False
+                    
+                    # Verify question structure
+                    if questions:
+                        first_question = questions[0]
+                        required_question_fields = ["id", "question", "type", "options"]
+                        missing_question_fields = [f for f in required_question_fields if f not in first_question]
+                        
+                        if missing_question_fields:
+                            self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", False, 
+                                        f"Missing question fields: {missing_question_fields}")
+                            return False
+                    
+                    self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", True, 
+                                f"Retrieved {question_count} questions for {level} level")
+                    
+                elif response.status_code == 400:
+                    self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", False, 
+                                f"Invalid level parameter: {level}")
+                    return False
+                elif response.status_code == 404:
+                    self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", False, 
+                                f"Questionnaire not found for {node_subtype} at {level} level")
+                    return False
+                else:
+                    self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Expanded Questionnaire - {node_subtype} {level}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_expanded_nodes_calculate_risk(self):
+        """Test POST /api/expanded-nodes/{node_subtype}/calculate-risk with probabilistic modeling"""
+        test_cases = [
+            {
+                "node_subtype": "EC2",
+                "request": {
+                    "responses": {
+                        "instance_type": "t3.large",
+                        "security_groups": "restrictive",
+                        "encryption": "enabled",
+                        "patching": "automated"
+                    },
+                    "business_context": {
+                        "criticality": "high",
+                        "data_classification": "confidential",
+                        "compliance_requirements": ["SOC2", "PCI-DSS"]
+                    }
+                }
+            },
+            {
+                "node_subtype": "RDS",
+                "request": {
+                    "responses": {
+                        "engine": "postgresql",
+                        "encryption_at_rest": "enabled",
+                        "backup_retention": "30_days",
+                        "multi_az": "enabled"
+                    },
+                    "business_context": {
+                        "criticality": "critical",
+                        "data_classification": "restricted"
+                    }
+                }
+            }
+        ]
+        
+        for test_case in test_cases:
+            node_subtype = test_case["node_subtype"]
+            request_data = test_case["request"]
+            
+            try:
+                response = self.session.post(
+                    f"{self.base_url}/expanded-nodes/{node_subtype}/calculate-risk",
+                    json=request_data,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_subtype", "risk_assessment", "security_recommendations", "calculation_timestamp"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Expanded Risk Calculation - {node_subtype}", False, 
+                                    f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    risk_assessment = data.get("risk_assessment", {})
+                    recommendations = data.get("security_recommendations", [])
+                    
+                    # Verify enhanced risk assessment structure
+                    expected_risk_fields = ["composite_risk_score", "risk_level", "confidence_interval", "threat_likelihood"]
+                    missing_risk_fields = [f for f in expected_risk_fields if f not in risk_assessment]
+                    
+                    if missing_risk_fields:
+                        self.log_test(f"Expanded Risk Calculation - {node_subtype}", False, 
+                                    f"Missing risk assessment fields: {missing_risk_fields}")
+                        return False
+                    
+                    composite_score = risk_assessment.get("composite_risk_score", 0)
+                    risk_level = risk_assessment.get("risk_level", "Unknown")
+                    
+                    # Verify probabilistic modeling features
+                    if "confidence_interval" not in risk_assessment:
+                        self.log_test(f"Expanded Risk Calculation - {node_subtype}", False, 
+                                    "Missing probabilistic confidence interval")
+                        return False
+                    
+                    # Verify risk score is valid
+                    if not (0 <= composite_score <= 10):
+                        self.log_test(f"Expanded Risk Calculation - {node_subtype}", False, 
+                                    f"Invalid composite risk score: {composite_score}")
+                        return False
+                    
+                    self.log_test(f"Expanded Risk Calculation - {node_subtype}", True, 
+                                f"Risk assessment: {composite_score}/10 ({risk_level}), {len(recommendations)} recommendations")
+                    
+                elif response.status_code == 500:
+                    self.log_test(f"Expanded Risk Calculation - {node_subtype}", False, 
+                                f"Risk calculation failed: {response.text}")
+                    return False
+                else:
+                    self.log_test(f"Expanded Risk Calculation - {node_subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Expanded Risk Calculation - {node_subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_expanded_nodes_bulk_risk_assessment(self):
+        """Test POST /api/expanded-nodes/bulk-risk-assessment"""
+        try:
+            request_data = {
+                "nodes": [
+                    {
+                        "node_subtype": "EC2",
+                        "responses": {
+                            "instance_type": "t3.medium",
+                            "security_groups": "default",
+                            "encryption": "disabled"
+                        }
+                    },
+                    {
+                        "node_subtype": "RDS",
+                        "responses": {
+                            "engine": "mysql",
+                            "encryption_at_rest": "enabled",
+                            "backup_retention": "7_days"
+                        }
+                    },
+                    {
+                        "node_subtype": "Lambda",
+                        "responses": {
+                            "runtime": "python3.9",
+                            "vpc_config": "enabled",
+                            "environment_variables": "encrypted"
+                        }
+                    }
+                ],
+                "business_context": {
+                    "criticality": "high",
+                    "data_classification": "confidential",
+                    "compliance_requirements": ["SOC2"]
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/bulk-risk-assessment",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["assessment_results", "overall_risk_summary", "cross_node_correlations", "bulk_recommendations"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Bulk Risk Assessment", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                assessment_results = data.get("assessment_results", [])
+                overall_summary = data.get("overall_risk_summary", {})
+                correlations = data.get("cross_node_correlations", [])
+                
+                # Verify we got results for all nodes
+                if len(assessment_results) != 3:
+                    self.log_test("Bulk Risk Assessment", False, 
+                                f"Expected 3 assessment results, got {len(assessment_results)}")
+                    return False
+                
+                # Verify overall summary structure
+                expected_summary_fields = ["average_risk_score", "highest_risk_node", "total_recommendations"]
+                missing_summary_fields = [f for f in expected_summary_fields if f not in overall_summary]
+                
+                if missing_summary_fields:
+                    self.log_test("Bulk Risk Assessment", False, 
+                                f"Missing summary fields: {missing_summary_fields}")
+                    return False
+                
+                avg_risk = overall_summary.get("average_risk_score", 0)
+                highest_risk = overall_summary.get("highest_risk_node", "")
+                
+                self.log_test("Bulk Risk Assessment", True, 
+                            f"Assessed 3 nodes: avg risk {avg_risk:.2f}, highest risk: {highest_risk}, {len(correlations)} correlations")
+                return True
+                
+            elif response.status_code == 400:
+                self.log_test("Bulk Risk Assessment", False, f"Bad request: {response.text}")
+                return False
+            else:
+                self.log_test("Bulk Risk Assessment", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Bulk Risk Assessment", False, f"Error: {str(e)}")
+            return False
+
+    def test_expanded_nodes_categories(self):
+        """Test GET /api/expanded-nodes/categories"""
+        try:
+            response = self.session.get(f"{self.base_url}/expanded-nodes/categories")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["categories", "category_count", "nodes_by_category"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Expanded Nodes - Categories", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                categories = data.get("categories", [])
+                category_count = data.get("category_count", 0)
+                nodes_by_category = data.get("nodes_by_category", {})
+                
+                # Verify expected categories
+                expected_categories = ["Cloud Infrastructure", "Security Controls", "Development Tools", "Data Storage", "Networking"]
+                missing_categories = [c for c in expected_categories if c not in categories]
+                
+                if missing_categories:
+                    self.log_test("Expanded Nodes - Categories", False, 
+                                f"Missing expected categories: {missing_categories}")
+                    return False
+                
+                # Verify nodes are properly categorized
+                total_categorized_nodes = sum(len(nodes) for nodes in nodes_by_category.values())
+                if total_categorized_nodes == 0:
+                    self.log_test("Expanded Nodes - Categories", False, "No nodes found in categories")
+                    return False
+                
+                self.log_test("Expanded Nodes - Categories", True, 
+                            f"Retrieved {category_count} categories with {total_categorized_nodes} total nodes")
+                return True
+            else:
+                self.log_test("Expanded Nodes - Categories", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Expanded Nodes - Categories", False, f"Error: {str(e)}")
+            return False
+
+    def test_expanded_nodes_threat_intelligence_summary(self):
+        """Test POST /api/expanded-nodes/threat-intelligence-summary"""
+        try:
+            request_data = {
+                "node_types": ["EC2", "RDS", "Lambda", "S3"],
+                "threat_level": "high",
+                "time_range": "30_days"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/threat-intelligence-summary",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["threat_summary", "node_threat_profiles", "recent_threats", "mitigation_recommendations"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Threat Intelligence Summary", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                threat_summary = data.get("threat_summary", {})
+                node_profiles = data.get("node_threat_profiles", [])
+                recent_threats = data.get("recent_threats", [])
+                
+                # Verify threat summary structure
+                expected_summary_fields = ["total_threats", "threat_level_distribution", "most_targeted_node_type"]
+                missing_summary_fields = [f for f in expected_summary_fields if f not in threat_summary]
+                
+                if missing_summary_fields:
+                    self.log_test("Threat Intelligence Summary", False, 
+                                f"Missing threat summary fields: {missing_summary_fields}")
+                    return False
+                
+                # Verify we got profiles for requested node types
+                if len(node_profiles) != 4:
+                    self.log_test("Threat Intelligence Summary", False, 
+                                f"Expected 4 node profiles, got {len(node_profiles)}")
+                    return False
+                
+                total_threats = threat_summary.get("total_threats", 0)
+                most_targeted = threat_summary.get("most_targeted_node_type", "")
+                
+                self.log_test("Threat Intelligence Summary", True, 
+                            f"Aggregated {total_threats} threats, most targeted: {most_targeted}, {len(recent_threats)} recent threats")
+                return True
+            else:
+                self.log_test("Threat Intelligence Summary", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Threat Intelligence Summary", False, f"Error: {str(e)}")
+            return False
+
+    # ============================================================================
+    # THREAT INTELLIGENCE ENDPOINTS
+    # ============================================================================
+
+    def test_threat_intelligence_node_profile(self):
+        """Test GET /api/threat-intelligence/node/{node_type}/profile"""
+        test_node_types = ["EC2", "RDS", "Lambda", "S3"]
+        
+        for node_type in test_node_types:
+            try:
+                response = self.session.get(f"{self.base_url}/threat-intelligence/node/{node_type}/profile")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_type", "threat_profile", "vulnerability_summary", "attack_vectors", "mitre_techniques"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Threat Intelligence Profile - {node_type}", False, 
+                                    f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    threat_profile = data.get("threat_profile", {})
+                    vulnerability_summary = data.get("vulnerability_summary", {})
+                    attack_vectors = data.get("attack_vectors", [])
+                    mitre_techniques = data.get("mitre_techniques", [])
+                    
+                    # Verify threat profile structure
+                    expected_profile_fields = ["threat_level", "common_vulnerabilities", "recent_incidents"]
+                    missing_profile_fields = [f for f in expected_profile_fields if f not in threat_profile]
+                    
+                    if missing_profile_fields:
+                        self.log_test(f"Threat Intelligence Profile - {node_type}", False, 
+                                    f"Missing threat profile fields: {missing_profile_fields}")
+                        return False
+                    
+                    # Verify vulnerability summary
+                    if "cve_count" not in vulnerability_summary:
+                        self.log_test(f"Threat Intelligence Profile - {node_type}", False, 
+                                    "Missing CVE count in vulnerability summary")
+                        return False
+                    
+                    cve_count = vulnerability_summary.get("cve_count", 0)
+                    threat_level = threat_profile.get("threat_level", "Unknown")
+                    
+                    self.log_test(f"Threat Intelligence Profile - {node_type}", True, 
+                                f"Profile: {threat_level} threat level, {cve_count} CVEs, {len(attack_vectors)} attack vectors, {len(mitre_techniques)} MITRE techniques")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Threat Intelligence Profile - {node_type}", False, 
+                                f"Threat profile not found for {node_type}")
+                    return False
+                else:
+                    self.log_test(f"Threat Intelligence Profile - {node_type}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Threat Intelligence Profile - {node_type}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_threat_intelligence_correlate_vulnerabilities(self):
+        """Test POST /api/threat-intelligence/correlate-vulnerabilities"""
+        try:
+            request_data = {
+                "node_configurations": [
+                    {
+                        "node_type": "EC2",
+                        "configuration": {
+                            "instance_type": "t3.large",
+                            "ami_id": "ami-12345678",
+                            "security_groups": ["sg-default"]
+                        }
+                    },
+                    {
+                        "node_type": "RDS",
+                        "configuration": {
+                            "engine": "postgresql",
+                            "version": "13.7",
+                            "publicly_accessible": True
+                        }
+                    }
+                ],
+                "correlation_depth": "deep"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/threat-intelligence/correlate-vulnerabilities",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["vulnerability_correlations", "cross_node_risks", "attack_chain_analysis", "mitigation_priorities"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Threat Intelligence - Correlate Vulnerabilities", False, 
+                                f"Missing fields: {missing_fields}")
+                    return False
+                
+                correlations = data.get("vulnerability_correlations", [])
+                cross_node_risks = data.get("cross_node_risks", [])
+                attack_chains = data.get("attack_chain_analysis", [])
+                
+                # Verify correlation structure
+                if correlations:
+                    first_correlation = correlations[0]
+                    expected_correlation_fields = ["vulnerability_id", "affected_nodes", "correlation_score", "exploitation_likelihood"]
+                    missing_correlation_fields = [f for f in expected_correlation_fields if f not in first_correlation]
+                    
+                    if missing_correlation_fields:
+                        self.log_test("Threat Intelligence - Correlate Vulnerabilities", False, 
+                                    f"Missing correlation fields: {missing_correlation_fields}")
+                        return False
+                
+                self.log_test("Threat Intelligence - Correlate Vulnerabilities", True, 
+                            f"Found {len(correlations)} vulnerability correlations, {len(cross_node_risks)} cross-node risks, {len(attack_chains)} attack chains")
+                return True
+            else:
+                self.log_test("Threat Intelligence - Correlate Vulnerabilities", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Threat Intelligence - Correlate Vulnerabilities", False, f"Error: {str(e)}")
+            return False
+
+    def test_threat_intelligence_real_time_score(self):
+        """Test POST /api/threat-intelligence/real-time-score"""
+        try:
+            request_data = {
+                "node_type": "EC2",
+                "current_configuration": {
+                    "instance_type": "t3.large",
+                    "security_groups": ["sg-restrictive"],
+                    "encryption": "enabled",
+                    "patching_status": "up_to_date"
+                },
+                "threat_feeds": ["cve", "mitre", "commercial"],
+                "scoring_model": "composite"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/threat-intelligence/real-time-score",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["real_time_score", "threat_level", "score_components", "trending_threats", "score_history"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Threat Intelligence - Real-time Score", False, 
+                                f"Missing fields: {missing_fields}")
+                    return False
+                
+                real_time_score = data.get("real_time_score", 0)
+                threat_level = data.get("threat_level", "Unknown")
+                score_components = data.get("score_components", {})
+                trending_threats = data.get("trending_threats", [])
+                
+                # Verify score is valid
+                if not (0 <= real_time_score <= 10):
+                    self.log_test("Threat Intelligence - Real-time Score", False, 
+                                f"Invalid real-time score: {real_time_score}")
+                    return False
+                
+                # Verify score components
+                expected_components = ["vulnerability_score", "exposure_score", "threat_landscape_score"]
+                missing_components = [c for c in expected_components if c not in score_components]
+                
+                if missing_components:
+                    self.log_test("Threat Intelligence - Real-time Score", False, 
+                                f"Missing score components: {missing_components}")
+                    return False
+                
+                self.log_test("Threat Intelligence - Real-time Score", True, 
+                            f"Real-time score: {real_time_score}/10 ({threat_level}), {len(trending_threats)} trending threats")
+                return True
+            else:
+                self.log_test("Threat Intelligence - Real-time Score", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Threat Intelligence - Real-time Score", False, f"Error: {str(e)}")
+            return False
+
+    def test_threat_intelligence_mitre_technique(self):
+        """Test GET /api/threat-intelligence/mitre/{technique_id}"""
+        test_techniques = ["T1190", "T1078", "T1552.001", "T1059"]
+        
+        for technique_id in test_techniques:
+            try:
+                response = self.session.get(f"{self.base_url}/threat-intelligence/mitre/{technique_id}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["technique_id", "technique_details", "threat_intelligence", "related_vulnerabilities", "detection_rules"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Threat Intelligence MITRE - {technique_id}", False, 
+                                    f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    technique_details = data.get("technique_details", {})
+                    threat_intelligence = data.get("threat_intelligence", {})
+                    related_vulnerabilities = data.get("related_vulnerabilities", [])
+                    detection_rules = data.get("detection_rules", [])
+                    
+                    # Verify technique details structure
+                    expected_detail_fields = ["name", "description", "tactics", "platforms"]
+                    missing_detail_fields = [f for f in expected_detail_fields if f not in technique_details]
+                    
+                    if missing_detail_fields:
+                        self.log_test(f"Threat Intelligence MITRE - {technique_id}", False, 
+                                    f"Missing technique detail fields: {missing_detail_fields}")
+                        return False
+                    
+                    # Verify threat intelligence enhancement
+                    if "recent_usage" not in threat_intelligence:
+                        self.log_test(f"Threat Intelligence MITRE - {technique_id}", False, 
+                                    "Missing recent usage in threat intelligence")
+                        return False
+                    
+                    technique_name = technique_details.get("name", "Unknown")
+                    
+                    self.log_test(f"Threat Intelligence MITRE - {technique_id}", True, 
+                                f"Retrieved {technique_name}: {len(related_vulnerabilities)} vulnerabilities, {len(detection_rules)} detection rules")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Threat Intelligence MITRE - {technique_id}", False, 
+                                f"MITRE technique {technique_id} not found")
+                    return False
+                else:
+                    self.log_test(f"Threat Intelligence MITRE - {technique_id}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Threat Intelligence MITRE - {technique_id}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_threat_intelligence_dashboard(self):
+        """Test GET /api/threat-intelligence/dashboard"""
+        try:
+            response = self.session.get(f"{self.base_url}/threat-intelligence/dashboard")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for required fields
+                expected_fields = ["dashboard_summary", "threat_trends", "vulnerability_metrics", "node_type_risks", "recent_alerts"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Threat Intelligence Dashboard", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                dashboard_summary = data.get("dashboard_summary", {})
+                threat_trends = data.get("threat_trends", [])
+                vulnerability_metrics = data.get("vulnerability_metrics", {})
+                node_type_risks = data.get("node_type_risks", [])
+                recent_alerts = data.get("recent_alerts", [])
+                
+                # Verify dashboard summary structure
+                expected_summary_fields = ["total_threats", "active_vulnerabilities", "risk_score_average", "last_updated"]
+                missing_summary_fields = [f for f in expected_summary_fields if f not in dashboard_summary]
+                
+                if missing_summary_fields:
+                    self.log_test("Threat Intelligence Dashboard", False, 
+                                f"Missing dashboard summary fields: {missing_summary_fields}")
+                    return False
+                
+                # Verify vulnerability metrics
+                expected_metric_fields = ["critical_count", "high_count", "medium_count", "low_count"]
+                missing_metric_fields = [f for f in expected_metric_fields if f not in vulnerability_metrics]
+                
+                if missing_metric_fields:
+                    self.log_test("Threat Intelligence Dashboard", False, 
+                                f"Missing vulnerability metric fields: {missing_metric_fields}")
+                    return False
+                
+                total_threats = dashboard_summary.get("total_threats", 0)
+                active_vulnerabilities = dashboard_summary.get("active_vulnerabilities", 0)
+                avg_risk_score = dashboard_summary.get("risk_score_average", 0)
+                
+                self.log_test("Threat Intelligence Dashboard", True, 
+                            f"Dashboard: {total_threats} threats, {active_vulnerabilities} vulnerabilities, avg risk: {avg_risk_score:.2f}, {len(recent_alerts)} alerts")
+                return True
+            else:
+                self.log_test("Threat Intelligence Dashboard", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Threat Intelligence Dashboard", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
