@@ -1496,6 +1496,20 @@ function AppContent() {
           existingEdges={edges}
         />
       )}
+
+      {/* Questionnaire Overview Modal */}
+      {showQuestionnaireOverview && overviewNode && (
+        <QuestionnaireOverview
+          node={overviewNode}
+          diagram={currentDiagram}
+          isVisible={showQuestionnaireOverview}
+          onClose={() => {
+            setShowQuestionnaireOverview(false);
+            setOverviewNode(null);
+          }}
+          onEdit={handleQuestionnaireOverviewEdit}
+        />
+      )}
     </div>
   );
 }
