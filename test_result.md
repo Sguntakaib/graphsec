@@ -605,6 +605,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🚨 CRITICAL BUG FIX: Fixed TypeError in handleDependentNodeCreation - 'can't access property x, sourceNode.position is undefined'. Issue was that currentQuestionnaireNode only contained {id, subtype, data} but not the position property from React Flow nodes. FIX: Updated handleDependentNodeCreation to find the actual React Flow node using nodes.find(node => node.id === currentQuestionnaireNode?.id) before accessing position properties. Added proper error handling for missing nodes and positions. This resolves the immediate UI error preventing dependent node creation from working."
+      - working: "NA"
+        agent: "main"
+        comment: "🎯 MAJOR ENHANCEMENT: Implemented complete parent questionnaire resumption system. ISSUES FIXED: 1) Parent questionnaire not resuming after dependent questionnaire completion - added parentQuestionnaireState tracking with nodeId, nodeSubtype, resumeFromPromptIndex, and partialAnswers. 2) Updated handleSecurityQuestionnaireComplete to properly store parent state when dependencies are triggered and resume parent questionnaire when dependent questionnaires complete. 3) Enhanced SecurityQuestionnaire component to accept resumeFromPromptIndex and partialAnswers props for proper state restoration. 4) Added proper state cleanup in cancel handlers. FLOW NOW WORKS: WebApp questionnaire → API dependency → API questionnaire → **resume parent WebApp questionnaire** → complete remaining questions. Ready for retesting."
 
 agent_communication:
   - agent: "testing"
