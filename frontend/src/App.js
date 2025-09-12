@@ -1048,8 +1048,10 @@ function AppContent() {
 
   const handleQuestionnaireOverviewEdit = (node) => {
     setShowQuestionnaireOverview(false);
-    setCurrentQuestionnaireNode(node);
-    setShowSecurityQuestionnaire(true);
+    
+    // Use enhanced questionnaire system
+    const nodeSubtype = node.subtype || node.data?.subtype;
+    startEnhancedQuestionnaire(node.id, nodeSubtype);
   };
 
   const handleNodeBranchUpdate = (nodeId, updatedBranches) => {
