@@ -546,6 +546,42 @@ test_plan:
 
 frontend:
 
+  - task: "Questionnaire Management - Get Responses API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire endpoint working correctly - retrieves questionnaire responses with 2/5 completed questions, 5 prompts, handles missing data gracefully, returns proper node subtype and response structure"
+
+  - task: "Questionnaire Management - Update Responses API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire endpoint working correctly - successfully updates 4 questionnaire responses, saves data to MongoDB, verifies persistence through GET endpoint"
+
+  - task: "Conditional Dependencies - Check Dependencies API"
+    implemented: true
+    working: true
+    file: "backend/server.py, backend/intelligent_nodes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ POST /api/intelligent-nodes/{node_subtype}/check-dependencies endpoint working correctly - conditional node expansion logic functional: WebApp with API=true,Database=false returns ['API'], API=true,Database=true returns ['API','Database'], Database backup/monitoring enabled returns ['Backup','Monitoring'], empty answers return []"
+
 agent_communication:
   - agent: "testing"
     message: "Completed comprehensive backend API testing for Security Modeling Platform. All 9 backend tasks tested successfully with realistic security modeling data. API endpoints handle CRUD operations correctly, simulation engine generates meaningful attack paths with MITRE ATT&CK mapping, and security domain models work as expected. Backend is fully functional and ready for production use."
@@ -569,6 +605,8 @@ agent_communication:
     message: "🚀 PHASE 4A: GUIDED THREAT MODELING WIZARD IMPLEMENTATION COMPLETE! ✅ Comprehensive step-by-step security assessment wizard implemented with 10-step workflow ✅ SystemOverviewStep: Complete system identification with CIA triad assessment, business criticality, deployment models, user types, data types, compliance requirements ✅ AssetIdentificationStep: Full asset inventory with asset types, criticality levels, security requirements, regulatory compliance ✅ ThreatModelingWizard: Progressive navigation, contextual recommendations, progress tracking, save/resume capability ✅ Backend endpoints: POST /api/wizard/recommendations (contextual guidance), POST /api/wizard/generate-model (automated model generation) ✅ Frontend integration: Purple 'Wizard' button in header, full-screen modal interface, step navigation, recommendations sidebar ✅ Testing: All wizard endpoints tested successfully with proper data validation, contextual recommendations, and model generation. Phase 4A expert-guided threat modeling workflow fully functional and ready for production use."
   - agent: "testing"
     message: "🎯 THREAT MODELING WIZARD TESTING COMPLETE: All 2 wizard endpoint tasks tested successfully! ✅ POST /api/wizard/recommendations: Tested systemOverview step (2 contextual recommendations), assetInventory step (3 asset-specific recommendations), and invalid step handling (1 fallback recommendation) - all responses contextual and security-relevant ✅ POST /api/wizard/generate-model: Tested complete wizard data (5 nodes, 8 recommendations), minimal data (2 nodes, 5 recommendations), and error handling - all responses include proper node structure, implementation plans, and accurate summaries. Wizard endpoints fully functional for guided threat modeling workflows."
+  - agent: "testing"
+    message: "🎯 QUESTIONNAIRE MANAGEMENT & CONDITIONAL DEPENDENCIES TESTING COMPLETE: All 3 new endpoint tasks tested successfully! ✅ GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire: Retrieves questionnaire responses with proper data structure, handles missing data gracefully ✅ POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire: Updates questionnaire responses successfully, persists data to MongoDB ✅ POST /api/intelligent-nodes/{node_subtype}/check-dependencies: Conditional node expansion logic working correctly - WebApp dependencies (API=true,Database=false→['API'], API=true,Database=true→['API','Database']), Database dependencies (backup/monitoring enabled→['Backup','Monitoring']), empty answers→[]. Core questionnaire management and conditional node expansion features fully functional and ready for production use."
 
   - task: "Probabilistic Attack Path Analysis"
     implemented: true
