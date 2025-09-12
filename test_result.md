@@ -584,15 +584,18 @@ frontend:
 
   - task: "Conditional Node Expansion Frontend Fix"
     implemented: true
-    working: "NA"
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "🔧 CRITICAL FIX: Fixed duplicate node creation and missing questionnaire prompts in conditional node expansion. Updated handleDependentNodeCreation to detect existing SmartNodeConnector nodes, prevent duplication, and immediately trigger questionnaire modals for dependent nodes. Enhanced questionnaire completion flow to handle dependent questionnaire chaining without premature modal closure."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUES FOUND: 1) Questionnaire modal and chaining works correctly ✅ 2) DUPLICATE NODE CREATION: System creates both API and Database nodes regardless of questionnaire answers - found 2 WebApp, 2 API, 2 Database nodes when expecting 1 WebApp, 1 API, 0 Database for API-only scenario 3) Conditional logic not working - both dependent nodes created instead of based on answers 4) Backend dependency issues fixed (networkx, pyyaml installed) 5) Console shows 'Creating new API node' and 'Creating new Database node' for all scenarios. The conditional dependency logic is not properly filtering based on questionnaire responses."
 
 agent_communication:
   - agent: "testing"
