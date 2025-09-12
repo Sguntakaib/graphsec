@@ -608,6 +608,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🎯 MAJOR ENHANCEMENT: Implemented complete parent questionnaire resumption system. ISSUES FIXED: 1) Parent questionnaire not resuming after dependent questionnaire completion - added parentQuestionnaireState tracking with nodeId, nodeSubtype, resumeFromPromptIndex, and partialAnswers. 2) Updated handleSecurityQuestionnaireComplete to properly store parent state when dependencies are triggered and resume parent questionnaire when dependent questionnaires complete. 3) Enhanced SecurityQuestionnaire component to accept resumeFromPromptIndex and partialAnswers props for proper state restoration. 4) Added proper state cleanup in cancel handlers. FLOW NOW WORKS: WebApp questionnaire → API dependency → API questionnaire → **resume parent WebApp questionnaire** → complete remaining questions. Ready for retesting."
+      - working: "NA"
+        agent: "main"
+        comment: "🎯 QUESTIONNAIRE NAVIGATION FIX: Fixed critical issues with questionnaire flow navigation reported by user. PROBLEMS FIXED: 1) API questionnaire starting from question 3 instead of question 1 - root cause was resumeFromPromptIndex being passed to ALL questionnaires instead of only the parent being resumed. Fixed by conditionally passing resumeFromPromptIndex/partialAnswers only when currentQuestionnaireNode.id matches parentQuestionnaireState.nodeId. 2) Parent questionnaire not resuming after dependent questionnaire completion - fixed completion flow logic to properly check for parent resumption after dependent questionnaires finish. 3) Enhanced parent state management to clear parent state only when the actual parent questionnaire completes. FLOW NOW CORRECT: WebApp Q1-Q2 → API dependency → API Q1-Q5 (starts from Q1) → Resume WebApp Q3-Q5. Ready for testing."
 
 agent_communication:
   - agent: "testing"
