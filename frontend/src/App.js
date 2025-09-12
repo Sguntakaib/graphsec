@@ -1654,28 +1654,30 @@ function AppContent() {
         </div>
       </div>
 
-      {/* Security Questionnaire Modal */}
-      <SecurityQuestionnaire
-        nodeSubtype={currentQuestionnaireNode?.subtype || currentQuestionnaireNode?.data?.subtype}
-        onComplete={handleSecurityQuestionnaireComplete}
-        onCancel={handleSecurityQuestionnaireCancel}
-        isVisible={showSecurityQuestionnaire}
-        sourceNode={currentQuestionnaireNode}
-        currentNodes={nodes}
-        onCreateLinkedNodes={handleCreateLinkedNodes}
-        resumeFromPromptIndex={
-          parentQuestionnaireState && 
-          currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId 
-            ? parentQuestionnaireState.resumeFromPromptIndex 
-            : null
-        }
-        partialAnswers={
-          parentQuestionnaireState && 
-          currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId 
-            ? parentQuestionnaireState.partialAnswers 
-            : null
-        }
-      />
+      {/* Security Questionnaire Modal - Only show if enhanced system is not active */}
+      {!questionnaireState.isFlowActive && (
+        <SecurityQuestionnaire
+          nodeSubtype={currentQuestionnaireNode?.subtype || currentQuestionnaireNode?.data?.subtype}
+          onComplete={handleSecurityQuestionnaireComplete}
+          onCancel={handleSecurityQuestionnaireCancel}
+          isVisible={showSecurityQuestionnaire}
+          sourceNode={currentQuestionnaireNode}
+          currentNodes={nodes}
+          onCreateLinkedNodes={handleCreateLinkedNodes}
+          resumeFromPromptIndex={
+            parentQuestionnaireState && 
+            currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId 
+              ? parentQuestionnaireState.resumeFromPromptIndex 
+              : null
+          }
+          partialAnswers={
+            parentQuestionnaireState && 
+            currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId 
+              ? parentQuestionnaireState.partialAnswers 
+              : null
+          }
+        />
+      )}
 
       {/* Template Library Modal */}
       {showTemplateLibrary && (
