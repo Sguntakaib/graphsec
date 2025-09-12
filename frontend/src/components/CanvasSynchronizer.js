@@ -214,12 +214,19 @@ const CanvasSynchronizer = ({
     applyHighlights();
   }, [state.canvasUpdates.highlightedNodes, applyHighlights]);
   
-  // Visualize flow progress - with proper dependencies
+  // Visualize flow progress - only when questionnaire status changes
   useEffect(() => {
     if (state.isFlowActive && Object.keys(state.questionnaires).length > 0) {
+      // Create a stable key that only changes when questionnaire statuses change
+      const questionnaireStatusKey = Object.values(state.questionnaires)
+        .map(q => `${q.nodeId}:${q.status}`)
+        .sort()
+        .join('|');
+      
+      // Only run if there's actually a status change
       visualizeFlowProgress();
     }
-  }, [state.isFlowActive, Object.keys(state.questionnaires).join(','), visualizeFlowProgress]);
+  }, [state.isFlowActive, state.questionnaires]);
   
   // Clean up on unmount
   useEffect(() => {
