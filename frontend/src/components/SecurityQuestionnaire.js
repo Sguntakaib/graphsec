@@ -195,6 +195,12 @@ const SecurityQuestionnaire = ({
         if (dependencyResponse.ok) {
           const dependencyData = await dependencyResponse.json();
           dependentNodes = dependencyData.dependent_nodes || [];
+          console.log('🎯 Dependency check result:', {
+            nodeSubtype,
+            answers,
+            dependentNodes,
+            triggerRequired: dependentNodes.length > 0
+          });
         }
       } catch (error) {
         console.error('Error checking dependencies:', error);
