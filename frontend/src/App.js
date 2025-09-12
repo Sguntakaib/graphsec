@@ -832,6 +832,14 @@ function AppContent() {
       // If dependent questionnaires were triggered, don't close - the handleDependentNodeCreation will manage the flow
       if (result?.triggerDependentQuestionnaires && result?.dependentNodes?.length > 0) {
         console.log('🔄 Dependent questionnaires triggered, keeping modal open for chaining');
+        
+        // If this is a partial completion (from immediate dependency trigger), store resume info
+        if (result.partialCompletion && result.currentPromptIndex !== undefined) {
+          // Store current questionnaire state for resuming after dependency handling
+          console.log(`📝 Storing partial completion state - resume at prompt ${result.currentPromptIndex}`);
+          // The questionnaire modal should remain open and continue after dependency flow
+        }
+        
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
       }
 
