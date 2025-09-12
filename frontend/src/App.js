@@ -1584,9 +1584,11 @@ function AppContent() {
 
 function App() {
   return (
-    <ReactFlowProvider>
-      <AppContent />
-    </ReactFlowProvider>
+    <QuestionnaireProvider>
+      <ReactFlowProvider>
+        <AppContent />
+      </ReactFlowProvider>
+    </QuestionnaireProvider>
   );
 }
 
