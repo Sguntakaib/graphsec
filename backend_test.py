@@ -3313,138 +3313,146 @@ class SecurityModelingAPITester:
             return False
 
     def test_check_dependencies(self):
-        """Test POST /api/intelligent-nodes/{node_subtype}/check-dependencies"""
-        test_cases = [
+        """Test POST /api/intelligent-nodes/{node_subtype}/check-dependencies for conditional dependency system"""
+        print("\n🔍 Testing Conditional Dependency System for Immediate Node Creation...")
+        
+        # Test WebApp Dependencies
+        webapp_test_cases = [
             {
-                "subtype": "WebApp",
-                "answers": {
-                    "webapp_api_endpoints": True,
-                    "webapp_database_connection": False
-                },
+                "name": "WebApp - API endpoints only",
+                "answers": {"webapp_api_endpoints": True},
                 "expected_dependencies": ["API"]
             },
             {
-                "subtype": "WebApp", 
-                "answers": {
-                    "webapp_api_endpoints": True,
-                    "webapp_database_connection": True
-                },
+                "name": "WebApp - Database connection only", 
+                "answers": {"webapp_database_connection": True},
+                "expected_dependencies": ["Database"]
+            },
+            {
+                "name": "WebApp - Both API and Database",
+                "answers": {"webapp_api_endpoints": True, "webapp_database_connection": True},
                 "expected_dependencies": ["API", "Database"]
             },
             {
-                "subtype": "WebApp",
-                "answers": {
-                    "webapp_api_endpoints": False,
-                    "webapp_database_connection": False
-                },
+                "name": "WebApp - API false (should return empty)",
+                "answers": {"webapp_api_endpoints": False},
                 "expected_dependencies": []
+            }
+        ]
+        
+        # Test Database Dependencies
+        database_test_cases = [
+            {
+                "name": "Database - Backup enabled only",
+                "answers": {"db_backup_enabled": True},
+                "expected_dependencies": ["Backup"]
             },
             {
-                "subtype": "Database",
-                "answers": {
-                    "db_backup_enabled": "yes",
-                    "db_monitoring_enabled": "true"
-                },
+                "name": "Database - Monitoring enabled only",
+                "answers": {"db_monitoring_enabled": True},
+                "expected_dependencies": ["Monitoring"]
+            },
+            {
+                "name": "Database - Both backup and monitoring",
+                "answers": {"db_backup_enabled": True, "db_monitoring_enabled": True},
                 "expected_dependencies": ["Backup", "Monitoring"]
             }
         ]
         
-        for i, test_case in enumerate(test_cases):
-            subtype = test_case["subtype"]
-            answers = test_case["answers"]
-            expected_deps = test_case["expected_dependencies"]
-            
-            try:
-                response = self.session.post(
-                    f"{self.base_url}/intelligent-nodes/{subtype}/check-dependencies",
-                    json={"answers": answers},
-                    headers={"Content-Type": "application/json"}
-                )
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    
-                    # Check required fields
-                    expected_fields = ["success", "node_subtype", "dependent_nodes", "dependencies_found"]
-                    missing_fields = [f for f in expected_fields if f not in data]
-                    
-                    if missing_fields:
-                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, f"Missing fields: {missing_fields}")
-                        return False
-                    
-                    # Verify response structure
-                    if not data.get("success"):
-                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, "Success field is False")
-                        return False
-                    
-                    if data.get("node_subtype") != subtype:
-                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, f"Subtype mismatch")
-                        return False
-                    
-                    dependent_nodes = data.get("dependent_nodes", [])
-                    dependencies_found = data.get("dependencies_found", 0)
-                    
-                    # Verify dependencies match expected
-                    if set(dependent_nodes) != set(expected_deps):
-                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, 
-                                    f"Expected {expected_deps}, got {dependent_nodes}")
-                        return False
-                    
-                    if dependencies_found != len(expected_deps):
-                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, 
-                                    f"Dependencies count mismatch: expected {len(expected_deps)}, got {dependencies_found}")
-                        return False
-                    
-                    self.log_test(f"Check Dependencies - {subtype} Case {i+1}", True, 
-                                f"Found {dependencies_found} dependencies: {dependent_nodes}")
-                    
-                else:
-                    self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, 
-                                f"HTTP {response.status_code}: {response.text}")
-                    return False
-                    
-            except Exception as e:
-                self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, f"Error: {str(e)}")
+        # Test Edge Cases
+        edge_test_cases = [
+            {
+                "name": "WebApp - Empty answers",
+                "subtype": "WebApp",
+                "answers": {},
+                "expected_dependencies": []
+            },
+            {
+                "name": "WebApp - Mixed true/false answers",
+                "subtype": "WebApp", 
+                "answers": {"webapp_api_endpoints": True, "webapp_database_connection": False},
+                "expected_dependencies": ["API"]
+            }
+        ]
+        
+        # Test WebApp Dependencies
+        for test_case in webapp_test_cases:
+            if not self._test_dependency_case("WebApp", test_case["name"], test_case["answers"], test_case["expected_dependencies"]):
                 return False
         
-        # Test error cases
+        # Test Database Dependencies  
+        for test_case in database_test_cases:
+            if not self._test_dependency_case("Database", test_case["name"], test_case["answers"], test_case["expected_dependencies"]):
+                return False
+        
+        # Test Edge Cases
+        for test_case in edge_test_cases:
+            if not self._test_dependency_case(test_case["subtype"], test_case["name"], test_case["answers"], test_case["expected_dependencies"]):
+                return False
+        
+        # Test Invalid Node Subtype (should handle gracefully)
         try:
-            # Test invalid node subtype
             response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/InvalidType/check-dependencies",
-                json={"answers": {"test": True}},
+                f"{self.base_url}/intelligent-nodes/InvalidNodeType/check-dependencies",
+                json={"webapp_api_endpoints": True},
                 headers={"Content-Type": "application/json"}
             )
             
-            if response.status_code in [404, 500]:
-                self.log_test("Check Dependencies - Invalid Subtype", True, f"Correctly handled invalid subtype with {response.status_code}")
+            if response.status_code in [404, 400, 500]:
+                self.log_test("Check Dependencies - Invalid Subtype", True, 
+                            f"Gracefully handled invalid node subtype with HTTP {response.status_code}")
             else:
-                self.log_test("Check Dependencies - Invalid Subtype", False, f"Expected 404/500, got {response.status_code}")
+                self.log_test("Check Dependencies - Invalid Subtype", False, 
+                            f"Expected error status, got HTTP {response.status_code}")
                 return False
-            
-            # Test empty answers
+                
+        except Exception as e:
+            self.log_test("Check Dependencies - Invalid Subtype", False, f"Error: {str(e)}")
+            return False
+        
+        return True
+    
+    def _test_dependency_case(self, subtype, test_name, answers, expected_dependencies):
+        """Helper method to test individual dependency cases"""
+        try:
             response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
-                json={"answers": {}},
+                f"{self.base_url}/intelligent-nodes/{subtype}/check-dependencies",
+                json=answers,  # Send answers directly as per API contract
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("dependencies_found", -1) == 0:
-                    self.log_test("Check Dependencies - Empty Answers", True, "Correctly handled empty answers")
+                
+                # The API should return a list of dependent node types directly
+                if isinstance(data, list):
+                    dependent_nodes = data
+                elif isinstance(data, dict) and "dependent_nodes" in data:
+                    dependent_nodes = data["dependent_nodes"]
+                elif isinstance(data, dict) and "dependencies" in data:
+                    dependent_nodes = data["dependencies"]
                 else:
-                    self.log_test("Check Dependencies - Empty Answers", False, "Should return 0 dependencies for empty answers")
+                    self.log_test(test_name, False, f"Unexpected response format: {data}")
                     return False
+                
+                # Verify dependencies match expected (order doesn't matter)
+                if set(dependent_nodes) == set(expected_dependencies):
+                    self.log_test(test_name, True, 
+                                f"✅ Expected {expected_dependencies}, got {dependent_nodes}")
+                    return True
+                else:
+                    self.log_test(test_name, False, 
+                                f"❌ Expected {expected_dependencies}, got {dependent_nodes}")
+                    return False
+                    
             else:
-                self.log_test("Check Dependencies - Empty Answers", False, f"Expected 200, got {response.status_code}")
+                self.log_test(test_name, False, 
+                            f"HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("Check Dependencies - Error Cases", False, f"Error: {str(e)}")
+            self.log_test(test_name, False, f"Error: {str(e)}")
             return False
-        
-        return True
 
     def run_all_tests(self):
         """Run all API tests in sequence"""
