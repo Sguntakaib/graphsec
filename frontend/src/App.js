@@ -362,6 +362,12 @@ function AppContent() {
         if (supportedType) {
           console.log('✅ Node type supported, attempting enhanced questionnaire...');
           
+          // Check if enhanced system is already active for this node
+          if (questionnaireState.isFlowActive) {
+            console.log('🔄 Enhanced system already active, skipping duplicate initialization');
+            return;
+          }
+          
           // Try enhanced system first
           try {
             const node = nodes.find(n => n.id === nodeId);
