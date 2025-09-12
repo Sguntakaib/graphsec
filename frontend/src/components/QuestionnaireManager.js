@@ -370,8 +370,17 @@ const QuestionnaireManager = ({
     // This could be exposed via a ref or context if needed
     window.questionnaireManager = publicMethods;
     
+    // Initialize pending requests set
+    if (!window.pendingPromptRequests) {
+      window.pendingPromptRequests = new Set();
+    }
+    
     return () => {
       delete window.questionnaireManager;
+      // Clean up pending requests on unmount
+      if (window.pendingPromptRequests) {
+        window.pendingPromptRequests.clear();
+      }
     };
   }, [publicMethods]);
   
