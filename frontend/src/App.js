@@ -1742,6 +1742,7 @@ function AppContent() {
               ? parentQuestionnaireState.partialAnswers 
               : null
           }
+          getIncompleteDependencies={getIncompleteDependencies}
         />
       )}
 
