@@ -48,6 +48,17 @@ const QuestionnaireManager = ({
         // Final completion - questionnaire is fully done
         console.log('✅ Questionnaire completed:', nodeId);
         
+        // Mark dependency as COMPLETED if this node is a dependency of another node
+        if (setDependencyState) {
+          const completedNode = nodes.find(node => node.id === nodeId);
+          if (completedNode?.data?.parentNode) {
+            const parentNodeId = completedNode.data.parentNode;
+            const dependencyType = completedNode.subtype || completedNode.data?.subtype;
+            console.log(`✅ Marking dependency as COMPLETED: ${parentNodeId} → ${dependencyType}`);
+            setDependencyState(parentNodeId, dependencyType, 'COMPLETED');
+          }
+        }
+        
         // Remove from modal stack
         actions.popModal();
         
