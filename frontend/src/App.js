@@ -92,6 +92,7 @@ function AppContent() {
   const [overviewNode, setOverviewNode] = useState(null);
   const [questionnaireQueue, setQuestionnaireQueue] = useState([]); // Queue for chained questionnaires
   const [currentQueueIndex, setCurrentQueueIndex] = useState(0);
+  const [parentQuestionnaireState, setParentQuestionnaireState] = useState(null); // For resuming parent questionnaires
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
