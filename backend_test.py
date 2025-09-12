@@ -3112,6 +3112,340 @@ class SecurityModelingAPITester:
             self.log_test("Wizard Generate Model - Error Handling", False, f"Error: {str(e)}")
             return False
 
+    def test_questionnaire_get_responses(self):
+        """Test GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire"""
+        if not self.test_diagram_id:
+            self.log_test("Questionnaire Get Responses", False, "No test diagram ID available")
+            return False
+        
+        try:
+            # First create a diagram with a WebApp node
+            webapp_node_id = str(uuid.uuid4())
+            diagram_data = {
+                "id": self.test_diagram_id,
+                "title": "Questionnaire Test Diagram",
+                "description": "Testing questionnaire management",
+                "nodes": [
+                    {
+                        "id": webapp_node_id,
+                        "type": "Asset",
+                        "subtype": "WebApp",
+                        "label": "Test Web Application",
+                        "position": {"x": 100, "y": 100},
+                        "data": {
+                            "description": "Web application for questionnaire testing",
+                            "questionnaireResponses": {
+                                "webapp_api_endpoints": True,
+                                "webapp_database_connection": False
+                            }
+                        }
+                    }
+                ],
+                "edges": []
+            }
+            
+            # Update diagram with WebApp node
+            update_response = self.session.put(
+                f"{self.base_url}/diagrams/{self.test_diagram_id}",
+                json=diagram_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if update_response.status_code != 200:
+                self.log_test("Questionnaire Get Responses", False, f"Failed to update diagram: {update_response.status_code}")
+                return False
+            
+            # Test getting questionnaire responses
+            response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}/nodes/{webapp_node_id}/questionnaire")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check required fields
+                expected_fields = ["success", "node_id", "node_subtype", "questionnaire_responses", "prompts", "completed_questions", "total_questions"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Questionnaire Get Responses", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Verify response structure
+                if not data.get("success"):
+                    self.log_test("Questionnaire Get Responses", False, "Success field is False")
+                    return False
+                
+                if data.get("node_subtype") != "WebApp":
+                    self.log_test("Questionnaire Get Responses", False, f"Expected WebApp, got {data.get('node_subtype')}")
+                    return False
+                
+                questionnaire_responses = data.get("questionnaire_responses", {})
+                prompts = data.get("prompts", [])
+                completed_questions = data.get("completed_questions", 0)
+                total_questions = data.get("total_questions", 0)
+                
+                # Verify we have the expected responses
+                if "webapp_api_endpoints" not in questionnaire_responses:
+                    self.log_test("Questionnaire Get Responses", False, "Missing expected questionnaire response")
+                    return False
+                
+                if len(prompts) == 0:
+                    self.log_test("Questionnaire Get Responses", False, "No prompts returned")
+                    return False
+                
+                self.log_test("Questionnaire Get Responses", True, 
+                            f"Retrieved questionnaire: {completed_questions}/{total_questions} completed, {len(prompts)} prompts")
+                return True
+                
+            elif response.status_code == 404:
+                self.log_test("Questionnaire Get Responses", False, "Diagram or node not found")
+                return False
+            else:
+                self.log_test("Questionnaire Get Responses", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Questionnaire Get Responses", False, f"Error: {str(e)}")
+            return False
+
+    def test_questionnaire_update_responses(self):
+        """Test POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire"""
+        if not self.test_diagram_id:
+            self.log_test("Questionnaire Update Responses", False, "No test diagram ID available")
+            return False
+        
+        try:
+            # Create a diagram with a WebApp node
+            webapp_node_id = str(uuid.uuid4())
+            diagram_data = {
+                "id": self.test_diagram_id,
+                "title": "Questionnaire Update Test",
+                "description": "Testing questionnaire response updates",
+                "nodes": [
+                    {
+                        "id": webapp_node_id,
+                        "type": "Asset",
+                        "subtype": "WebApp",
+                        "label": "Test Web Application",
+                        "position": {"x": 100, "y": 100},
+                        "data": {
+                            "description": "Web application for questionnaire testing"
+                        }
+                    }
+                ],
+                "edges": []
+            }
+            
+            # Update diagram with WebApp node
+            update_response = self.session.put(
+                f"{self.base_url}/diagrams/{self.test_diagram_id}",
+                json=diagram_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if update_response.status_code != 200:
+                self.log_test("Questionnaire Update Responses", False, f"Failed to update diagram: {update_response.status_code}")
+                return False
+            
+            # Test updating questionnaire responses
+            new_responses = {
+                "webapp_api_endpoints": True,
+                "webapp_database_connection": True,
+                "webapp_authentication": "OAuth2",
+                "webapp_encryption": "TLS 1.3"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/diagrams/{self.test_diagram_id}/nodes/{webapp_node_id}/questionnaire",
+                json={"responses": new_responses},
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check required fields
+                expected_fields = ["success", "node_id", "updated_responses"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Questionnaire Update Responses", False, f"Missing fields: {missing_fields}")
+                    return False
+                
+                # Verify response structure
+                if not data.get("success"):
+                    self.log_test("Questionnaire Update Responses", False, "Success field is False")
+                    return False
+                
+                if data.get("node_id") != webapp_node_id:
+                    self.log_test("Questionnaire Update Responses", False, f"Node ID mismatch")
+                    return False
+                
+                updated_responses = data.get("updated_responses", 0)
+                if updated_responses != len(new_responses):
+                    self.log_test("Questionnaire Update Responses", False, f"Expected {len(new_responses)} updates, got {updated_responses}")
+                    return False
+                
+                # Verify the responses were actually saved by getting them back
+                get_response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}/nodes/{webapp_node_id}/questionnaire")
+                if get_response.status_code == 200:
+                    get_data = get_response.json()
+                    saved_responses = get_data.get("questionnaire_responses", {})
+                    
+                    # Check if our responses were saved
+                    for key, value in new_responses.items():
+                        if saved_responses.get(key) != value:
+                            self.log_test("Questionnaire Update Responses", False, f"Response {key} not saved correctly")
+                            return False
+                
+                self.log_test("Questionnaire Update Responses", True, 
+                            f"Updated {updated_responses} questionnaire responses successfully")
+                return True
+                
+            elif response.status_code == 404:
+                self.log_test("Questionnaire Update Responses", False, "Diagram or node not found")
+                return False
+            else:
+                self.log_test("Questionnaire Update Responses", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Questionnaire Update Responses", False, f"Error: {str(e)}")
+            return False
+
+    def test_check_dependencies(self):
+        """Test POST /api/intelligent-nodes/{node_subtype}/check-dependencies"""
+        test_cases = [
+            {
+                "subtype": "WebApp",
+                "answers": {
+                    "webapp_api_endpoints": True,
+                    "webapp_database_connection": False
+                },
+                "expected_dependencies": ["API"]
+            },
+            {
+                "subtype": "WebApp", 
+                "answers": {
+                    "webapp_api_endpoints": True,
+                    "webapp_database_connection": True
+                },
+                "expected_dependencies": ["API", "Database"]
+            },
+            {
+                "subtype": "WebApp",
+                "answers": {
+                    "webapp_api_endpoints": False,
+                    "webapp_database_connection": False
+                },
+                "expected_dependencies": []
+            },
+            {
+                "subtype": "Database",
+                "answers": {
+                    "db_backup_enabled": "yes",
+                    "db_monitoring_enabled": "true"
+                },
+                "expected_dependencies": ["Backup", "Monitoring"]
+            }
+        ]
+        
+        for i, test_case in enumerate(test_cases):
+            subtype = test_case["subtype"]
+            answers = test_case["answers"]
+            expected_deps = test_case["expected_dependencies"]
+            
+            try:
+                response = self.session.post(
+                    f"{self.base_url}/intelligent-nodes/{subtype}/check-dependencies",
+                    json={"answers": answers},
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check required fields
+                    expected_fields = ["success", "node_subtype", "dependent_nodes", "dependencies_found"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    # Verify response structure
+                    if not data.get("success"):
+                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, "Success field is False")
+                        return False
+                    
+                    if data.get("node_subtype") != subtype:
+                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, f"Subtype mismatch")
+                        return False
+                    
+                    dependent_nodes = data.get("dependent_nodes", [])
+                    dependencies_found = data.get("dependencies_found", 0)
+                    
+                    # Verify dependencies match expected
+                    if set(dependent_nodes) != set(expected_deps):
+                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, 
+                                    f"Expected {expected_deps}, got {dependent_nodes}")
+                        return False
+                    
+                    if dependencies_found != len(expected_deps):
+                        self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, 
+                                    f"Dependencies count mismatch: expected {len(expected_deps)}, got {dependencies_found}")
+                        return False
+                    
+                    self.log_test(f"Check Dependencies - {subtype} Case {i+1}", True, 
+                                f"Found {dependencies_found} dependencies: {dependent_nodes}")
+                    
+                else:
+                    self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Check Dependencies - {subtype} Case {i+1}", False, f"Error: {str(e)}")
+                return False
+        
+        # Test error cases
+        try:
+            # Test invalid node subtype
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/InvalidType/check-dependencies",
+                json={"answers": {"test": True}},
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 500:
+                self.log_test("Check Dependencies - Invalid Subtype", True, "Correctly handled invalid subtype")
+            else:
+                self.log_test("Check Dependencies - Invalid Subtype", False, f"Expected 500, got {response.status_code}")
+                return False
+            
+            # Test empty answers
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
+                json={"answers": {}},
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("dependencies_found", -1) == 0:
+                    self.log_test("Check Dependencies - Empty Answers", True, "Correctly handled empty answers")
+                else:
+                    self.log_test("Check Dependencies - Empty Answers", False, "Should return 0 dependencies for empty answers")
+                    return False
+            else:
+                self.log_test("Check Dependencies - Empty Answers", False, f"Expected 200, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Check Dependencies - Error Cases", False, f"Error: {str(e)}")
+            return False
+        
+        return True
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
