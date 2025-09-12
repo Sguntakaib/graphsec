@@ -44,6 +44,14 @@ const EnhancedSecurityQuestionnaire = ({
     if (nodeId && nodeSubtype) {
       initializeQuestionnaire();
     }
+    
+    // Cleanup function
+    return () => {
+      // Clean up any pending request for this component
+      if (window.pendingPromptRequests) {
+        window.pendingPromptRequests.delete(`${nodeSubtype}-prompts`);
+      }
+    };
   }, [nodeId, nodeSubtype]);
   
   const initializeQuestionnaire = async () => {
