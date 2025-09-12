@@ -20,6 +20,7 @@ import { EnhancedSimulationPanel } from './components/EnhancedSimulationPanel';
 import { TemplateLibrary } from './components/TemplateLibrary';
 import { CustomNode } from './components/CustomNode';
 import SecurityQuestionnaire from './components/SecurityQuestionnaire';
+import QuestionnaireOverview from './components/QuestionnaireOverview';
 import SmartNodeConnector from './components/SmartNodeConnector';
 import SimulationDebugger from './components/SimulationDebugger';
 import NodeBranchVisualizer from './components/NodeBranchVisualizer';
