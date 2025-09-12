@@ -3394,7 +3394,7 @@ class SecurityModelingAPITester:
         try:
             response = self.session.post(
                 f"{self.base_url}/intelligent-nodes/InvalidNodeType/check-dependencies",
-                json={"webapp_api_endpoints": True},
+                json={"answers": {"webapp_api_endpoints": True}},
                 headers={"Content-Type": "application/json"}
             )
             
