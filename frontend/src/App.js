@@ -94,6 +94,21 @@ function AppContent() {
     setZoomLevel(Math.round(viewport.zoom * 100) / 100);
   }, []);
 
+  // Double-tap handler for nodes
+  useEffect(() => {
+    const handleNodeDoubleTap = (event) => {
+      const { nodeId, nodeData } = event.detail;
+      const node = nodes.find(n => n.id === nodeId);
+      if (node && currentDiagram) {
+        setOverviewNode(node);
+        setShowQuestionnaireOverview(true);
+      }
+    };
+
+    window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
+    return () => window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
+  }, [nodes, currentDiagram]);
+
   // Performance monitoring
   const [performance, setPerformance] = useState({
     nodeCount: 0,
