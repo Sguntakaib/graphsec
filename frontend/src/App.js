@@ -349,6 +349,49 @@ function AppContent() {
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
+  // Helper function to start enhanced questionnaire
+  const startEnhancedQuestionnaire = useCallback(async (nodeId, nodeSubtype, parentNodeId = null) => {
+    console.log('🎬 Starting enhanced questionnaire:', { nodeId, nodeSubtype, parentNodeId });
+    
+    try {
+      // Check if this node type supports intelligent expansion
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/supported-types`);
+      if (response.ok) {
+        const data = await response.json();
+        const supportedType = data.supported_types.find(
+          type => type.node_subtype === nodeSubtype
+        );
+
+        if (supportedType) {
+          // Start questionnaire flow using the new system
+          const node = nodes.find(n => n.id === nodeId);
+          if (node) {
+            questionnaireActions.startQuestionnaireFlow(node, 1);
+            
+            // The QuestionnaireManager will handle the rest
+            if (window.questionnaireManager) {
+              await window.questionnaireManager.startQuestionnaireForNode(
+                nodeId, 
+                nodeSubtype, 
+                parentNodeId, 
+                {}
+              );
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error starting enhanced questionnaire:', error);
+      // Fallback to old system if needed
+      setCurrentQuestionnaireNode({
+        id: nodeId,
+        subtype: nodeSubtype,
+        data: { subtype: nodeSubtype }
+      });
+      setShowSecurityQuestionnaire(true);
+    }
+  }, [nodes, questionnaireActions, setCurrentQuestionnaireNode, setShowSecurityQuestionnaire]);
+
   const handleSaveDiagram = async () => {
     setIsLoading(true);
     try {
