@@ -32,6 +32,27 @@ const CustomNode = ({ data, selected, id }) => {
   const IconComponent = getIcon(data.type);
   const nodeClass = getNodeClass(data.type);
 
+  const handleNodeClick = (event) => {
+    event.stopPropagation();
+    
+    setTapCount(prev => prev + 1);
+    
+    if (tapTimer.current) {
+      clearTimeout(tapTimer.current);
+    }
+    
+    tapTimer.current = setTimeout(() => {
+      if (tapCount + 1 === 2) {
+        // Double tap detected
+        const customEvent = new CustomEvent('nodeDoubleTap', {
+          detail: { nodeId: id, nodeData: data }
+        });
+        window.dispatchEvent(customEvent);
+      }
+      setTapCount(0);
+    }, 300); // 300ms window for double tap
+  };
+
   return (
     <div className={`react-flow__node-custom ${nodeClass} ${selected ? 'selected' : ''}`}>
       <Handle type="target" position={Position.Top} />
