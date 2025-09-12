@@ -829,14 +829,22 @@ function AppContent() {
     } catch (error) {
       console.error('Error completing security questionnaire:', error);
     } finally {
+      // If dependent questionnaires were triggered, don't close - the handleDependentNodeCreation will manage the flow
+      if (result?.triggerDependentQuestionnaires && result?.dependentNodes?.length > 0) {
+        console.log('🔄 Dependent questionnaires triggered, keeping modal open for chaining');
+        return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
+      }
+
       // Check if there are more questionnaires in the queue
       if (questionnaireQueue.length > currentQueueIndex + 1) {
         // Move to next questionnaire
         setCurrentQueueIndex(prev => prev + 1);
         const nextNode = questionnaireQueue[currentQueueIndex + 1];
         setCurrentQuestionnaireNode(nextNode);
+        console.log(`🔄 Moving to next questionnaire in queue: ${nextNode?.data?.subtype}`);
       } else {
         // Clear queue and close questionnaire
+        console.log('✅ All questionnaires completed, closing modal');
         setShowSecurityQuestionnaire(false);
         setCurrentQuestionnaireNode(null);
         setQuestionnaireQueue([]);
