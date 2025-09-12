@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://diagwizard.preview.emergentagent.com/api"
+BASE_URL = "https://flow-questionnaire.preview.emergentagent.com/api"
 
 class SecurityModelingAPITester:
     def __init__(self):
