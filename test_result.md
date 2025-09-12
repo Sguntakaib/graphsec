@@ -602,6 +602,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🎯 ROOT CAUSE FIX: Identified and fixed the core issue causing duplicate node creation. Problem was TWO systems creating nodes: 1) SmartNodeConnector automatically creating API/Database nodes during questionnaire completion, 2) Conditional dependency system also creating the same nodes. FIX: Modified SmartNodeConnector.js to NOT create conditional dependent nodes (API/Database for WebApp, Backup/Monitoring for Database) and let the conditional dependency system handle them properly with questionnaire chaining. This ensures: ✅ No duplicate nodes ✅ Proper conditional logic based on answers ✅ Immediate questionnaire prompts for dependent nodes. Ready for retesting."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 MAJOR FIXES COMPLETED: 1) Fixed MongoDB ObjectId serialization errors with Pydantic v2 compatibility 2) Fixed ReactFlow drag-and-drop using screenToFlowPosition for proper coordinate handling 3) Fixed backend URL configuration (was pointing to wrong external URL) 4) Backend API now responding correctly (200 OK) 5) WebApp nodes now visible in Advanced Node Library under Critical Assets category 6) Category filtering working properly. Ready for comprehensive conditional dependency testing."
 
 agent_communication:
   - agent: "testing"
