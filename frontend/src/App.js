@@ -127,7 +127,7 @@ function AppContent() {
     }));
   }, [nodes, edges]);
   
-  const { fitView, zoomIn, zoomOut } = useReactFlow();
+  const { fitView, zoomIn, zoomOut, screenToFlowPosition } = useReactFlow();
 
   // Save state for undo/redo
   const saveStateToUndoStack = useCallback(() => {
