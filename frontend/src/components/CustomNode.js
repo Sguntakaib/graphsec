@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Shield, Server, AlertTriangle, Lock, Network, Activity } from 'lucide-react';
 
-const CustomNode = ({ data, selected }) => {
+const CustomNode = ({ data, selected, id }) => {
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimer = useRef(null);
   const getIcon = (type) => {
     const iconMap = {
       'Actor': Shield,
