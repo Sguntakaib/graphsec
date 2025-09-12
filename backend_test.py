@@ -4265,7 +4265,20 @@ class SecurityModelingAPITester:
             # Questionnaire Management and Conditional Dependencies Tests
             self.test_questionnaire_get_responses,
             self.test_questionnaire_update_responses,
-            self.test_check_dependencies
+            self.test_check_dependencies,
+            # Phase 1 Enhanced APIs - Expanded Intelligent Nodes & Threat Intelligence
+            self.test_expanded_nodes_supported_types,
+            self.test_expanded_nodes_questionnaire_levels,
+            self.test_expanded_nodes_calculate_risk,
+            self.test_expanded_nodes_bulk_risk_assessment,
+            self.test_expanded_nodes_categories,
+            self.test_expanded_nodes_threat_intelligence_summary,
+            # Threat Intelligence Endpoints
+            self.test_threat_intelligence_node_profile,
+            self.test_threat_intelligence_correlate_vulnerabilities,
+            self.test_threat_intelligence_real_time_score,
+            self.test_threat_intelligence_mitre_technique,
+            self.test_threat_intelligence_dashboard
         ]
         
         passed = 0
