@@ -107,7 +107,62 @@ const SecurityQuestionnaire = ({
     }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Check if current question is a dependency-triggering question
+    const currentPrompt = prompts[currentPromptIndex];
+    const currentAnswer = answers[currentPrompt.id];
+    
+    // Define dependency-triggering questions that should immediately create nodes
+    const dependencyTriggers = {
+      'webapp_api_endpoints': 'API',
+      'webapp_database_connection': 'Database',
+      'db_backup_enabled': 'Backup',
+      'db_monitoring_enabled': 'Monitoring'
+    };
+    
+    // If current question triggers a dependency and answer is Yes/True
+    if (dependencyTriggers[currentPrompt.id] && (currentAnswer === true || currentAnswer === 'Yes')) {
+      console.log(`🎯 Dependency trigger detected for ${currentPrompt.id} → ${dependencyTriggers[currentPrompt.id]}`);
+      
+      try {
+        // Check dependencies for this specific answer
+        const dependencyResponse = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/check-dependencies`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ answers: { [currentPrompt.id]: currentAnswer } })
+          }
+        );
+        
+        if (dependencyResponse.ok) {
+          const dependencyData = await dependencyResponse.json();
+          const dependentNodes = dependencyData.dependent_nodes || [];
+          
+          if (dependentNodes.length > 0) {
+            console.log(`🚀 Creating ${dependentNodes.length} dependent nodes:`, dependentNodes);
+            
+            // Trigger dependent node creation immediately
+            if (onComplete) {
+              onComplete({
+                answers,
+                dependentNodes,
+                triggerDependentQuestionnaires: true,
+                partialCompletion: true, // Flag to indicate this is not final completion
+                currentPromptIndex: currentPromptIndex + 1 // Continue questionnaire after dependencies
+              });
+              return; // Don't proceed to next question yet - let the dependency flow handle it
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking immediate dependencies:', error);
+      }
+    }
+    
+    // Normal next question flow
     if (currentPromptIndex < prompts.length - 1) {
       setCurrentPromptIndex(currentPromptIndex + 1);
     }
