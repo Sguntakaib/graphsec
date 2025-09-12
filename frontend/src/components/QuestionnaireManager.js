@@ -195,15 +195,21 @@ const QuestionnaireManager = ({
       // Create questionnaire in context
       actions.createQuestionnaire(nodeId, nodeSubtype, prompts, existingAnswers, parentNodeId);
       
-      // Add to modal stack to trigger the modal display
-      actions.pushModal({
-        id: nodeId,
-        type: 'questionnaire',
-        nodeId,
-        nodeSubtype,
-        parentId: parentNodeId,
-        zIndex: 1000 + state.modalStack.length * 10,
-      });
+      // Check if modal already exists in stack to prevent duplicates
+      const existingModal = state.modalStack.find(modal => modal.nodeId === nodeId);
+      if (!existingModal) {
+        // Add to modal stack to trigger the modal display
+        actions.pushModal({
+          id: nodeId,
+          type: 'questionnaire',
+          nodeId,
+          nodeSubtype,
+          parentId: parentNodeId,
+          zIndex: 1000 + state.modalStack.length * 10,
+        });
+      } else {
+        console.log('⚠️ Modal already exists for node:', nodeId, '- skipping duplicate');
+      }
       
       console.log('🎉 Questionnaire modal should now be visible!');
       
