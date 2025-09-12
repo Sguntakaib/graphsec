@@ -228,6 +228,34 @@ function AppContent() {
     }
   };
 
+  // Dependency State Management Functions
+  const getDependencyState = (parentNodeId, dependencyType) => {
+    return dependencyStates[parentNodeId]?.[dependencyType] || 'PENDING';
+  };
+
+  const setDependencyState = (parentNodeId, dependencyType, state) => {
+    console.log(`🔄 Setting dependency state: ${parentNodeId} → ${dependencyType} = ${state}`);
+    setDependencyStates(prev => ({
+      ...prev,
+      [parentNodeId]: {
+        ...prev[parentNodeId],
+        [dependencyType]: state
+      }
+    }));
+  };
+
+  const getIncompleteDependencies = (parentNodeId, allDependencies) => {
+    if (!allDependencies || allDependencies.length === 0) return [];
+    
+    const incompleteDependencies = allDependencies.filter(dep => {
+      const state = getDependencyState(parentNodeId, dep);
+      return state !== 'COMPLETED';
+    });
+    
+    console.log(`🔍 Incomplete dependencies for ${parentNodeId}:`, incompleteDependencies);
+    return incompleteDependencies;
+  };
+
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
