@@ -50,8 +50,43 @@ const EnhancedSecurityQuestionnaire = ({
     try {
       setLoading(true);
       
+      // Check if questionnaire already exists in context (prevents duplicate API calls)
+      if (questionnaire && questionnaire.prompts && questionnaire.prompts.length > 0) {
+        console.log('📋 Using existing prompts from context:', questionnaire.prompts.length);
+        setPrompts(questionnaire.prompts);
+        setError(null);
+        setLoading(false);
+        return;
+      }
+      
+      // Add a small delay to prevent rapid duplicate requests
+      const requestKey = `${nodeSubtype}-prompts`;
+      if (window.pendingPromptRequests && window.pendingPromptRequests.has(requestKey)) {
+        console.log('⏳ Prompt request already in progress, waiting...');
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Check again if prompts are now available
+        const updatedQuestionnaire = state.questionnaires[nodeId];
+        if (updatedQuestionnaire && updatedQuestionnaire.prompts && updatedQuestionnaire.prompts.length > 0) {
+          setPrompts(updatedQuestionnaire.prompts);
+          setError(null);
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Mark request as pending
+      if (!window.pendingPromptRequests) {
+        window.pendingPromptRequests = new Set();
+      }
+      window.pendingPromptRequests.add(requestKey);
+      
       // Fetch security prompts
+      console.log('🔄 Fetching prompts for', nodeSubtype);
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
+      
+      // Remove from pending requests
+      window.pendingPromptRequests.delete(requestKey);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch prompts: ${response.statusText}`);
@@ -70,15 +105,18 @@ const EnhancedSecurityQuestionnaire = ({
         parentNodeId
       );
       
-      // Add to modal stack
-      actions.pushModal({
-        id: nodeId,
-        type: 'questionnaire',
-        nodeId,
-        nodeSubtype,
-        parentId: parentNodeId,
-        zIndex: zIndex + modalDepth,
-      });
+      // Add to modal stack (prevent duplicates)
+      const existingModal = state.modalStack.find(modal => modal.id === nodeId);
+      if (!existingModal) {
+        actions.pushModal({
+          id: nodeId,
+          type: 'questionnaire',
+          nodeId,
+          nodeSubtype,
+          parentId: parentNodeId,
+          zIndex: zIndex + modalDepth,
+        });
+      }
       
       // Update progress tracking
       actions.addQuestionnaireToFlow(nodeId);
@@ -87,6 +125,11 @@ const EnhancedSecurityQuestionnaire = ({
     } catch (err) {
       console.error('Error initializing questionnaire:', err);
       setError(err.message);
+      
+      // Remove from pending requests on error
+      if (window.pendingPromptRequests) {
+        window.pendingPromptRequests.delete(`${nodeSubtype}-prompts`);
+      }
     } finally {
       setLoading(false);
     }
