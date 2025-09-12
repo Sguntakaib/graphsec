@@ -24,6 +24,7 @@ const EnhancedSecurityQuestionnaire = ({
   parentNodeId = null,
   existingValues = {},
   zIndex = 1000,
+  getIncompleteDependencies = null,
 }) => {
   const { state, actions } = useQuestionnaire();
   const [prompts, setPrompts] = useState([]);
