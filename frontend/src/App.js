@@ -1578,6 +1578,37 @@ function AppContent() {
           onEdit={handleQuestionnaireOverviewEdit}
         />
       )}
+
+      {/* Enhanced Questionnaire System */}
+      <QuestionnaireManager
+        nodes={nodes}
+        setNodes={setNodes}
+        onNodeCreate={(newNode) => {
+          setNodes(currentNodes => [...currentNodes, newNode]);
+        }}
+        onNodeUpdate={(updatedNode) => {
+          setNodes(currentNodes => 
+            currentNodes.map(node => 
+              node.id === updatedNode.id ? updatedNode : node
+            )
+          );
+        }}
+        currentDiagram={currentDiagram}
+      />
+
+      {/* Canvas Synchronizer */}
+      <CanvasSynchronizer
+        nodes={nodes}
+        setNodes={setNodes}
+        edges={edges}
+        setEdges={setEdges}
+        onNodeUpdate={(updatedNode) => {
+          console.log('Canvas sync: Node updated', updatedNode);
+        }}
+        onEdgeCreate={(newEdge) => {
+          console.log('Canvas sync: Edge created', newEdge);
+        }}
+      />
     </div>
   );
 }
