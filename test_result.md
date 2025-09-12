@@ -602,6 +602,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🎯 ROOT CAUSE FIX: Identified and fixed the core issue causing duplicate node creation. Problem was TWO systems creating nodes: 1) SmartNodeConnector automatically creating API/Database nodes during questionnaire completion, 2) Conditional dependency system also creating the same nodes. FIX: Modified SmartNodeConnector.js to NOT create conditional dependent nodes (API/Database for WebApp, Backup/Monitoring for Database) and let the conditional dependency system handle them properly with questionnaire chaining. This ensures: ✅ No duplicate nodes ✅ Proper conditional logic based on answers ✅ Immediate questionnaire prompts for dependent nodes. Ready for retesting."
+      - working: "NA"
+        agent: "main"
+        comment: "🚨 CRITICAL BUG FIX: Fixed TypeError in handleDependentNodeCreation - 'can't access property x, sourceNode.position is undefined'. Issue was that currentQuestionnaireNode only contained {id, subtype, data} but not the position property from React Flow nodes. FIX: Updated handleDependentNodeCreation to find the actual React Flow node using nodes.find(node => node.id === currentQuestionnaireNode?.id) before accessing position properties. Added proper error handling for missing nodes and positions. This resolves the immediate UI error preventing dependent node creation from working."
 
 agent_communication:
   - agent: "testing"
