@@ -84,6 +84,10 @@ function AppContent() {
   const [showThreatModelingWizard, setShowThreatModelingWizard] = useState(false);
   const [currentQuestionnaireNode, setCurrentQuestionnaireNode] = useState(null);
   const [nodeBranches, setNodeBranches] = useState({}); // Store security branches for each node
+  const [showQuestionnaireOverview, setShowQuestionnaireOverview] = useState(false);
+  const [overviewNode, setOverviewNode] = useState(null);
+  const [questionnaireQueue, setQuestionnaireQueue] = useState([]); // Queue for chained questionnaires
+  const [currentQueueIndex, setCurrentQueueIndex] = useState(0);
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
