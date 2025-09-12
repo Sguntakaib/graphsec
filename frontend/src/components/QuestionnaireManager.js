@@ -8,7 +8,10 @@ const QuestionnaireManager = ({
   setNodes,
   onNodeCreate,
   onNodeUpdate,
-  currentDiagram
+  currentDiagram,
+  setDependencyState,
+  getDependencyState,
+  getIncompleteDependencies
 }) => {
   const { state, actions } = useQuestionnaire();
   
