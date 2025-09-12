@@ -808,7 +808,14 @@ function AppContent() {
         }));
 
         // Handle dependent node questionnaires
+        console.log('🔍 Checking for dependent questionnaires:', {
+          triggerDependentQuestionnaires: result.triggerDependentQuestionnaires,
+          dependentNodesLength: result.dependentNodes?.length,
+          dependentNodes: result.dependentNodes
+        });
+        
         if (result.triggerDependentQuestionnaires && result.dependentNodes?.length > 0) {
+          console.log('🚀 Triggering dependent node creation for:', result.dependentNodes);
           await handleDependentNodeCreation(result.dependentNodes, result.answers);
         }
 
