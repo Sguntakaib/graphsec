@@ -379,10 +379,14 @@ function AppContent() {
                   {}
                 );
                 console.log('✅ Enhanced questionnaire started:', result);
-                // Make sure old system doesn't activate
-                setShowSecurityQuestionnaire(false);
-                setCurrentQuestionnaireNode(null);
-                return; // Success - exit early
+                
+                // Only use fallback if the enhanced system actually failed
+                if (result && result.success) {
+                  // Make sure old system doesn't activate
+                  setShowSecurityQuestionnaire(false);
+                  setCurrentQuestionnaireNode(null);
+                  return; // Success - exit early
+                }
               } else {
                 console.warn('⚠️ QuestionnaireManager not available, using fallback');
               }
