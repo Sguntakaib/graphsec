@@ -581,6 +581,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ POST /api/intelligent-nodes/{node_subtype}/check-dependencies endpoint working correctly - conditional node expansion logic functional: WebApp with API=true,Database=false returns ['API'], API=true,Database=true returns ['API','Database'], Database backup/monitoring enabled returns ['Backup','Monitoring'], empty answers return []"
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE CONDITIONAL DEPENDENCY TESTING COMPLETE: All test scenarios passed successfully! WebApp Dependencies: ✅ API endpoints only → ['API'] ✅ Database connection only → ['Database'] ✅ Both API and Database → ['API', 'Database'] ✅ API false → [] Database Dependencies: ✅ Backup enabled → ['Backup'] ✅ Monitoring enabled → ['Monitoring'] ✅ Both enabled → ['Backup', 'Monitoring'] Edge Cases: ✅ Empty answers → [] ✅ Mixed true/false → only true values returned ✅ Invalid subtype → gracefully handled with empty array. The immediate dependency triggering system is fully functional and ready for the new immediate node creation flow."
 
   - task: "Conditional Node Expansion Frontend Fix"
     implemented: true
