@@ -123,6 +123,28 @@ const SecurityQuestionnaire = ({
     const validationResult = await validateAnswers();
     
     if (validationResult) {
+      // Check for conditional dependencies
+      let dependentNodes = [];
+      try {
+        const dependencyResponse = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/check-dependencies`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ answers })
+          }
+        );
+        
+        if (dependencyResponse.ok) {
+          const dependencyData = await dependencyResponse.json();
+          dependentNodes = dependencyData.dependent_nodes || [];
+        }
+      } catch (error) {
+        console.error('Error checking dependencies:', error);
+      }
+
       // Trigger smart node creation if callback is provided
       let smartNodeResult = null;
       if (onCreateLinkedNodes && sourceNode && currentNodes) {
@@ -137,7 +159,9 @@ const SecurityQuestionnaire = ({
         answers,
         validation: validationResult.validation,
         recommendations: validationResult.recommendations,
-        smartNodeResult
+        smartNodeResult,
+        dependentNodes,
+        triggerDependentQuestionnaires: dependentNodes.length > 0
       });
     }
   };
