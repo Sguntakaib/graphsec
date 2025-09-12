@@ -42,6 +42,9 @@ simulation_engine = AdvancedSimulationEngine()
 mitre_db = MitreAttackDatabase()
 executor = ThreadPoolExecutor(max_workers=4)
 
+# Initialize expanded intelligent node engine
+expanded_node_engine = ExpandedIntelligentNodeEngine()
+
 # Default Security Templates Data
 def get_default_templates():
     """Get pre-built security templates for common architectures"""
