@@ -1787,6 +1787,320 @@ async def get_threat_intelligence_summary(request: Dict[str, Any]):
         "analysis_timestamp": datetime.now(timezone.utc).isoformat()
     }
 
+# ============================================================================
+# THREAT INTELLIGENCE ENDPOINTS - PHASE 1 ENHANCEMENT  
+# ============================================================================
+
+@api_router.get("/threat-intelligence/node/{node_type}/profile")
+async def get_node_threat_profile(node_type: str, force_refresh: bool = False):
+    """Get comprehensive threat intelligence profile for a node type"""
+    try:
+        profile = await threat_intelligence_engine.get_node_threat_profile(node_type, force_refresh)
+        
+        return {
+            "node_type": node_type,
+            "threat_profile": {
+                "total_cves": profile.total_cves,
+                "recent_cves_count": len(profile.recent_cves),
+                "high_risk_cves_count": len(profile.high_risk_cves),
+                "threat_indicators_count": len(profile.threat_indicators),
+                "threat_score": profile.threat_score,
+                "threat_level": "Critical" if profile.threat_score >= 8.0 else 
+                              "High" if profile.threat_score >= 6.0 else
+                              "Medium" if profile.threat_score >= 4.0 else "Low",
+                "mitre_techniques": list(profile.mitre_techniques),
+                "attack_patterns": profile.attack_patterns,
+                "last_updated": profile.last_updated
+            },
+            "recent_cves": [
+                {
+                    "cve_id": cve.cve_id,
+                    "cvss_score": cve.cvss_score,
+                    "severity": cve.severity.value,
+                    "description": cve.description,
+                    "published_date": cve.published_date,
+                    "exploit_available": cve.exploit_available,
+                    "mitre_techniques": cve.mitre_techniques
+                } for cve in profile.recent_cves[:5]  # Latest 5
+            ],
+            "high_risk_cves": [
+                {
+                    "cve_id": cve.cve_id,
+                    "cvss_score": cve.cvss_score,
+                    "severity": cve.severity.value,
+                    "description": cve.description,
+                    "exploit_available": cve.exploit_available,
+                    "mitre_techniques": cve.mitre_techniques
+                } for cve in profile.high_risk_cves[:5]  # Top 5 high-risk
+            ],
+            "threat_indicators": [
+                {
+                    "indicator_id": indicator.indicator_id,
+                    "indicator_type": indicator.indicator_type,
+                    "value": indicator.value,
+                    "severity": indicator.severity.value,
+                    "category": indicator.category.value,
+                    "confidence": indicator.confidence,
+                    "description": indicator.description,
+                    "tags": indicator.tags
+                } for indicator in profile.threat_indicators[:5]  # Top 5 indicators
+            ]
+        }
+    
+    except Exception as e:
+        logger.error(f"Threat profile error for {node_type}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get threat profile: {str(e)}")
+
+@api_router.post("/threat-intelligence/correlate-vulnerabilities")
+async def correlate_vulnerabilities(request: Dict[str, Any]):
+    """Correlate vulnerabilities across multiple nodes"""
+    node_configs = request.get("node_configs", [])
+    
+    if not node_configs:
+        raise HTTPException(status_code=400, detail="No node configurations provided")
+    
+    try:
+        correlation_result = await threat_intelligence_engine.correlate_vulnerabilities(node_configs)
+        
+        return {
+            "correlation_analysis": correlation_result,
+            "risk_summary": {
+                "overall_risk_level": "Critical" if correlation_result["overall_risk_score"] >= 8.0 else
+                                     "High" if correlation_result["overall_risk_score"] >= 6.0 else
+                                     "Medium" if correlation_result["overall_risk_score"] >= 4.0 else "Low",
+                "correlation_strength": "High" if correlation_result["correlation_count"] >= 3 else
+                                       "Medium" if correlation_result["correlation_count"] >= 1 else "Low",
+                "recommendation": "Immediate attention required for correlated vulnerabilities" if correlation_result["correlation_count"] >= 3 else
+                                 "Review correlated attack vectors" if correlation_result["correlation_count"] >= 1 else
+                                 "Monitor for emerging correlations"
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Vulnerability correlation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Correlation analysis failed: {str(e)}")
+
+@api_router.post("/threat-intelligence/real-time-score")
+async def get_real_time_threat_score(request: Dict[str, Any]):
+    """Calculate real-time threat score based on current configuration"""
+    node_type = request.get("node_type")
+    configuration = request.get("configuration", {})
+    
+    if not node_type:
+        raise HTTPException(status_code=400, detail="Node type is required")
+    
+    try:
+        threat_score = await threat_intelligence_engine.get_real_time_threat_score(node_type, configuration)
+        
+        # Get base profile for comparison
+        profile = await threat_intelligence_engine.get_node_threat_profile(node_type)
+        baseline_score = profile.threat_score
+        
+        score_delta = threat_score - baseline_score
+        
+        return {
+            "node_type": node_type,
+            "real_time_threat_score": round(threat_score, 2),
+            "baseline_threat_score": round(baseline_score, 2),
+            "score_delta": round(score_delta, 2),
+            "threat_level": "Critical" if threat_score >= 8.0 else
+                           "High" if threat_score >= 6.0 else
+                           "Medium" if threat_score >= 4.0 else "Low",
+            "risk_factors": {
+                "configuration_impact": "Increases Risk" if score_delta > 0 else "Reduces Risk" if score_delta < 0 else "Neutral",
+                "impact_magnitude": abs(score_delta),
+                "primary_concerns": _identify_primary_concerns(configuration, score_delta)
+            },
+            "recommendations": _generate_threat_recommendations(node_type, configuration, threat_score),
+            "calculation_timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    
+    except Exception as e:
+        logger.error(f"Real-time threat scoring error for {node_type}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Threat scoring failed: {str(e)}")
+
+def _identify_primary_concerns(configuration: Dict[str, Any], score_delta: float) -> List[str]:
+    """Identify primary security concerns from configuration"""
+    concerns = []
+    
+    if configuration.get("public_access", False):
+        concerns.append("Public exposure increases attack surface")
+    if configuration.get("weak_authentication", False):
+        concerns.append("Weak authentication enables credential attacks")
+    if configuration.get("no_encryption", False):
+        concerns.append("Lack of encryption exposes data")
+    if configuration.get("default_credentials", False):
+        concerns.append("Default credentials are easily exploited")
+    if configuration.get("outdated_version", False):
+        concerns.append("Outdated software contains known vulnerabilities")
+    
+    if score_delta < 0:  # Positive security controls
+        if configuration.get("mfa_enabled", False):
+            concerns.append("MFA significantly reduces credential risk")
+        if configuration.get("encryption_enabled", False):
+            concerns.append("Encryption protects data confidentiality")
+        if configuration.get("monitoring_enabled", False):
+            concerns.append("Monitoring enables threat detection")
+    
+    return concerns[:5]  # Top 5 concerns
+
+def _generate_threat_recommendations(node_type: str, configuration: Dict[str, Any], threat_score: float) -> List[Dict[str, str]]:
+    """Generate threat-specific recommendations"""
+    recommendations = []
+    
+    if threat_score >= 8.0:
+        recommendations.append({
+            "priority": "CRITICAL",
+            "action": "Immediate security review required",
+            "rationale": "Critical threat level detected"
+        })
+    
+    if configuration.get("public_access", False) and not configuration.get("mfa_enabled", False):
+        recommendations.append({
+            "priority": "HIGH",
+            "action": "Implement multi-factor authentication",
+            "rationale": "Public access without MFA is high-risk"
+        })
+    
+    if configuration.get("no_encryption", False):
+        recommendations.append({
+            "priority": "HIGH", 
+            "action": "Enable encryption at rest and in transit",
+            "rationale": "Unencrypted data is vulnerable to interception"
+        })
+    
+    if not configuration.get("monitoring_enabled", False):
+        recommendations.append({
+            "priority": "MEDIUM",
+            "action": "Implement security monitoring and alerting",
+            "rationale": "Monitoring enables early threat detection"
+        })
+    
+    if configuration.get("outdated_version", False):
+        recommendations.append({
+            "priority": "HIGH",
+            "action": "Update to latest version with security patches",
+            "rationale": "Outdated software contains known vulnerabilities"
+        })
+    
+    return recommendations[:5]  # Top 5 recommendations
+
+@api_router.get("/threat-intelligence/mitre/{technique_id}")
+async def get_mitre_technique_details(technique_id: str):
+    """Get details for a specific MITRE ATT&CK technique"""
+    technique_details = threat_intelligence_engine.get_mitre_technique_details(technique_id)
+    
+    if not technique_details:
+        raise HTTPException(status_code=404, detail=f"MITRE technique {technique_id} not found")
+    
+    return {
+        "technique_id": technique_id,
+        "technique_details": technique_details,
+        "related_techniques": [
+            tid for tid, details in threat_intelligence_engine.mitre_techniques_map.items() 
+            if details.get("tactic") == technique_details.get("tactic") and tid != technique_id
+        ][:5]  # Related techniques in same tactic
+    }
+
+@api_router.get("/threat-intelligence/dashboard")
+async def get_threat_intelligence_dashboard():
+    """Get overall threat intelligence dashboard data"""
+    try:
+        # Get threat profiles for major node types
+        major_node_types = ["EC2", "Lambda", "S3", "RDS", "Kubernetes", "WebApp", "Database", "API"]
+        dashboard_data = {
+            "overall_stats": {
+                "total_node_types": len(major_node_types),
+                "total_cves": 0,
+                "high_risk_nodes": 0,
+                "average_threat_score": 0.0
+            },
+            "threat_trends": [],
+            "top_threats": [],
+            "mitre_technique_coverage": {},
+            "node_risk_distribution": {}
+        }
+        
+        total_threat_score = 0.0
+        all_techniques = set()
+        
+        for node_type in major_node_types:
+            try:
+                profile = await threat_intelligence_engine.get_node_threat_profile(node_type)
+                
+                dashboard_data["overall_stats"]["total_cves"] += profile.total_cves
+                total_threat_score += profile.threat_score
+                
+                if profile.threat_score >= 7.0:
+                    dashboard_data["overall_stats"]["high_risk_nodes"] += 1
+                
+                all_techniques.update(profile.mitre_techniques)
+                
+                # Risk distribution
+                risk_level = "Critical" if profile.threat_score >= 8.0 else \
+                           "High" if profile.threat_score >= 6.0 else \
+                           "Medium" if profile.threat_score >= 4.0 else "Low"
+                
+                dashboard_data["node_risk_distribution"][node_type] = {
+                    "threat_score": profile.threat_score,
+                    "risk_level": risk_level,
+                    "cve_count": profile.total_cves,
+                    "recent_cves": len(profile.recent_cves)
+                }
+                
+                # Top threats from recent CVEs
+                for cve in profile.recent_cves[:3]:
+                    dashboard_data["top_threats"].append({
+                        "threat_id": cve.cve_id,
+                        "description": cve.description,
+                        "severity": cve.severity.value,
+                        "cvss_score": cve.cvss_score,
+                        "affected_node_types": [node_type],
+                        "published_date": cve.published_date
+                    })
+            
+            except Exception as e:
+                logger.warning(f"Failed to get profile for {node_type}: {str(e)}")
+                continue
+        
+        # Calculate averages
+        dashboard_data["overall_stats"]["average_threat_score"] = round(
+            total_threat_score / len(major_node_types), 2
+        )
+        
+        # MITRE technique coverage
+        technique_tactics = {}
+        for technique_id in all_techniques:
+            technique_details = threat_intelligence_engine.get_mitre_technique_details(technique_id)
+            if technique_details:
+                tactic = technique_details.get("tactic", "Unknown")
+                if tactic not in technique_tactics:
+                    technique_tactics[tactic] = []
+                technique_tactics[tactic].append(technique_id)
+        
+        dashboard_data["mitre_technique_coverage"] = {
+            "total_techniques": len(all_techniques),
+            "by_tactic": technique_tactics,
+            "coverage_percentage": round((len(all_techniques) / 200) * 100, 1)  # Assume ~200 total techniques
+        }
+        
+        # Sort top threats by CVSS score
+        dashboard_data["top_threats"] = sorted(
+            dashboard_data["top_threats"], 
+            key=lambda x: x["cvss_score"], 
+            reverse=True
+        )[:10]
+        
+        return {
+            "dashboard_data": dashboard_data,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "data_freshness": "Real-time simulation data for Phase 1"
+        }
+        
+    except Exception as e:
+        logger.error(f"Dashboard generation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Dashboard generation failed: {str(e)}")
+
 # DSL Rule Engine APIs - Phase 2
 @api_router.post("/diagrams/{diagram_id}/evaluate-rules")
 async def evaluate_security_rules(diagram_id: str):
