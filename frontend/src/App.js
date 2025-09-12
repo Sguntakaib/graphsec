@@ -973,6 +973,11 @@ function AppContent() {
       setCurrentQueueIndex(0);
       
       // Immediately show questionnaire for the first dependent node
+      console.log(`🚀 Setting questionnaire node:`, {
+        nodeId: allDependentNodes[0].id,
+        nodeSubtype: allDependentNodes[0].subtype || allDependentNodes[0].data?.subtype,
+        nodeData: allDependentNodes[0].data
+      });
       setCurrentQuestionnaireNode(allDependentNodes[0]);
       setShowSecurityQuestionnaire(true);
       
