@@ -116,13 +116,23 @@ class QuestionnaireLoader:
         return list(self._cache.keys())
     
     def get_questionnaire(self, node_subtype: str, level: QuestionnaireLevel) -> List[Dict]:
-        """Get questionnaire for specific node type and level"""
+        """Get questionnaire for specific level with proper scaling"""
         if node_subtype not in self._cache:
             logger.warning(f"Node type {node_subtype} not found")
             return []
         
         questionnaires = self._cache[node_subtype]
-        return questionnaires.get(level.value, [])
+        
+        # If level exists in YAML, return it
+        if level.value in questionnaires:
+            return questionnaires[level.value]
+        
+        # If level doesn't exist, scale from basic level
+        basic_questions = questionnaires.get('basic', [])
+        if not basic_questions:
+            return []
+        
+        return self._scale_questionnaire_for_level(basic_questions, level, node_subtype)
     
     def get_metadata(self, node_subtype: str) -> Optional[QuestionnaireMetadata]:
         """Get metadata for a specific node type"""
