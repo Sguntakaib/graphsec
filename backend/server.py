@@ -3472,8 +3472,10 @@ async def enhanced_rule_evaluation(request: dict):
             severity = result.impact_level
             impact_assessment["severity_distribution"][severity] = impact_assessment["severity_distribution"].get(severity, 0) + 1
             
-            # Track categories
-            impact_assessment["categories_affected"].add(result.category)
+            # Track categories - get category from the rule by ID
+            rule = dsl_rule_engine.get_rule_by_id(result.rule_id) if hasattr(dsl_rule_engine, 'get_rule_by_id') else None
+            if rule and hasattr(rule, 'category'):
+                impact_assessment["categories_affected"].add(str(rule.category))
             
             # Accumulate risk
             total_risk += result.risk_score
