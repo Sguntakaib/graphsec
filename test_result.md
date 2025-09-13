@@ -976,7 +976,7 @@ agent_communication:
         comment: "Phase 1 Enhanced APIs - POST /api/expanded-nodes/threat-intelligence-summary endpoint implemented for threat intelligence aggregation"
       - working: false
         agent: "testing"
-        comment: "❌ MISSING THREAT INTELLIGENCE INTEGRATION: Threat intelligence summary missing required fields: threat_summary, cve_data, mitre_techniques, aggregated_intelligence. Current implementation lacks comprehensive threat intelligence integration with CVE data and MITRE technique mappings expected for Phase 1 Enhanced APIs."
+        comment: "❌ API RESPONSE STRUCTURE MISMATCH: Threat intelligence summary returns different structure than expected. API returns 'aggregated_intelligence' and 'node_summaries' but test expects 'node_type_summaries', 'cross_cutting_threats', 'threat_trends', 'recommendations'. Implementation has comprehensive threat intelligence data (total_cve_count: 220, unique_threats, attack_vectors, mitre_techniques, threat_actors) but field names don't match expected API contract from review request."
 
   - task: "Threat Intelligence - Node Profile API"
     implemented: true
