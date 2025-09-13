@@ -3445,7 +3445,16 @@ async def enhanced_rule_evaluation(request: dict):
         
         # Filter by rule categories if specified
         if rule_categories:
-            rule_results = [r for r in rule_results if r.category in rule_categories]
+            # Get the rule categories by looking up rules by ID
+            filtered_results = []
+            for result in rule_results:
+                # Get the rule by ID to check its category
+                rule = dsl_rule_engine.get_rule_by_id(result.rule_id) if hasattr(dsl_rule_engine, 'get_rule_by_id') else None
+                if rule and hasattr(rule, 'category') and rule.category in rule_categories:
+                    filtered_results.append(result)
+                elif not rule_categories:  # If no categories specified, include all
+                    filtered_results.append(result)
+            rule_results = filtered_results
         
         # Calculate impact assessment
         impact_assessment = {
