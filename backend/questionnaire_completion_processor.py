@@ -146,6 +146,47 @@ class QuestionnaireCompletionProcessor:
             "synthetic": True
         }
     
+    def _create_synthetic_node(
+        self, 
+        node_id: str, 
+        node_subtype: str, 
+        security_attributes: Dict[str, Any], 
+        responses: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Create synthetic node for standalone questionnaire completion"""
+        
+        # Determine node type based on subtype
+        node_type_mapping = {
+            "WebApp": "Asset",
+            "Database": "Asset", 
+            "API": "Asset",
+            "ExternalAttacker": "Actor",
+            "Insider": "Actor",
+            "WAF": "Control",
+            "EDR": "Control"
+        }
+        
+        node_type = node_type_mapping.get(node_subtype, "Asset")
+        
+        return {
+            "id": node_id,
+            "type": node_type,
+            "subtype": node_subtype,
+            "label": f"{node_subtype} Node",
+            "position": {"x": 100, "y": 100},
+            "data": {
+                "type": node_type,
+                "subtype": node_subtype, 
+                "label": f"{node_subtype} Node",
+                "securityAttributes": security_attributes,
+                "questionnaireResponses": responses,
+                "lastQuestionnaireUpdate": datetime.now(timezone.utc).isoformat(),
+                "questionnaireCompleted": True,
+                "synthetic": True
+            },
+            "synthetic": True
+        }
+    
     async def _update_node_attributes(
         self,
         diagram_id: str,
