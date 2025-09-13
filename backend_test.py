@@ -7331,6 +7331,236 @@ class SecurityModelingAPITester:
             self.log_test("Threat Intelligence Summary", False, f"Error: {str(e)}")
             return False
 
+    # Phase 1 Enhanced APIs - Specific Review Request Tests
+    def test_multi_level_questionnaires(self):
+        """Test GET /api/expanded-nodes/EC2/questionnaire/{level} for basic/advanced/expert"""
+        levels = [
+            ("basic", 5, 8),      # Should return 5-8 questions
+            ("advanced", 15, 20), # Should return 15-20 questions  
+            ("expert", 25, 30)    # Should return 25-30 questions
+        ]
+        
+        for level, min_questions, max_questions in levels:
+            try:
+                response = self.session.get(f"{self.base_url}/expanded-nodes/EC2/questionnaire/{level}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for questions field
+                    if "questions" not in data:
+                        self.log_test(f"Multi-Level Questionnaire - EC2/{level}", False, 
+                                    "Missing 'questions' field in response")
+                        return False
+                    
+                    questions = data.get("questions", [])
+                    question_count = len(questions)
+                    
+                    # Verify question count is within expected range
+                    if min_questions <= question_count <= max_questions:
+                        self.log_test(f"Multi-Level Questionnaire - EC2/{level}", True, 
+                                    f"Question count {question_count} within expected range ({min_questions}-{max_questions})")
+                    else:
+                        self.log_test(f"Multi-Level Questionnaire - EC2/{level}", False, 
+                                    f"Question count {question_count} outside expected range ({min_questions}-{max_questions})")
+                        return False
+                        
+                else:
+                    self.log_test(f"Multi-Level Questionnaire - EC2/{level}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Multi-Level Questionnaire - EC2/{level}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_categories_api(self):
+        """Test GET /api/expanded-nodes/categories - verify direct category mapping"""
+        try:
+            response = self.session.get(f"{self.base_url}/expanded-nodes/categories")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify it returns direct category mapping instead of categories array
+                if isinstance(data, dict) and "categories" not in data:
+                    # Should be direct mapping like {"Infrastructure": [...], "Security": [...]}
+                    category_keys = list(data.keys())
+                    if category_keys:
+                        self.log_test("Categories API", True, 
+                                    f"Returns direct category mapping with {len(category_keys)} categories: {category_keys}")
+                        return True
+                    else:
+                        self.log_test("Categories API", False, "Empty category mapping returned")
+                        return False
+                elif isinstance(data, dict) and "categories" in data:
+                    self.log_test("Categories API", False, 
+                                "Returns categories array instead of direct mapping")
+                    return False
+                else:
+                    self.log_test("Categories API", False, 
+                                f"Unexpected response format: {type(data)}")
+                    return False
+            else:
+                self.log_test("Categories API", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Categories API", False, f"Error: {str(e)}")
+            return False
+
+    def test_enhanced_risk_calculation(self):
+        """Test POST /api/expanded-nodes/EC2/calculate-risk - verify 'risk_factors' field"""
+        try:
+            # Test data for EC2 risk calculation
+            test_data = {
+                "responses": {
+                    "instance_type": "t3.large",
+                    "security_groups": "restrictive",
+                    "encryption_enabled": True,
+                    "monitoring_enabled": True,
+                    "backup_strategy": "automated"
+                },
+                "business_context": {
+                    "criticality": "high",
+                    "data_classification": "confidential",
+                    "compliance_requirements": ["SOC2", "GDPR"]
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/EC2/calculate-risk",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify 'risk_factors' field is present
+                if "risk_factors" in data:
+                    risk_factors = data.get("risk_factors", {})
+                    self.log_test("Enhanced Risk Calculation", True, 
+                                f"'risk_factors' field present with {len(risk_factors)} factors")
+                    return True
+                else:
+                    self.log_test("Enhanced Risk Calculation", False, 
+                                "'risk_factors' field missing from response")
+                    return False
+            else:
+                self.log_test("Enhanced Risk Calculation", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Enhanced Risk Calculation", False, f"Error: {str(e)}")
+            return False
+
+    def test_bulk_risk_assessment(self):
+        """Test POST /api/expanded-nodes/bulk-risk-assessment - verify field names"""
+        try:
+            # Test data for bulk assessment
+            test_data = {
+                "assessments": [
+                    {
+                        "node_type": "EC2",
+                        "responses": {
+                            "instance_type": "t3.large",
+                            "security_groups": "restrictive"
+                        },
+                        "business_context": {
+                            "criticality": "high"
+                        }
+                    },
+                    {
+                        "node_type": "RDS",
+                        "responses": {
+                            "engine": "postgresql",
+                            "encryption_enabled": True
+                        },
+                        "business_context": {
+                            "criticality": "critical"
+                        }
+                    }
+                ]
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/bulk-risk-assessment",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify expected field names
+                expected_fields = ["individual_assessments", "overall_risk_summary"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if not missing_fields:
+                    individual_count = len(data.get("individual_assessments", []))
+                    self.log_test("Bulk Risk Assessment", True, 
+                                f"Correct field names: {individual_count} individual assessments, overall summary present")
+                    return True
+                else:
+                    self.log_test("Bulk Risk Assessment", False, 
+                                f"Missing expected fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Bulk Risk Assessment", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Bulk Risk Assessment", False, f"Error: {str(e)}")
+            return False
+
+    def test_threat_intelligence_summary_review(self):
+        """Test POST /api/expanded-nodes/threat-intelligence-summary - verify field names"""
+        try:
+            # Test data for threat intelligence summary
+            test_data = {
+                "node_types": ["EC2", "RDS", "S3"],
+                "time_range": "30d",
+                "include_cve_data": True,
+                "threat_sources": ["mitre", "cve", "threat_feeds"]
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/threat-intelligence-summary",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify expected field names
+                expected_fields = ["node_type_summaries", "cross_cutting_threats", "threat_trends", "recommendations"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if not missing_fields:
+                    node_summaries_count = len(data.get("node_type_summaries", {}))
+                    cross_threats_count = len(data.get("cross_cutting_threats", []))
+                    self.log_test("Threat Intelligence Summary Review", True, 
+                                f"Correct field names: {node_summaries_count} node summaries, {cross_threats_count} cross-cutting threats")
+                    return True
+                else:
+                    self.log_test("Threat Intelligence Summary Review", False, 
+                                f"Missing expected fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Threat Intelligence Summary Review", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Threat Intelligence Summary Review", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
