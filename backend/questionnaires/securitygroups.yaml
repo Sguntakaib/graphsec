@@ -1,0 +1,288 @@
+node_type: "Control"
+node_subtype: "SecurityGroups"
+category: "Network Security"
+description: "AWS EC2 Security Groups for network access control"
+required_branches:
+  - "Firewall"
+  - "NetworkSecurity"
+  - "AccessControl"
+  - "Monitoring"
+  - "Compliance"
+
+questionnaires:
+  basic:
+    - id: "sg_rule_principle"
+      question: "What principle is followed for security group rules?"
+      type: "single_choice"
+      options: ["Least Privilege (Minimal Access)", "Standard Ports Only", "Application Requirements", "Wide Open Access", "Unknown"]
+      help_text: "Least privilege principle minimizes attack surface by allowing only necessary access."
+      related_branch: "AccessControl"
+    - id: "sg_default_configuration"
+      question: "How are default security groups configured?"
+      type: "single_choice"
+      options: ["Locked Down (No Rules)", "Minimal Required Rules", "Standard Configuration", "Default AWS Settings", "Unknown"]
+      help_text: "Properly configured default security groups prevent accidental exposure."
+      related_branch: "Firewall"
+    - id: "sg_ingress_rules"
+      question: "How are ingress rules typically configured?"
+      type: "single_choice"
+      options: ["Specific Sources + Ports", "Port-Based Only", "Source-Based Only", "Any Source Allowed", "Unknown"]
+      help_text: "Specific ingress rules limit access to authorized sources and services."
+      related_branch: "NetworkSecurity"
+    - id: "sg_egress_rules"
+      question: "How are egress rules managed?"
+      type: "single_choice"
+      options: ["Explicitly Defined", "Default Allow All", "Service-Specific", "Unknown"]
+      help_text: "Explicit egress rules control outbound traffic and prevent data exfiltration."
+      related_branch: "NetworkSecurity"
+    - id: "sg_management_process"
+      question: "What process is used for security group management?"
+      type: "single_choice"
+      options: ["Automated Management", "Change Control Process", "Ad-hoc Changes", "Manual Management", "Unknown"]
+      help_text: "Structured management processes ensure consistent and secure configurations."
+      related_branch: "AccessControl"
+
+  advanced:
+    - id: "sg_naming_convention"
+      question: "Is a standardized naming convention used for security groups?"
+      type: "single_choice"
+      options: ["Comprehensive Naming Standard", "Basic Naming", "Descriptive Names", "No Standard", "Unknown"]
+      help_text: "Naming conventions improve security group management and identification."
+      related_branch: "Firewall"
+    - id: "sg_tagging_strategy"
+      question: "What tagging strategy is used for security groups?"
+      type: "single_choice"
+      options: ["Comprehensive Tagging", "Basic Tags", "Minimal Tagging", "No Tagging", "Unknown"]
+      help_text: "Proper tagging enables better organization, cost tracking, and compliance."
+      related_branch: "Compliance"
+    - id: "sg_cross_reference_control"
+      question: "How are security group cross-references controlled?"
+      type: "single_choice"
+      options: ["Strict Cross-Reference Policy", "Controlled References", "Basic Management", "No Control", "Unknown"]
+      help_text: "Controlled cross-references prevent circular dependencies and security issues."
+      related_branch: "NetworkSecurity"
+    - id: "sg_monitoring_logging"
+      question: "What monitoring and logging is implemented for security groups?"
+      type: "single_choice"
+      options: ["Comprehensive Monitoring", "Change Logging", "Basic Monitoring", "No Monitoring", "Unknown"]
+      help_text: "Monitoring security group changes helps detect unauthorized modifications."
+      related_branch: "Monitoring"
+    - id: "sg_automated_compliance"
+      question: "Is automated compliance checking implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Scheduled Compliance Checks", "Manual Reviews", "No Compliance Checking", "Unknown"]
+      help_text: "Automated compliance ensures security groups adhere to security policies."
+      related_branch: "Compliance"
+    - id: "sg_unused_groups_management"
+      question: "How are unused security groups managed?"
+      type: "single_choice"
+      options: ["Automated Cleanup", "Regular Audits", "Manual Review", "No Management", "Unknown"]
+      help_text: "Removing unused security groups reduces attack surface and management overhead."
+      related_branch: "AccessControl"
+    - id: "sg_rule_documentation"
+      question: "How are security group rules documented?"
+      type: "single_choice"
+      options: ["Comprehensive Documentation", "Basic Documentation", "Inline Comments", "No Documentation", "Unknown"]
+      help_text: "Proper documentation helps understand rule purposes and facilitates reviews."
+      related_branch: "Firewall"
+    - id: "sg_change_approval_process"
+      question: "What change approval process exists for security groups?"
+      type: "single_choice"
+      options: ["Multi-Level Approval", "Peer Review", "Automated Approval", "No Approval Process", "Unknown"]
+      help_text: "Change approval processes prevent unauthorized or risky security group modifications."
+      related_branch: "AccessControl"
+    - id: "sg_version_control"
+      question: "Is version control used for security group configurations?"
+      type: "single_choice"
+      options: ["Full Version Control", "Change Tracking", "Basic Versioning", "No Version Control", "Unknown"]
+      help_text: "Version control enables tracking changes and rolling back problematic configurations."
+      related_branch: "Firewall"
+    - id: "sg_testing_validation"
+      question: "What testing and validation is performed on security group changes?"
+      type: "single_choice"
+      options: ["Automated Testing", "Manual Validation", "Basic Testing", "No Testing", "Unknown"]
+      help_text: "Testing validates that security group changes work as intended without breaking functionality."
+      related_branch: "NetworkSecurity"
+    - id: "sg_emergency_procedures"
+      question: "What emergency procedures exist for security group issues?"
+      type: "single_choice"
+      options: ["Defined Emergency Procedures", "Basic Response Plan", "Ad-hoc Response", "No Emergency Procedures", "Unknown"]
+      help_text: "Emergency procedures enable rapid response to security group-related incidents."
+      related_branch: "AccessControl"
+    - id: "sg_cross_account_management"
+      question: "How are cross-account security group references managed?"
+      type: "single_choice"
+      options: ["Centralized Management", "Account-Specific Rules", "No Cross-Account Rules", "Unknown"]
+      help_text: "Proper cross-account management ensures consistent security across AWS accounts."
+      related_branch: "NetworkSecurity"
+    - id: "sg_application_mapping"
+      question: "How are security groups mapped to applications?"
+      type: "single_choice"
+      options: ["Application-Specific Groups", "Service-Based Mapping", "Basic Grouping", "No Mapping", "Unknown"]
+      help_text: "Application mapping ensures security groups align with business requirements."
+      related_branch: "AccessControl"
+    - id: "sg_performance_optimization"
+      question: "How is security group performance optimized?"
+      type: "single_choice"
+      options: ["Rule Optimization", "Group Consolidation", "Basic Optimization", "No Optimization", "Unknown"]
+      help_text: "Performance optimization ensures security groups don't impact network performance."
+      related_branch: "NetworkSecurity"
+    - id: "sg_backup_recovery"
+      question: "What backup and recovery exists for security group configurations?"
+      type: "single_choice"
+      options: ["Automated Backup + Recovery", "Manual Backup", "Basic Backup", "No Backup", "Unknown"]
+      help_text: "Backup and recovery enables restoration of security group configurations after incidents."
+      related_branch: "Firewall"
+    - id: "sg_integration_tools"
+      question: "What tools are integrated with security group management?"
+      type: "multiple_choice"
+      options: ["Infrastructure as Code", "Configuration Management", "Monitoring Tools", "SIEM Integration", "None"]
+      help_text: "Tool integration streamlines security group management and monitoring."
+      related_branch: "Firewall"
+    - id: "sg_anomaly_detection"
+      question: "Is anomaly detection implemented for security group changes?"
+      type: "single_choice"
+      options: ["Advanced Anomaly Detection", "Basic Change Detection", "Manual Review", "No Anomaly Detection", "Unknown"]
+      help_text: "Anomaly detection identifies unusual security group modifications that may indicate attacks."
+      related_branch: "Monitoring"
+
+  expert:
+    - id: "sg_zero_trust_implementation"
+      question: "How are security groups implemented in zero trust architecture?"
+      type: "single_choice"
+      options: ["Full Zero Trust Implementation", "Partial Zero Trust", "Traditional Security Model", "Unknown"]
+      help_text: "Zero trust implementation ensures every connection is verified and authorized."
+      related_branch: "NetworkSecurity"
+    - id: "sg_ai_powered_management"
+      question: "Is AI-powered management used for security groups?"
+      type: "single_choice"
+      options: ["AI-Driven Recommendations", "Machine Learning Analysis", "Basic AI Features", "No AI Management", "Unknown"]
+      help_text: "AI-powered management can optimize security group configurations and detect anomalies."
+      related_branch: "AccessControl"
+    - id: "sg_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for security group architecture?"
+      type: "single_choice"
+      options: ["Comprehensive Threat Model", "Network-Focused Analysis", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies network-specific attack vectors and defenses."
+      related_branch: "NetworkSecurity"
+    - id: "sg_micro_segmentation"
+      question: "How is micro-segmentation implemented with security groups?"
+      type: "single_choice"
+      options: ["Full Micro-Segmentation", "Application-Based Segmentation", "Basic Segmentation", "No Micro-Segmentation", "Unknown"]
+      help_text: "Micro-segmentation limits lateral movement in case of compromise."
+      related_branch: "NetworkSecurity"
+    - id: "sg_dynamic_rule_management"
+      question: "Is dynamic rule management implemented?"
+      type: "single_choice"
+      options: ["Context-Aware Dynamic Rules", "Time-Based Rules", "Static Rules Only", "Unknown"]
+      help_text: "Dynamic rules adapt to changing conditions and improve security posture."
+      related_branch: "AccessControl"
+    - id: "sg_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Enforcement", "Automated Remediation", "Real-time Compliance Monitoring", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to security policies."
+      related_branch: "Compliance"
+    - id: "sg_behavioral_analysis"
+      question: "Is behavioral analysis used for security group access patterns?"
+      type: "single_choice"
+      options: ["Advanced Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual access patterns that may indicate attacks."
+      related_branch: "Monitoring"
+    - id: "sg_supply_chain_integration"
+      question: "How is supply chain security integrated with security groups?"
+      type: "single_choice"
+      options: ["Supply Chain-Aware Rules", "Vendor Access Controls", "Basic Integration", "No Supply Chain Integration", "Unknown"]
+      help_text: "Supply chain integration ensures third-party access is properly controlled."
+      related_branch: "AccessControl"
+    - id: "sg_quantum_safe_networking"
+      question: "Are quantum-safe networking principles applied to security groups?"
+      type: "single_choice"
+      options: ["Quantum-Safe Network Design", "Post-Quantum Considerations", "Classical Security Only", "Unknown"]
+      help_text: "Quantum-safe networking prepares for future quantum computing threats."
+      related_branch: "NetworkSecurity"
+    - id: "sg_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for security groups?"
+      type: "multiple_choice"
+      options: ["Automated Incident Isolation", "Dynamic Rule Deployment", "Emergency Access Controls", "Forensic Rule Analysis", "None"]
+      help_text: "Advanced incident response enables rapid network-level containment and analysis."
+      related_branch: "AccessControl"
+    - id: "sg_cross_cloud_integration"
+      question: "How are security groups integrated with multi-cloud environments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Policy", "Cross-Cloud Correlation", "Basic Integration", "AWS Only", "Unknown"]
+      help_text: "Multi-cloud integration provides consistent network security across environments."
+      related_branch: "NetworkSecurity"
+    - id: "sg_advanced_analytics"
+      question: "What advanced analytics are applied to security group data?"
+      type: "single_choice"
+      options: ["Predictive Analytics", "Network Flow Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into network security patterns and trends."
+      related_branch: "Monitoring"
+    - id: "sg_privacy_protection"
+      question: "How is privacy protection implemented in security group configurations?"
+      type: "single_choice"
+      options: ["Privacy-Aware Network Design", "Data Flow Protection", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures network controls don't compromise user privacy."
+      related_branch: "Compliance"
+    - id: "sg_advanced_automation"
+      question: "What advanced automation is implemented for security groups?"
+      type: "multiple_choice"
+      options: ["Self-Healing Networks", "Adaptive Security Policies", "Intelligent Rule Optimization", "Automated Threat Response", "None"]
+      help_text: "Advanced automation improves security posture while reducing management overhead."
+      related_branch: "AccessControl"
+    - id: "sg_business_continuity_integration"
+      question: "How are security groups integrated with business continuity planning?"
+      type: "single_choice"
+      options: ["BC-Aware Network Policies", "Disaster Recovery Integration", "Basic Integration", "No BC Integration", "Unknown"]
+      help_text: "Business continuity integration ensures network security during disruptions."
+      related_branch: "NetworkSecurity"
+    - id: "sg_advanced_visualization"
+      question: "What advanced visualization tools are used for security group analysis?"
+      type: "single_choice"
+      options: ["Interactive Network Maps", "3D Security Visualization", "Basic Diagrams", "No Advanced Visualization", "Unknown"]
+      help_text: "Advanced visualization helps understand complex network security relationships."
+      related_branch: "Monitoring"
+    - id: "sg_cognitive_security"
+      question: "Is cognitive security applied to security group management?"
+      type: "single_choice"
+      options: ["Cognitive Security Systems", "AI-Enhanced Decision Making", "Basic Cognitive Features", "No Cognitive Security", "Unknown"]
+      help_text: "Cognitive security uses AI to enhance security group decision-making and management."
+      related_branch: "AccessControl"
+    - id: "sg_regulatory_adaptation"
+      question: "How do security groups adapt to changing regulatory requirements?"
+      type: "single_choice"
+      options: ["Proactive Regulatory Compliance", "Automated Policy Updates", "Manual Adaptation", "No Regulatory Adaptation", "Unknown"]
+      help_text: "Regulatory adaptation ensures network controls meet evolving compliance requirements."
+      related_branch: "Compliance"
+    - id: "sg_advanced_testing"
+      question: "What advanced testing methodologies are used for security groups?"
+      type: "multiple_choice"
+      options: ["Chaos Engineering", "Penetration Testing", "Automated Security Testing", "Continuous Validation", "None"]
+      help_text: "Advanced testing validates security group effectiveness under various conditions."
+      related_branch: "NetworkSecurity"
+    - id: "sg_future_technology_readiness"
+      question: "How prepared are security groups for future networking technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future readiness ensures security groups can evolve with new networking technologies."
+      related_branch: "NetworkSecurity"
+
+dependencies:
+  sg_vpc_integration: "VPC"
+  sg_ec2_integration: "EC2"
+  sg_loadbalancer_integration: "LoadBalancer"
+
+threat_intelligence:
+  cve_count: 30
+  recent_threats: ["Network Scanning", "Lateral Movement", "Port Exploitation"]
+  attack_vectors: ["Open Ports", "Misconfigured Rules", "Cross-Account Access"]
+  mitre_techniques: ["T1046", "T1021", "T1135"]
+  threat_actors: ["Script Kiddies", "APT Groups", "Insider Threats"]
+
+risk_factors:
+  open_to_internet: 4.5
+  wide_port_ranges: 3.5
+  cross_reference_loops: 3.0
+  no_monitoring: 2.5
+  default_configurations: 2.0

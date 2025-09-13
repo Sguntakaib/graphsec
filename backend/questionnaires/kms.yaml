@@ -1,0 +1,300 @@
+node_type: "Control"
+node_subtype: "KMS"
+category: "Security Services"
+description: "AWS Key Management Service for cryptographic key management"
+required_branches:
+  - "Encryption"
+  - "KeyManagement"
+  - "AccessControl"
+  - "Compliance"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "kms_key_type"
+      question: "What type of KMS keys are being used?"
+      type: "single_choice"
+      options: ["Customer Managed Keys", "AWS Managed Keys", "Mix of Both", "Unknown"]
+      help_text: "Customer managed keys provide more control but require additional management."
+      related_branch: "KeyManagement"
+    - id: "kms_key_rotation"
+      question: "Is automatic key rotation enabled?"
+      type: "single_choice"
+      options: ["Yes - Annual Rotation", "Yes - Custom Schedule", "No Rotation", "Unknown"]
+      help_text: "Automatic key rotation reduces the risk of key compromise over time."
+      related_branch: "KeyManagement"
+    - id: "kms_key_access_control"
+      question: "How is access to KMS keys controlled?"
+      type: "single_choice"
+      options: ["IAM Policies + Key Policies", "IAM Policies Only", "Key Policies Only", "Basic Controls", "Unknown"]
+      help_text: "Proper access control ensures only authorized users can use encryption keys."
+      related_branch: "AccessControl"
+    - id: "kms_cross_account_usage"
+      question: "Are KMS keys shared across AWS accounts?"
+      type: "single_choice"
+      options: ["Yes - With Strict Controls", "Yes - Limited Sharing", "No Cross-Account Usage", "Unknown"]
+      help_text: "Cross-account key usage requires careful permission management."
+      related_branch: "AccessControl"
+    - id: "kms_logging"
+      question: "Is KMS key usage logging enabled?"
+      type: "single_choice"
+      options: ["CloudTrail + CloudWatch", "CloudTrail Only", "Basic Logging", "No Logging", "Unknown"]
+      help_text: "Key usage logging is essential for security monitoring and compliance."
+      related_branch: "Monitoring"
+
+  advanced:
+    - id: "kms_multi_region_keys"
+      question: "Are multi-region keys used for global applications?"
+      type: "single_choice"
+      options: ["Yes - Strategic Usage", "Yes - All Keys", "No Multi-Region Keys", "Unknown"]
+      help_text: "Multi-region keys enable consistent encryption across AWS regions."
+      related_branch: "KeyManagement"
+    - id: "kms_key_material_origin"
+      question: "What is the origin of key material?"
+      type: "single_choice"
+      options: ["AWS Generated", "Customer Provided (BYOK)", "CloudHSM Generated", "Mix of Origins", "Unknown"]
+      help_text: "Key material origin affects security properties and compliance requirements."
+      related_branch: "KeyManagement"
+    - id: "kms_key_spec_usage"
+      question: "What key specifications are used?"
+      type: "multiple_choice"
+      options: ["SYMMETRIC_DEFAULT", "RSA_2048", "RSA_3072", "RSA_4096", "ECC_NIST_P256", "ECC_NIST_P384", "ECC_NIST_P521", "ECC_SECG_P256K1"]
+      help_text: "Different key specifications provide varying levels of security and performance."
+      related_branch: "Encryption"
+    - id: "kms_key_deletion_protection"
+      question: "How is accidental key deletion prevented?"
+      type: "single_choice"
+      options: ["Minimum Wait Period + Monitoring", "Wait Period Only", "No Protection", "Unknown"]
+      help_text: "Key deletion protection prevents accidental loss of encrypted data."
+      related_branch: "KeyManagement"
+    - id: "kms_envelope_encryption"
+      question: "Is envelope encryption properly implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Implementation", "Basic Implementation", "Not Implemented", "Unknown"]
+      help_text: "Envelope encryption provides performance benefits for large data encryption."
+      related_branch: "Encryption"
+    - id: "kms_grant_management"
+      question: "How are KMS grants managed?"
+      type: "single_choice"
+      options: ["Automated Grant Lifecycle", "Manual Grant Management", "No Grant Usage", "Unknown"]
+      help_text: "Proper grant management ensures temporary access is properly controlled."
+      related_branch: "AccessControl"
+    - id: "kms_key_usage_constraints"
+      question: "Are key usage constraints implemented?"
+      type: "multiple_choice"
+      options: ["Encryption Context Requirements", "Time-based Constraints", "Source IP Restrictions", "User/Role Restrictions", "None"]
+      help_text: "Key usage constraints provide additional security controls on key usage."
+      related_branch: "AccessControl"
+    - id: "kms_hsm_integration"
+      question: "Is CloudHSM integration used for sensitive keys?"
+      type: "single_choice"
+      options: ["Yes - For Sensitive Keys", "Yes - For All Keys", "No HSM Integration", "Unknown"]
+      help_text: "CloudHSM provides hardware-level security for the most sensitive keys."
+      related_branch: "KeyManagement"
+    - id: "kms_cross_service_integration"
+      question: "How is KMS integrated with other AWS services?"
+      type: "multiple_choice"
+      options: ["S3 Encryption", "EBS Encryption", "RDS Encryption", "Lambda Environment Variables", "Secrets Manager", "Parameter Store", "Custom Applications"]
+      help_text: "Cross-service integration ensures consistent encryption across AWS services."
+      related_branch: "Encryption"
+    - id: "kms_key_policy_validation"
+      question: "How are key policies validated for security?"
+      type: "single_choice"
+      options: ["Automated Policy Analysis", "Manual Review Process", "Basic Validation", "No Validation", "Unknown"]
+      help_text: "Key policy validation ensures permissions follow security best practices."
+      related_branch: "AccessControl"
+    - id: "kms_compliance_monitoring"
+      question: "How is compliance monitored for KMS usage?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Periodic Audits", "Basic Monitoring", "No Compliance Monitoring", "Unknown"]
+      help_text: "Compliance monitoring ensures KMS usage meets regulatory requirements."
+      related_branch: "Compliance"
+    - id: "kms_disaster_recovery"
+      question: "What disaster recovery measures are in place for keys?"
+      type: "single_choice"
+      options: ["Multi-Region Backup Strategy", "Cross-Region Replication", "Basic Backup", "No DR Plan", "Unknown"]
+      help_text: "Disaster recovery ensures key availability during outages or disasters."
+      related_branch: "KeyManagement"
+    - id: "kms_performance_optimization"
+      question: "How is KMS performance optimized?"
+      type: "multiple_choice"
+      options: ["Data Key Caching", "Regional Optimization", "Batch Operations", "Connection Pooling", "None"]
+      help_text: "Performance optimization reduces latency and improves application performance."
+      related_branch: "Encryption"
+    - id: "kms_encryption_context_strategy"
+      question: "How is encryption context strategically used?"
+      type: "single_choice"
+      options: ["Comprehensive Context Strategy", "Basic Context Usage", "No Encryption Context", "Unknown"]
+      help_text: "Encryption context provides additional authenticated data for encryption operations."
+      related_branch: "Encryption"
+    - id: "kms_key_lifecycle_automation"
+      question: "Is key lifecycle management automated?"
+      type: "single_choice"
+      options: ["Fully Automated Lifecycle", "Partial Automation", "Manual Management", "Unknown"]
+      help_text: "Automated lifecycle management ensures consistent key management practices."
+      related_branch: "KeyManagement"
+    - id: "kms_threat_detection"
+      question: "What threat detection is in place for KMS?"
+      type: "multiple_choice"
+      options: ["GuardDuty Integration", "CloudTrail Analysis", "Custom Monitoring", "Anomaly Detection", "None"]
+      help_text: "Threat detection helps identify potential key compromise or misuse."
+      related_branch: "Monitoring"
+    - id: "kms_data_classification_integration"
+      question: "How is KMS integrated with data classification?"
+      type: "single_choice"
+      options: ["Classification-Based Key Selection", "Basic Integration", "No Integration", "Unknown"]
+      help_text: "Data classification integration ensures appropriate encryption for different data types."
+      related_branch: "Encryption"
+
+  expert:
+    - id: "kms_quantum_resistance_planning"
+      question: "What quantum resistance planning is in place?"
+      type: "single_choice"
+      options: ["Post-Quantum Cryptography Migration Plan", "Hybrid Classical-Quantum Approach", "Future Planning Only", "No Quantum Planning", "Unknown"]
+      help_text: "Quantum resistance planning prepares for future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "kms_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for KMS usage?"
+      type: "single_choice"
+      options: ["Comprehensive Cryptographic Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies specific cryptographic vulnerabilities."
+      related_branch: "KeyManagement"
+    - id: "kms_zero_trust_architecture"
+      question: "How is KMS integrated into zero trust architecture?"
+      type: "single_choice"
+      options: ["Full Zero Trust Integration", "Partial Integration", "Traditional Security Model", "Unknown"]
+      help_text: "Zero trust integration ensures keys are protected under never trust, always verify principles."
+      related_branch: "AccessControl"
+    - id: "kms_advanced_monitoring_analytics"
+      question: "What advanced monitoring and analytics are implemented?"
+      type: "multiple_choice"
+      options: ["Machine Learning Anomaly Detection", "Behavioral Analysis", "Predictive Analytics", "Real-time Alerting", "None"]
+      help_text: "Advanced analytics provide deeper insights into key usage patterns and threats."
+      related_branch: "Monitoring"
+    - id: "kms_cryptographic_agility"
+      question: "How is cryptographic agility implemented?"
+      type: "single_choice"
+      options: ["Full Algorithm Agility", "Partial Agility", "Fixed Cryptographic Standards", "Unknown"]
+      help_text: "Cryptographic agility enables quick migration to new algorithms when needed."
+      related_branch: "Encryption"
+    - id: "kms_advanced_access_patterns"
+      question: "What advanced access patterns are implemented?"
+      type: "multiple_choice"
+      options: ["Attribute-Based Access Control", "Context-Aware Access", "Risk-Based Access", "Time-Based Access", "None"]
+      help_text: "Advanced access patterns provide fine-grained control over key usage."
+      related_branch: "AccessControl"
+    - id: "kms_supply_chain_security"
+      question: "How is supply chain security ensured for cryptographic operations?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "Basic Vendor Assessment", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures cryptographic implementations are trustworthy."
+      related_branch: "KeyManagement"
+    - id: "kms_incident_response_crypto"
+      question: "What cryptographic incident response capabilities exist?"
+      type: "multiple_choice"
+      options: ["Key Compromise Response", "Cryptographic Forensics", "Emergency Key Rotation", "Crypto-Shredding", "None"]
+      help_text: "Cryptographic incident response enables quick response to key-related security incidents."
+      related_branch: "KeyManagement"
+    - id: "kms_advanced_compliance_automation"
+      question: "How is advanced compliance automation implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Validation", "Automated Compliance Reporting", "Basic Compliance Checks", "Manual Compliance", "Unknown"]
+      help_text: "Advanced compliance automation ensures continuous adherence to cryptographic standards."
+      related_branch: "Compliance"
+    - id: "kms_homomorphic_encryption_support"
+      question: "Is homomorphic encryption supported for advanced use cases?"
+      type: "single_choice"
+      options: ["Full Homomorphic Encryption", "Partial Homomorphic Encryption", "No Homomorphic Support", "Unknown"]
+      help_text: "Homomorphic encryption enables computation on encrypted data without decryption."
+      related_branch: "Encryption"
+    - id: "kms_multi_party_computation"
+      question: "Is multi-party computation implemented for key operations?"
+      type: "single_choice"
+      options: ["Full MPC Implementation", "Partial MPC Usage", "No MPC", "Unknown"]
+      help_text: "Multi-party computation enables secure key operations across multiple parties."
+      related_branch: "KeyManagement"
+    - id: "kms_advanced_key_escrow"
+      question: "What advanced key escrow mechanisms are in place?"
+      type: "single_choice"
+      options: ["Distributed Key Escrow", "Traditional Escrow", "No Key Escrow", "Unknown"]
+      help_text: "Advanced key escrow ensures key recovery while maintaining security."
+      related_branch: "KeyManagement"
+    - id: "kms_cryptographic_proofs"
+      question: "Are cryptographic proofs used for key operations verification?"
+      type: "single_choice"
+      options: ["Zero-Knowledge Proofs", "Digital Signatures", "Basic Verification", "No Cryptographic Proofs", "Unknown"]
+      help_text: "Cryptographic proofs provide mathematical verification of key operations."
+      related_branch: "Encryption"
+    - id: "kms_advanced_entropy_management"
+      question: "How is entropy management optimized for key generation?"
+      type: "single_choice"
+      options: ["Advanced Entropy Sources", "Hardware Random Number Generators", "Standard Entropy", "Unknown"]
+      help_text: "Advanced entropy management ensures high-quality randomness for key generation."
+      related_branch: "KeyManagement"
+    - id: "kms_blockchain_integration"
+      question: "Is blockchain technology integrated for key attestation?"
+      type: "single_choice"
+      options: ["Blockchain-Based Attestation", "Distributed Ledger Integration", "No Blockchain Integration", "Unknown"]
+      help_text: "Blockchain integration provides immutable records of key operations."
+      related_branch: "KeyManagement"
+    - id: "kms_advanced_performance_monitoring"
+      question: "What advanced performance monitoring is implemented?"
+      type: "multiple_choice"
+      options: ["Latency Analysis", "Throughput Optimization", "Resource Utilization Monitoring", "Performance Prediction", "None"]
+      help_text: "Advanced performance monitoring ensures optimal cryptographic operation performance."
+      related_branch: "Monitoring"
+    - id: "kms_ai_ml_security_integration"
+      question: "How is AI/ML integrated into KMS security?"
+      type: "single_choice"
+      options: ["AI-Powered Threat Detection", "ML-Based Usage Analysis", "Basic Integration", "No AI/ML Integration", "Unknown"]
+      help_text: "AI/ML integration enhances security monitoring and threat detection capabilities."
+      related_branch: "Monitoring"
+    - id: "kms_advanced_cryptographic_protocols"
+      question: "What advanced cryptographic protocols are supported?"
+      type: "multiple_choice"
+      options: ["Threshold Cryptography", "Secret Sharing", "Proxy Re-encryption", "Identity-Based Encryption", "None"]
+      help_text: "Advanced cryptographic protocols provide specialized security capabilities."
+      related_branch: "Encryption"
+    - id: "kms_regulatory_adaptation"
+      question: "How does the system adapt to changing regulatory requirements?"
+      type: "single_choice"
+      options: ["Proactive Regulatory Monitoring", "Reactive Compliance Updates", "No Regulatory Adaptation", "Unknown"]
+      help_text: "Regulatory adaptation ensures ongoing compliance with evolving requirements."
+      related_branch: "Compliance"
+    - id: "kms_advanced_secure_communication"
+      question: "What advanced secure communication protocols are used?"
+      type: "single_choice"
+      options: ["Post-Quantum Secure Channels", "Advanced TLS Configurations", "Standard Protocols", "Unknown"]
+      help_text: "Advanced secure communication ensures protection of cryptographic operations in transit."
+      related_branch: "Encryption"
+    - id: "kms_crisis_management_crypto"
+      question: "What cryptographic crisis management capabilities exist?"
+      type: "multiple_choice"
+      options: ["Emergency Key Revocation", "Crisis Communication Protocols", "Rapid Algorithm Migration", "Cryptographic Containment", "None"]
+      help_text: "Crisis management ensures rapid response to cryptographic emergencies."
+      related_branch: "KeyManagement"
+    - id: "kms_future_technology_readiness"
+      question: "How prepared is the system for future cryptographic technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology readiness ensures the system can evolve with cryptographic advances."
+      related_branch: "KeyManagement"
+
+dependencies:
+  kms_s3_integration: "S3"
+  kms_rds_integration: "RDS"
+  kms_ebs_integration: "EC2"
+
+threat_intelligence:
+  cve_count: 20
+  recent_threats: ["Key Compromise", "Cryptographic Attacks", "Side-Channel Attacks"]
+  attack_vectors: ["Key Extraction", "Algorithm Weaknesses", "Implementation Flaws"]
+  mitre_techniques: ["T1552", "T1555", "T1027"]
+  threat_actors: ["APT Groups", "Cryptographic Researchers"]
+
+risk_factors:
+  weak_key_policy: 4.0
+  no_key_rotation: 3.5
+  cross_account_misconfig: 3.0
+  insufficient_monitoring: 2.5
+  no_hsm_integration: 2.0

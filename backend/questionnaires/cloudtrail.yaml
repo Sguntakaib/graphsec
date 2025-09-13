@@ -1,0 +1,294 @@
+node_type: "Control"
+node_subtype: "CloudTrail"
+category: "Security Services"
+description: "AWS CloudTrail audit logging and monitoring service"
+required_branches:
+  - "AuditLogging"
+  - "Monitoring"
+  - "Compliance"
+  - "IncidentResponse"
+  - "DataIntegrity"
+
+questionnaires:
+  basic:
+    - id: "cloudtrail_enabled"
+      question: "Is CloudTrail enabled across all AWS regions?"
+      type: "single_choice"
+      options: ["Yes - All Regions", "Yes - Selected Regions", "Single Region Only", "Not Enabled", "Unknown"]
+      help_text: "Multi-region CloudTrail provides comprehensive audit coverage."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_log_file_integrity"
+      question: "Is log file integrity validation enabled?"
+      type: "single_choice"
+      options: ["Yes - With SNS Notifications", "Yes - Basic Validation", "Not Enabled", "Unknown"]
+      help_text: "Log file integrity validation detects unauthorized modifications to audit logs."
+      related_branch: "DataIntegrity"
+    - id: "cloudtrail_s3_bucket_security"
+      question: "How is the CloudTrail S3 bucket secured?"
+      type: "single_choice"
+      options: ["Dedicated Bucket + Encryption + Access Controls", "Basic Bucket Security", "Shared Bucket", "Minimal Security", "Unknown"]
+      help_text: "Proper S3 bucket security protects audit logs from unauthorized access."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_event_types"
+      question: "What types of events are being logged?"
+      type: "single_choice"
+      options: ["Management + Data + Insights Events", "Management + Data Events", "Management Events Only", "Basic Events", "Unknown"]
+      help_text: "Comprehensive event logging provides better security visibility."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_monitoring"
+      question: "How are CloudTrail logs monitored?"
+      type: "single_choice"
+      options: ["Real-time Analysis + Alerts", "CloudWatch Integration", "Basic Monitoring", "No Monitoring", "Unknown"]
+      help_text: "Active monitoring enables rapid detection of security events."
+      related_branch: "Monitoring"
+
+  advanced:
+    - id: "cloudtrail_organization_trail"
+      question: "Is an organization-wide CloudTrail configured?"
+      type: "single_choice"
+      options: ["Yes - Organization Trail", "Yes - Multiple Account Trails", "Single Account Only", "Unknown"]
+      help_text: "Organization trails provide centralized logging across all AWS accounts."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_data_events"
+      question: "What data events are being captured?"
+      type: "multiple_choice"
+      options: ["S3 Object-level", "Lambda Function Invocations", "DynamoDB", "CloudFormation", "Secrets Manager", "None"]
+      help_text: "Data events provide visibility into resource-level operations."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_insights_events"
+      question: "Are CloudTrail Insights events enabled?"
+      type: "single_choice"
+      options: ["Yes - Write Events", "Yes - Read Events", "Yes - Both", "Not Enabled", "Unknown"]
+      help_text: "Insights events identify unusual activity patterns in AWS account usage."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_log_encryption"
+      question: "How are CloudTrail logs encrypted?"
+      type: "single_choice"
+      options: ["Customer Managed KMS Keys", "AWS Managed KMS Keys", "S3 Server-Side Encryption", "No Encryption", "Unknown"]
+      help_text: "Proper encryption protects audit logs from unauthorized access."
+      related_branch: "DataIntegrity"
+    - id: "cloudtrail_log_aggregation"
+      question: "How are logs aggregated from multiple sources?"
+      type: "single_choice"
+      options: ["Centralized SIEM Integration", "CloudWatch Logs", "S3 Cross-Region Replication", "Basic Aggregation", "No Aggregation"]
+      help_text: "Log aggregation enables comprehensive security analysis across environments."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_real_time_processing"
+      question: "Is real-time log processing implemented?"
+      type: "single_choice"
+      options: ["CloudWatch Events + Lambda", "Kinesis Streams", "SQS Integration", "No Real-time Processing", "Unknown"]
+      help_text: "Real-time processing enables immediate response to security events."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_log_retention"
+      question: "What is the log retention policy?"
+      type: "single_choice"
+      options: ["Long-term (> 2 years)", "Standard (1-2 years)", "Short-term (< 1 year)", "No Defined Policy", "Unknown"]
+      help_text: "Appropriate retention policies support compliance and forensic requirements."
+      related_branch: "Compliance"
+    - id: "cloudtrail_log_analysis"
+      question: "What automated log analysis is performed?"
+      type: "multiple_choice"
+      options: ["Anomaly Detection", "Threat Pattern Recognition", "Compliance Checking", "User Behavior Analysis", "None"]
+      help_text: "Automated analysis helps identify security threats and compliance issues."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_cross_account_logging"
+      question: "How is cross-account logging secured?"
+      type: "single_choice"
+      options: ["Strict Cross-Account Policies", "Basic Cross-Account Setup", "No Cross-Account Logging", "Unknown"]
+      help_text: "Secure cross-account logging prevents unauthorized access to audit data."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_api_filtering"
+      question: "Are API calls filtered for security relevance?"
+      type: "single_choice"
+      options: ["Security-Focused Filtering", "Administrative Actions", "All API Calls", "Basic Filtering", "Unknown"]
+      help_text: "Filtering helps focus on security-relevant events while managing log volume."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_integration_siem"
+      question: "How is CloudTrail integrated with SIEM systems?"
+      type: "single_choice"
+      options: ["Real-time SIEM Integration", "Batch SIEM Integration", "Manual Log Review", "No SIEM Integration", "Unknown"]
+      help_text: "SIEM integration enables comprehensive security event correlation."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_log_tampering_detection"
+      question: "What log tampering detection is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Integrity Monitoring", "Basic File Validation", "Hash Verification", "No Tampering Detection", "Unknown"]
+      help_text: "Tampering detection ensures audit log integrity and reliability."
+      related_branch: "DataIntegrity"
+    - id: "cloudtrail_compliance_reporting"
+      question: "How is compliance reporting automated from CloudTrail data?"
+      type: "single_choice"
+      options: ["Automated Compliance Dashboards", "Scheduled Reports", "Manual Report Generation", "No Compliance Reporting", "Unknown"]
+      help_text: "Automated reporting streamlines compliance demonstration and auditing."
+      related_branch: "Compliance"
+    - id: "cloudtrail_incident_investigation"
+      question: "How is CloudTrail used for incident investigation?"
+      type: "single_choice"
+      options: ["Integrated Investigation Tools", "Custom Investigation Queries", "Manual Log Review", "Not Used for Investigation", "Unknown"]
+      help_text: "Proper investigation tools enable effective forensic analysis of security incidents."
+      related_branch: "IncidentResponse"
+    - id: "cloudtrail_performance_optimization"
+      question: "How is CloudTrail performance optimized?"
+      type: "multiple_choice"
+      options: ["Log Sampling", "Event Filtering", "Parallel Processing", "Storage Optimization", "None"]
+      help_text: "Performance optimization balances comprehensive logging with system efficiency."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_cost_optimization"
+      question: "What cost optimization strategies are implemented?"
+      type: "single_choice"
+      options: ["Intelligent Tiering", "Selective Event Logging", "Storage Class Optimization", "No Cost Optimization", "Unknown"]
+      help_text: "Cost optimization maintains security logging while managing expenses."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_alerting_system"
+      question: "What alerting system is configured for CloudTrail?"
+      type: "single_choice"
+      options: ["Multi-Channel Alerting", "CloudWatch Alarms", "SNS Notifications", "No Alerting", "Unknown"]
+      help_text: "Comprehensive alerting ensures rapid notification of security events."
+      related_branch: "Monitoring"
+
+  expert:
+    - id: "cloudtrail_advanced_threat_detection"
+      question: "What advanced threat detection is implemented with CloudTrail?"
+      type: "single_choice"
+      options: ["ML-Based Anomaly Detection", "Behavioral Analysis", "Pattern Recognition", "Basic Detection", "No Advanced Detection"]
+      help_text: "Advanced threat detection identifies sophisticated attack patterns in audit logs."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_forensic_capabilities"
+      question: "What forensic capabilities are built into CloudTrail analysis?"
+      type: "multiple_choice"
+      options: ["Timeline Reconstruction", "Attack Chain Analysis", "Evidence Preservation", "Legal Hold Capabilities", "None"]
+      help_text: "Forensic capabilities enable thorough investigation of security incidents."
+      related_branch: "IncidentResponse"
+    - id: "cloudtrail_zero_trust_integration"
+      question: "How is CloudTrail integrated into zero trust architecture?"
+      type: "single_choice"
+      options: ["Continuous Verification Logging", "Trust Boundary Monitoring", "Basic Integration", "No Zero Trust Integration", "Unknown"]
+      help_text: "Zero trust integration ensures all access is logged and verified."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_ai_powered_analysis"
+      question: "Is AI-powered analysis used for CloudTrail data?"
+      type: "single_choice"
+      options: ["Advanced AI Analytics", "Machine Learning Models", "Basic AI Features", "No AI Analysis", "Unknown"]
+      help_text: "AI-powered analysis can identify complex attack patterns and anomalies."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_blockchain_integrity"
+      question: "Is blockchain technology used for log integrity verification?"
+      type: "single_choice"
+      options: ["Blockchain-Based Integrity", "Distributed Ledger Verification", "No Blockchain Integration", "Unknown"]
+      help_text: "Blockchain integration provides immutable audit trail verification."
+      related_branch: "DataIntegrity"
+    - id: "cloudtrail_quantum_safe_logging"
+      question: "Are quantum-safe cryptographic methods used for log protection?"
+      type: "single_choice"
+      options: ["Post-Quantum Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe logging prepares for future quantum computing threats."
+      related_branch: "DataIntegrity"
+    - id: "cloudtrail_advanced_correlation"
+      question: "What advanced correlation techniques are used?"
+      type: "multiple_choice"
+      options: ["Cross-Service Correlation", "Multi-Account Analysis", "Temporal Analysis", "Geospatial Correlation", "None"]
+      help_text: "Advanced correlation provides comprehensive security event analysis."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_privacy_protection"
+      question: "How is privacy protection implemented in audit logging?"
+      type: "single_choice"
+      options: ["Advanced Privacy Controls", "Data Masking", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures audit logging doesn't compromise user privacy."
+      related_branch: "Compliance"
+    - id: "cloudtrail_supply_chain_monitoring"
+      question: "How is supply chain activity monitored through CloudTrail?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Logging", "Vendor Activity Monitoring", "Basic Monitoring", "No Supply Chain Monitoring", "Unknown"]
+      help_text: "Supply chain monitoring identifies potential third-party security risks."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_insider_threat_detection"
+      question: "What insider threat detection capabilities are implemented?"
+      type: "multiple_choice"
+      options: ["User Behavior Analytics", "Privileged Access Monitoring", "Anomaly Detection", "Access Pattern Analysis", "None"]
+      help_text: "Insider threat detection identifies malicious or negligent insider activities."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_advanced_retention_management"
+      question: "How is advanced retention management implemented?"
+      type: "single_choice"
+      options: ["Intelligent Lifecycle Management", "Compliance-Driven Retention", "Basic Retention Policies", "No Advanced Management", "Unknown"]
+      help_text: "Advanced retention management optimizes storage while meeting compliance requirements."
+      related_branch: "Compliance"
+    - id: "cloudtrail_crisis_response_integration"
+      question: "How is CloudTrail integrated into crisis response procedures?"
+      type: "single_choice"
+      options: ["Automated Crisis Detection", "Emergency Analysis Tools", "Basic Integration", "No Crisis Integration", "Unknown"]
+      help_text: "Crisis response integration enables rapid response to major security incidents."
+      related_branch: "IncidentResponse"
+    - id: "cloudtrail_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Audit Preparation", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to regulatory requirements."
+      related_branch: "Compliance"
+    - id: "cloudtrail_threat_intelligence_integration"
+      question: "How is threat intelligence integrated with CloudTrail analysis?"
+      type: "single_choice"
+      options: ["Real-time Threat Feed Integration", "Threat Intelligence Correlation", "Basic Integration", "No Threat Intelligence", "Unknown"]
+      help_text: "Threat intelligence integration enhances detection of known attack patterns."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_advanced_visualization"
+      question: "What advanced visualization tools are used for CloudTrail data?"
+      type: "single_choice"
+      options: ["Interactive Security Dashboards", "3D Attack Visualization", "Basic Charts", "No Advanced Visualization", "Unknown"]
+      help_text: "Advanced visualization helps analysts quickly understand complex security events."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_predictive_analysis"
+      question: "Is predictive analysis used with CloudTrail data?"
+      type: "single_choice"
+      options: ["Advanced Predictive Models", "Trend Analysis", "Basic Prediction", "No Predictive Analysis", "Unknown"]
+      help_text: "Predictive analysis helps anticipate and prevent future security incidents."
+      related_branch: "Monitoring"
+    - id: "cloudtrail_multi_cloud_integration"
+      question: "How is CloudTrail integrated with multi-cloud logging?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Logging", "Cross-Cloud Correlation", "Basic Integration", "AWS Only", "Unknown"]
+      help_text: "Multi-cloud integration provides comprehensive visibility across cloud environments."
+      related_branch: "AuditLogging"
+    - id: "cloudtrail_advanced_data_protection"
+      question: "What advanced data protection is implemented for logs?"
+      type: "multiple_choice"
+      options: ["End-to-End Encryption", "Zero-Knowledge Architecture", "Confidential Computing", "Homomorphic Encryption", "None"]
+      help_text: "Advanced data protection ensures log confidentiality and integrity."
+      related_branch: "DataIntegrity"
+    - id: "cloudtrail_regulatory_adaptation"
+      question: "How does the system adapt to changing regulatory requirements?"
+      type: "single_choice"
+      options: ["Proactive Regulatory Monitoring", "Automated Compliance Updates", "Manual Adaptation", "No Regulatory Adaptation", "Unknown"]
+      help_text: "Regulatory adaptation ensures ongoing compliance with evolving requirements."
+      related_branch: "Compliance"
+    - id: "cloudtrail_advanced_incident_correlation"
+      question: "What advanced incident correlation is performed?"
+      type: "single_choice"
+      options: ["Multi-Source Incident Correlation", "Timeline-Based Analysis", "Basic Correlation", "No Advanced Correlation", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive incident analysis across multiple sources."
+      related_branch: "IncidentResponse"
+    - id: "cloudtrail_future_technology_integration"
+      question: "How prepared is the system for future logging technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures the system can evolve with new logging capabilities."
+      related_branch: "AuditLogging"
+
+dependencies:
+  cloudtrail_s3_integration: "S3"
+  cloudtrail_kms_integration: "KMS"
+  cloudtrail_sns_integration: "MessageQueue"
+
+threat_intelligence:
+  cve_count: 15
+  recent_threats: ["Log Tampering", "Audit Bypass", "Data Exfiltration"]
+  attack_vectors: ["Log Manipulation", "Access Control Bypass", "Data Mining"]
+  mitre_techniques: ["T1562", "T1070", "T1530"]
+  threat_actors: ["Insider Threats", "APT Groups"]
+
+risk_factors:
+  no_log_integrity: 4.5
+  insufficient_monitoring: 3.5
+  weak_access_controls: 3.0
+  no_encryption: 2.5
+  incomplete_coverage: 2.0
