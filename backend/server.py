@@ -46,6 +46,7 @@ executor = ThreadPoolExecutor(max_workers=4)
 
 # Initialize expanded intelligent node engine
 expanded_node_engine = ExpandedIntelligentNodeEngine()
+questionnaire_loader = get_questionnaire_loader()
 
 # Default Security Templates Data
 def get_default_templates():
