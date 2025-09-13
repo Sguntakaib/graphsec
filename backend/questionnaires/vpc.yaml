@@ -1,0 +1,318 @@
+node_type: "Asset"
+node_subtype: "VPC"
+category: "Network Infrastructure" 
+description: "Amazon Virtual Private Cloud"
+required_branches:
+  - "NetworkSecurity"
+  - "NetworkSegmentation"
+  - "Firewall"
+  - "Monitoring"
+  - "AccessControl"
+
+questionnaires:
+  basic:
+    - id: "vpc_cidr_block"
+      question: "What CIDR block size is used for this VPC?"
+      type: "single_choice"
+      options: ["/16 (65,536 IPs)", "/20 (4,096 IPs)", "/24 (256 IPs)", "/28 (16 IPs)", "Other", "Unknown"]
+      help_text: "CIDR block size affects available IP addresses and network design flexibility."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_public_subnets"
+      question: "Are there public subnets in this VPC?"
+      type: "single_choice"
+      options: ["Yes - Multiple public subnets", "Yes - Single public subnet", "No public subnets", "Unknown"]
+      help_text: "Public subnets increase attack surface and require careful security configuration."
+      related_branch: "NetworkSegmentation"
+    - id: "vpc_internet_gateway"
+      question: "Is an Internet Gateway attached to this VPC?"
+      type: "single_choice"
+      options: ["Yes - IGW attached", "No - Private VPC", "Unknown"]
+      help_text: "Internet Gateway enables internet connectivity but increases security considerations."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_nat_gateway"
+      question: "Are NAT Gateways configured for private subnets?"
+      type: "single_choice"
+      options: ["NAT Gateway in each AZ", "Single NAT Gateway", "NAT Instance", "No NAT configured", "Unknown"]
+      help_text: "NAT configuration affects outbound internet access security for private resources."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_dns_settings"
+      question: "What DNS settings are configured?"
+      type: "multiple_choice"
+      options: ["DNS resolution enabled", "DNS hostnames enabled", "Custom DNS servers", "Default settings", "Unknown"]
+      help_text: "DNS configuration affects name resolution and can impact security."
+      related_branch: "NetworkSecurity"
+
+  advanced:
+    - id: "vpc_flow_logs"
+      question: "Are VPC Flow Logs enabled?"
+      type: "single_choice"
+      options: ["All traffic logging", "Accepted traffic only", "Rejected traffic only", "Flow logs disabled", "Unknown"]
+      help_text: "VPC Flow Logs provide network traffic visibility for security monitoring."
+      related_branch: "Monitoring"
+    - id: "vpc_network_acls"
+      question: "How are Network ACLs configured?"
+      type: "single_choice"
+      options: ["Custom restrictive ACLs", "Modified default ACLs", "Default ACLs only", "Unknown"]
+      help_text: "Network ACLs provide subnet-level firewall controls."
+      related_branch: "Firewall"
+    - id: "vpc_security_groups_strategy"
+      question: "What security group strategy is implemented?"
+      type: "single_choice"
+      options: ["Least privilege per service", "Application-tier based", "Basic security groups", "Default security groups", "Unknown"]
+      help_text: "Security group strategy determines instance-level access controls."
+      related_branch: "Firewall"
+    - id: "vpc_route_tables"
+      question: "How are route tables configured for security?"
+      type: "single_choice"
+      options: ["Separate route tables per tier", "Custom routing rules", "Default route tables", "Unknown"]
+      help_text: "Route table configuration affects traffic flow and network segmentation."
+      related_branch: "NetworkSegmentation"
+    - id: "vpc_endpoints"
+      question: "Are VPC Endpoints configured for AWS services?"
+      type: "single_choice"
+      options: ["Multiple interface endpoints", "Gateway endpoints only", "No VPC endpoints", "Unknown"]
+      help_text: "VPC Endpoints provide secure access to AWS services without internet routing."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_peering"
+      question: "Is VPC Peering configured with other VPCs?"
+      type: "single_choice"
+      options: ["Secure peering with access controls", "Standard VPC peering", "No VPC peering", "Unknown"]
+      help_text: "VPC Peering enables network connectivity between VPCs and requires security considerations."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_transit_gateway"
+      question: "Is AWS Transit Gateway used for connectivity?"
+      type: "single_choice"
+      options: ["Transit Gateway with route tables", "Basic Transit Gateway", "No Transit Gateway", "Unknown"]
+      help_text: "Transit Gateway centralizes network connectivity and enables advanced routing controls."
+      related_branch: "NetworkSecurity"  
+    - id: "vpc_direct_connect"
+      question: "Is AWS Direct Connect used for on-premises connectivity?"
+      type: "single_choice"
+      options: ["Dedicated connection", "Hosted connection", "No Direct Connect", "Unknown"]
+      help_text: "Direct Connect provides dedicated network connectivity with specific security considerations."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_vpn_connections"
+      question: "Are Site-to-Site VPN connections configured?"
+      type: "single_choice"
+      options: ["Multiple VPN tunnels", "Single VPN connection", "No VPN connections", "Unknown"]
+      help_text: "VPN connections provide encrypted connectivity to on-premises networks."
+      related_branch: "VPN"
+    - id: "vpc_dhcp_options"
+      question: "Are custom DHCP options configured?"
+      type: "single_choice"
+      options: ["Custom DHCP options", "Default DHCP options", "Unknown"]
+      help_text: "DHCP options control network configuration for instances in the VPC."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_network_monitoring"
+      question: "What network monitoring is implemented?"
+      type: "multiple_choice"
+      options: ["GuardDuty VPC monitoring", "Third-party NIDS", "CloudWatch metrics", "Custom monitoring", "None"]
+      help_text: "Network monitoring detects suspicious network activity and security threats."
+      related_branch: "Monitoring"
+    - id: "vpc_subnet_isolation"
+      question: "How is subnet isolation implemented?"
+      type: "single_choice"
+      options: ["Application tier isolation", "Environment isolation", "Basic subnet separation", "No isolation strategy", "Unknown"]
+      help_text: "Subnet isolation limits lateral movement and contains security breaches."
+      related_branch: "NetworkSegmentation"
+    - id: "vpc_elastic_ips"
+      question: "How are Elastic IP addresses managed?"
+      type: "single_choice"
+      options: ["Restricted EIP allocation", "Managed EIP pool", "Unrestricted usage", "No EIPs used", "Unknown"]
+      help_text: "Elastic IP management affects public IP exposure and security."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_load_balancer_security"
+      question: "How are load balancers secured within the VPC?"
+      type: "single_choice"
+      options: ["Internal load balancers only", "Internet-facing with restrictions", "Mixed configuration", "No load balancers", "Unknown"]
+      help_text: "Load balancer placement affects application exposure and security architecture."
+      related_branch: "LoadBalancer"
+    - id: "vpc_dns_filtering"
+      question: "Is DNS filtering implemented?"
+      type: "single_choice"
+      options: ["Route 53 Resolver DNS Firewall", "Third-party DNS filtering", "No DNS filtering", "Unknown"]
+      help_text: "DNS filtering blocks access to malicious domains and prevents data exfiltration."
+      related_branch: "Firewall"
+    - id: "vpc_network_segmentation_testing"
+      question: "Is network segmentation regularly tested?"
+      type: "single_choice"
+      options: ["Automated segmentation testing", "Manual testing", "No testing", "Unknown"]
+      help_text: "Regular testing validates network segmentation effectiveness."
+      related_branch: "NetworkSegmentation"
+    - id: "vpc_ipv6_configuration"
+      question: "Is IPv6 configured for this VPC?"
+      type: "single_choice"
+      options: ["IPv6 enabled with security controls", "IPv6 enabled basic", "IPv4 only", "Unknown"]
+      help_text: "IPv6 configuration requires additional security considerations."
+      related_branch: "NetworkSecurity"
+
+  expert:
+    - id: "vpc_zero_trust_networking"
+      question: "How is zero trust networking implemented?"
+      type: "single_choice"
+      options: ["Full zero trust architecture", "Partial implementation", "Traditional perimeter security", "No zero trust", "Unknown"]
+      help_text: "Zero trust networking assumes no implicit trust based on network location."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_micro_segmentation"
+      question: "What level of micro-segmentation is implemented?"
+      type: "single_choice"
+      options: ["Application-level micro-segmentation", "Service-level segmentation", "Basic segmentation", "No micro-segmentation", "Unknown"]
+      help_text: "Micro-segmentation provides granular network access controls."
+      related_branch: "NetworkSegmentation"
+    - id: "vpc_network_threat_detection"
+      question: "What advanced network threat detection is deployed?"
+      type: "multiple_choice"
+      options: ["AI-powered threat detection", "Behavioral analysis", "Signature-based detection", "Flow analysis", "None"]
+      help_text: "Advanced threat detection identifies sophisticated network-based attacks."
+      related_branch: "Monitoring"
+    - id: "vpc_network_forensics"
+      question: "What network forensics capabilities are available?"
+      type: "multiple_choice"
+      options: ["Packet capture analysis", "Flow log analysis", "Network timeline reconstruction", "Traffic pattern analysis", "None"]
+      help_text: "Network forensics enable investigation of network security incidents."
+      related_branch: "IncidentResponse"
+    - id: "vpc_software_defined_perimeter"
+      question: "Is Software Defined Perimeter (SDP) implemented?"
+      type: "single_choice"
+      options: ["Full SDP implementation", "Partial SDP", "Traditional VPN", "No SDP", "Unknown"]
+      help_text: "SDP provides dynamic, encrypted network access based on identity."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_network_automation"
+      question: "How is network security automation implemented?"
+      type: "single_choice"
+      options: ["Comprehensive automation", "Partial automation", "Manual processes", "No automation", "Unknown"]
+      help_text: "Network automation enables rapid response to network security events."
+      related_branch: "IncidentResponse"
+    - id: "vpc_compliance_monitoring"
+      question: "How is network compliance monitored?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance scans", "Manual reviews", "No compliance monitoring", "Unknown"]
+      help_text: "Network compliance monitoring ensures adherence to security standards."
+      related_branch: "Compliance"
+    - id: "vpc_quantum_safe_networking"
+      question: "Is quantum-safe networking implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum key distribution", "Classical cryptography", "No quantum preparation", "Unknown"]
+      help_text: "Quantum-safe networking prepares for future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "vpc_network_ai_integration"
+      question: "How is AI integrated into network security?"
+      type: "multiple_choice"
+      options: ["Automated threat response", "Predictive analytics", "Anomaly detection", "Traffic optimization", "None"]
+      help_text: "AI integration enhances network security through intelligent automation."
+      related_branch: "Monitoring"
+    - id: "vpc_supply_chain_network_security"
+      question: "How is network supply chain security validated?"
+      type: "single_choice"
+      options: ["Comprehensive validation", "Basic checks", "No validation", "Unknown"]
+      help_text: "Network supply chain security ensures integrity of network components."
+      related_branch: "SupplyChain"
+    - id: "vpc_incident_response_network"
+      question: "How is network incident response automated?"
+      type: "single_choice"
+      options: ["Automated network isolation", "Semi-automated response", "Manual response", "No automation", "Unknown"]
+      help_text: "Automated network incident response enables rapid containment of threats."
+      related_branch: "IncidentResponse"
+    - id: "vpc_business_continuity_network"
+      question: "How is network integrated with business continuity?"
+      type: "single_choice"
+      options: ["Network redundancy planning", "Standard failover", "Basic backup", "No network BCP", "Unknown"]
+      help_text: "Network business continuity ensures connectivity during disasters."
+      related_branch: "Backup"
+    - id: "vpc_regulatory_network_compliance"
+      question: "How is regulatory network compliance automated?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular reviews", "Manual tracking", "No automation", "Unknown"]
+      help_text: "Automated network compliance ensures ongoing regulatory adherence."
+      related_branch: "Compliance"
+    - id: "vpc_threat_intelligence_network"
+      question: "How is threat intelligence integrated into network security?"
+      type: "single_choice"
+      options: ["Real-time threat feeds", "Periodic updates", "Basic indicators", "No threat intelligence", "Unknown"]
+      help_text: "Network threat intelligence provides contextual security information."
+      related_branch: "Monitoring"
+    - id: "vpc_advanced_network_correlation"
+      question: "How is advanced network correlation implemented?"
+      type: "single_choice"
+      options: ["Cross-layer correlation", "Multi-dimensional analysis", "Basic monitoring", "No correlation", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive network security visibility."
+      related_branch: "Monitoring"
+    - id: "vpc_network_security_testing"
+      question: "What network security testing is performed?"
+      type: "multiple_choice"
+      options: ["Penetration testing", "Vulnerability scanning", "Configuration assessment", "Red team exercises", "None"]
+      help_text: "Regular network security testing validates network controls."
+      related_branch: "VulnerabilityScanning"
+    - id: "vpc_network_governance"
+      question: "How is network governance implemented?"
+      type: "single_choice"
+      options: ["Comprehensive network governance", "Basic policies", "No governance", "Unknown"]
+      help_text: "Network governance ensures proper management of network resources."
+      related_branch: "AccessControl"
+    - id: "vpc_network_orchestration"
+      question: "How is network security orchestration implemented?"
+      type: "single_choice"
+      options: ["Automated orchestration", "Semi-automated", "Manual processes", "No orchestration", "Unknown"]
+      help_text: "Network orchestration enables coordinated response to network threats."
+      related_branch: "IncidentResponse"
+    - id: "vpc_cost_network_optimization"
+      question: "How is network cost-security optimization balanced?"
+      type: "single_choice"
+      options: ["Optimized balance", "Security-focused", "Cost-focused", "No optimization", "Unknown"]
+      help_text: "Network optimization balances cost and security requirements."
+      related_branch: "Compliance"
+    - id: "vpc_future_network_roadmap"
+      question: "Is there a future network security roadmap?"
+      type: "single_choice"
+      options: ["Comprehensive roadmap", "Basic planning", "No roadmap", "Unknown"]
+      help_text: "Network security roadmap ensures preparedness for evolving threats."
+      related_branch: "Compliance"
+    - id: "vpc_network_privacy_design"
+      question: "How is privacy by design implemented in networking?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Basic privacy measures", "No privacy design", "Unknown"]
+      help_text: "Network privacy by design ensures data protection in network architecture."
+      related_branch: "DataClassification"
+    - id: "vpc_cross_vpc_security"
+      question: "How is cross-VPC security managed?"
+      type: "single_choice"
+      options: ["Unified security management", "Per-VPC security", "Basic controls", "No cross-VPC security", "Unknown"]
+      help_text: "Cross-VPC security ensures consistent protection across multiple VPCs."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_network_culture_integration"
+      question: "How is network security culture promoted?"
+      type: "single_choice"
+      options: ["Comprehensive training", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Network security culture ensures teams understand networking security best practices."
+      related_branch: "Compliance"
+    - id: "vpc_edge_security_integration"
+      question: "How is edge security integrated with VPC?"
+      type: "single_choice"
+      options: ["Integrated edge security", "Separate edge controls", "No edge integration", "Unknown"]
+      help_text: "Edge security integration provides comprehensive protection from cloud to edge."
+      related_branch: "NetworkSecurity"
+    - id: "vpc_network_resilience_testing"
+      question: "How is network resilience tested?"
+      type: "single_choice"
+      options: ["Chaos engineering", "Failure simulation", "Basic testing", "No resilience testing", "Unknown"]
+      help_text: "Network resilience testing validates network security under adverse conditions."
+      related_branch: "IncidentResponse"
+
+dependencies:
+  vpc_flow_logs_enabled: "Monitoring"
+  vpc_nat_gateway: "NetworkSecurity"
+  vpc_endpoints_enabled: "NetworkSecurity"
+
+threat_intelligence:
+  cve_count: 35
+  recent_threats: ["Network Reconnaissance", "Lateral Movement", "DDoS Attacks"]
+  attack_vectors: ["Network Scanning", "Traffic Interception", "Route Hijacking"]
+  mitre_techniques: ["T1046", "T1040", "T1565", "T1021"]
+  threat_actors: ["APT Groups", "Cybercriminals", "Nation State"]
+
+risk_factors:
+  public_subnets: 2.5
+  open_security_groups: 3.5
+  no_flow_logs: 2.0
+  default_nacls: 1.5
+  no_vpc_endpoints: 2.0

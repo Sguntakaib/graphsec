@@ -1,0 +1,317 @@
+node_type: "Asset"
+node_subtype: "S3"
+category: "Data Storage"
+description: "Amazon S3 Storage Bucket"
+required_branches:
+  - "Encryption"
+  - "AccessControl"
+  - "DataClassification"
+  - "Backup"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "s3_bucket_versioning"
+      question: "Is bucket versioning enabled?"
+      type: "single_choice"
+      options: ["Enabled", "Suspended", "Disabled", "Unknown"]
+      help_text: "Versioning protects against accidental deletion and provides data recovery options."
+      related_branch: "Backup"
+    - id: "s3_public_access"
+      question: "What is the public access configuration?"
+      type: "single_choice"
+      options: ["Block all public access", "Partial blocking", "Public read allowed", "Fully public", "Unknown"]
+      help_text: "Public access settings determine if bucket contents can be accessed publicly."
+      related_branch: "AccessControl"
+    - id: "s3_encryption_at_rest"
+      question: "What encryption is used for data at rest?"
+      type: "single_choice"
+      options: ["SSE-KMS (Customer Keys)", "SSE-KMS (AWS Keys)", "SSE-S3", "No encryption", "Unknown"]
+      help_text: "Server-side encryption protects data stored in S3."
+      related_branch: "Encryption"
+    - id: "s3_access_logging"
+      question: "Is server access logging enabled?"
+      type: "boolean"
+      help_text: "Access logging tracks all requests made to the bucket for security monitoring."
+      related_branch: "Monitoring"
+    - id: "s3_mfa_delete"
+      question: "Is MFA Delete enabled for this bucket?"
+      type: "single_choice"
+      options: ["Enabled", "Disabled", "Not applicable", "Unknown"]
+      help_text: "MFA Delete requires multi-factor authentication to delete objects or suspend versioning."
+      related_branch: "AccessControl"
+
+  advanced:
+    - id: "s3_bucket_policy"
+      question: "How restrictive is the bucket policy?"
+      type: "single_choice"
+      options: ["Least privilege", "Standard restrictions", "Basic restrictions", "No bucket policy", "Unknown"]
+      help_text: "Bucket policies control access at the bucket and object level."
+      related_branch: "AccessControl"
+    - id: "s3_cors_configuration"
+      question: "How is CORS configured for this bucket?"
+      type: "single_choice"
+      options: ["Specific origins only", "Wildcard with restrictions", "Fully open (*)", "CORS disabled", "Unknown"]
+      help_text: "CORS configuration controls cross-origin web requests to the bucket."
+      related_branch: "CORS"
+    - id: "s3_lifecycle_management"
+      question: "Is lifecycle management configured?"
+      type: "single_choice"
+      options: ["Comprehensive rules", "Basic transitions", "Expiration only", "No lifecycle rules", "Unknown"]
+      help_text: "Lifecycle rules automatically manage object storage classes and retention."
+      related_branch: "DataClassification"
+    - id: "s3_object_lock"
+      question: "Is S3 Object Lock enabled?"
+      type: "single_choice"
+      options: ["Enabled - Compliance mode", "Enabled - Governance mode", "Disabled", "Unknown"]
+      help_text: "Object Lock prevents object deletion or modification for a specified period."
+      related_branch: "Backup"
+    - id: "s3_cloudtrail_integration"
+      question: "Is CloudTrail logging S3 API calls?"
+      type: "single_choice"
+      options: ["All API calls logged", "Data events only", "Management events only", "No CloudTrail", "Unknown"]
+      help_text: "CloudTrail provides audit logs for S3 API operations."
+      related_branch: "Monitoring"
+    - id: "s3_replication"
+      question: "Is cross-region replication configured?"
+      type: "single_choice"
+      options: ["Cross-region replication", "Same-region replication", "No replication", "Unknown"]
+      help_text: "Replication provides data durability and disaster recovery capabilities."
+      related_branch: "Backup"
+    - id: "s3_notification_configuration"
+      question: "Are bucket notifications configured for security events?"
+      type: "single_choice"
+      options: ["Comprehensive notifications", "Basic events", "No notifications", "Unknown"]
+      help_text: "Bucket notifications alert on security-relevant events like unauthorized access."
+      related_branch: "Monitoring"
+    - id: "s3_inventory_configuration"
+      question: "Is S3 Inventory configured for this bucket?"
+      type: "single_choice"
+      options: ["Daily inventory", "Weekly inventory", "No inventory", "Unknown"]
+      help_text: "S3 Inventory provides regular reports on object metadata and status."
+      related_branch: "Monitoring"
+    - id: "s3_analytics_configuration"
+      question: "Is S3 Analytics configured?"
+      type: "single_choice"
+      options: ["Storage class analysis", "Basic analytics", "No analytics", "Unknown"]
+      help_text: "S3 Analytics provides insights into storage usage patterns."
+      related_branch: "Monitoring"
+    - id: "s3_intelligent_tiering"
+      question: "Is S3 Intelligent Tiering enabled?"
+      type: "single_choice"
+      options: ["Enabled with monitoring", "Enabled basic", "Disabled", "Unknown"]
+      help_text: "Intelligent Tiering automatically moves objects between storage classes."
+      related_branch: "DataClassification"
+    - id: "s3_transfer_acceleration"
+      question: "Is Transfer Acceleration enabled?"
+      type: "single_choice"
+      options: ["Enabled", "Disabled", "Not needed", "Unknown"]
+      help_text: "Transfer Acceleration speeds up uploads using CloudFront edge locations."
+      related_branch: "NetworkSecurity"
+    - id: "s3_request_payer"
+      question: "Who pays for S3 requests and data transfer?"
+      type: "single_choice"
+      options: ["Bucket owner", "Requester", "Mixed model", "Unknown"]
+      help_text: "Request payer configuration affects cost allocation and access patterns."
+      related_branch: "AccessControl"
+    - id: "s3_website_configuration"
+      question: "Is this bucket configured for static website hosting?"
+      type: "single_choice"
+      options: ["Website hosting enabled", "Redirect only", "Not a website", "Unknown"]
+      help_text: "Website hosting configuration affects security and access controls."
+      related_branch: "AccessControl"
+    - id: "s3_encryption_in_transit"
+      question: "Is encryption in transit enforced?"
+      type: "single_choice"
+      options: ["HTTPS only enforced", "HTTPS preferred", "HTTP allowed", "Unknown"]
+      help_text: "Encryption in transit protects data during transmission."
+      related_branch: "Encryption"
+    - id: "s3_access_points"
+      question: "Are S3 Access Points used for this bucket?"
+      type: "single_choice"
+      options: ["Multiple access points", "Single access point", "No access points", "Unknown"]
+      help_text: "Access Points provide simplified access management for shared datasets."
+      related_branch: "AccessControl"
+    - id: "s3_multi_region_access_points"
+      question: "Are Multi-Region Access Points configured?"
+      type: "single_choice"
+      options: ["Configured", "Not configured", "Not applicable", "Unknown"]
+      help_text: "Multi-Region Access Points provide automatic failover capabilities."
+      related_branch: "Backup"
+    - id: "s3_batch_operations"
+      question: "Are S3 Batch Operations used for security tasks?"
+      type: "single_choice"
+      options: ["Regular batch operations", "Occasional use", "Not used", "Unknown"]
+      help_text: "Batch Operations can perform security tasks like encryption at scale."
+      related_branch: "Encryption"
+
+  expert:
+    - id: "s3_advanced_threat_protection"
+      question: "What advanced threat protection is implemented?"
+      type: "multiple_choice"
+      options: ["GuardDuty S3 protection", "Macie data discovery", "Custom threat detection", "Third-party solutions", "None"]
+      help_text: "Advanced threat protection detects suspicious activities and data exposures."
+      related_branch: "Monitoring"
+    - id: "s3_data_loss_prevention"
+      question: "How is data loss prevention implemented?"
+      type: "single_choice"
+      options: ["Comprehensive DLP", "Basic content scanning", "Manual classification", "No DLP", "Unknown"]
+      help_text: "DLP prevents unauthorized disclosure of sensitive data."
+      related_branch: "DataLossPrevention"
+    - id: "s3_compliance_automation"
+      question: "How is compliance automated for this bucket?"
+      type: "single_choice"
+      options: ["Automated compliance checks", "Regular compliance scans", "Manual reviews", "No compliance automation", "Unknown"]
+      help_text: "Automated compliance ensures adherence to regulatory requirements."
+      related_branch: "Compliance"
+    - id: "s3_forensic_capabilities"
+      question: "What forensic capabilities are available?"
+      type: "multiple_choice"
+      options: ["Object-level auditing", "Access pattern analysis", "Integrity verification", "Chain of custody", "None"]
+      help_text: "Forensic capabilities enable investigation of security incidents."
+      related_branch: "IncidentResponse"
+    - id: "s3_advanced_encryption_management"
+      question: "How is advanced encryption key management implemented?"
+      type: "single_choice"
+      options: ["Centralized key management", "Per-object encryption", "Basic KMS", "No key management", "Unknown"]
+      help_text: "Advanced encryption management provides granular control over data protection."
+      related_branch: "KeyManagement"
+    - id: "s3_zero_trust_architecture"
+      question: "How is zero trust implemented for S3 access?"
+      type: "single_choice"
+      options: ["Full zero trust", "Partial implementation", "Traditional security", "No zero trust", "Unknown"]
+      help_text: "Zero trust architecture assumes no implicit trust for any access request."
+      related_branch: "AccessControl"
+    - id: "s3_supply_chain_security"
+      question: "How is supply chain security validated for S3 integrations?"
+      type: "single_choice"
+      options: ["Comprehensive validation", "Basic checks", "No validation", "Unknown"]
+      help_text: "Supply chain security ensures integrity of third-party integrations."
+      related_branch: "SupplyChain"
+    - id: "s3_quantum_safe_encryption"
+      question: "Is quantum-safe encryption implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum-resistant protocols", "Classical encryption only", "Unknown"]
+      help_text: "Quantum-safe encryption protects against future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "s3_advanced_monitoring_correlation"
+      question: "How is advanced monitoring correlation implemented?"
+      type: "single_choice"
+      options: ["Cross-service correlation", "Multi-dimensional analysis", "Basic monitoring", "No correlation", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive security visibility."
+      related_branch: "Monitoring"
+    - id: "s3_incident_response_automation"
+      question: "How is incident response automation implemented?"
+      type: "single_choice"
+      options: ["Automated response", "Semi-automated", "Manual response", "No automation", "Unknown"]
+      help_text: "Automated incident response enables rapid containment of security events."
+      related_branch: "IncidentResponse"
+    - id: "s3_business_continuity_integration"
+      question: "How is this bucket integrated with business continuity plans?"
+      type: "single_choice"
+      options: ["Critical data designation", "Standard backup procedures", "Basic inclusion", "No BCP integration", "Unknown"]
+      help_text: "Business continuity integration ensures data availability during disasters."
+      related_branch: "Backup"
+    - id: "s3_regulatory_compliance_automation"
+      question: "How is regulatory compliance automated?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance reviews", "Manual tracking", "No automation", "Unknown"]
+      help_text: "Automated compliance ensures ongoing adherence to regulations."
+      related_branch: "Compliance"
+    - id: "s3_threat_intelligence_integration"
+      question: "How is threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Real-time threat feeds", "Periodic updates", "Basic indicators", "No threat intelligence", "Unknown"]
+      help_text: "Threat intelligence integration provides contextual security information."
+      related_branch: "Monitoring"
+    - id: "s3_advanced_access_analytics"
+      question: "What advanced access analytics are implemented?"
+      type: "multiple_choice"
+      options: ["User behavior analytics", "Access pattern analysis", "Anomaly detection", "Risk scoring", "None"]
+      help_text: "Advanced analytics detect unusual access patterns and potential threats."
+      related_branch: "Monitoring"
+    - id: "s3_data_sovereignty_compliance"
+      question: "How is data sovereignty compliance maintained?"
+      type: "single_choice"
+      options: ["Geographic restrictions enforced", "Basic location controls", "No geo-restrictions", "Unknown"]
+      help_text: "Data sovereignty ensures data remains within required geographic boundaries."
+      related_branch: "Compliance"
+    - id: "s3_advanced_backup_strategies"
+      question: "What advanced backup strategies are implemented?"
+      type: "multiple_choice"
+      options: ["Cross-region backup", "Point-in-time recovery", "Immutable backups", "Automated testing", "None"]
+      help_text: "Advanced backup strategies ensure comprehensive data protection and recovery."
+      related_branch: "Backup"
+    - id: "s3_security_orchestration"
+      question: "How is security orchestration implemented?"
+      type: "single_choice"
+      options: ["Automated orchestration", "Semi-automated", "Manual processes", "No orchestration", "Unknown"]
+      help_text: "Security orchestration enables coordinated response to security events."
+      related_branch: "IncidentResponse"
+    - id: "s3_cost_security_optimization"
+      question: "How is cost-security optimization balanced?"
+      type: "single_choice"
+      options: ["Optimized balance", "Security-focused", "Cost-focused", "No optimization", "Unknown"]
+      help_text: "Cost-security optimization ensures efficient resource utilization without compromising security."
+      related_branch: "Compliance"
+    - id: "s3_future_security_roadmap"
+      question: "Is there a future security roadmap for this bucket?"
+      type: "single_choice"
+      options: ["Comprehensive roadmap", "Basic planning", "No roadmap", "Unknown"]
+      help_text: "Future security roadmap ensures preparedness for evolving threats."
+      related_branch: "Compliance"
+    - id: "s3_ai_ml_security_integration"
+      question: "How is AI/ML integrated into S3 security?"
+      type: "multiple_choice" 
+      options: ["Automated threat detection", "Content analysis", "Access prediction", "Risk assessment", "None"]
+      help_text: "AI/ML integration enhances threat detection and security automation."
+      related_branch: "Monitoring"
+    - id: "s3_privacy_by_design"
+      question: "How is privacy by design implemented?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Basic privacy measures", "No privacy design", "Unknown"]
+      help_text: "Privacy by design ensures data protection is built into system architecture."
+      related_branch: "DataClassification"
+    - id: "s3_security_testing_automation"
+      question: "How is security testing automated?"
+      type: "single_choice"
+      options: ["Continuous security testing", "Regular automated tests", "Manual testing", "No testing", "Unknown"]
+      help_text: "Automated security testing ensures ongoing validation of security controls."
+      related_branch: "VulnerabilityScanning"
+    - id: "s3_cross_account_security"
+      question: "How is cross-account access security managed?"
+      type: "single_choice"
+      options: ["Strict cross-account controls", "Standard controls", "Basic restrictions", "No cross-account access", "Unknown"]
+      help_text: "Cross-account security ensures secure resource sharing across AWS accounts."
+      related_branch: "AccessControl"
+    - id: "s3_advanced_retention_policies"
+      question: "What advanced retention policies are implemented?"
+      type: "multiple_choice"
+      options: ["Legal hold", "Regulatory retention", "Business retention", "Automated expiration", "None"]
+      help_text: "Advanced retention policies ensure compliance with legal and business requirements."
+      related_branch: "Compliance"
+    - id: "s3_security_culture_integration"
+      question: "How is security culture promoted for S3 usage?"
+      type: "single_choice"
+      options: ["Comprehensive training", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Security culture ensures users understand S3 security best practices."
+      related_branch: "Compliance"
+
+dependencies:
+  s3_backup_enabled: "Backup"
+  s3_kms_encryption: "KMS"
+  s3_cloudtrail_logging: "CloudTrail"
+
+threat_intelligence:
+  cve_count: 25
+  recent_threats: ["Data Exposure", "Ransomware", "Credential Harvesting"]
+  attack_vectors: ["Misconfigured Permissions", "Public Bucket Exposure", "Insider Threats"]
+  mitre_techniques: ["T1530", "T1083", "T1552"]
+  threat_actors: ["Cybercriminals", "Insider Threats", "Nation State"]
+
+risk_factors:
+  public_bucket: 4.5
+  no_encryption: 3.0
+  no_versioning: 2.0
+  no_access_logging: 1.5
+  overly_permissive_policy: 3.5

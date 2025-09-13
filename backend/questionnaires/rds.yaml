@@ -1,0 +1,318 @@
+node_type: "Asset"
+node_subtype: "RDS"
+category: "Data Storage"
+description: "Amazon RDS Database Instance"
+required_branches:
+  - "Database"
+  - "Encryption"
+  - "AccessControl"
+  - "Backup"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "rds_engine_type"
+      question: "What database engine is used?"
+      type: "single_choice"
+      options: ["PostgreSQL", "MySQL", "MariaDB", "Oracle", "SQL Server", "Aurora PostgreSQL", "Aurora MySQL"]
+      help_text: "Different database engines have varying security features and vulnerabilities."
+      related_branch: "Database"
+    - id: "rds_encryption_at_rest"
+      question: "Is encryption at rest enabled?"
+      type: "single_choice"
+      options: ["Yes - Customer managed keys", "Yes - AWS managed keys", "No encryption", "Unknown"]
+      help_text: "Encryption at rest protects data stored in the database."
+      related_branch: "Encryption"
+    - id: "rds_public_accessibility"
+      question: "Is the database publicly accessible?"
+      type: "single_choice"
+      options: ["No - Private subnet only", "Yes - With security groups", "Yes - Publicly accessible", "Unknown"]
+      help_text: "Public accessibility increases attack surface and requires careful configuration."
+      related_branch: "NetworkSecurity"
+    - id: "rds_backup_retention"
+      question: "What is the backup retention period?"
+      type: "single_choice"
+      options: ["30+ days", "7-30 days", "1-7 days", "No backups", "Unknown"]
+      help_text: "Backup retention determines recovery options in case of data loss."
+      related_branch: "Backup"
+    - id: "rds_multi_az_deployment"
+      question: "Is Multi-AZ deployment enabled?"
+      type: "single_choice"
+      options: ["Multi-AZ enabled", "Single AZ", "Unknown"]
+      help_text: "Multi-AZ deployment provides high availability and automatic failover."
+      related_branch: "Backup"
+
+  advanced:
+    - id: "rds_parameter_group_hardening"
+      question: "Is the database parameter group hardened?"
+      type: "single_choice"
+      options: ["Custom hardened parameters", "Modified default parameters", "Default parameters", "Unknown"]
+      help_text: "Parameter group hardening improves database security configuration."
+      related_branch: "Database"
+    - id: "rds_ssl_encryption"
+      question: "Is SSL/TLS encryption enforced for connections?"
+      type: "single_choice"
+      options: ["SSL required", "SSL available", "No SSL enforcement", "Unknown"]
+      help_text: "SSL/TLS encryption protects data in transit to and from the database."
+      related_branch: "Encryption"
+    - id: "rds_iam_database_authentication"
+      question: "Is IAM database authentication enabled?"
+      type: "single_choice"
+      options: ["IAM authentication enabled", "Traditional authentication only", "Mixed authentication", "Unknown"]
+      help_text: "IAM authentication eliminates the need for database passwords."
+      related_branch: "IAM"
+    - id: "rds_automated_backups"
+      question: "Are automated backups configured optimally?"
+      type: "single_choice"
+      options: ["Optimal backup window", "Standard configuration", "Suboptimal timing", "Backups disabled", "Unknown"]
+      help_text: "Proper backup configuration ensures minimal impact on performance."
+      related_branch: "Backup"
+    - id: "rds_performance_insights"
+      question: "Is Performance Insights enabled?"
+      type: "single_choice"
+      options: ["Enabled with long retention", "Enabled with short retention", "Disabled", "Unknown"]
+      help_text: "Performance Insights helps identify performance bottlenecks and security issues."
+      related_branch: "Monitoring"
+    - id: "rds_enhanced_monitoring"
+      question: "Is Enhanced Monitoring enabled?"
+      type: "single_choice"
+      options: ["Enabled with detailed metrics", "Basic enhanced monitoring", "CloudWatch only", "No monitoring", "Unknown"]
+      help_text: "Enhanced Monitoring provides OS-level metrics for security analysis."
+      related_branch: "Monitoring"
+    - id: "rds_log_exports"
+      question: "Which logs are exported to CloudWatch?"
+      type: "multiple_choice"
+      options: ["Error logs", "General logs", "Slow query logs", "Audit logs", "None"]
+      help_text: "Log exports enable centralized log analysis and security monitoring."
+      related_branch: "Logging"
+    - id: "rds_deletion_protection"
+      question: "Is deletion protection enabled?"
+      type: "single_choice"
+      options: ["Enabled", "Disabled", "Unknown"]
+      help_text: "Deletion protection prevents accidental database deletion."
+      related_branch: "AccessControl"
+    - id: "rds_minor_version_upgrades"
+      question: "Are automatic minor version upgrades enabled?"
+      type: "single_choice"
+      options: ["Auto upgrades enabled", "Manual upgrades only", "No upgrades configured", "Unknown"]
+      help_text: "Automatic upgrades ensure security patches are applied promptly."
+      related_branch: "PatchManagement"
+    - id: "rds_maintenance_window"
+      question: "Is the maintenance window optimally configured?"
+      type: "single_choice"
+      options: ["Optimal low-traffic window", "Standard window", "Default window", "Unknown"]
+      help_text: "Proper maintenance windows minimize impact of security updates."
+      related_branch: "PatchManagement"
+    - id: "rds_option_groups"
+      question: "Are option groups configured for security?"
+      type: "single_choice"
+      options: ["Security-focused options", "Standard options", "Default options", "No option groups", "Unknown"]
+      help_text: "Option groups can enhance database security features."
+      related_branch: "Database"
+    - id: "rds_subnet_groups"
+      question: "How are DB subnet groups configured?"
+      type: "single_choice"
+      options: ["Private subnets only", "Mixed public/private", "Public subnets", "Unknown"]
+      help_text: "Subnet group configuration affects network isolation and security."
+      related_branch: "NetworkSecurity"
+    - id: "rds_security_groups"
+      question: "How restrictive are the security groups?"
+      type: "single_choice"
+      options: ["Least privilege access", "Standard restrictions", "Broad access", "Unknown"]
+      help_text: "Security groups control network access to the database."
+      related_branch: "Firewall"
+    - id: "rds_read_replicas"
+      question: "Are read replicas configured securely?"
+      type: "single_choice"
+      options: ["Encrypted replicas in private subnets", "Standard replica configuration", "No read replicas", "Unknown"]
+      help_text: "Read replicas should maintain the same security posture as the primary database."
+      related_branch: "Encryption"
+    - id: "rds_cross_region_backups"
+      question: "Are cross-region automated backups enabled?"
+      type: "single_choice"
+      options: ["Cross-region backups enabled", "Same-region backups only", "No automated backups", "Unknown"]
+      help_text: "Cross-region backups provide disaster recovery capabilities."
+      related_branch: "Backup"
+    - id: "rds_snapshot_sharing"
+      question: "How are database snapshots shared?"
+      type: "single_choice"
+      options: ["No sharing (private)", "Specific account sharing", "Public sharing", "Unknown"]
+      help_text: "Snapshot sharing policies affect data confidentiality."
+      related_branch: "AccessControl"
+    - id: "rds_custom_endpoints"
+      question: "Are custom endpoints used for security?"
+      type: "single_choice"
+      options: ["Security-focused endpoints", "Standard endpoints", "No custom endpoints", "Unknown"]
+      help_text: "Custom endpoints can provide additional security controls."
+      related_branch: "AccessControl"
+
+  expert:
+    - id: "rds_advanced_threat_protection"
+      question: "What advanced threat protection is implemented?"
+      type: "multiple_choice"
+      options: ["GuardDuty RDS protection", "Third-party database security", "Custom threat detection", "Database activity monitoring", "None"]
+      help_text: "Advanced threat protection detects database-specific attacks."
+      related_branch: "Monitoring"
+    - id: "rds_database_activity_streams"
+      question: "Are Database Activity Streams enabled?"
+      type: "single_choice"
+      options: ["Enabled with real-time monitoring", "Enabled basic", "Disabled", "Unknown"]
+      help_text: "Database Activity Streams provide near real-time audit of database activity."
+      related_branch: "Monitoring"
+    - id: "rds_compliance_automation"
+      question: "How is database compliance automated?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance scans", "Manual compliance checks", "No automation", "Unknown"]
+      help_text: "Automated compliance ensures adherence to database security standards."
+      related_branch: "Compliance"
+    - id: "rds_data_masking"
+      question: "Is data masking implemented for non-production environments?"
+      type: "single_choice"
+      options: ["Dynamic data masking", "Static data masking", "No data masking", "Unknown"]
+      help_text: "Data masking protects sensitive data in development and testing environments."
+      related_branch: "DataClassification"
+    - id: "rds_database_firewall"
+      question: "Is a database firewall implemented?"
+      type: "single_choice"
+      options: ["Advanced database firewall", "Basic SQL injection protection", "No database firewall", "Unknown"]
+      help_text: "Database firewalls provide application-layer protection against database attacks."
+      related_branch: "Firewall"
+    - id: "rds_privilege_management"
+      question: "How is database privilege management implemented?"
+      type: "single_choice"
+      options: ["Automated privilege management", "Role-based access control", "Manual privilege assignment", "Basic permissions", "Unknown"]
+      help_text: "Proper privilege management ensures least privilege access to database resources."
+      related_branch: "AccessControl"
+    - id: "rds_data_loss_prevention"
+      question: "How is data loss prevention implemented?"
+      type: "single_choice"
+      options: ["Comprehensive DLP", "Basic content filtering", "Manual monitoring", "No DLP", "Unknown"]
+      help_text: "DLP prevents unauthorized disclosure of sensitive database information."
+      related_branch: "DataLossPrevention"
+    - id: "rds_forensic_capabilities"
+      question: "What forensic capabilities are available?"
+      type: "multiple_choice"
+      options: ["Transaction log analysis", "Query forensics", "Connection tracking", "Data lineage", "None"]
+      help_text: "Forensic capabilities enable investigation of database security incidents."
+      related_branch: "IncidentResponse"
+    - id: "rds_zero_trust_database"
+      question: "How is zero trust implemented for database access?"
+      type: "single_choice"
+      options: ["Full zero trust architecture", "Partial implementation", "Traditional security", "No zero trust", "Unknown"]
+      help_text: "Zero trust database architecture assumes no implicit trust for any database access."
+      related_branch: "AccessControl"
+    - id: "rds_quantum_safe_encryption"
+      question: "Is quantum-safe encryption implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum-resistant protocols", "Classical encryption only", "Unknown"]
+      help_text: "Quantum-safe encryption protects against future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "rds_supply_chain_security"
+      question: "How is supply chain security validated for database components?"
+      type: "single_choice"
+      options: ["Comprehensive validation", "Basic checks", "No validation", "Unknown"]
+      help_text: "Supply chain security ensures integrity of database software and dependencies."
+      related_branch: "SupplyChain"
+    - id: "rds_incident_response_automation"
+      question: "How is incident response automation implemented?"
+      type: "single_choice"
+      options: ["Automated response playbooks", "Semi-automated response", "Manual response", "No automation", "Unknown"]
+      help_text: "Automated incident response enables rapid containment of database security events."
+      related_branch: "IncidentResponse"
+    - id: "rds_business_continuity_integration"
+      question: "How is this database integrated with business continuity plans?"
+      type: "single_choice"
+      options: ["Critical system designation", "Standard recovery procedures", "Basic backup inclusion", "No BCP integration", "Unknown"]
+      help_text: "Business continuity integration ensures database availability during disasters."
+      related_branch: "Backup"
+    - id: "rds_regulatory_compliance_automation"
+      question: "How is regulatory compliance automated?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance reviews", "Manual tracking", "No automation", "Unknown"]
+      help_text: "Automated compliance ensures ongoing adherence to database regulations."
+      related_branch: "Compliance"
+    - id: "rds_threat_intelligence_integration"
+      question: "How is threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Real-time threat feeds", "Periodic updates", "Basic indicators", "No threat intelligence", "Unknown"]
+      help_text: "Threat intelligence integration provides contextual database security information."
+      related_branch: "Monitoring"
+    - id: "rds_advanced_monitoring_correlation"
+      question: "How is advanced monitoring correlation implemented?"
+      type: "single_choice"
+      options: ["Cross-system correlation", "Database-specific monitoring", "Basic monitoring", "No correlation", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive database security visibility."
+      related_branch: "Monitoring"
+    - id: "rds_database_security_testing"
+      question: "What database security testing is performed?"
+      type: "multiple_choice"
+      options: ["Penetration testing", "Vulnerability scanning", "Configuration assessment", "Code review", "None"]
+      help_text: "Regular security testing validates database security controls."
+      related_branch: "VulnerabilityScanning"
+    - id: "rds_data_governance"
+      question: "How is data governance implemented?"
+      type: "single_choice"
+      options: ["Comprehensive data governance", "Basic policies", "No governance", "Unknown"]
+      help_text: "Data governance ensures proper management and protection of database information."
+      related_branch: "DataClassification"
+    - id: "rds_security_orchestration"
+      question: "How is security orchestration implemented?"
+      type: "single_choice"
+      options: ["Automated orchestration", "Semi-automated", "Manual processes", "No orchestration", "Unknown"]
+      help_text: "Security orchestration enables coordinated response to database security events."
+      related_branch: "IncidentResponse"
+    - id: "rds_cost_security_optimization"
+      question: "How is cost-security optimization balanced?"
+      type: "single_choice"
+      options: ["Optimized balance", "Security-focused", "Cost-focused", "No optimization", "Unknown"]
+      help_text: "Cost-security optimization ensures efficient resource utilization without compromising security."
+      related_branch: "Compliance"
+    - id: "rds_future_security_roadmap"
+      question: "Is there a future security roadmap for this database?"
+      type: "single_choice"
+      options: ["Comprehensive roadmap", "Basic planning", "No roadmap", "Unknown"]
+      help_text: "Future security roadmap ensures preparedness for evolving database threats."
+      related_branch: "Compliance"
+    - id: "rds_ai_ml_security_integration"
+      question: "How is AI/ML integrated into database security?"
+      type: "multiple_choice"
+      options: ["Automated threat detection", "Anomaly detection", "Query analysis", "Performance optimization", "None"]
+      help_text: "AI/ML integration enhances database threat detection and security automation."
+      related_branch: "Monitoring"
+    - id: "rds_privacy_by_design"
+      question: "How is privacy by design implemented?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Basic privacy measures", "No privacy design", "Unknown"]
+      help_text: "Privacy by design ensures data protection is built into database architecture."
+      related_branch: "DataClassification"
+    - id: "rds_cross_database_security"
+      question: "How is cross-database security managed?"
+      type: "single_choice"
+      options: ["Unified security management", "Per-database security", "Basic controls", "No cross-database security", "Unknown"]
+      help_text: "Cross-database security ensures consistent protection across multiple databases."
+      related_branch: "AccessControl"
+    - id: "rds_security_culture_integration"
+      question: "How is security culture promoted for database usage?"
+      type: "single_choice"
+      options: ["Comprehensive training", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Security culture ensures database users understand security best practices."
+      related_branch: "Compliance"
+
+dependencies:
+  rds_backup_enabled: "Backup"
+  rds_kms_encryption: "KMS"
+  rds_monitoring_enabled: "Monitoring"
+
+threat_intelligence:
+  cve_count: 80
+  recent_threats: ["SQL Injection", "Privilege Escalation", "Data Exfiltration"]
+  attack_vectors: ["Database Injection", "Credential Stuffing", "Insider Threats"]
+  mitre_techniques: ["T1190", "T1078", "T1213", "T1552"]
+  threat_actors: ["Cybercriminals", "APT Groups", "Insider Threats"]
+
+risk_factors:
+  public_database: 4.0
+  no_encryption: 3.5
+  weak_authentication: 3.0
+  no_backups: 2.5
+  default_configuration: 2.0

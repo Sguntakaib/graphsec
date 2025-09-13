@@ -1,0 +1,318 @@
+node_type: "Control"
+node_subtype: "WAF"
+category: "Security Services"
+description: "AWS Web Application Firewall"
+required_branches:
+  - "WAF"
+  - "Firewall"
+  - "Monitoring"
+  - "RateLimiting"
+  - "InputValidation"
+
+questionnaires:
+  basic:
+    - id: "waf_deployment_type"
+      question: "What type of WAF deployment is configured?"
+      type: "single_choice"
+      options: ["CloudFront distribution", "Application Load Balancer", "API Gateway", "AppSync GraphQL API", "Unknown"]
+      help_text: "WAF deployment type affects coverage and protection capabilities."
+      related_branch: "WAF"
+    - id: "waf_managed_rules"
+      question: "Which AWS managed rule groups are enabled?"
+      type: "multiple_choice"
+      options: ["Core Rule Set", "Known Bad Inputs", "SQL Database", "WordPress", "PHP", "POSIX", "Windows", "None"]
+      help_text: "Managed rule groups provide pre-configured protection against common attacks."
+      related_branch: "WAF"
+    - id: "waf_rate_limiting"
+      question: "Is rate limiting configured?"
+      type: "single_choice"
+      options: ["Comprehensive rate limiting", "Basic rate limiting", "No rate limiting", "Unknown"]
+      help_text: "Rate limiting prevents automated attacks and resource exhaustion."
+      related_branch: "RateLimiting"
+    - id: "waf_geo_blocking"
+      question: "Is geographic blocking configured?"
+      type: "single_choice"
+      options: ["Specific countries blocked", "High-risk regions blocked", "No geo-blocking", "Unknown"]
+      help_text: "Geographic blocking can reduce attacks from high-risk regions."
+      related_branch: "WAF"
+    - id: "waf_logging"
+      question: "Is WAF logging enabled?"
+      type: "single_choice"
+      options: ["Full logging to CloudWatch", "Sampled logging", "No logging", "Unknown"]
+      help_text: "WAF logging is essential for security monitoring and incident response."
+      related_branch: "Monitoring"
+
+  advanced:
+    - id: "waf_custom_rules"
+      question: "Are custom WAF rules implemented?"
+      type: "single_choice"
+      options: ["Comprehensive custom rules", "Application-specific rules", "Basic custom rules", "No custom rules", "Unknown"]
+      help_text: "Custom rules provide application-specific protection beyond managed rules."
+      related_branch: "WAF"
+    - id: "waf_ip_reputation"
+      question: "Is IP reputation filtering enabled?"
+      type: "single_choice"
+      options: ["Multiple IP reputation lists", "AWS IP reputation list", "No IP reputation filtering", "Unknown"]
+      help_text: "IP reputation filtering blocks traffic from known malicious IP addresses."
+      related_branch: "WAF"
+    - id: "waf_size_constraints"
+      question: "Are request size constraints configured?"
+      type: "single_choice"
+      options: ["Granular size limits", "Basic size constraints", "No size constraints", "Unknown"]
+      help_text: "Size constraints prevent large payload attacks and resource exhaustion."
+      related_branch: "InputValidation"
+    - id: "waf_string_match_conditions"
+      question: "Are string match conditions configured for sensitive areas?"
+      type: "single_choice"
+      options: ["Comprehensive string matching", "Basic pattern matching", "No string matching", "Unknown"]
+      help_text: "String matching can detect and block specific attack patterns."
+      related_branch: "InputValidation"
+    - id: "waf_regex_patterns"
+      question: "Are regex patterns used for advanced detection?"
+      type: "single_choice"
+      options: ["Complex regex patterns", "Simple regex patterns", "No regex patterns", "Unknown"]
+      help_text: "Regex patterns enable sophisticated attack pattern detection."
+      related_branch: "InputValidation"
+    - id: "waf_bot_control"
+      question: "Is AWS WAF Bot Control enabled?"
+      type: "single_choice"
+      options: ["Bot Control with custom config", "Bot Control with defaults", "No Bot Control", "Unknown"]
+      help_text: "Bot Control identifies and manages automated traffic."
+      related_branch: "WAF"
+    - id: "waf_captcha_integration"
+      question: "Is CAPTCHA integration configured?"
+      type: "single_choice"
+      options: ["Adaptive CAPTCHA", "Static CAPTCHA challenges", "No CAPTCHA", "Unknown"]
+      help_text: "CAPTCHA helps distinguish between human users and automated attacks."
+      related_branch: "WAF"
+    - id: "waf_account_takeover_prevention"
+      question: "Is Account Takeover Prevention (ATP) enabled?"
+      type: "single_choice"
+      options: ["ATP with custom configuration", "ATP with defaults", "No ATP", "Unknown"]
+      help_text: "ATP protects against credential stuffing and brute force attacks."
+      related_branch: "Authentication"
+    - id: "waf_fraud_control"
+      question: "Is Fraud Control enabled for payment protection?"
+      type: "single_choice"
+      options: ["Fraud Control enabled", "Not applicable", "No Fraud Control", "Unknown"]
+      help_text: "Fraud Control detects fraudulent payment activities."
+      related_branch: "WAF"
+    - id: "waf_label_matching"
+      question: "Are label-based rules configured?"
+      type: "single_choice"
+      options: ["Advanced label matching", "Basic label usage", "No label matching", "Unknown"]
+      help_text: "Label matching enables sophisticated rule logic and exception handling."
+      related_branch: "WAF"
+    - id: "waf_sampling_configuration"
+      question: "How is WAF sampling configured?"
+      type: "single_choice"
+      options: ["Adaptive sampling", "Fixed sampling rate", "Full logging", "No sampling strategy", "Unknown"]
+      help_text: "Proper sampling balances visibility with log volume and costs."
+      related_branch: "Monitoring"
+    - id: "waf_challenge_actions"
+      question: "Are challenge actions configured appropriately?"
+      type: "single_choice"
+      options: ["Graduated challenge responses", "Basic challenge actions", "Block/allow only", "Unknown"]
+      help_text: "Challenge actions provide flexible response options for different threat levels."
+      related_branch: "WAF"
+    - id: "waf_exception_handling"
+      question: "How are legitimate traffic exceptions handled?"
+      type: "single_choice"
+      options: ["Granular exception rules", "Basic allow lists", "No exception handling", "Unknown"]
+      help_text: "Exception handling ensures legitimate traffic isn't blocked by security rules."
+      related_branch: "WAF"
+    - id: "waf_rule_testing"
+      question: "How are WAF rules tested before deployment?"
+      type: "single_choice"
+      options: ["Comprehensive testing environment", "Basic rule validation", "No testing", "Unknown"]
+      help_text: "Rule testing prevents blocking legitimate traffic while ensuring security effectiveness."
+      related_branch: "WAF"
+    - id: "waf_performance_optimization"
+      question: "How is WAF performance optimized?"
+      type: "single_choice"
+      options: ["Rule order optimization", "Basic optimization", "No optimization", "Unknown"]
+      help_text: "Performance optimization ensures WAF doesn't impact application response times."
+      related_branch: "WAF"
+    - id: "waf_scope_down_statements"
+      question: "Are scope-down statements used for efficiency?"
+      type: "single_choice"
+      options: ["Advanced scope-down logic", "Basic scope reduction", "No scope-down statements", "Unknown"]
+      help_text: "Scope-down statements improve WAF performance by reducing rule evaluation scope."
+      related_branch: "WAF"
+    - id: "waf_integration_testing"
+      question: "How is WAF integration tested with applications?"
+      type: "single_choice"
+      options: ["Automated integration testing", "Manual testing", "No integration testing", "Unknown"]
+      help_text: "Integration testing ensures WAF works correctly with protected applications."
+      related_branch: "WAF"
+
+  expert:
+    - id: "waf_machine_learning_integration"
+      question: "How is machine learning integrated with WAF?"
+      type: "single_choice"
+      options: ["Custom ML models", "AWS managed ML features", "Third-party ML integration", "No ML integration", "Unknown"]
+      help_text: "ML integration enhances threat detection and reduces false positives."
+      related_branch: "WAF"
+    - id: "waf_threat_intelligence_feeds"
+      question: "Are external threat intelligence feeds integrated?"
+      type: "single_choice"
+      options: ["Multiple threat intel feeds", "Single threat feed", "No external feeds", "Unknown"]
+      help_text: "Threat intelligence feeds provide up-to-date information about emerging threats."
+      related_branch: "Monitoring"
+    - id: "waf_behavioral_analysis"
+      question: "Is behavioral analysis implemented?"
+      type: "single_choice"
+      options: ["Advanced behavioral analysis", "Basic pattern recognition", "No behavioral analysis", "Unknown"]
+      help_text: "Behavioral analysis detects anomalous patterns that may indicate attacks."
+      related_branch: "Monitoring"
+    - id: "waf_zero_day_protection"
+      question: "What zero-day protection mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["Behavioral monitoring", "Heuristic detection", "Anomaly detection", "Signature updates", "None"]
+      help_text: "Zero-day protection defends against unknown attack vectors."
+      related_branch: "WAF"
+    - id: "waf_advanced_evasion_protection"
+      question: "How does WAF protect against advanced evasion techniques?"
+      type: "single_choice"
+      options: ["Multi-layer evasion detection", "Basic evasion protection", "Standard rule matching", "Unknown"]
+      help_text: "Advanced evasion protection detects sophisticated bypass attempts."
+      related_branch: "WAF"
+    - id: "waf_api_security_integration"
+      question: "How is API security integrated with WAF?"
+      type: "single_choice"
+      options: ["API-specific rules and monitoring", "Standard web protection", "No API-specific protection", "Unknown"]
+      help_text: "API security integration provides specialized protection for API endpoints."
+      related_branch: "API"
+    - id: "waf_incident_response_automation"
+      question: "How is incident response automated with WAF?"
+      type: "single_choice"
+      options: ["Automated response playbooks", "Semi-automated response", "Manual response", "No automation", "Unknown"]
+      help_text: "Automated incident response enables rapid threat containment."
+      related_branch: "IncidentResponse"
+    - id: "waf_compliance_automation"
+      question: "How is compliance automated with WAF?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance checks", "Manual compliance", "No automation", "Unknown"]
+      help_text: "Automated compliance ensures WAF configuration meets regulatory requirements."
+      related_branch: "Compliance"
+    - id: "waf_forensic_capabilities"
+      question: "What forensic capabilities are available?"
+      type: "multiple_choice"
+      options: ["Detailed request analysis", "Attack pattern reconstruction", "Timeline analysis", "Evidence preservation", "None"]
+      help_text: "Forensic capabilities enable detailed investigation of web attacks."
+      related_branch: "IncidentResponse"
+    - id: "waf_advanced_logging_analysis"
+      question: "What advanced logging analysis is performed?"
+      type: "single_choice"
+      options: ["AI-powered log analysis", "Advanced pattern recognition", "Basic log review", "No analysis", "Unknown"]
+      help_text: "Advanced logging analysis identifies sophisticated attack patterns."
+      related_branch: "Monitoring"
+    - id: "waf_supply_chain_protection"
+      question: "How does WAF protect against supply chain attacks?"
+      type: "single_choice"
+      options: ["Supply chain specific rules", "Generic protection", "No supply chain protection", "Unknown"]
+      help_text: "Supply chain protection detects attacks through compromised dependencies."
+      related_branch: "SupplyChain"
+    - id: "waf_quantum_safe_implementation"
+      question: "Is quantum-safe cryptography implemented in WAF?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum-resistant protocols", "Classical cryptography", "Unknown"]
+      help_text: "Quantum-safe implementation prepares for future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "waf_business_logic_protection"
+      question: "How does WAF protect against business logic attacks?"
+      type: "single_choice"
+      options: ["Business logic specific rules", "Application workflow protection", "No business logic protection", "Unknown"]
+      help_text: "Business logic protection defends against application-specific attack vectors."
+      related_branch: "WAF"
+    - id: "waf_advanced_rate_limiting"
+      question: "What advanced rate limiting features are implemented?"
+      type: "multiple_choice"
+      options: ["Adaptive rate limiting", "Distributed rate limiting", "User-based limits", "API-specific limits", "None"]
+      help_text: "Advanced rate limiting provides granular control over traffic patterns."
+      related_branch: "RateLimiting"
+    - id: "waf_threat_hunting_integration"
+      question: "How is threat hunting integrated with WAF?"
+      type: "single_choice"
+      options: ["Active threat hunting", "Periodic analysis", "Alert-based hunting", "No threat hunting", "Unknown"]
+      help_text: "Threat hunting integration enables proactive threat detection."
+      related_branch: "Monitoring"
+    - id: "waf_cost_optimization"
+      question: "How is WAF cost optimized without compromising security?"
+      type: "single_choice"
+      options: ["Intelligent cost optimization", "Basic cost controls", "No cost optimization", "Unknown"]
+      help_text: "Cost optimization balances security effectiveness with operational costs."
+      related_branch: "Compliance"
+    - id: "waf_multi_cloud_integration"
+      question: "How is WAF integrated across multiple cloud environments?"
+      type: "single_choice"
+      options: ["Unified multi-cloud protection", "Cloud-specific WAF", "Single cloud only", "Unknown"]
+      help_text: "Multi-cloud integration provides consistent protection across environments."
+      related_branch: "WAF"
+    - id: "waf_devsecops_integration"
+      question: "How is WAF integrated into DevSecOps processes?"
+      type: "single_choice"
+      options: ["Full DevSecOps integration", "Partial automation", "Manual deployment", "No DevSecOps integration", "Unknown"]
+      help_text: "DevSecOps integration ensures security is built into development workflows."
+      related_branch = "CICDSecurity"
+    - id: "waf_privacy_protection"
+      question: "How does WAF implement privacy protection?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Basic data protection", "No privacy features", "Unknown"]
+      help_text: "Privacy protection ensures WAF doesn't compromise user data privacy."
+      related_branch: "DataClassification"
+    - id: "waf_edge_security_integration"
+      question: "How is WAF integrated with edge security?"
+      type: "single_choice"
+      options: ["Integrated edge protection", "Separate edge controls", "No edge integration", "Unknown"]
+      help_text: "Edge integration provides protection at the network edge."
+      related_branch: "CDN"
+    - id: "waf_security_orchestration"
+      question: "How is security orchestration implemented with WAF?"
+      type: "single_choice"
+      options: ["Automated orchestration", "Semi-automated", "Manual processes", "No orchestration", "Unknown"]
+      help_text: "Security orchestration enables coordinated response across security tools."
+      related_branch: "IncidentResponse"
+    - id: "waf_future_threat_preparation"
+      question: "How is WAF prepared for future threat landscapes?"
+      type: "single_choice"
+      options: ["Adaptive threat preparation", "Static rule updates", "No future planning", "Unknown"]
+      help_text: "Future threat preparation ensures WAF evolves with emerging attack vectors."
+      related_branch: "WAF"
+    - id: "waf_performance_security_balance"
+      question: "How is the balance between performance and security optimized?"
+      type: "single_choice"
+      options: ["Dynamic optimization", "Static configuration", "Performance-first", "Security-first", "Unknown"]
+      help_text: "Performance-security balance ensures protection without impacting user experience."
+      related_branch: "WAF"
+    - id: "waf_security_culture_integration"
+      question: "How is security culture promoted around WAF usage?"
+      type: "single_choice"
+      options: ["Comprehensive training", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Security culture ensures teams understand WAF capabilities and limitations."
+      related_branch: "Compliance"
+    - id: "waf_continuous_improvement"
+      question: "How is continuous improvement implemented for WAF?"
+      type: "single_choice"
+      options: ["Automated improvement cycles", "Regular reviews", "Ad-hoc updates", "No improvement process", "Unknown"]
+      help_text: "Continuous improvement ensures WAF effectiveness evolves over time."
+      related_branch: "WAF"
+
+dependencies:
+  waf_cloudfront_integration: "CDN"
+  waf_alb_integration: "LoadBalancer"
+  waf_cloudwatch_logging: "Monitoring"
+
+threat_intelligence:
+  cve_count: 40
+  recent_threats: ["Application Layer DDoS", "SQL Injection", "Cross-Site Scripting"]
+  attack_vectors: ["HTTP Flood", "Slowloris", "Protocol Attacks"]
+  mitre_techniques: ["T1190", "T1498", "T1499"]
+  threat_actors: ["Botnets", "Cybercriminals", "Script Kiddies"]
+
+risk_factors:
+  no_rate_limiting: 3.0
+  default_rules_only: 2.5
+  no_logging: 2.0
+  no_custom_rules: 1.5
+  misconfigured_rules: 3.5
