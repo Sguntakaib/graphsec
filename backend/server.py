@@ -14,6 +14,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import networkx as nx
 import math
+from dataclasses import asdict
 
 # Import advanced simulation modules
 from advanced_simulation import AdvancedSimulationEngine
