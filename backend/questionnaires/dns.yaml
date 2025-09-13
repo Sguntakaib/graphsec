@@ -1,0 +1,282 @@
+node_type: "Control"
+node_subtype: "DNS"
+category: "Network Infrastructure"
+description: "DNS Services (Route 53, CloudFlare DNS)"
+required_branches:
+  - "DNSSecurity"
+  - "AccessControl"
+  - "Monitoring"
+  - "Compliance"
+  - "NetworkSecurity"
+
+questionnaires:
+  basic:
+    - id: "dns_provider"
+      question: "What DNS service provider is used?"
+      type: "single_choice"
+      options: ["AWS Route 53", "Cloudflare DNS", "Google Cloud DNS", "Azure DNS", "Internal DNS", "Unknown"]
+      help_text: "Different DNS providers offer varying security features and global distribution."
+      related_branch: "DNSSecurity"
+    - id: "dns_security_extensions"
+      question: "Are DNS Security Extensions (DNSSEC) implemented?"
+      type: "single_choice"
+      options: ["Full DNSSEC Implementation", "Partial DNSSEC", "No DNSSEC", "Unknown"]
+      help_text: "DNSSEC provides authentication and integrity protection for DNS responses."
+      related_branch: "DNSSecurity"
+    - id: "dns_access_control"
+      question: "How is access to DNS management controlled?"
+      type: "single_choice"
+      options: ["RBAC + MFA", "Basic Access Control", "Shared Access", "No Access Control", "Unknown"]
+      help_text: "Proper access control prevents unauthorized DNS configuration changes."
+      related_branch: "AccessControl"
+    - id: "dns_monitoring_logging"
+      question: "What DNS monitoring and logging is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive DNS Monitoring", "Basic Query Logging", "Minimal Monitoring", "No Monitoring", "Unknown"]
+      help_text: "DNS monitoring helps detect security issues and performance problems."
+      related_branch: "Monitoring"
+    - id: "dns_backup_recovery"
+      question: "What backup and recovery strategy exists for DNS configurations?"
+      type: "single_choice"
+      options: ["Automated DNS Backup", "Manual Configuration Backup", "No DNS Backup", "Unknown"]
+      help_text: "DNS backup ensures recovery capability during configuration loss or corruption."
+      related_branch: "DNSSecurity"
+
+  advanced:
+    - id: "dns_filtering_security"
+      question: "Is DNS filtering implemented for security?"
+      type: "single_choice"
+      options: ["Advanced DNS Filtering", "Basic Malware Blocking", "No DNS Filtering", "Unknown"]
+      help_text: "DNS filtering blocks access to malicious domains and improves security posture."
+      related_branch: "DNSSecurity"
+    - id: "dns_over_https_tls"
+      question: "Are DNS over HTTPS (DoH) or DNS over TLS (DoT) implemented?"
+      type: "single_choice"
+      options: ["DoH and DoT", "DoH Only", "DoT Only", "Neither", "Unknown"]
+      help_text: "Encrypted DNS protocols protect DNS queries from interception and tampering."
+      related_branch: "DNSSecurity"
+    - id: "dns_response_policy_zones"
+      question: "Are Response Policy Zones (RPZ) implemented?"
+      type: "single_choice"
+      options: ["Comprehensive RPZ Implementation", "Basic RPZ", "No RPZ", "Unknown"]
+      help_text: "RPZ enables DNS-based filtering and security policy enforcement."
+      related_branch: "DNSSecurity"
+    - id: "dns_geo_routing"
+      question: "Is geographic routing implemented for DNS?"
+      type: "single_choice"
+      options: ["Advanced Geo-Routing", "Basic Geographic Distribution", "No Geo-Routing", "Unknown"]
+      help_text: "Geographic routing improves performance and can enhance security by region."
+      related_branch: "NetworkSecurity"
+    - id: "dns_health_checks"
+      question: "Are DNS health checks configured for endpoints?"
+      type: "single_choice"
+      options: ["Comprehensive Health Monitoring", "Basic Health Checks", "No Health Checks", "Unknown"]
+      help_text: "Health checks ensure DNS resolves to available and healthy endpoints."
+      related_branch: "Monitoring"
+    - id: "dns_failover_configuration"
+      question: "How is DNS failover configured?"
+      type: "single_choice"
+      options: ["Automated Failover", "Manual Failover", "No Failover Configuration", "Unknown"]
+      help_text: "DNS failover ensures service availability during endpoint failures."
+      related_branch: "NetworkSecurity"
+    - id: "dns_load_balancing"
+      question: "Is DNS-based load balancing implemented?"
+      type: "single_choice"
+      options: ["Advanced DNS Load Balancing", "Basic Round-Robin", "No DNS Load Balancing", "Unknown"]
+      help_text: "DNS load balancing distributes traffic across multiple endpoints for performance and availability."
+      related_branch: "NetworkSecurity"
+    - id: "dns_ttl_optimization"
+      question: "How are DNS TTL values optimized for security and performance?"
+      type: "single_choice"
+      options: ["Security-Optimized TTL", "Performance-Optimized TTL", "Default TTL Values", "Unknown"]
+      help_text: "Proper TTL configuration balances security response time with caching efficiency."
+      related_branch: "DNSSecurity"
+    - id: "dns_subdomain_management"
+      question: "How is subdomain management secured?"
+      type: "single_choice"
+      options: ["Strict Subdomain Controls", "Basic Subdomain Management", "Unrestricted Subdomains", "Unknown"]
+      help_text: "Subdomain management prevents unauthorized domain creation and potential abuse."
+      related_branch: "AccessControl"
+    - id: "dns_zone_transfer_security"
+      question: "How are DNS zone transfers secured?"
+      type: "single_choice"
+      options: ["Restricted Zone Transfers", "Authenticated Transfers", "No Transfer Restrictions", "Unknown"]
+      help_text: "Secure zone transfers prevent unauthorized access to DNS zone information."
+      related_branch: "DNSSecurity"
+    - id: "dns_wildcard_management"
+      question: "How are wildcard DNS records managed?"
+      type: "single_choice"
+      options: ["Restricted Wildcard Usage", "Monitored Wildcards", "Unrestricted Wildcards", "No Wildcards", "Unknown"]
+      help_text: "Careful wildcard management prevents potential security issues and certificate problems."
+      related_branch: "DNSSecurity"
+    - id: "dns_threat_intelligence"
+      question: "Is DNS threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Real-time Threat Feed Integration", "Basic Threat Intelligence", "No Threat Intelligence", "Unknown"]
+      help_text: "Threat intelligence integration enhances DNS security with current threat information."
+      related_branch: "DNSSecurity"
+    - id: "dns_performance_monitoring"
+      question: "How is DNS performance monitored?"
+      type: "single_choice"
+      options: ["Global Performance Monitoring", "Regional Monitoring", "Basic Performance Checks", "No Performance Monitoring", "Unknown"]
+      help_text: "Performance monitoring ensures DNS queries are resolved quickly and reliably."
+      related_branch: "Monitoring"
+    - id: "dns_compliance_requirements"
+      question: "What compliance requirements are addressed by DNS configuration?"
+      type: "multiple_choice"
+      options: ["GDPR", "HIPAA", "SOX", "Industry-Specific", "No Compliance Requirements"]
+      help_text: "Compliance requirements may dictate specific DNS security and logging practices."
+      related_branch: "Compliance"
+    - id: "dns_incident_response"
+      question: "What incident response procedures exist for DNS security events?"
+      type: "single_choice"
+      options: ["Defined DNS Incident Response", "Basic Response Procedures", "No DNS-Specific IR", "Unknown"]
+      help_text: "DNS incident response procedures enable rapid mitigation of DNS-related security incidents."
+      related_branch: "DNSSecurity"
+    - id: "dns_change_management"
+      question: "What change management process exists for DNS configurations?"
+      type: "single_choice"
+      options: ["Formal DNS Change Control", "Basic Change Tracking", "No Change Management", "Unknown"]
+      help_text: "Change management ensures DNS modifications are controlled and documented."
+      related_branch: "AccessControl"
+    - id: "dns_automation_tools"
+      question: "What automation tools are used for DNS management?"
+      type: "single_choice"
+      options: ["Comprehensive DNS Automation", "Basic Automation Scripts", "Manual Management", "Unknown"]
+      help_text: "Automation tools improve consistency and reduce errors in DNS management."
+      related_branch: "DNSSecurity"
+
+  expert:
+    - id: "dns_zero_trust_implementation"
+      question: "How is zero trust implemented for DNS services?"
+      type: "single_choice"
+      options: ["Full Zero Trust DNS Architecture", "Partial Zero Trust", "Traditional DNS Security", "Unknown"]
+      help_text: "Zero trust DNS ensures all DNS queries and management are verified and authorized."
+      related_branch: "DNSSecurity"
+    - id: "dns_ai_powered_security"
+      question: "Is AI-powered security used for DNS protection?"
+      type: "single_choice"
+      options: ["AI-Based DNS Threat Detection", "Machine Learning Analysis", "Basic AI Features", "No AI Security", "Unknown"]
+      help_text: "AI-powered security can identify sophisticated DNS attacks and anomalies."
+      related_branch: "DNSSecurity"
+    - id: "dns_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for DNS infrastructure?"
+      type: "single_choice"
+      options: ["Comprehensive DNS Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies DNS-specific attack vectors and defenses."
+      related_branch: "DNSSecurity"
+    - id: "dns_quantum_safe_cryptography"
+      question: "Are quantum-safe cryptographic methods used for DNS security?"
+      type: "single_choice"
+      options: ["Post-Quantum DNS Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe cryptography prepares DNS infrastructure for future quantum computing threats."
+      related_branch: "DNSSecurity"
+    - id: "dns_behavioral_analysis"
+      question: "Is behavioral analysis used for DNS query monitoring?"
+      type: "single_choice"
+      options: ["Advanced DNS Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual DNS patterns that may indicate attacks or compromise."
+      related_branch: "Monitoring"
+    - id: "dns_advanced_filtering"
+      question: "What advanced DNS filtering techniques are implemented?"
+      type: "multiple_choice"
+      options: ["Machine Learning-Based Filtering", "Real-time Reputation Analysis", "Advanced Heuristics", "Contextual Filtering", "None"]
+      help_text: "Advanced filtering provides sophisticated protection against DNS-based threats."
+      related_branch: "DNSSecurity"
+    - id: "dns_privacy_protection"
+      question: "How is user privacy protected in DNS operations?"
+      type: "single_choice"
+      options: ["Privacy-Preserving DNS Architecture", "DNS Query Anonymization", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures DNS operations don't compromise user privacy."
+      related_branch: "Compliance"
+    - id: "dns_supply_chain_security"
+      question: "How is supply chain security ensured for DNS services?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "DNS Provider Assessment", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures DNS services and infrastructure haven't been compromised."
+      related_branch: "DNSSecurity"
+    - id: "dns_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for DNS incidents?"
+      type: "multiple_choice"
+      options: ["Automated DNS Isolation", "Emergency DNS Reconfiguration", "DNS Forensics", "Incident Correlation", "None"]
+      help_text: "Advanced incident response enables rapid mitigation of DNS-related security incidents."
+      related_branch: "DNSSecurity"
+    - id: "dns_edge_security"
+      question: "How is edge DNS security implemented?"
+      type: "single_choice"
+      options: ["Edge-Specific DNS Security", "Distributed DNS Protection", "Standard DNS Security", "No Edge DNS", "Unknown"]
+      help_text: "Edge DNS security provides protection at the network edge for improved performance and security."
+      related_branch: "DNSSecurity"
+    - id: "dns_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented for DNS?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to DNS security standards."
+      related_branch: "Compliance"
+    - id: "dns_multi_cloud_management"
+      question: "How is DNS managed across multi-cloud environments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud DNS Strategy", "Cloud-Specific DNS", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud DNS management provides consistent name resolution across cloud environments."
+      related_branch: "DNSSecurity"
+    - id: "dns_advanced_analytics"
+      question: "What advanced analytics are applied to DNS data?"
+      type: "single_choice"
+      options: ["Predictive DNS Analytics", "Query Pattern Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into DNS usage patterns, security threats, and performance."
+      related_branch: "Monitoring"
+    - id: "dns_iot_security"
+      question: "How is DNS security implemented for IoT devices?"
+      type: "single_choice"
+      options: ["IoT-Specific DNS Security", "Standard DNS Security", "No IoT DNS Considerations", "Unknown"]
+      help_text: "IoT DNS security addresses unique requirements for device name resolution and security."
+      related_branch: "DNSSecurity"
+    - id: "dns_advanced_caching"
+      question: "What advanced DNS caching strategies are implemented?"
+      type: "multiple_choice"
+      options: ["Intelligent Cache Management", "Security-Aware Caching", "Performance-Optimized Caching", "Cache Poisoning Protection", "None"]
+      help_text: "Advanced caching improves DNS performance while maintaining security and accuracy."
+      related_branch: "DNSSecurity"
+    - id: "dns_governance_framework"
+      question: "What DNS governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive DNS Governance", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "DNS governance ensures consistent security practices across all DNS operations."
+      related_branch: "Compliance"
+    - id: "dns_advanced_redundancy"
+      question: "What advanced redundancy mechanisms are implemented for DNS?"
+      type: "multiple_choice"
+      options: ["Anycast DNS", "Multi-Provider Strategy", "Geographic Redundancy", "Automated Failover", "None"]
+      help_text: "Advanced redundancy ensures DNS availability during various failure scenarios."
+      related_branch: "NetworkSecurity"
+    - id: "dns_crisis_management"
+      question: "What crisis management capabilities exist for DNS services?"
+      type: "multiple_choice"
+      options: ["Emergency DNS Services", "Crisis Communication", "Priority Query Processing", "Emergency Reconfiguration", "None"]
+      help_text: "Crisis management ensures DNS services remain available during major incidents."
+      related_branch: "DNSSecurity"
+    - id: "dns_future_technology_integration"
+      question: "How prepared is DNS infrastructure for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures DNS can evolve with new networking and security technologies."
+      related_branch: "DNSSecurity"
+
+dependencies:
+  dns_cdn_integration: "CDN"
+  dns_certificate_integration: "CertificateManager"
+  dns_monitoring_integration: "Monitoring"
+
+threat_intelligence:
+  cve_count: 40
+  recent_threats: ["DNS Hijacking", "Cache Poisoning", "DDoS Attacks"]
+  attack_vectors: ["DNS Spoofing", "Subdomain Takeover", "DNS Tunneling"]
+  mitre_techniques: ["T1071", "T1568", "T1590"]
+  threat_actors: ["APT Groups", "DNS Hijackers", "Cybercriminals"]
+
+risk_factors:
+  no_dnssec: 4.0
+  weak_access_control: 4.5
+  no_monitoring: 3.5
+  subdomain_takeover: 4.0
+  dns_cache_poisoning: 4.5

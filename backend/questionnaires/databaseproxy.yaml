@@ -1,0 +1,276 @@
+node_type: "Control"
+node_subtype: "DatabaseProxy"
+category: "Data Storage"
+description: "Database Proxy Services (RDS Proxy, ProxySQL, PgBouncer)"
+required_branches:
+  - "DatabaseSecurity"
+  - "ConnectionManagement"
+  - "Authentication"
+  - "Monitoring"
+  - "AccessControl"
+
+questionnaires:
+  basic:
+    - id: "db_proxy_type"
+      question: "What type of database proxy is used?"
+      type: "single_choice"
+      options: ["AWS RDS Proxy", "ProxySQL", "PgBouncer", "HAProxy", "Custom Proxy", "Unknown"]
+      help_text: "Different database proxies offer varying features for connection management and security."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_authentication"
+      question: "How is authentication handled by the database proxy?"
+      type: "single_choice"
+      options: ["IAM Database Authentication", "Secrets Manager Integration", "Connection Pooling Authentication", "Pass-through Authentication", "Unknown"]
+      help_text: "Proper authentication ensures secure database access through the proxy."
+      related_branch: "Authentication"
+    - id: "db_proxy_connection_pooling"
+      question: "How is connection pooling configured?"
+      type: "single_choice"
+      options: ["Optimized Connection Pooling", "Basic Connection Pooling", "No Connection Pooling", "Unknown"]
+      help_text: "Connection pooling improves database performance and resource utilization."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_ssl_tls"
+      question: "Is SSL/TLS encryption enforced for database connections?"
+      type: "single_choice"
+      options: ["Enforced SSL/TLS", "Optional SSL/TLS", "No Encryption", "Unknown"]
+      help_text: "Encryption protects database traffic from interception and tampering."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_monitoring"
+      question: "What monitoring is implemented for the database proxy?"
+      type: "single_choice"
+      options: ["Comprehensive Proxy Monitoring", "Basic Connection Monitoring", "Minimal Monitoring", "No Monitoring", "Unknown"]
+      help_text: "Monitoring helps detect performance issues and security problems with database access."
+      related_branch: "Monitoring"
+
+  advanced:
+    - id: "db_proxy_failover"
+      question: "How is database failover configured through the proxy?"
+      type: "single_choice"
+      options: ["Automatic Failover", "Manual Failover", "No Failover Configuration", "Unknown"]
+      help_text: "Failover configuration ensures database availability during outages."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_load_balancing"
+      question: "Is load balancing implemented across database instances?"
+      type: "single_choice"
+      options: ["Read/Write Split Load Balancing", "Basic Load Balancing", "No Load Balancing", "Unknown"]
+      help_text: "Load balancing distributes database load for better performance and availability."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_query_filtering"
+      question: "Is query filtering or blocking implemented?"
+      type: "single_choice"
+      options: ["SQL Injection Protection", "Query Pattern Filtering", "No Query Filtering", "Unknown"]
+      help_text: "Query filtering provides protection against malicious database queries."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_connection_limits"
+      question: "How are connection limits configured?"
+      type: "single_choice"
+      options: ["Dynamic Connection Limits", "Static Connection Limits", "No Connection Limits", "Unknown"]
+      help_text: "Connection limits prevent database overload and resource exhaustion."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_audit_logging"
+      question: "What audit logging is implemented for database proxy?"
+      type: "single_choice"
+      options: ["Comprehensive Audit Logging", "Connection Logging", "Basic Logging", "No Audit Logging", "Unknown"]
+      help_text: "Audit logging provides visibility into database access patterns and security events."
+      related_branch: "Monitoring"
+    - id: "db_proxy_secrets_management"
+      question: "How are database credentials managed by the proxy?"
+      type: "single_choice"
+      options: ["External Secrets Management", "Built-in Credential Storage", "Hardcoded Credentials", "Unknown"]
+      help_text: "Proper credential management prevents password exposure and enables rotation."
+      related_branch: "Authentication"
+    - id: "db_proxy_performance_optimization"
+      question: "What performance optimization features are enabled?"
+      type: "single_choice"
+      options: ["Query Caching + Connection Reuse", "Basic Optimization", "No Performance Optimization", "Unknown"]
+      help_text: "Performance optimization improves database response times and resource efficiency."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_high_availability"
+      question: "How is high availability configured for the proxy itself?"
+      type: "single_choice"
+      options: ["Multi-AZ Proxy Deployment", "Single Point Proxy", "No HA Configuration", "Unknown"]
+      help_text: "High availability ensures the proxy doesn't become a single point of failure."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_access_control"
+      question: "What access control is implemented at the proxy level?"
+      type: "single_choice"
+      options: ["Granular Access Control", "Basic User Authentication", "No Proxy-Level Access Control", "Unknown"]
+      help_text: "Access control at the proxy level provides additional security layers."
+      related_branch: "AccessControl"
+    - id: "db_proxy_connection_encryption"
+      question: "How is connection encryption configured between components?"
+      type: "single_choice"
+      options: ["End-to-End Encryption", "Proxy-to-Database Encryption", "Client-to-Proxy Encryption", "No Encryption", "Unknown"]
+      help_text: "Comprehensive encryption protects data throughout the connection path."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_query_analysis"
+      question: "Is query analysis and optimization performed?"
+      type: "single_choice"
+      options: ["Real-time Query Analysis", "Basic Query Logging", "No Query Analysis", "Unknown"]
+      help_text: "Query analysis helps identify performance issues and potential security threats."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_connection_tracking"
+      question: "How is connection tracking and management implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Connection Tracking", "Basic Connection Monitoring", "No Connection Tracking", "Unknown"]
+      help_text: "Connection tracking provides visibility into database usage patterns."
+      related_branch: "Monitoring"
+    - id: "db_proxy_backup_recovery"
+      question: "What backup and recovery strategy exists for proxy configurations?"
+      type: "single_choice"
+      options: ["Automated Configuration Backup", "Manual Configuration Backup", "No Configuration Backup", "Unknown"]
+      help_text: "Configuration backup ensures proxy settings can be recovered after failures."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_alerting"
+      question: "What alerting is configured for proxy events?"
+      type: "single_choice"
+      options: ["Comprehensive Alerting", "Basic Error Alerts", "No Alerting", "Unknown"]
+      help_text: "Alerting enables rapid response to proxy-related issues and security events."
+      related_branch: "Monitoring"
+    - id: "db_proxy_compliance_features"
+      question: "What compliance features are implemented?"
+      type: "multiple_choice"
+      options: ["PCI DSS Compliance", "HIPAA Compliance", "SOX Compliance", "GDPR Compliance", "None"]
+      help_text: "Compliance features ensure database proxy meets regulatory requirements."
+      related_branch: "AccessControl"
+    - id: "db_proxy_network_security"
+      question: "How is network security implemented for the proxy?"
+      type: "single_choice"
+      options: ["Private Network Deployment", "VPC Endpoint Access", "Public Network Access", "Unknown"]
+      help_text: "Network security controls how the proxy can be accessed and from where."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_maintenance_windows"
+      question: "How are maintenance windows managed for the proxy?"
+      type: "single_choice"
+      options: ["Automated Maintenance Scheduling", "Manual Maintenance", "No Maintenance Planning", "Unknown"]
+      help_text: "Proper maintenance planning minimizes downtime and ensures security updates."
+      related_branch: "ConnectionManagement"
+
+  expert:
+    - id: "db_proxy_zero_trust_implementation"
+      question: "How is zero trust implemented for database proxy access?"
+      type: "single_choice"
+      options: ["Full Zero Trust Database Access", "Partial Zero Trust", "Traditional Database Security", "Unknown"]
+      help_text: "Zero trust ensures all database access through the proxy is verified and authorized."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_ai_powered_optimization"
+      question: "Is AI-powered optimization used for database proxy operations?"
+      type: "single_choice"
+      options: ["AI-Based Query Optimization", "Machine Learning Analysis", "Basic AI Features", "No AI Optimization", "Unknown"]
+      help_text: "AI-powered optimization can improve database performance and detect anomalies."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for database proxy architecture?"
+      type: "single_choice"
+      options: ["Comprehensive Database Proxy Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies database proxy-specific attack vectors and defenses."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_quantum_safe_encryption"
+      question: "Are quantum-safe encryption methods used for database connections?"
+      type: "single_choice"
+      options: ["Post-Quantum Database Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe encryption prepares database connections for future quantum computing threats."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_behavioral_analysis"
+      question: "Is behavioral analysis used for database access pattern monitoring?"
+      type: "single_choice"
+      options: ["Advanced Database Behavioral Analysis", "Query Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual database access patterns that may indicate compromise."
+      related_branch: "Monitoring"
+    - id: "db_proxy_advanced_authentication"
+      question: "What advanced authentication mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["Multi-factor Authentication", "Certificate-Based Authentication", "Biometric Authentication", "Token-Based Authentication", "None"]
+      help_text: "Advanced authentication provides stronger security for database access."
+      related_branch: "Authentication"
+    - id: "db_proxy_supply_chain_security"
+      question: "How is supply chain security ensured for database proxy components?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "Component Verification", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures database proxy components haven't been compromised."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for database proxy incidents?"
+      type: "multiple_choice"
+      options: ["Automated Connection Isolation", "Emergency Query Blocking", "Database Forensics", "Incident Correlation", "None"]
+      help_text: "Advanced incident response enables rapid mitigation of database-related security incidents."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_privacy_protection"
+      question: "How is privacy protection implemented in database proxy operations?"
+      type: "single_choice"
+      options: ["Privacy-Preserving Database Access", "Data Masking", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures database proxy operations don't compromise user data privacy."
+      related_branch: "AccessControl"
+    - id: "db_proxy_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to database security standards."
+      related_branch: "AccessControl"
+    - id: "db_proxy_multi_cloud_database"
+      question: "How is database proxy configured for multi-cloud database access?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Database Access", "Cloud-Specific Proxies", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud configuration provides consistent database access across cloud environments."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_advanced_analytics"
+      question: "What advanced analytics are applied to database proxy data?"
+      type: "single_choice"
+      options: ["Predictive Database Analytics", "Usage Pattern Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into database usage patterns, performance, and security."
+      related_branch: "Monitoring"
+    - id: "db_proxy_containerized_deployment"
+      question: "How is database proxy security implemented in containerized deployments?"
+      type: "single_choice"
+      options: ["Container-Native Database Proxy Security", "Standard Proxy Security", "No Container Deployment", "Unknown"]
+      help_text: "Container deployment requires specialized security measures for database proxy services."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_advanced_caching"
+      question: "What advanced caching strategies are implemented?"
+      type: "multiple_choice"
+      options: ["Intelligent Query Caching", "Result Set Caching", "Connection State Caching", "Security-Aware Caching", "None"]
+      help_text: "Advanced caching improves database performance while maintaining data consistency and security."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_governance_framework"
+      question: "What database proxy governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive Proxy Governance", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "Proxy governance ensures consistent security practices across all database access."
+      related_branch: "AccessControl"
+    - id: "db_proxy_advanced_connection_management"
+      question: "What advanced connection management techniques are implemented?"
+      type: "multiple_choice"
+      options: ["Dynamic Connection Scaling", "Connection Health Monitoring", "Automatic Connection Recovery", "Connection Lifecycle Management", "None"]
+      help_text: "Advanced connection management provides optimal database connectivity and resource utilization."
+      related_branch: "ConnectionManagement"
+    - id: "db_proxy_crisis_management"
+      question: "What crisis management capabilities exist for database proxy services?"
+      type: "multiple_choice"
+      options: ["Emergency Database Isolation", "Crisis Communication", "Priority Query Processing", "Emergency Failover", "None"]
+      help_text: "Crisis management ensures database availability and security during major incidents."
+      related_branch: "DatabaseSecurity"
+    - id: "db_proxy_future_technology_integration"
+      question: "How prepared is the database proxy for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures database proxy can evolve with new database and security technologies."
+      related_branch: "DatabaseSecurity"
+
+dependencies:
+  db_proxy_rds_integration: "RDS"
+  db_proxy_secrets_integration: "SecretsManager"
+  db_proxy_monitoring_integration: "Monitoring"
+
+threat_intelligence:
+  cve_count: 30
+  recent_threats: ["SQL Injection", "Connection Hijacking", "Credential Stuffing"]
+  attack_vectors: ["Database Attacks", "Man-in-the-Middle", "Privilege Escalation"]
+  mitre_techniques: ["T1190", "T1078", "T1557"]
+  threat_actors: ["Database Attackers", "APT Groups", "Insider Threats"]
+
+risk_factors:
+  unencrypted_connections: 4.5
+  weak_authentication: 4.0
+  no_connection_limits: 3.5
+  insufficient_monitoring: 3.0
+  default_configurations: 2.5
