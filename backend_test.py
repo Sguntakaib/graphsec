@@ -4209,6 +4209,145 @@ class SecurityModelingAPITester:
             self.log_test("Threat Intelligence Dashboard", False, f"Error: {str(e)}")
             return False
 
+    def test_multi_level_questionnaires_implementation(self):
+        """Test the newly implemented multi-level questionnaires for EC2 and Lambda"""
+        print("\n🎯 TESTING MULTI-LEVEL QUESTIONNAIRES IMPLEMENTATION")
+        print("=" * 60)
+        
+        # Specific test cases as requested by user
+        test_cases = [
+            {
+                "node_subtype": "EC2", 
+                "level": "expert",
+                "expected_min_questions": 25,
+                "description": "EC2 EXPERT level should have 25+ questions"
+            },
+            {
+                "node_subtype": "Lambda", 
+                "level": "advanced",
+                "expected_min_questions": 17,
+                "description": "Lambda ADVANCED level should have 17 questions"
+            },
+            {
+                "node_subtype": "Lambda", 
+                "level": "expert",
+                "expected_min_questions": 24,
+                "description": "Lambda EXPERT level should have 24+ questions"
+            }
+        ]
+        
+        all_tests_passed = True
+        
+        for test_case in test_cases:
+            node_subtype = test_case["node_subtype"]
+            level = test_case["level"]
+            expected_min_questions = test_case["expected_min_questions"]
+            description = test_case["description"]
+            
+            print(f"\n🔍 Testing: {description}")
+            
+            try:
+                response = self.session.get(f"{self.base_url}/expanded-nodes/{node_subtype}/questionnaire/{level}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for required fields
+                    expected_fields = ["node_subtype", "questionnaire_level", "questions", "question_count", "estimated_time"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                    f"Missing fields: {missing_fields}")
+                        all_tests_passed = False
+                        continue
+                    
+                    questions = data.get("questions", [])
+                    question_count = data.get("question_count", 0)
+                    
+                    # Verify question count meets expectations
+                    if question_count < expected_min_questions:
+                        self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                    f"Expected at least {expected_min_questions} questions, got {question_count}")
+                        all_tests_passed = False
+                        continue
+                    
+                    # Verify question structure
+                    if questions:
+                        first_question = questions[0]
+                        required_question_fields = ["id", "question", "type", "options", "help_text", "related_branch"]
+                        missing_question_fields = [f for f in required_question_fields if f not in first_question]
+                        
+                        if missing_question_fields:
+                            self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                        f"Missing question fields: {missing_question_fields}")
+                            all_tests_passed = False
+                            continue
+                        
+                        # Verify question types are valid
+                        valid_types = ["single_choice", "multiple_choice", "text", "boolean", "number"]
+                        invalid_questions = []
+                        for i, q in enumerate(questions):
+                            if q.get("type") not in valid_types:
+                                invalid_questions.append(f"Q{i+1}: {q.get('type')}")
+                        
+                        if invalid_questions:
+                            self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                        f"Invalid question types: {invalid_questions}")
+                            all_tests_passed = False
+                            continue
+                        
+                        # Verify questions are relevant to node type and level
+                        relevant_keywords = {
+                            "EC2": ["instance", "security group", "vpc", "ami", "ebs", "iam", "monitoring", "patching", "encryption"],
+                            "Lambda": ["function", "runtime", "trigger", "vpc", "iam", "environment", "logging", "monitoring", "timeout"]
+                        }
+                        
+                        node_keywords = relevant_keywords.get(node_subtype, [])
+                        relevant_questions = 0
+                        
+                        for question in questions:
+                            question_text = question.get("question", "").lower()
+                            if any(keyword.lower() in question_text for keyword in node_keywords):
+                                relevant_questions += 1
+                        
+                        relevance_percentage = (relevant_questions / len(questions)) * 100 if questions else 0
+                        
+                        if relevance_percentage < 30:  # At least 30% should be relevant
+                            self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                        f"Low relevance: only {relevance_percentage:.1f}% questions relevant to {node_subtype}")
+                            all_tests_passed = False
+                            continue
+                    
+                    self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", True, 
+                                f"✅ {question_count} questions (expected ≥{expected_min_questions}), {relevance_percentage:.1f}% relevant to {node_subtype}")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                f"❌ Questionnaire not found - {description}")
+                    all_tests_passed = False
+                elif response.status_code == 400:
+                    self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                f"❌ Invalid level parameter: {level}")
+                    all_tests_passed = False
+                else:
+                    self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, 
+                                f"❌ HTTP {response.status_code}: {response.text}")
+                    all_tests_passed = False
+                    
+            except Exception as e:
+                self.log_test(f"Multi-Level Questionnaire - {node_subtype} {level.upper()}", False, f"❌ Error: {str(e)}")
+                all_tests_passed = False
+        
+        print(f"\n{'='*60}")
+        if all_tests_passed:
+            print("🎉 ALL MULTI-LEVEL QUESTIONNAIRE TESTS PASSED!")
+        else:
+            print("❌ SOME MULTI-LEVEL QUESTIONNAIRE TESTS FAILED!")
+        print(f"{'='*60}")
+        
+        return all_tests_passed
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
