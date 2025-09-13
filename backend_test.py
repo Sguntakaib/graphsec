@@ -7368,7 +7368,22 @@ def main():
         print("\n❌ Backend API testing completed with failures!")
         sys.exit(1)
 
-    def test_phase1_critical_endpoints(self):
+def main():
+    tester = SecurityModelingAPITester()
+    passed, failed = tester.test_phase1_critical_endpoints()
+    
+    if failed == 0:
+        print("\n✅ Phase 1 Critical Endpoints testing completed successfully!")
+        sys.exit(0)
+    else:
+        print("\n❌ Phase 1 Critical Endpoints testing completed with failures!")
+        sys.exit(1)
+
+# Add the new test methods to the SecurityModelingAPITester class
+SecurityModelingAPITester.test_phase1_critical_endpoints = lambda self: self._test_phase1_critical_endpoints()
+SecurityModelingAPITester._test_phase1_critical_endpoints = lambda self: test_phase1_critical_endpoints_func(self)
+
+def test_phase1_critical_endpoints_func(self):
         """Test the 4 critical Phase 1 Core Loop endpoints that were fixed"""
         print("🎯 Testing Phase 1 Critical Endpoints (Post-Fix Verification)")
         print("=" * 80)
