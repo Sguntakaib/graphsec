@@ -1554,30 +1554,24 @@ async def get_expanded_supported_types():
 async def get_expanded_questionnaire(node_subtype: str, level: str):
     """Get questionnaire for specific node type and level (basic/advanced/expert)"""
     try:
-        questionnaire_level = QuestionnaireLevel(level.lower())
+        questionnaire_level = LoaderQuestionnaireLevel(level.lower())
     except ValueError:
-        raise HTTPException(status_code=400, detail=f"Invalid questionnaire level. Must be one of: {[l.value for l in QuestionnaireLevel]}")
+        raise HTTPException(status_code=400, detail=f"Invalid questionnaire level. Must be one of: {[l.value for l in LoaderQuestionnaireLevel]}")
     
-    questionnaire = expanded_node_engine.get_questionnaire_by_level(node_subtype, questionnaire_level)
+    # Use the new file-based questionnaire system
+    response = questionnaire_loader.create_questionnaire_response(node_subtype, questionnaire_level)
     
-    if not questionnaire:
-        raise HTTPException(status_code=404, detail=f"Questionnaire not found for node type '{node_subtype}' at level '{level}'")
+    if "error" in response:
+        raise HTTPException(status_code=404, detail=response["error"])
     
-    template = expanded_node_engine.node_templates.get(node_subtype, {})
+    # Add threat intelligence from the old system for now
+    try:
+        threat_intelligence = expanded_node_engine._get_threat_intelligence_summary(node_subtype)
+    except:
+        threat_intelligence = {}
     
-    return {
-        "node_subtype": node_subtype,
-        "questionnaire_level": level,
-        "questions": questionnaire,
-        "question_count": len(questionnaire),
-        "estimated_time": f"{len(questionnaire) * 1.5:.0f}-{len(questionnaire) * 2:.0f} minutes",
-        "node_info": {
-            "category": template.get("category", "Unknown"),
-            "description": template.get("description", ""),
-            "required_branches": [branch.value for branch in template.get("required_branches", [])]
-        },
-        "threat_intelligence": expanded_node_engine._get_threat_intelligence_summary(node_subtype)
-    }
+    response["threat_intelligence"] = threat_intelligence
+    return response
 
 @api_router.post("/expanded-nodes/{node_subtype}/calculate-risk")
 async def calculate_expanded_risk(node_subtype: str, request: Dict[str, Any]):
