@@ -137,10 +137,13 @@ class QuestionnaireLoader:
     def _scale_questionnaire_for_level(self, basic_questions: List[Dict], level: QuestionnaireLevel, node_subtype: str) -> List[Dict]:
         """Scale basic questionnaire to match the requested level"""
         if level == QuestionnaireLevel.BASIC:
-            return basic_questions
+            # Basic level should have 5-8 questions
+            target_count = max(5, min(8, len(basic_questions)))
+            return basic_questions[:target_count]
         
         scaled_questions = []
         
+        # Start with enhanced versions of basic questions
         for question in basic_questions:
             scaled_question = question.copy()
             
@@ -180,7 +183,20 @@ class QuestionnaireLoader:
             
             scaled_questions.append(scaled_question)
         
-        logger.info(f"Scaled {len(basic_questions)} questions from basic to {level.value} level for {node_subtype}")
+        # Generate additional questions to meet level requirements
+        if level == QuestionnaireLevel.ADVANCED:
+            # Advanced level should have 15-20 questions
+            target_count = 18  # Aim for middle of range
+            additional_needed = max(0, target_count - len(scaled_questions))
+            scaled_questions.extend(self._generate_additional_questions(node_subtype, additional_needed, level))
+        
+        elif level == QuestionnaireLevel.EXPERT:
+            # Expert level should have 25-30 questions  
+            target_count = 28  # Aim for middle of range
+            additional_needed = max(0, target_count - len(scaled_questions))
+            scaled_questions.extend(self._generate_additional_questions(node_subtype, additional_needed, level))
+        
+        logger.info(f"Scaled {len(basic_questions)} questions to {len(scaled_questions)} questions from basic to {level.value} level for {node_subtype}")
         return scaled_questions
     
     def get_metadata(self, node_subtype: str) -> Optional[QuestionnaireMetadata]:
