@@ -52,6 +52,10 @@ executor = ThreadPoolExecutor(max_workers=4)
 expanded_node_engine = ExpandedIntelligentNodeEngine()
 questionnaire_loader = get_questionnaire_loader()
 
+# Initialize findings management and questionnaire completion processing
+findings_manager = FindingsManager(db)
+questionnaire_processor = QuestionnaireCompletionProcessor(db, findings_manager)
+
 # Default Security Templates Data
 def get_default_templates():
     """Get pre-built security templates for common architectures"""
