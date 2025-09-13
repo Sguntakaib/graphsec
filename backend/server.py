@@ -3282,10 +3282,10 @@ async def complete_questionnaire(
         diagram_id = request.get("diagram_id") or str(uuid.uuid4())
         node_id = request.get("node_id") or str(uuid.uuid4())
         
-        # Validate required data
-        questionnaire_responses = request.get("questionnaire_responses")
+        # Validate required data - support both parameter formats
+        questionnaire_responses = request.get("questionnaire_responses") or request.get("responses")
         if not questionnaire_responses:
-            raise HTTPException(status_code=400, detail="questionnaire_responses are required")
+            raise HTTPException(status_code=400, detail="questionnaire_responses or responses are required")
         
         user_id = request.get("user_id")
         business_context = request.get("business_context", {})
