@@ -127,13 +127,19 @@ class ThreatIntelligence:
 
 @dataclass
 class RiskMetrics:
-    """Enhanced risk calculation metrics"""
+    """Enhanced risk calculation metrics with probabilistic modeling"""
     base_risk: float = 5.0
     attack_surface_score: float = 5.0
     vulnerability_score: float = 5.0
     control_effectiveness: float = 5.0
     business_impact: float = 5.0
     threat_probability: float = 0.5
+    
+    # Priority 1: Probabilistic Modeling Enhancement - NEW FIELDS
+    confidence_interval: tuple = (0.0, 0.0)  # (lower_bound, upper_bound)
+    threat_likelihood: float = 0.5  # Probability of threat materialization (0-1)
+    probabilistic_score: float = 0.0  # Monte Carlo simulation result
+    uncertainty_factor: float = 0.1  # Uncertainty in risk assessment (0-1)
     
     def calculate_composite_risk(self) -> float:
         """Calculate composite risk using weighted formula"""
@@ -155,6 +161,72 @@ class RiskMetrics:
         )
         
         return max(0.0, min(10.0, composite))
+    
+    def calculate_probabilistic_risk(self, num_simulations: int = 1000) -> dict:
+        """Calculate probabilistic risk using Monte Carlo simulation"""
+        import random
+        import numpy as np
+        
+        simulation_results = []
+        
+        for _ in range(num_simulations):
+            # Add uncertainty to each risk factor
+            sim_attack_surface = max(0, min(10, 
+                self.attack_surface_score + random.gauss(0, self.uncertainty_factor * 2)))
+            sim_vulnerability = max(0, min(10, 
+                self.vulnerability_score + random.gauss(0, self.uncertainty_factor * 2)))
+            sim_control_eff = max(0, min(10, 
+                self.control_effectiveness + random.gauss(0, self.uncertainty_factor * 1.5)))
+            sim_business_impact = max(0, min(10, 
+                self.business_impact + random.gauss(0, self.uncertainty_factor * 1)))
+            sim_threat_prob = max(0, min(1, 
+                self.threat_probability + random.gauss(0, self.uncertainty_factor * 0.2)))
+            
+            # Calculate risk for this simulation
+            weights = {
+                'attack_surface': 0.25,
+                'vulnerability': 0.25,
+                'control_effectiveness': -0.20,
+                'business_impact': 0.30,
+                'threat_probability': 0.20
+            }
+            
+            sim_risk = (
+                sim_attack_surface * weights['attack_surface'] +
+                sim_vulnerability * weights['vulnerability'] +
+                sim_control_eff * weights['control_effectiveness'] +
+                sim_business_impact * weights['business_impact'] +
+                (sim_threat_prob * 10) * weights['threat_probability']
+            )
+            
+            simulation_results.append(max(0.0, min(10.0, sim_risk)))
+        
+        # Calculate statistics
+        sim_array = np.array(simulation_results)
+        mean_risk = float(np.mean(sim_array))
+        std_risk = float(np.std(sim_array))
+        percentile_5 = float(np.percentile(sim_array, 5))
+        percentile_95 = float(np.percentile(sim_array, 95))
+        
+        # Update probabilistic fields
+        self.probabilistic_score = mean_risk
+        self.confidence_interval = (percentile_5, percentile_95)
+        self.threat_likelihood = self.threat_probability
+        
+        return {
+            "mean_risk": mean_risk,
+            "standard_deviation": std_risk,
+            "confidence_interval_90": (percentile_5, percentile_95),
+            "risk_distribution": {
+                "p5": percentile_5,
+                "p25": float(np.percentile(sim_array, 25)),
+                "p50": float(np.percentile(sim_array, 50)),
+                "p75": float(np.percentile(sim_array, 75)),
+                "p95": percentile_95
+            },
+            "probability_high_risk": float(np.sum(sim_array >= 7.0) / len(sim_array)),
+            "probability_critical_risk": float(np.sum(sim_array >= 8.5) / len(sim_array))
+        }
 
 class ExpandedIntelligentNodeEngine:
     """Enhanced engine for comprehensive node types and security intelligence"""
