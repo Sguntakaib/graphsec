@@ -1515,7 +1515,7 @@ async def get_supported_intelligent_types():
 @api_router.get("/expanded-nodes/supported-types")
 async def get_expanded_supported_types():
     """Get all supported node types with enhanced metadata and questionnaire information"""
-    supported_types = questionnaire_loader.get_supported_node_types()
+    supported_types = expanded_node_engine.get_supported_node_types()
     
     type_info = []
     for node_type in supported_types:
