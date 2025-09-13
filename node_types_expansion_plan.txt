@@ -1,0 +1,257 @@
+====================================================================================================
+SECURITY MODELING PLATFORM - NODE TYPES EXPANSION PLAN
+FROM 24 TO 25+ COMPREHENSIVE NODE TYPES
+====================================================================================================
+
+EXECUTIVE SUMMARY:
+Currently we have 24 node types implemented. The test failure shows "Expected 25+ node types, got 24".
+Goal: Add strategic node types to reach 25+ for comprehensive security modeling coverage.
+
+CURRENT NODE TYPES ANALYSIS (24 Total):
+====================================================================================================
+
+CLOUD INFRASTRUCTURE (9): 
+✅ EC2, Lambda, S3, RDS, VPC, LoadBalancer, KMS, CloudTrail, SecurityGroups
+
+SECURITY SERVICES (2):
+✅ WAF, IAM
+
+NETWORK COMPONENTS (2):
+✅ NetworkACL, CDN
+
+CONTAINER & DEVOPS (3):
+✅ Kubernetes, CICD, Docker
+
+DATA & STORAGE (3):
+✅ MessageQueue, DatabaseProxy, Backup
+
+COMPUTE SERVICES (2):
+✅ APIGateway, SecretsManager
+
+MONITORING & CERTIFICATES (3):
+✅ Monitoring, CertificateManager, DNS
+
+MISSING CATEGORIES ANALYSIS:
+====================================================================================================
+
+Based on modern security modeling needs and industry best practices, we need to add node types in:
+
+1. **ADVANCED CLOUD SERVICES** (Missing critical AWS/Azure/GCP services)
+2. **NETWORK SECURITY APPLIANCES** (Missing dedicated security hardware/software)
+3. **APPLICATION LAYER SECURITY** (Missing app-specific security components)
+4. **IDENTITY & ACCESS MANAGEMENT** (Missing advanced IAM components)
+5. **COMPLIANCE & GOVERNANCE** (Missing governance/compliance specific nodes)
+
+STRATEGIC NODE TYPES TO ADD (Target: +6 nodes = 30 total):
+====================================================================================================
+
+PRIORITY 1 - IMMEDIATE VALUE NODE TYPES (3 nodes):
+---------------------------------------------------
+1. **ElasticLoadBalancer** (Advanced)
+   - Rationale: Different from basic LoadBalancer, covers ALB/NLB/GLB specifics
+   - Security Focus: SSL termination, security groups, access logs, WAF integration
+   - Questionnaires: 3 levels focusing on load balancing security, DDoS protection
+
+2. **ConfigurationManagement** 
+   - Rationale: Critical for infrastructure as code security (Terraform, CloudFormation)
+   - Security Focus: Configuration drift, compliance scanning, secret management
+   - Questionnaires: 3 levels focusing on IaC security, drift detection, compliance
+
+3. **ServiceMesh**
+   - Rationale: Modern microservices security (Istio, Linkerd, AWS App Mesh)
+   - Security Focus: mTLS, service-to-service auth, traffic encryption, observability
+   - Questionnaires: 3 levels focusing on mesh security, certificate management
+
+PRIORITY 2 - COMPREHENSIVE COVERAGE (3 nodes):
+----------------------------------------------
+4. **DataLakeStorage**
+   - Rationale: Big data security (different from S3, covers Hadoop, Data Lakes)
+   - Security Focus: Data classification, access patterns, encryption at scale
+   - Questionnaires: 3 levels focusing on data governance, privacy, compliance
+
+5. **EdgeComputing**
+   - Rationale: IoT and edge security (AWS IoT, Azure IoT Edge, GCP Edge TPU)
+   - Security Focus: Device identity, secure boot, OTA updates, local processing
+   - Questionnaires: 3 levels focusing on device security, network isolation
+
+6. **QuantumSafeEncryption**
+   - Rationale: Future-proofing for quantum computing threats (NIST post-quantum)
+   - Security Focus: Quantum-resistant algorithms, migration planning, hybrid approaches
+   - Questionnaires: 3 levels focusing on quantum readiness, algorithm selection
+
+TECHNICAL IMPLEMENTATION PLAN:
+====================================================================================================
+
+PHASE 1: BACKEND NODE TYPE IMPLEMENTATION (2-3 hours)
+-----------------------------------------------------
+1. **Update expanded_intelligent_nodes.py**:
+   - Add 6 new node type templates in _initialize_expanded_templates()
+   - Each template needs: node_type, node_subtype, category, description, required_branches
+   - Each needs 3 questionnaire levels (basic: 5-8, advanced: 15-20, expert: 25-30)
+
+2. **Create YAML questionnaire files**:
+   - Create 6 new .yaml files in /app/backend/questionnaires/
+   - Follow existing pattern from ec2.yaml, lambda.yaml
+   - Each YAML needs basic, advanced, expert sections
+
+3. **Update category mappings**:
+   - Add new NodeCategory enum values if needed
+   - Update category descriptions in get_node_categories()
+   - Ensure proper categorization for UI grouping
+
+PHASE 2: QUESTIONNAIRE CONTENT DEVELOPMENT (1-2 hours)
+------------------------------------------------------
+1. **ElasticLoadBalancer Questionnaires**:
+   - Basic: Load balancer type, SSL certificates, health checks, target groups, logging
+   - Advanced: Advanced routing, sticky sessions, connection draining, security policies
+   - Expert: Multi-AZ failover, cross-zone load balancing, integration with WAF/Shield
+
+2. **ConfigurationManagement Questionnaires**:
+   - Basic: IaC tool used, version control, deployment frequency, rollback capability
+   - Advanced: Drift detection, compliance scanning, secret injection, environment promotion
+   - Expert: Policy as code, supply chain security, dependency scanning, compliance frameworks
+
+3. **ServiceMesh Questionnaires**:
+   - Basic: Mesh technology, mTLS enabled, service discovery, traffic routing
+   - Advanced: Certificate rotation, policy enforcement, observability integration, canary deployments
+   - Expert: Multi-cluster mesh, zero-trust networking, performance optimization, troubleshooting
+
+4. **DataLakeStorage Questionnaires**:
+   - Basic: Storage format, data classification, access controls, encryption status
+   - Advanced: Data lineage, privacy controls, data masking, audit logging, retention policies
+   - Expert: Data governance frameworks, GDPR compliance, data quality monitoring, federated queries
+
+5. **EdgeComputing Questionnaires**:
+   - Basic: Device types, connectivity, local processing, remote management capability
+   - Advanced: Device authentication, secure boot, OTA update mechanisms, network segmentation
+   - Expert: Hardware security modules, edge-to-cloud sync, offline capabilities, threat detection
+
+6. **QuantumSafeEncryption Questionnaires**:
+   - Basic: Current encryption standards, quantum threat assessment, migration timeline
+   - Advanced: Post-quantum algorithms evaluation, hybrid deployment, performance impact
+   - Expert: NIST compliance, key management integration, industry-specific requirements
+
+PHASE 3: RISK CALCULATION & INTELLIGENCE (1 hour)
+-------------------------------------------------
+1. **Update risk calculation methods**:
+   - Add risk profiles for each new node type
+   - Define threat patterns and vulnerability matrices
+   - Set appropriate base risk scores and calculation factors
+
+2. **Enhance threat intelligence**:
+   - Add MITRE ATT&CK technique mappings for new node types
+   - Define relevant CVE patterns and threat actor targeting
+   - Create node-specific security recommendations
+
+PHASE 4: TESTING & VALIDATION (30 minutes)
+------------------------------------------
+1. **Backend API Testing**:
+   - Test GET /api/expanded-nodes/supported-types returns 30 node types
+   - Test each new node type questionnaire endpoints
+   - Verify risk calculation for new node types
+
+2. **Integration Testing**:
+   - Test template system with new node types
+   - Verify dependency relationships work
+   - Test bulk assessment with new nodes
+
+DETAILED NODE TYPE SPECIFICATIONS:
+====================================================================================================
+
+1. ELASTICLOADBALANCER:
+-----------------------
+Category: NETWORK_SECURITY
+Required Branches: NETWORK_SECURITY, ENCRYPTION, MONITORING, ACCESS_CONTROL, DDoS_PROTECTION
+Base Risk: 6.0 (publicly accessible)
+Key Security Concerns: SSL/TLS termination, DDoS protection, access logging, security groups
+
+2. CONFIGURATIONMANAGEMENT:
+---------------------------
+Category: DEVOPS_SECURITY
+Required Branches: SUPPLY_CHAIN, SECRETS_MANAGEMENT, COMPLIANCE, ACCESS_CONTROL, MONITORING
+Base Risk: 7.0 (infrastructure control)
+Key Security Concerns: Configuration drift, IaC security, secret injection, compliance scanning
+
+3. SERVICEMESH:
+---------------
+Category: NETWORK_SECURITY
+Required Branches: ENCRYPTION, AUTHENTICATION, AUTHORIZATION, MONITORING, NETWORK_SEGMENTATION
+Base Risk: 5.0 (internal networking)
+Key Security Concerns: mTLS, service identity, traffic policies, observability
+
+4. DATALAKESTORAGE:
+-------------------
+Category: DATA_STORAGE
+Required Branches: ENCRYPTION, DATA_CLASSIFICATION, ACCESS_CONTROL, COMPLIANCE, MONITORING
+Base Risk: 8.0 (large data volumes)
+Key Security Concerns: Data governance, privacy controls, access patterns, audit logging
+
+5. EDGECOMPUTING:
+-----------------
+Category: IOT_EDGE
+Required Branches: AUTHENTICATION, ENCRYPTION, MONITORING, PATCH_MANAGEMENT, NETWORK_SECURITY
+Base Risk: 7.5 (distributed, harder to secure)
+Key Security Concerns: Device identity, secure boot, OTA updates, network isolation
+
+6. QUANTUMSAFEENCRYPTION:
+-------------------------
+Category: CRYPTOGRAPHIC_CONTROLS
+Required Branches: ENCRYPTION, KEY_MANAGEMENT, COMPLIANCE, MONITORING
+Base Risk: 4.0 (future-proofing, currently theoretical)
+Key Security Concerns: Algorithm selection, migration planning, performance impact
+
+IMPLEMENTATION CHECKLIST:
+====================================================================================================
+
+Backend Implementation:
+□ Add 6 new node templates to _initialize_expanded_templates()
+□ Create 6 new YAML questionnaire files
+□ Update NodeCategory enum with new categories if needed
+□ Add risk calculation profiles for new node types
+□ Add threat intelligence mappings
+
+Frontend Integration:
+□ No changes needed - system is designed to auto-discover new node types
+□ UI will automatically show new node types in templates and creation flows
+
+Testing:
+□ Backend API test for 30+ supported node types
+□ Individual questionnaire endpoint tests
+□ Risk calculation tests for new node types
+□ Integration tests with existing features
+
+Validation:
+□ Verify test failure "Expected 25+ node types, got 24" is resolved
+□ Test comprehensive security modeling scenarios with new node types
+□ Validate questionnaire quality and security relevance
+
+EXPECTED OUTCOMES:
+====================================================================================================
+
+1. **Immediate Fix**: GET /api/expanded-nodes/supported-types returns 30 node types (was 24)
+2. **Enhanced Coverage**: 6 critical modern architecture components now supported
+3. **Better Security Modeling**: Users can model service meshes, edge computing, IaC security
+4. **Future-Proofing**: Quantum-safe encryption planning, advanced cloud services
+5. **Industry Relevance**: Configuration management, data lakes address real enterprise needs
+
+RISK ASSESSMENT:
+====================================================================================================
+
+LOW RISK IMPLEMENTATION:
+- Following established patterns from existing 24 node types
+- YAML-based questionnaire system is proven and stable
+- No changes to core APIs or data structures
+- New node types integrate seamlessly with existing features
+
+ROLLBACK PLAN:
+- If issues arise, can easily remove new templates from _initialize_expanded_templates()
+- YAML files are standalone and can be removed without affecting existing functionality
+- No database schema changes required
+
+TIME ESTIMATE: 4-6 hours total
+COMPLEXITY: Medium (well-defined patterns, straightforward expansion)
+SUCCESS CRITERIA: Backend test passes with 30+ node types, all questionnaires functional
+
+====================================================================================================
+END OF PLAN
+====================================================================================================
