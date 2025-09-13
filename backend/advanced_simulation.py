@@ -50,10 +50,21 @@ class AdvancedSimulationEngine:
     Advanced simulation engine using graph theory and security intelligence
     """
     
-    def __init__(self):
+    def __init__(self, nodes: Optional[List[Dict[str, Any]]] = None, edges: Optional[List[Dict[str, Any]]] = None):
+        """
+        Initialize simulation engine with optional nodes and edges
+        
+        Args:
+            nodes: List of node dictionaries for the diagram
+            edges: List of edge dictionaries for the diagram
+        """
         self.graph = nx.DiGraph()
         self.mitre_database = self._load_mitre_techniques()
         self.cve_database = self._load_cve_data()
+        
+        # Initialize graph with provided nodes and edges
+        if nodes and edges:
+            self._build_graph(nodes, edges)
         
     def _load_mitre_techniques(self) -> Dict[str, Dict[str, Any]]:
         """Load MITRE ATT&CK technique database (simplified version)"""
