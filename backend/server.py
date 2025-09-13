@@ -1606,6 +1606,28 @@ async def get_expanded_questionnaire(node_subtype: str, level: str):
     response["threat_intelligence"] = threat_intelligence
     return response
 
+def _extract_risk_factors(node_subtype: str, enhanced_responses: Dict[str, Any], risk_assessment: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract and structure risk factors from responses and assessment"""
+    risk_factors = {}
+    
+    # Extract key risk indicators from responses
+    for key, value in enhanced_responses.items():
+        if value and key in ['encryption_enabled', 'access_controls', 'monitoring_enabled', 'backup_strategy', 'network_segmentation']:
+            risk_factors[key] = {
+                "value": value,
+                "impact": "positive" if value else "negative"
+            }
+    
+    # Add risk assessment components
+    if "risk_components" in risk_assessment:
+        risk_factors["assessment_components"] = risk_assessment["risk_components"]
+    
+    # Add composite risk score
+    if "composite_risk_score" in risk_assessment:
+        risk_factors["composite_score"] = risk_assessment["composite_risk_score"]
+    
+    return risk_factors
+
 @api_router.post("/expanded-nodes/{node_subtype}/calculate-risk")
 async def calculate_expanded_risk(node_subtype: str, request: Dict[str, Any]):
     """Calculate comprehensive risk assessment using enhanced probabilistic model"""
