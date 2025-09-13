@@ -3260,6 +3260,457 @@ async def check_node_dependencies(node_subtype: str, request: dict):
     except Exception as e:
         logger.error(f"Error checking dependencies: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+#====================================================================================================
+# PHASE 1: CORE LOOP COMPLETION - ENHANCED API ROUTES
+#====================================================================================================
+
+@api_router.post("/questionnaires/{node_subtype}/complete")
+async def complete_questionnaire(
+    node_subtype: str, 
+    request: dict
+):
+    """
+    Complete questionnaire processing with end-to-end flow:
+    1. Process questionnaire responses
+    2. Run rule evaluation and simulation
+    3. Generate and persist findings
+    4. Return comprehensive results
+    """
+    try:
+        diagram_id = request.get("diagram_id")
+        node_id = request.get("node_id")
+        responses = request.get("responses", {})
+        user_id = request.get("user_id")
+        
+        if not diagram_id or not node_id:
+            raise HTTPException(status_code=400, detail="diagram_id and node_id are required")
+        
+        # Process questionnaire completion with full end-to-end flow
+        results = await questionnaire_processor.process_questionnaire_completion(
+            diagram_id=diagram_id,
+            node_id=node_id,
+            node_subtype=node_subtype,
+            questionnaire_responses=responses,
+            user_id=user_id
+        )
+        
+        return {
+            "success": True,
+            "message": f"Questionnaire completed successfully for {node_subtype} node",
+            "processing_results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Error completing questionnaire: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/simulate")
+async def enhanced_simulate(request: dict):
+    """
+    Enhanced simulation endpoint with comprehensive flags and options
+    """
+    try:
+        diagram_id = request.get("diagram_id")
+        simulation_type = request.get("type", "advanced")  # advanced, probabilistic, comprehensive
+        max_paths = request.get("max_paths", 10)
+        max_length = request.get("max_length", 6)
+        include_mitre = request.get("include_mitre", True)
+        include_recommendations = request.get("include_recommendations", True)
+        
+        if not diagram_id:
+            raise HTTPException(status_code=400, detail="diagram_id is required")
+        
+        # Get diagram data
+        diagram = await db.diagrams.find_one({"id": diagram_id})
+        if not diagram:
+            raise HTTPException(status_code=404, detail="Diagram not found")
+        
+        nodes = diagram.get("nodes", [])
+        edges = diagram.get("edges", [])
+        
+        if simulation_type == "advanced":
+            # Use advanced simulation engine
+            simulation_engine = AdvancedSimulationEngine(nodes, edges)
+            attack_paths = simulation_engine.find_attack_paths(max_paths=max_paths, max_length=max_length)
+            
+            results = {
+                "simulation_type": "advanced",
+                "attack_paths": [path.dict() if hasattr(path, 'dict') else str(path) for path in attack_paths],
+                "total_paths": len(attack_paths),
+                "diagram_id": diagram_id
+            }
+            
+        elif simulation_type == "probabilistic":
+            # Use probabilistic simulation
+            prob_results = probabilistic_engine.run_scenario_analysis(nodes, edges)
+            results = {
+                "simulation_type": "probabilistic",
+                "scenario_analysis": prob_results.dict() if hasattr(prob_results, 'dict') else str(prob_results),
+                "diagram_id": diagram_id
+            }
+            
+        else:  # comprehensive
+            # Run both advanced and probabilistic
+            simulation_engine = AdvancedSimulationEngine(nodes, edges)
+            attack_paths = simulation_engine.find_attack_paths(max_paths=max_paths, max_length=max_length)
+            prob_results = probabilistic_engine.run_scenario_analysis(nodes, edges)
+            
+            results = {
+                "simulation_type": "comprehensive",
+                "advanced_simulation": {
+                    "attack_paths": [path.dict() if hasattr(path, 'dict') else str(path) for path in attack_paths],
+                    "total_paths": len(attack_paths)
+                },
+                "probabilistic_simulation": prob_results.dict() if hasattr(prob_results, 'dict') else str(prob_results),
+                "diagram_id": diagram_id
+            }
+        
+        if include_mitre:
+            # Add MITRE technique analysis
+            mitre_analysis = await get_mitre_analysis_for_diagram(diagram_id)
+            results["mitre_analysis"] = mitre_analysis
+        
+        if include_recommendations:
+            # Generate security recommendations
+            recommendations = await generate_security_recommendations(nodes, edges)
+            results["recommendations"] = recommendations
+        
+        return {
+            "success": True,
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in enhanced simulation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/rules/evaluate")
+async def enhanced_rule_evaluation(request: dict):
+    """
+    Enhanced rule evaluation endpoint with impact assessment
+    """
+    try:
+        diagram_id = request.get("diagram_id")
+        node_filter = request.get("node_filter", [])  # Specific nodes to evaluate
+        rule_categories = request.get("rule_categories", [])  # Specific rule categories
+        include_recommendations = request.get("include_recommendations", True)
+        include_mitre = request.get("include_mitre", True)
+        
+        if not diagram_id:
+            raise HTTPException(status_code=400, detail="diagram_id is required")
+        
+        # Get diagram data
+        diagram = await db.diagrams.find_one({"id": diagram_id})
+        if not diagram:
+            raise HTTPException(status_code=404, detail="Diagram not found")
+        
+        nodes = diagram.get("nodes", [])
+        edges = diagram.get("edges", [])
+        
+        # Filter nodes if specified
+        if node_filter:
+            nodes = [node for node in nodes if node.get("id") in node_filter]
+        
+        # Run rule evaluation
+        rule_results = dsl_rule_engine.evaluate_rules(nodes, edges)
+        
+        # Filter by rule categories if specified
+        if rule_categories:
+            rule_results = [r for r in rule_results if r.category in rule_categories]
+        
+        # Calculate impact assessment
+        impact_assessment = {
+            "total_rules_triggered": len(rule_results),
+            "severity_distribution": {},
+            "categories_affected": set(),
+            "overall_risk_score": 0.0,
+            "critical_issues": [],
+            "recommendations_summary": []
+        }
+        
+        total_risk = 0.0
+        for result in rule_results:
+            # Update severity distribution
+            severity = result.impact_level
+            impact_assessment["severity_distribution"][severity] = impact_assessment["severity_distribution"].get(severity, 0) + 1
+            
+            # Track categories
+            impact_assessment["categories_affected"].add(result.category)
+            
+            # Accumulate risk
+            total_risk += result.risk_score
+            
+            # Track critical issues
+            if result.impact_level == "Critical":
+                impact_assessment["critical_issues"].append({
+                    "rule_name": result.rule_name,
+                    "affected_nodes": result.matching_nodes,
+                    "risk_score": result.risk_score
+                })
+            
+            # Collect recommendations
+            if include_recommendations:
+                impact_assessment["recommendations_summary"].extend(result.recommendations)
+        
+        # Calculate overall risk score
+        if rule_results:
+            impact_assessment["overall_risk_score"] = total_risk / len(rule_results)
+        
+        # Convert set to list for JSON serialization
+        impact_assessment["categories_affected"] = list(impact_assessment["categories_affected"])
+        
+        # Remove duplicates from recommendations
+        impact_assessment["recommendations_summary"] = list(set(impact_assessment["recommendations_summary"]))
+        
+        results = {
+            "diagram_id": diagram_id,
+            "rule_results": [result.dict() for result in rule_results],
+            "impact_assessment": impact_assessment,
+            "evaluation_timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+        if include_mitre:
+            # Add MITRE technique mapping
+            mitre_techniques = set()
+            for result in rule_results:
+                mitre_techniques.update(result.mitre_techniques)
+            results["mitre_techniques"] = list(mitre_techniques)
+        
+        return {
+            "success": True,
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in enhanced rule evaluation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Findings Management API Routes
+
+@api_router.post("/findings", response_model=Finding)
+async def create_finding(finding: Finding):
+    """Create a new security finding"""
+    try:
+        created_finding = await findings_manager.create_finding(finding)
+        return created_finding
+    except Exception as e:
+        logger.error(f"Error creating finding: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/findings/{finding_id}", response_model=Finding)
+async def get_finding(finding_id: str):
+    """Get a specific finding by ID"""
+    try:
+        finding = await findings_manager.get_finding(finding_id)
+        if not finding:
+            raise HTTPException(status_code=404, detail="Finding not found")
+        return finding
+    except Exception as e:
+        logger.error(f"Error getting finding: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/findings/{finding_id}", response_model=Finding)
+async def update_finding(finding_id: str, updates: dict):
+    """Update an existing finding"""
+    try:
+        updated_finding = await findings_manager.update_finding(finding_id, updates)
+        if not updated_finding:
+            raise HTTPException(status_code=404, detail="Finding not found")
+        return updated_finding
+    except Exception as e:
+        logger.error(f"Error updating finding: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/findings/{finding_id}")
+async def delete_finding(finding_id: str):
+    """Delete a finding"""
+    try:
+        deleted = await findings_manager.delete_finding(finding_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Finding not found")
+        return {"success": True, "message": "Finding deleted successfully"}
+    except Exception as e:
+        logger.error(f"Error deleting finding: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/findings", response_model=List[Finding])
+async def list_findings(
+    diagram_id: Optional[str] = None,
+    node_id: Optional[str] = None,
+    severity: Optional[str] = None,
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 100
+):
+    """List findings with optional filtering"""
+    try:
+        # Build filters
+        filters = FindingsFilter()
+        if diagram_id:
+            filters.diagram_id = diagram_id
+        if node_id:
+            filters.node_id = node_id
+        if severity:
+            filters.severity = [FindingSeverity(severity)]
+        if status:
+            filters.status = [FindingStatus(status)]
+        
+        findings = await findings_manager.list_findings(
+            filters=filters,
+            skip=skip,
+            limit=limit
+        )
+        return findings
+    except Exception as e:
+        logger.error(f"Error listing findings: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/findings/summary", response_model=FindingsSummary)
+async def get_findings_summary(diagram_id: Optional[str] = None):
+    """Get findings summary statistics"""
+    try:
+        summary = await findings_manager.get_findings_summary(diagram_id)
+        return summary
+    except Exception as e:
+        logger.error(f"Error getting findings summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/questionnaires/{node_subtype}")
+async def get_merged_questionnaire_prompts(node_subtype: str):
+    """Get merged questionnaire prompts from intelligent nodes and loader"""
+    try:
+        # Get prompts from intelligent nodes engine
+        intelligent_prompts = intelligent_node_engine.get_security_prompts(node_subtype)
+        
+        # Get prompts from questionnaire loader (YAML files)
+        try:
+            loader_prompts = questionnaire_loader.get_questionnaire(node_subtype, LoaderQuestionnaireLevel.BASIC)
+        except:
+            loader_prompts = []
+        
+        # Merge and structure the prompts
+        merged_prompts = []
+        
+        # Add intelligent node prompts
+        for prompt in intelligent_prompts:
+            merged_prompts.append({
+                "id": prompt.id,
+                "question": prompt.question,
+                "type": prompt.question_type,
+                "options": prompt.validation_rules.get("options", []) if prompt.validation_rules else [],
+                "help_text": prompt.help_text,
+                "related_branch": prompt.related_branch,
+                "source": "intelligent_nodes"
+            })
+        
+        # Add loader prompts (avoiding duplicates)
+        existing_ids = {p["id"] for p in merged_prompts}
+        for prompt in loader_prompts:
+            prompt_id = getattr(prompt, 'id', f"loader_{len(merged_prompts)}")
+            if prompt_id not in existing_ids:
+                merged_prompts.append({
+                    "id": prompt_id,
+                    "question": getattr(prompt, 'question', str(prompt)),
+                    "type": getattr(prompt, 'type', 'text'),
+                    "options": getattr(prompt, 'options', []),
+                    "help_text": getattr(prompt, 'help_text', ''),
+                    "related_branch": getattr(prompt, 'related_branch', ''),
+                    "source": "yaml_loader"
+                })
+        
+        return {
+            "success": True,
+            "node_subtype": node_subtype,
+            "prompts": merged_prompts,
+            "total_prompts": len(merged_prompts),
+            "sources": {
+                "intelligent_nodes": len(intelligent_prompts),
+                "yaml_loader": len(loader_prompts)
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting merged questionnaire prompts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Helper functions for enhanced simulation
+
+async def get_mitre_analysis_for_diagram(diagram_id: str) -> dict:
+    """Get MITRE technique analysis for a diagram"""
+    try:
+        # Get diagram
+        diagram = await db.diagrams.find_one({"id": diagram_id})
+        if not diagram:
+            return {}
+        
+        # Use existing MITRE coverage analysis
+        nodes = diagram.get("nodes", [])
+        edges = diagram.get("edges", [])
+        
+        # This would use the existing MITRE integration
+        coverage_analysis = mitre_db.analyze_coverage(nodes, edges)
+        return coverage_analysis
+        
+    except Exception as e:
+        logger.error(f"Error getting MITRE analysis: {e}")
+        return {}
+
+async def generate_security_recommendations(nodes: List[dict], edges: List[dict]) -> List[str]:
+    """Generate security recommendations based on diagram analysis"""
+    try:
+        recommendations = []
+        
+        # Analyze node types and generate recommendations
+        node_types = set()
+        for node in nodes:
+            node_type = node.get("data", {}).get("subtype", node.get("type", "unknown"))
+            node_types.add(node_type.lower())
+        
+        # Generate recommendations based on node types present
+        if "webapp" in node_types:
+            recommendations.extend([
+                "Implement Web Application Firewall (WAF)",
+                "Enable HTTPS/TLS encryption",
+                "Implement input validation and sanitization",
+                "Enable security headers (HSTS, CSP, etc.)"
+            ])
+        
+        if "database" in node_types:
+            recommendations.extend([
+                "Enable database encryption at rest",
+                "Implement database access controls",
+                "Enable database audit logging",
+                "Use connection encryption (TLS)"
+            ])
+        
+        if "api" in node_types:
+            recommendations.extend([
+                "Implement API rate limiting",
+                "Use OAuth 2.0 or similar authentication",
+                "Enable API logging and monitoring",
+                "Implement API input validation"
+            ])
+        
+        # Remove duplicates and return top recommendations
+        unique_recommendations = list(set(recommendations))
+        return unique_recommendations[:10]  # Return top 10
+        
+    except Exception as e:
+        logger.error(f"Error generating recommendations: {e}")
+        return []
+
+# Initialize database indexes on startup
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database indexes and components on startup"""
+    try:
+        # Create findings collection indexes
+        await findings_manager.create_indexes()
+        logger.info("Database indexes created successfully")
+    except Exception as e:
+        logger.error(f"Error creating database indexes: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
