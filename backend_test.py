@@ -5062,6 +5062,598 @@ class SecurityModelingAPITester:
             self.log_test("Priority 2 - Bulk Risk Assessment", False, f"Error: {str(e)}")
             return False
 
+    # ============================================================================
+    # PHASE 1 CORE LOOP COMPLETION TESTS - CRITICAL PRIORITY
+    # ============================================================================
+    
+    def test_questionnaire_completion_flow(self):
+        """Test POST /api/questionnaires/{node_subtype}/complete - Core completion flow"""
+        test_subtypes = ["WebApp", "Database"]
+        
+        for subtype in test_subtypes:
+            try:
+                # Create realistic questionnaire completion data
+                completion_data = {
+                    "responses": {
+                        "authentication_method": "OAuth2 with MFA",
+                        "https_enforcement": "Strict HTTPS with HSTS",
+                        "input_validation": "Comprehensive server-side validation",
+                        "security_logging": "Detailed audit logging enabled",
+                        "mfa_settings": "TOTP and SMS backup"
+                    } if subtype == "WebApp" else {
+                        "encryption_at_rest": "AES-256 encryption enabled",
+                        "encryption_in_transit": "TLS 1.3 for all connections",
+                        "access_controls": "Role-based access with least privilege",
+                        "backup_encryption": "Encrypted backups with key rotation",
+                        "audit_logging": "Comprehensive database audit trail"
+                    },
+                    "business_context": {
+                        "criticality": "High",
+                        "data_classification": "Confidential",
+                        "compliance_requirements": ["GDPR", "SOC2", "ISO27001"]
+                    }
+                }
+                
+                response = self.session.post(
+                    f"{self.base_url}/questionnaires/{subtype}/complete",
+                    json=completion_data,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Verify core completion flow fields
+                    expected_fields = [
+                        "completion_id", "node_subtype", "security_analysis", 
+                        "findings_generated", "framework_mappings", "risk_assessment"
+                    ]
+                    
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    if missing_fields:
+                        self.log_test(f"Questionnaire Completion - {subtype}", False, 
+                                    f"Missing completion flow fields: {missing_fields}")
+                        return False
+                    
+                    # Verify findings generation
+                    findings_generated = data.get("findings_generated", [])
+                    if not findings_generated:
+                        self.log_test(f"Questionnaire Completion - {subtype}", False, 
+                                    "No findings generated from questionnaire completion")
+                        return False
+                    
+                    # Verify framework mappings (8 frameworks expected)
+                    framework_mappings = data.get("framework_mappings", {})
+                    expected_frameworks = ["MITRE", "ASVS", "OWASP", "CIS", "NIST", "ISO27001", "SOC2", "GDPR"]
+                    mapped_frameworks = list(framework_mappings.keys())
+                    
+                    if len(mapped_frameworks) < 4:  # At least 4 frameworks should be mapped
+                        self.log_test(f"Questionnaire Completion - {subtype}", False, 
+                                    f"Insufficient framework mappings: {mapped_frameworks}")
+                        return False
+                    
+                    # Verify security analysis
+                    security_analysis = data.get("security_analysis", {})
+                    if not security_analysis or "risk_score" not in security_analysis:
+                        self.log_test(f"Questionnaire Completion - {subtype}", False, 
+                                    "Missing security analysis in completion flow")
+                        return False
+                    
+                    # Check response time requirement (< 3 seconds)
+                    response_time = response.elapsed.total_seconds()
+                    if response_time > 3.0:
+                        self.log_test(f"Questionnaire Completion - {subtype}", False, 
+                                    f"Response time {response_time:.2f}s exceeds 3s requirement")
+                        return False
+                    
+                    self.log_test(f"Questionnaire Completion - {subtype}", True, 
+                                f"Complete flow: {len(findings_generated)} findings, "
+                                f"{len(mapped_frameworks)} frameworks mapped, "
+                                f"response time: {response_time:.2f}s")
+                    
+                else:
+                    self.log_test(f"Questionnaire Completion - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Questionnaire Completion - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_findings_management_crud(self):
+        """Test Findings Management System CRUD operations"""
+        try:
+            # Test CREATE finding (POST /api/findings)
+            finding_data = {
+                "title": "SQL Injection Vulnerability in Search Function",
+                "description": "Unvalidated user input in search functionality allows SQL injection attacks",
+                "severity": "HIGH",
+                "status": "OPEN",
+                "source": "QUESTIONNAIRE_COMPLETION",
+                "node_id": str(uuid.uuid4()),
+                "node_subtype": "WebApp",
+                "framework_mappings": {
+                    "MITRE": ["T1190", "T1213"],
+                    "OWASP": ["A03:2021 – Injection"],
+                    "ASVS": ["V5.3.4", "V5.3.5"],
+                    "CIS": ["CIS-6.1"],
+                    "NIST": ["PR.DS-2", "DE.CM-1"],
+                    "ISO27001": ["A.12.6.1"],
+                    "SOC2": ["CC6.1"],
+                    "GDPR": ["Article 32"]
+                },
+                "risk_score": 8.5,
+                "affected_assets": ["customer_database", "user_portal"],
+                "remediation_steps": [
+                    "Implement parameterized queries",
+                    "Add input validation and sanitization",
+                    "Deploy WAF rules for SQL injection protection"
+                ]
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/findings",
+                json=finding_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                self.log_test("Findings CRUD - CREATE", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            created_finding = response.json()
+            finding_id = created_finding.get("id")
+            
+            if not finding_id:
+                self.log_test("Findings CRUD - CREATE", False, "No finding ID returned")
+                return False
+            
+            self.log_test("Findings CRUD - CREATE", True, f"Created finding: {finding_id}")
+            
+            # Test READ finding (GET /api/findings/{id})
+            response = self.session.get(f"{self.base_url}/findings/{finding_id}")
+            
+            if response.status_code != 200:
+                self.log_test("Findings CRUD - READ", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            retrieved_finding = response.json()
+            if retrieved_finding.get("id") != finding_id:
+                self.log_test("Findings CRUD - READ", False, "Retrieved finding ID mismatch")
+                return False
+            
+            self.log_test("Findings CRUD - READ", True, f"Retrieved finding: {retrieved_finding.get('title')}")
+            
+            # Test UPDATE finding (PUT /api/findings/{id})
+            update_data = {
+                **finding_data,
+                "status": "IN_PROGRESS",
+                "severity": "CRITICAL",
+                "risk_score": 9.2,
+                "remediation_steps": finding_data["remediation_steps"] + ["Implement real-time monitoring"]
+            }
+            
+            response = self.session.put(
+                f"{self.base_url}/findings/{finding_id}",
+                json=update_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                self.log_test("Findings CRUD - UPDATE", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            updated_finding = response.json()
+            if updated_finding.get("status") != "IN_PROGRESS":
+                self.log_test("Findings CRUD - UPDATE", False, "Finding status not updated")
+                return False
+            
+            self.log_test("Findings CRUD - UPDATE", True, f"Updated finding status to {updated_finding.get('status')}")
+            
+            # Test LIST findings (GET /api/findings)
+            response = self.session.get(f"{self.base_url}/findings")
+            
+            if response.status_code != 200:
+                self.log_test("Findings CRUD - LIST", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            findings_list = response.json()
+            if not isinstance(findings_list, list):
+                self.log_test("Findings CRUD - LIST", False, f"Expected list, got {type(findings_list)}")
+                return False
+            
+            # Verify our finding is in the list
+            our_finding = next((f for f in findings_list if f.get("id") == finding_id), None)
+            if not our_finding:
+                self.log_test("Findings CRUD - LIST", False, "Created finding not found in list")
+                return False
+            
+            self.log_test("Findings CRUD - LIST", True, f"Retrieved {len(findings_list)} findings")
+            
+            # Test DELETE finding (DELETE /api/findings/{id})
+            response = self.session.delete(f"{self.base_url}/findings/{finding_id}")
+            
+            if response.status_code != 200:
+                self.log_test("Findings CRUD - DELETE", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            # Verify deletion
+            response = self.session.get(f"{self.base_url}/findings/{finding_id}")
+            if response.status_code != 404:
+                self.log_test("Findings CRUD - DELETE", False, "Finding still exists after deletion")
+                return False
+            
+            self.log_test("Findings CRUD - DELETE", True, f"Successfully deleted finding: {finding_id}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Findings CRUD", False, f"Error: {str(e)}")
+            return False
+
+    def test_enhanced_simulation_endpoint(self):
+        """Test POST /api/simulate - Enhanced simulation with findings integration"""
+        try:
+            # Create realistic simulation data
+            simulation_data = {
+                "diagram_id": str(uuid.uuid4()),
+                "nodes": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "type": "Actor",
+                        "subtype": "ExternalAttacker",
+                        "label": "Advanced Persistent Threat",
+                        "position": {"x": 100, "y": 100},
+                        "data": {"sophistication": "High", "motivation": "Financial"}
+                    },
+                    {
+                        "id": str(uuid.uuid4()),
+                        "type": "Asset",
+                        "subtype": "WebApp",
+                        "label": "Customer Portal",
+                        "position": {"x": 400, "y": 100},
+                        "data": {"criticality": "High", "data_classification": "Confidential"}
+                    },
+                    {
+                        "id": str(uuid.uuid4()),
+                        "type": "Surface",
+                        "subtype": "SQLi",
+                        "label": "SQL Injection",
+                        "position": {"x": 250, "y": 150},
+                        "data": {"severity": "High", "exploitability": "High"}
+                    }
+                ],
+                "edges": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "source": "actor_id",
+                        "target": "surface_id",
+                        "label": "Exploits vulnerability"
+                    }
+                ],
+                "enhanced_flags": {
+                    "generate_findings": True,
+                    "framework_mapping": True,
+                    "comprehensive_analysis": True
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/simulate",
+                json=simulation_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify enhanced simulation fields
+                expected_fields = [
+                    "simulation_id", "attack_paths", "findings_generated", 
+                    "framework_mappings", "risk_assessment", "recommendations"
+                ]
+                
+                missing_fields = [f for f in expected_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Enhanced Simulation", False, f"Missing enhanced fields: {missing_fields}")
+                    return False
+                
+                # Verify findings integration
+                findings_generated = data.get("findings_generated", [])
+                if not findings_generated:
+                    self.log_test("Enhanced Simulation", False, "No findings generated from enhanced simulation")
+                    return False
+                
+                # Verify comprehensive flags
+                enhanced_flags = data.get("enhanced_flags", {})
+                if not enhanced_flags.get("comprehensive_analysis"):
+                    self.log_test("Enhanced Simulation", False, "Comprehensive analysis flag not set")
+                    return False
+                
+                # Check response time (< 1s for simulation)
+                response_time = response.elapsed.total_seconds()
+                if response_time > 1.0:
+                    self.log_test("Enhanced Simulation", False, 
+                                f"Response time {response_time:.2f}s exceeds 1s requirement")
+                    return False
+                
+                self.log_test("Enhanced Simulation", True, 
+                            f"Enhanced simulation: {len(findings_generated)} findings, "
+                            f"response time: {response_time:.2f}s")
+                return True
+            else:
+                self.log_test("Enhanced Simulation", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Enhanced Simulation", False, f"Error: {str(e)}")
+            return False
+
+    def test_enhanced_rule_evaluation(self):
+        """Test POST /api/rules/evaluate - Enhanced rule evaluation with MITRE integration"""
+        try:
+            # Create rule evaluation data
+            evaluation_data = {
+                "diagram_id": str(uuid.uuid4()),
+                "nodes": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "type": "Asset",
+                        "subtype": "WebApp",
+                        "data": {
+                            "authentication": "basic",
+                            "encryption": "none",
+                            "input_validation": "minimal"
+                        }
+                    },
+                    {
+                        "id": str(uuid.uuid4()),
+                        "type": "Asset", 
+                        "subtype": "Database",
+                        "data": {
+                            "encryption_at_rest": "disabled",
+                            "access_controls": "weak"
+                        }
+                    }
+                ],
+                "enhanced_evaluation": {
+                    "mitre_integration": True,
+                    "findings_generation": True,
+                    "framework_mapping": True
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/rules/evaluate",
+                json=evaluation_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify enhanced rule evaluation fields
+                expected_fields = [
+                    "evaluation_id", "rules_triggered", "findings_generated",
+                    "mitre_techniques", "framework_mappings", "risk_score"
+                ]
+                
+                missing_fields = [f for f in expected_fields if f not in data]
+                if missing_fields:
+                    self.log_test("Enhanced Rule Evaluation", False, f"Missing enhanced fields: {missing_fields}")
+                    return False
+                
+                # Verify MITRE integration
+                mitre_techniques = data.get("mitre_techniques", [])
+                if not mitre_techniques:
+                    self.log_test("Enhanced Rule Evaluation", False, "No MITRE techniques mapped")
+                    return False
+                
+                # Verify findings generation
+                findings_generated = data.get("findings_generated", [])
+                if not findings_generated:
+                    self.log_test("Enhanced Rule Evaluation", False, "No findings generated from rule evaluation")
+                    return False
+                
+                # Check response time (< 1s)
+                response_time = response.elapsed.total_seconds()
+                if response_time > 1.0:
+                    self.log_test("Enhanced Rule Evaluation", False, 
+                                f"Response time {response_time:.2f}s exceeds 1s requirement")
+                    return False
+                
+                rules_triggered = data.get("rules_triggered", [])
+                risk_score = data.get("risk_score", 0)
+                
+                self.log_test("Enhanced Rule Evaluation", True, 
+                            f"Enhanced evaluation: {len(rules_triggered)} rules triggered, "
+                            f"{len(findings_generated)} findings, "
+                            f"risk score: {risk_score}, "
+                            f"response time: {response_time:.2f}s")
+                return True
+            else:
+                self.log_test("Enhanced Rule Evaluation", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Enhanced Rule Evaluation", False, f"Error: {str(e)}")
+            return False
+
+    def test_merged_questionnaire_prompts(self):
+        """Test GET /api/questionnaires/{node_subtype} - Merged questionnaire prompts"""
+        test_subtypes = ["WebApp", "Database"]
+        
+        for subtype in test_subtypes:
+            try:
+                response = self.session.get(f"{self.base_url}/questionnaires/{subtype}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Verify merged prompts structure
+                    expected_fields = [
+                        "node_subtype", "merged_prompts", "security_configuration",
+                        "validation_rules", "help_text"
+                    ]
+                    
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    if missing_fields:
+                        self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, 
+                                    f"Missing merged prompts fields: {missing_fields}")
+                        return False
+                    
+                    # Verify comprehensive security configuration
+                    merged_prompts = data.get("merged_prompts", [])
+                    if not merged_prompts:
+                        self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, 
+                                    "No merged prompts returned")
+                        return False
+                    
+                    # Verify security-specific prompts for WebApp
+                    if subtype == "WebApp":
+                        expected_security_areas = [
+                            "authentication", "https_enforcement", "input_validation", 
+                            "security_logging", "mfa_settings"
+                        ]
+                        prompt_areas = [p.get("security_area") for p in merged_prompts if p.get("security_area")]
+                        
+                        missing_areas = [area for area in expected_security_areas if area not in prompt_areas]
+                        if missing_areas:
+                            self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, 
+                                        f"Missing security areas: {missing_areas}")
+                            return False
+                    
+                    # Verify security-specific prompts for Database
+                    if subtype == "Database":
+                        expected_security_areas = [
+                            "encryption_at_rest", "encryption_in_transit", "access_controls",
+                            "backup_encryption", "audit_logging"
+                        ]
+                        prompt_areas = [p.get("security_area") for p in merged_prompts if p.get("security_area")]
+                        
+                        missing_areas = [area for area in expected_security_areas if area not in prompt_areas]
+                        if missing_areas:
+                            self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, 
+                                        f"Missing security areas: {missing_areas}")
+                            return False
+                    
+                    # Verify validation rules and help text
+                    validation_rules = data.get("validation_rules", {})
+                    help_text = data.get("help_text", {})
+                    
+                    if not validation_rules or not help_text:
+                        self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, 
+                                    "Missing validation rules or help text")
+                        return False
+                    
+                    # Check response time (< 1s)
+                    response_time = response.elapsed.total_seconds()
+                    if response_time > 1.0:
+                        self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, 
+                                    f"Response time {response_time:.2f}s exceeds 1s requirement")
+                        return False
+                    
+                    self.log_test(f"Merged Questionnaire Prompts - {subtype}", True, 
+                                f"Merged prompts: {len(merged_prompts)} prompts, "
+                                f"response time: {response_time:.2f}s")
+                    
+                else:
+                    self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Merged Questionnaire Prompts - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_performance_and_error_handling(self):
+        """Test performance requirements and error handling"""
+        try:
+            # Test malformed request handling
+            malformed_data = {"invalid": "data", "missing_required_fields": True}
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/WebApp/complete",
+                json=malformed_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code not in [400, 422]:  # Should return validation error
+                self.log_test("Error Handling - Malformed Request", False, 
+                            f"Expected 400/422, got {response.status_code}")
+                return False
+            
+            self.log_test("Error Handling - Malformed Request", True, 
+                        f"Properly handled malformed request: HTTP {response.status_code}")
+            
+            # Test invalid ID handling
+            invalid_id = "invalid-uuid-format"
+            response = self.session.get(f"{self.base_url}/findings/{invalid_id}")
+            
+            if response.status_code not in [400, 404]:  # Should return not found or bad request
+                self.log_test("Error Handling - Invalid ID", False, 
+                            f"Expected 400/404, got {response.status_code}")
+                return False
+            
+            self.log_test("Error Handling - Invalid ID", True, 
+                        f"Properly handled invalid ID: HTTP {response.status_code}")
+            
+            # Test MongoDB connectivity (health check should verify this)
+            response = self.session.get(f"{self.base_url}/")
+            
+            if response.status_code != 200:
+                self.log_test("MongoDB Connectivity", False, 
+                            f"Health check failed: HTTP {response.status_code}")
+                return False
+            
+            self.log_test("MongoDB Connectivity", True, "Database connectivity verified")
+            
+            # Test framework integration accuracy
+            framework_test_data = {
+                "responses": {
+                    "sql_injection_vulnerability": "present",
+                    "weak_authentication": "basic_auth_only"
+                },
+                "business_context": {"criticality": "High"}
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/WebApp/complete",
+                json=framework_test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                framework_mappings = data.get("framework_mappings", {})
+                
+                # Verify all 8 frameworks are supported
+                expected_frameworks = ["MITRE", "ASVS", "OWASP", "CIS", "NIST", "ISO27001", "SOC2", "GDPR"]
+                mapped_frameworks = list(framework_mappings.keys())
+                
+                framework_coverage = len([f for f in expected_frameworks if f in mapped_frameworks])
+                if framework_coverage < 6:  # At least 6 out of 8 frameworks should be mapped
+                    self.log_test("Framework Integration", False, 
+                                f"Insufficient framework coverage: {framework_coverage}/8")
+                    return False
+                
+                self.log_test("Framework Integration", True, 
+                            f"Framework integration: {framework_coverage}/8 frameworks mapped")
+            else:
+                self.log_test("Framework Integration", False, 
+                            f"Framework test failed: HTTP {response.status_code}")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Performance and Error Handling", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
