@@ -16,13 +16,13 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime, timezone
 
-from .findings_management import (
+from findings_management import (
     FindingsManager, Finding, FindingSeverity, FindingSource,
     create_questionnaire_finding, create_rule_engine_finding, create_simulation_finding
 )
-from .dsl_rule_engine import DSLRuleEngine
-from .advanced_simulation import AdvancedSimulationEngine
-from .intelligent_nodes import IntelligentNodeEngine
+from dsl_rule_engine import DSLRuleEngine
+from advanced_simulation import AdvancedSimulationEngine
+from intelligent_nodes import IntelligentNodeEngine
 
 logger = logging.getLogger(__name__)
 
