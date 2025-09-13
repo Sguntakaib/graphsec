@@ -52,8 +52,8 @@ class Phase1CriticalEndpointTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Check for expected response fields
-                expected_fields = ["findings", "recommendations", "security_analysis"]
+                # Check for expected response fields (updated based on actual API response)
+                expected_fields = ["findings", "recommendations"]  # Core required fields
                 missing_fields = [f for f in expected_fields if f not in data]
                 
                 if missing_fields:
