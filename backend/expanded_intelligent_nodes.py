@@ -806,9 +806,710 @@ class ExpandedIntelligentNodeEngine:
             )
         }
         
-        # Add more node types... (Due to length constraints, showing pattern)
-        # Additional nodes would include: LoadBalancer, KMS, CloudTrail, 
-        # SecurityGroups, Docker, MessageQueue, Monitoring, etc.
+        # ===== ADDITIONAL CLOUD INFRASTRUCTURE NODES =====
+        
+        # Application Load Balancer
+        templates["LoadBalancer"] = {
+            "node_type": "Control",
+            "node_subtype": "LoadBalancer",
+            "category": NodeCategory.NETWORK_COMPONENTS,
+            "description": "Application Load Balancer for Traffic Distribution",
+            "required_branches": [
+                SecurityBranchType.LOAD_BALANCER,
+                SecurityBranchType.NETWORK_SECURITY,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.WAF
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "lb_type",
+                        "question": "What type of load balancer is configured?",
+                        "type": "single_choice",
+                        "options": ["Application Load Balancer", "Network Load Balancer", "Classic Load Balancer", "Gateway Load Balancer"],
+                        "help_text": "Different load balancer types provide varying security features.",
+                        "related_branch": SecurityBranchType.LOAD_BALANCER
+                    },
+                    {
+                        "id": "lb_internet_facing",
+                        "question": "Is the load balancer internet-facing?",
+                        "type": "boolean",
+                        "help_text": "Internet-facing load balancers have higher attack surface.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "lb_ssl_termination",
+                        "question": "How is SSL/TLS configured?",
+                        "type": "single_choice",
+                        "options": ["SSL Termination at LB", "End-to-End Encryption", "No SSL", "Mixed Configuration"],
+                        "help_text": "SSL termination affects security posture and performance.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=32,
+                recent_threats=["DDoS Attacks", "SSL/TLS Exploits", "Traffic Manipulation"],
+                attack_vectors=["Protocol Exploitation", "Certificate Spoofing", "Resource Exhaustion"],
+                mitre_techniques=["T1190", "T1557", "T1499"],
+                threat_actors=["DDoS Groups", "Web Attackers"]
+            )
+        }
+        
+        # KMS (Key Management Service)
+        templates["KMS"] = {
+            "node_type": "Control",
+            "node_subtype": "KMS",
+            "category": NodeCategory.SECURITY_SERVICES,
+            "description": "Key Management Service for Encryption",
+            "required_branches": [
+                SecurityBranchType.KEY_MANAGEMENT,
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.COMPLIANCE
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "kms_key_type",
+                        "question": "What type of KMS keys are used?",
+                        "type": "multiple_choice",
+                        "options": ["Customer Managed Keys", "AWS Managed Keys", "CloudHSM Keys", "External Keys"],
+                        "help_text": "Different key types provide varying levels of control and security.",
+                        "related_branch": SecurityBranchType.KEY_MANAGEMENT
+                    },
+                    {
+                        "id": "kms_key_rotation",
+                        "question": "Is automatic key rotation enabled?",
+                        "type": "boolean",
+                        "help_text": "Key rotation reduces the impact of key compromise.",
+                        "related_branch": SecurityBranchType.KEY_MANAGEMENT
+                    },
+                    {
+                        "id": "kms_access_policies",
+                        "question": "How are key access policies configured?",
+                        "type": "single_choice",
+                        "options": ["Least Privilege", "Role-based Access", "Broad Access", "Default Policies"],
+                        "help_text": "Restrictive access policies prevent unauthorized key usage.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=15,
+                recent_threats=["Key Compromise", "Privilege Escalation", "Cryptographic Attacks"],
+                attack_vectors=["Policy Misconfiguration", "Side-channel Attacks", "Key Extraction"],
+                mitre_techniques=["T1552", "T1078", "T1140"],
+                threat_actors=["APT Groups", "Cryptographic Attackers"]
+            )
+        }
+        
+        # CloudTrail
+        templates["CloudTrail"] = {
+            "node_type": "Control",
+            "node_subtype": "CloudTrail",
+            "category": NodeCategory.MONITORING_LOGGING,
+            "description": "AWS CloudTrail for API Activity Logging",
+            "required_branches": [
+                SecurityBranchType.LOGGING,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.COMPLIANCE,
+                SecurityBranchType.INCIDENT_RESPONSE
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "cloudtrail_coverage",
+                        "question": "What CloudTrail coverage is configured?",
+                        "type": "single_choice",
+                        "options": ["All Regions", "Single Region", "Multi-Region", "Organization Trail"],
+                        "help_text": "Comprehensive coverage ensures complete audit logging.",
+                        "related_branch": SecurityBranchType.LOGGING
+                    },
+                    {
+                        "id": "cloudtrail_data_events",
+                        "question": "Are data events logged?",
+                        "type": "single_choice",
+                        "options": ["All Data Events", "S3 Only", "Lambda Only", "No Data Events"],
+                        "help_text": "Data events provide detailed activity tracking.",
+                        "related_branch": SecurityBranchType.LOGGING
+                    },
+                    {
+                        "id": "cloudtrail_log_integrity",
+                        "question": "Is log file integrity validation enabled?",
+                        "type": "boolean",
+                        "help_text": "Integrity validation detects log tampering.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=8,
+                recent_threats=["Log Tampering", "Audit Evasion", "Compliance Violations"],
+                attack_vectors=["Log Deletion", "Event Manipulation", "Access Bypass"],
+                mitre_techniques=["T1562", "T1070", "T1078"],
+                threat_actors=["Insider Threats", "Advanced Attackers"]
+            )
+        }
+        
+        # Security Groups
+        templates["SecurityGroups"] = {
+            "node_type": "Control",
+            "node_subtype": "SecurityGroups",
+            "category": NodeCategory.NETWORK_COMPONENTS,
+            "description": "AWS Security Groups - Virtual Firewall Rules",
+            "required_branches": [
+                SecurityBranchType.FIREWALL,
+                SecurityBranchType.NETWORK_SECURITY,
+                SecurityBranchType.ACCESS_CONTROL
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "sg_inbound_rules",
+                        "question": "How are inbound rules configured?",
+                        "type": "single_choice",
+                        "options": ["Least Privilege (Specific IPs/Ports)", "Standard Ports", "Wide Open (0.0.0.0/0)", "Mixed Configuration"],
+                        "help_text": "Restrictive inbound rules reduce attack surface.",
+                        "related_branch": SecurityBranchType.FIREWALL
+                    },
+                    {
+                        "id": "sg_outbound_rules",
+                        "question": "How are outbound rules configured?",
+                        "type": "single_choice",
+                        "options": ["Restricted Outbound", "Standard Outbound", "Allow All", "Custom Rules"],
+                        "help_text": "Outbound restrictions prevent data exfiltration.",
+                        "related_branch": SecurityBranchType.FIREWALL
+                    },
+                    {
+                        "id": "sg_unused_rules",
+                        "question": "Are unused security group rules regularly reviewed?",
+                        "type": "boolean",
+                        "help_text": "Regular review prevents rule creep and reduces attack surface.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=5,
+                recent_threats=["Rule Misconfiguration", "Privilege Escalation", "Network Reconnaissance"],
+                attack_vectors=["Open Ports", "Default Rules", "Rule Manipulation"],
+                mitre_techniques=["T1018", "T1040", "T1046"],
+                threat_actors=["Network Attackers", "Insider Threats"]
+            )
+        }
+        
+        # Docker Container
+        templates["Docker"] = {
+            "node_type": "Asset",
+            "node_subtype": "Docker",
+            "category": NodeCategory.CONTAINER_DEVOPS,
+            "description": "Docker Container Runtime Environment",
+            "required_branches": [
+                SecurityBranchType.CONTAINER_SECURITY,
+                SecurityBranchType.VULNERABILITY_SCANNING,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.MONITORING
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "docker_base_image",
+                        "question": "What base image is used?",
+                        "type": "single_choice",
+                        "options": ["Official Minimal (Alpine/Distroless)", "Official Standard", "Third-party", "Custom Built", "Unknown"],
+                        "help_text": "Minimal official images reduce attack surface and vulnerabilities.",
+                        "related_branch": SecurityBranchType.CONTAINER_SECURITY
+                    },
+                    {
+                        "id": "docker_privileged_mode",
+                        "question": "Is the container running in privileged mode?",
+                        "type": "boolean",
+                        "help_text": "Privileged containers have full host access and security risks.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    },
+                    {
+                        "id": "docker_image_scanning",
+                        "question": "Is container image vulnerability scanning performed?",
+                        "type": "single_choice",
+                        "options": ["Continuous Scanning", "Build-time Only", "Manual Scanning", "No Scanning"],
+                        "help_text": "Regular scanning identifies vulnerabilities in container images.",
+                        "related_branch": SecurityBranchType.VULNERABILITY_SCANNING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=287,
+                recent_threats=["Container Escape", "Malicious Images", "Runtime Exploits"],
+                attack_vectors=["Privileged Escalation", "Image Poisoning", "Resource Abuse"],
+                mitre_techniques=["T1611", "T1610", "T1055"],
+                threat_actors=["TeamTNT", "Kinsing", "Hildegard"]
+            )
+        }
+        
+        # Message Queue
+        templates["MessageQueue"] = {
+            "node_type": "Asset",
+            "node_subtype": "MessageQueue",
+            "category": NodeCategory.APPLICATION_SERVICES,
+            "description": "Message Queue Service (SQS/RabbitMQ/Kafka)",
+            "required_branches": [
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.MESSAGE_SECURITY
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "mq_type",
+                        "question": "What message queue technology is used?",
+                        "type": "single_choice",
+                        "options": ["Amazon SQS", "Apache Kafka", "RabbitMQ", "Azure Service Bus", "Google Pub/Sub", "Redis", "Custom"],
+                        "help_text": "Different queue technologies have varying security characteristics.",
+                        "related_branch": SecurityBranchType.APPLICATION_SERVICES
+                    },
+                    {
+                        "id": "mq_encryption_transit",
+                        "question": "Is encryption in transit configured?",
+                        "type": "boolean",
+                        "help_text": "Encryption protects message data during transmission.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "mq_access_control",
+                        "question": "How is access control configured?",
+                        "type": "single_choice",
+                        "options": ["IAM-based", "Certificate-based", "Username/Password", "API Keys", "No Authentication"],
+                        "help_text": "Strong access control prevents unauthorized message access.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=64,
+                recent_threats=["Message Injection", "Queue Poisoning", "Denial of Service"],
+                attack_vectors=["Unauthenticated Access", "Message Tampering", "Resource Exhaustion"],
+                mitre_techniques=["T1190", "T1499", "T1565"],
+                threat_actors=["Application Attackers", "Bot Networks"]
+            )
+        }
+        
+        # Monitoring Service
+        templates["Monitoring"] = {
+            "node_type": "Control",
+            "node_subtype": "Monitoring", 
+            "category": NodeCategory.MONITORING_LOGGING,
+            "description": "Monitoring and Alerting Service (CloudWatch/Prometheus)",
+            "required_branches": [
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.LOGGING,
+                SecurityBranchType.INCIDENT_RESPONSE,
+                SecurityBranchType.COMPLIANCE
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "monitoring_type",
+                        "question": "What monitoring solution is deployed?",
+                        "type": "single_choice",
+                        "options": ["AWS CloudWatch", "Prometheus/Grafana", "Datadog", "New Relic", "Splunk", "ELK Stack", "Custom"],
+                        "help_text": "Different monitoring solutions provide varying security capabilities.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "monitoring_metrics",
+                        "question": "What types of metrics are collected?",
+                        "type": "multiple_choice",
+                        "options": ["System Metrics", "Application Metrics", "Security Events", "User Activity", "Network Traffic", "Custom Metrics"],
+                        "help_text": "Comprehensive metrics provide better security visibility.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "monitoring_alerting",
+                        "question": "How are security alerts configured?",
+                        "type": "single_choice",
+                        "options": ["Real-time Alerting", "Batch Alerting", "Manual Review", "No Alerting"],
+                        "help_text": "Real-time alerting enables faster incident response.",
+                        "related_branch": SecurityBranchType.INCIDENT_RESPONSE
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=43,
+                recent_threats=["Monitoring Evasion", "Log Injection", "Alert Fatigue"],
+                attack_vectors=["Blind Spot Exploitation", "False Positive Generation", "Data Poisoning"],
+                mitre_techniques=["T1562", "T1070", "T1036"],
+                threat_actors=["Advanced Persistent Threats", "Insider Threats"]
+            )
+        }
+        
+        # Content Delivery Network
+        templates["CDN"] = {
+            "node_type": "Control",
+            "node_subtype": "CDN",
+            "category": NodeCategory.NETWORK_COMPONENTS,
+            "description": "Content Delivery Network (CloudFront/Cloudflare)",
+            "required_branches": [
+                SecurityBranchType.WAF,
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.DDoS_PROTECTION
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "cdn_provider",
+                        "question": "What CDN provider is used?",
+                        "type": "single_choice",
+                        "options": ["Amazon CloudFront", "Cloudflare", "Azure CDN", "Google Cloud CDN", "Fastly", "KeyCDN", "Custom"],
+                        "help_text": "Different CDN providers offer varying security features.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "cdn_waf_integration",
+                        "question": "Is WAF integrated with the CDN?",
+                        "type": "boolean",
+                        "help_text": "WAF integration provides application layer protection.",
+                        "related_branch": SecurityBranchType.WAF
+                    },
+                    {
+                        "id": "cdn_ssl_tls",
+                        "question": "How is SSL/TLS configured?",
+                        "type": "single_choice",
+                        "options": ["TLS 1.3 Only", "TLS 1.2+", "Mixed Versions", "HTTP Only"],
+                        "help_text": "Modern TLS versions provide better security.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=28,
+                recent_threats=["Cache Poisoning", "Origin Exposure", "DDoS Attacks"],
+                attack_vectors=["Edge Server Compromise", "Certificate Issues", "Misconfiguration"],
+                mitre_techniques=["T1190", "T1499", "T1557"],
+                threat_actors=["DDoS Groups", "Web Attackers"]
+            )
+        }
+        
+        # API Gateway
+        templates["APIGateway"] = {
+            "node_type": "Control",
+            "node_subtype": "APIGateway",
+            "category": NodeCategory.APPLICATION_SERVICES,
+            "description": "API Gateway for API Management and Security",
+            "required_branches": [
+                SecurityBranchType.API,
+                SecurityBranchType.AUTHENTICATION,
+                SecurityBranchType.RATE_LIMITING,
+                SecurityBranchType.MONITORING
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "apigw_type",
+                        "question": "What type of API Gateway is deployed?",
+                        "type": "single_choice",
+                        "options": ["AWS API Gateway", "Kong", "Ambassador", "Istio Gateway", "Nginx", "Custom"],
+                        "help_text": "Different gateways provide varying security capabilities.",
+                        "related_branch": SecurityBranchType.API
+                    },
+                    {
+                        "id": "apigw_authentication",
+                        "question": "What authentication methods are supported?",
+                        "type": "multiple_choice",
+                        "options": ["OAuth 2.0", "JWT", "API Keys", "IAM", "Custom Authorizers", "No Authentication"],
+                        "help_text": "Strong authentication prevents unauthorized API access.",
+                        "related_branch": SecurityBranchType.AUTHENTICATION
+                    },
+                    {
+                        "id": "apigw_rate_limiting",
+                        "question": "Is rate limiting configured?",
+                        "type": "single_choice",
+                        "options": ["Per-User Rate Limiting", "Global Rate Limiting", "Burst Limiting", "No Rate Limiting"],
+                        "help_text": "Rate limiting prevents API abuse and DoS attacks.",
+                        "related_branch": SecurityBranchType.RATE_LIMITING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=52,
+                recent_threats=["API Abuse", "Authentication Bypass", "Rate Limit Evasion"],
+                attack_vectors=["Broken Authentication", "Excessive Data Exposure", "Injection Attacks"],
+                mitre_techniques=["T1190", "T1078", "T1059"],
+                threat_actors=["API Attackers", "Bot Networks"]
+            )
+        }
+        
+        # Network ACL
+        templates["NetworkACL"] = {
+            "node_type": "Control",
+            "node_subtype": "NetworkACL",
+            "category": NodeCategory.NETWORK_COMPONENTS,
+            "description": "Network Access Control Lists",
+            "required_branches": [
+                SecurityBranchType.NETWORK_SECURITY,
+                SecurityBranchType.FIREWALL,
+                SecurityBranchType.ACCESS_CONTROL
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "nacl_rules",
+                        "question": "How are NACL rules configured?",
+                        "type": "single_choice",
+                        "options": ["Deny by Default", "Allow by Default", "Mixed Rules", "Default AWS Rules"],
+                        "help_text": "Deny by default provides better security posture.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "nacl_logging",
+                        "question": "Is NACL traffic logging enabled?",
+                        "type": "boolean",
+                        "help_text": "Logging provides visibility into blocked traffic.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=7,
+                recent_threats=["Rule Bypass", "Network Reconnaissance", "Lateral Movement"],
+                attack_vectors=["Misconfiguration", "Rule Gaps", "Protocol Tunneling"],
+                mitre_techniques=["T1090", "T1046", "T1021"],
+                threat_actors=["Network Attackers", "Advanced Threats"]
+            )
+        }
+        
+        # Secrets Manager  
+        templates["SecretsManager"] = {
+            "node_type": "Control",
+            "node_subtype": "SecretsManager",
+            "category": NodeCategory.SECURITY_SERVICES,
+            "description": "Secrets Management Service",
+            "required_branches": [
+                SecurityBranchType.SECRETS_MANAGEMENT,
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.COMPLIANCE
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "secrets_type",
+                        "question": "What secrets management solution is used?",
+                        "type": "single_choice",
+                        "options": ["AWS Secrets Manager", "HashiCorp Vault", "Azure Key Vault", "Google Secret Manager", "Kubernetes Secrets", "Custom"],
+                        "help_text": "Different solutions provide varying security capabilities.",
+                        "related_branch": SecurityBranchType.SECRETS_MANAGEMENT
+                    },
+                    {
+                        "id": "secrets_rotation",
+                        "question": "Is automatic secret rotation enabled?",
+                        "type": "boolean",
+                        "help_text": "Automatic rotation reduces the impact of secret compromise.",
+                        "related_branch": SecurityBranchType.SECRETS_MANAGEMENT
+                    },
+                    {
+                        "id": "secrets_access_control",
+                        "question": "How is access to secrets controlled?",
+                        "type": "single_choice",
+                        "options": ["IAM Policies", "RBAC", "Service Accounts", "API Keys", "Basic Authentication"],
+                        "help_text": "Strong access control prevents unauthorized secret access.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=19,
+                recent_threats=["Secret Exposure", "Privilege Escalation", "Credential Theft"],
+                attack_vectors=["Configuration Errors", "Access Policy Bypass", "Log Exposure"],
+                mitre_techniques=["T1552", "T1078", "T1083"],
+                threat_actors=["Insider Threats", "APT Groups"]
+            )
+        }
+        
+        # Database Proxy
+        templates["DatabaseProxy"] = {
+            "node_type": "Control",
+            "node_subtype": "DatabaseProxy",
+            "category": NodeCategory.DATA_STORAGE,
+            "description": "Database Proxy Service (RDS Proxy/ProxySQL)",
+            "required_branches": [
+                SecurityBranchType.DATABASE,
+                SecurityBranchType.AUTHENTICATION,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.ACCESS_CONTROL
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "db_proxy_type",
+                        "question": "What database proxy solution is used?",
+                        "type": "single_choice",
+                        "options": ["AWS RDS Proxy", "ProxySQL", "PgBouncer", "Custom Proxy", "No Proxy"],
+                        "help_text": "Database proxies can improve security and performance.",
+                        "related_branch": SecurityBranchType.DATABASE
+                    },
+                    {
+                        "id": "db_proxy_auth",
+                        "question": "How does the proxy handle authentication?",
+                        "type": "single_choice",
+                        "options": ["IAM Authentication", "Connection Pooling", "Credential Management", "Pass-through", "Custom"],
+                        "help_text": "Proxy authentication can centralize database access control.",
+                        "related_branch": SecurityBranchType.AUTHENTICATION
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=25,
+                recent_threats=["Connection Hijacking", "Credential Interception", "SQL Injection"],
+                attack_vectors=["Proxy Bypass", "Authentication Weakness", "Protocol Exploitation"],
+                mitre_techniques=["T1557", "T1078", "T1190"],
+                threat_actors=["Database Attackers", "APT Groups"]
+            )
+        }
+        
+        # Backup Service
+        templates["Backup"] = {
+            "node_type": "Control",
+            "node_subtype": "Backup",
+            "category": NodeCategory.DATA_STORAGE,
+            "description": "Backup and Recovery Service",
+            "required_branches": [
+                SecurityBranchType.BACKUP,
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.COMPLIANCE
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "backup_type",
+                        "question": "What backup solution is used?",
+                        "type": "single_choice",
+                        "options": ["AWS Backup", "Native Database Backups", "Third-party Solution", "Custom Scripts", "No Automated Backups"],
+                        "help_text": "Automated backup solutions provide better reliability.",
+                        "related_branch": SecurityBranchType.BACKUP
+                    },
+                    {
+                        "id": "backup_encryption",
+                        "question": "Are backups encrypted?",
+                        "type": "single_choice",
+                        "options": ["Encrypted at Rest and Transit", "Encrypted at Rest Only", "Encrypted in Transit Only", "No Encryption"],
+                        "help_text": "Encryption protects backup data from unauthorized access.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "backup_retention",
+                        "question": "What is the backup retention policy?",
+                        "type": "single_choice",
+                        "options": ["Long-term (1+ years)", "Medium-term (3-12 months)", "Short-term (1-3 months)", "No Defined Policy"],
+                        "help_text": "Appropriate retention periods support recovery and compliance.",
+                        "related_branch": SecurityBranchType.BACKUP
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=31,
+                recent_threats=["Ransomware", "Backup Corruption", "Data Theft"],
+                attack_vectors=["Backup System Compromise", "Encryption Key Theft", "Access Control Bypass"],
+                mitre_techniques=["T1490", "T1486", "T1005"],
+                threat_actors=["Ransomware Groups", "Insider Threats"]
+            )
+        }
+        
+        # Certificate Manager
+        templates["CertificateManager"] = {
+            "node_type": "Control",
+            "node_subtype": "CertificateManager",
+            "category": NodeCategory.SECURITY_SERVICES,
+            "description": "SSL/TLS Certificate Management Service",
+            "required_branches": [
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.KEY_MANAGEMENT,
+                SecurityBranchType.COMPLIANCE,
+                SecurityBranchType.MONITORING
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "cert_provider",
+                        "question": "What certificate management solution is used?",
+                        "type": "single_choice",
+                        "options": ["AWS Certificate Manager", "Let's Encrypt", "Commercial CA", "Internal CA", "Self-signed"],
+                        "help_text": "Different certificate sources have varying trust and security levels.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "cert_auto_renewal",
+                        "question": "Is automatic certificate renewal configured?",
+                        "type": "boolean",
+                        "help_text": "Automatic renewal prevents certificate expiration issues.",
+                        "related_branch": SecurityBranchType.KEY_MANAGEMENT
+                    },
+                    {
+                        "id": "cert_monitoring",
+                        "question": "Is certificate expiration monitoring enabled?",
+                        "type": "boolean",
+                        "help_text": "Monitoring alerts on upcoming certificate expirations.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=12,
+                recent_threats=["Certificate Spoofing", "Weak Certificates", "CA Compromise"],
+                attack_vectors=["Certificate Pinning Bypass", "Man-in-the-Middle", "Certificate Authority Attack"],
+                mitre_techniques=["T1557", "T1588", "T1608"],
+                threat_actors=["Nation-state Actors", "Certificate Attackers"]
+            )
+        }
+        
+        # Route 53 DNS
+        templates["DNS"] = {
+            "node_type": "Control",
+            "node_subtype": "DNS",
+            "category": NodeCategory.NETWORK_COMPONENTS,
+            "description": "DNS Service (Route 53/CloudFlare DNS)",
+            "required_branches": [
+                SecurityBranchType.NETWORK_SECURITY,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.DDoS_PROTECTION
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "dns_provider",
+                        "question": "What DNS provider is used?",
+                        "type": "single_choice",
+                        "options": ["AWS Route 53", "Cloudflare DNS", "Google Cloud DNS", "Azure DNS", "Internal DNS", "ISP DNS"],
+                        "help_text": "Different DNS providers offer varying security and reliability features.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "dns_dnssec",
+                        "question": "Is DNSSEC enabled?",
+                        "type": "boolean",
+                        "help_text": "DNSSEC provides authentication and integrity for DNS responses.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "dns_logging",
+                        "question": "Is DNS query logging enabled?",
+                        "type": "boolean",
+                        "help_text": "DNS logging provides visibility into domain resolution patterns.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=24,
+                recent_threats=["DNS Hijacking", "Cache Poisoning", "DDoS Attacks"],
+                attack_vectors=["DNS Spoofing", "Subdomain Takeover", "Amplification Attacks"],
+                mitre_techniques=["T1584", "T1583", "T1499"],
+                threat_actors=["DNS Hijackers", "DDoS Groups"]
+            )
+        }
         
         return templates
     
