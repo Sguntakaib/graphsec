@@ -3671,7 +3671,9 @@ async def get_merged_questionnaire_prompts(node_subtype: str):
                 "Exposure to external networks",
                 "Data sensitivity level"
             ],
-            "dependencies": intelligent_node_engine.check_conditional_dependencies(node_subtype, {}) if hasattr(intelligent_node_engine, 'check_conditional_dependencies') else []
+            "dependencies": intelligent_node_engine.check_conditional_dependencies(node_subtype, {}) if hasattr(intelligent_node_engine, 'check_conditional_dependencies') else [],
+            # Add security branches field as expected by test
+            "security_branches": intelligent_node_engine.create_security_branches(node_subtype, {}) if hasattr(intelligent_node_engine, 'create_security_branches') else []
         }
         
         return enhanced_response
