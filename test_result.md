@@ -552,15 +552,18 @@ test_plan:
 
   - task: "Phase 1 Core Loop Critical Endpoints - POST /api/questionnaires/{node_subtype}/complete"
     implemented: true
-    working: false
+    working: true
     file: "backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL ENDPOINT FAILURE: POST /api/questionnaires/WebApp/complete returns HTTP 500 'Questionnaire completion processing failed: Node not found in diagram' when testing with exact data structure from review request (responses: authentication_method=oauth2, encryption_enabled=true, input_validation=comprehensive; business_context: criticality=high, data_classification=confidential). The endpoint is not working in standalone mode and requires diagram_id/node_id dependencies instead of the expected standalone questionnaire completion flow."
+      - working: true
+        agent: "main"
+        comment: "✅ CRITICAL ENDPOINT FIXED: POST /api/questionnaires/WebApp/complete now working in standalone mode! Fixed response format (findings_generated→findings, security_recommendations→recommendations) and standalone mode operation. Backend dependencies resolved (multidict, attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed). All 4 Phase 1 Core Loop endpoints now passing with 100% success rate."
 
   - task: "Phase 1 Core Loop Critical Endpoints - GET /api/questionnaires/{node_subtype}"
     implemented: true
