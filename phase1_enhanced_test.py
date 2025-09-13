@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://multilevelquiz.preview.emergentagent.com/api"
+BASE_URL = "https://project-roadmap-7.preview.emergentagent.com/api"
 
 class Phase1EnhancedAPITester:
     def __init__(self):
