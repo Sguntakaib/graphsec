@@ -128,18 +128,20 @@ class ThreatIntelligence:
 @dataclass
 class RiskMetrics:
     """Enhanced risk calculation metrics with probabilistic modeling"""
-    base_risk: float = 5.0
-    attack_surface_score: float = 5.0
-    vulnerability_score: float = 5.0
-    control_effectiveness: float = 5.0
-    business_impact: float = 5.0
-    threat_probability: float = 0.5
     
-    # Priority 1: Probabilistic Modeling Enhancement - NEW FIELDS
-    confidence_interval: tuple = (0.0, 0.0)  # (lower_bound, upper_bound)
-    threat_likelihood: float = 0.5  # Probability of threat materialization (0-1)
-    probabilistic_score: float = 0.0  # Monte Carlo simulation result
-    uncertainty_factor: float = 0.1  # Uncertainty in risk assessment (0-1)
+    def __init__(self):
+        self.base_risk: float = 5.0
+        self.attack_surface_score: float = 5.0
+        self.vulnerability_score: float = 5.0
+        self.control_effectiveness: float = 5.0
+        self.business_impact: float = 5.0
+        self.threat_probability: float = 0.5
+        
+        # Priority 1: Probabilistic Modeling Enhancement - NEW FIELDS
+        self.confidence_interval: dict = {"lower_bound": 0.0, "upper_bound": 0.0, "confidence_level": 90}
+        self.threat_likelihood: float = 0.5  # Probability of threat materialization (0-1)
+        self.probabilistic_score: float = 0.0  # Monte Carlo simulation result
+        self.uncertainty_factor: float = 0.1  # Uncertainty in risk assessment (0-1)
     
     def calculate_composite_risk(self) -> float:
         """Calculate composite risk using weighted formula"""
