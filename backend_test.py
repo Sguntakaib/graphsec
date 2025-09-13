@@ -6412,6 +6412,54 @@ class SecurityModelingAPITester:
             print(f"⚠️  {total - passed} tests failed. See details above.")
             return False
 
+    def run_critical_phase1_tests(self):
+        """Run the 4 critical Phase 1 Core Loop endpoint tests"""
+        print("🚨 CRITICAL PHASE 1 CORE LOOP ENDPOINT TESTING")
+        print(f"Testing against: {self.base_url}")
+        print("Focus: 4 critical endpoints that need to work in standalone mode")
+        print("=" * 80)
+        
+        # Critical Phase 1 Core Loop Tests
+        critical_tests = [
+            ("POST /api/questionnaires/{node_subtype}/complete - Standalone Mode", self.test_questionnaire_completion_standalone),
+            ("GET /api/questionnaires/{node_subtype} - Standalone Mode", self.test_questionnaire_get_prompts_standalone), 
+            ("POST /api/simulate - Enhanced Simulation Standalone", self.test_enhanced_simulation_standalone),
+            ("POST /api/rules/evaluate - Enhanced Rule Evaluation Standalone", self.test_enhanced_rule_evaluation_standalone)
+        ]
+        
+        passed = 0
+        failed = 0
+        
+        for test_name, test_func in critical_tests:
+            try:
+                print(f"\n🔍 Testing: {test_name}")
+                if test_func():
+                    passed += 1
+                else:
+                    failed += 1
+            except Exception as e:
+                self.log_test(test_name, False, f"Test execution error: {str(e)}")
+                failed += 1
+            
+            print()  # Add spacing between tests
+        
+        # Print summary
+        print("=" * 80)
+        print(f"🎯 CRITICAL PHASE 1 CORE LOOP TEST SUMMARY")
+        print(f"✅ Passed: {passed}")
+        print(f"❌ Failed: {failed}")
+        print(f"📊 Success Rate: {(passed/(passed+failed)*100):.1f}%")
+        
+        if failed > 0:
+            print(f"🚨 CRITICAL ISSUES FOUND: {failed} endpoints not working in standalone mode")
+            print("These endpoints need immediate fixes to support standalone operation")
+        else:
+            print("🎉 ALL CRITICAL ENDPOINTS WORKING IN STANDALONE MODE")
+        
+        print("=" * 80)
+        
+        return passed, failed
+
 def test_multi_level_questionnaires_only():
     """Test only the multi-level questionnaires as requested by user"""
     print("🎯 FOCUSED TESTING: Multi-Level Questionnaires Implementation")
