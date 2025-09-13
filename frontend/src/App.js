@@ -1373,6 +1373,15 @@ function AppContent() {
               <span>Wizard</span>
             </button>
             
+            <button
+              onClick={() => setShowCoreLoopDashboard(true)}
+              className="px-3 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded hover:from-green-700 hover:to-blue-700 flex items-center space-x-2 text-sm"
+              title="Core Loop Dashboard - Test Phase 1 Critical Endpoints"
+            >
+              <Zap className="h-4 w-4" />
+              <span>Core Loop</span>
+            </button>
+            
             <div className="relative">
               <input
                 type="file"
