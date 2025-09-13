@@ -3519,6 +3519,12 @@ async def enhanced_rule_evaluation(request: dict):
             results["mitre_techniques"] = list(mitre_techniques)
         
         return {
+            "evaluation_id": str(uuid.uuid4()),
+            "triggered_rules": [asdict(result) for result in rule_results],
+            "risk_score": impact_assessment["overall_risk_score"],
+            "recommendations": impact_assessment["recommendations_summary"],
+            "impact_assessment": impact_assessment,
+            "mitre_techniques": results.get("mitre_techniques", []),
             "success": True,
             "results": results
         }
