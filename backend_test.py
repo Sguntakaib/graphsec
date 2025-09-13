@@ -8318,6 +8318,221 @@ class SecurityModelingAPITester:
             self.log_test("Phase 2 Questionnaire Format Comparison", False, f"Error: {str(e)}")
             return False
 
+    # ============================================================================
+    # PHASE 2 QUESTIONNAIRE SYSTEM TESTS - CRITICAL ENDPOINTS (REVIEW REQUEST)
+    # ============================================================================
+    
+    def test_phase2_questionnaire_primary_endpoint(self):
+        """Test Phase 2 PRIMARY ENDPOINT: GET /api/questionnaires/{node_subtype}?level={level}"""
+        test_cases = [
+            # WebApp tests
+            {"node_subtype": "WebApp", "level": "basic", "expected_questions": 8},
+            {"node_subtype": "WebApp", "level": "advanced", "expected_questions": 18},
+            {"node_subtype": "WebApp", "level": "expert", "expected_questions": 28},
+            # API tests
+            {"node_subtype": "API", "level": "basic", "expected_questions": 7},
+            # Database tests
+            {"node_subtype": "Database", "level": "basic", "expected_questions": 8},
+        ]
+        
+        for test_case in test_cases:
+            node_subtype = test_case["node_subtype"]
+            level = test_case["level"]
+            expected_questions = test_case["expected_questions"]
+            
+            try:
+                response = self.session.get(f"{self.base_url}/questionnaires/{node_subtype}?level={level}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for expected response format
+                    expected_fields = ["questions", "question_count", "level", "node_subtype", "security_branches", "metadata"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                    f"Missing required fields: {missing_fields}")
+                        return False
+                    
+                    # Verify question count matches expected
+                    actual_questions = len(data.get("questions", []))
+                    question_count_field = data.get("question_count", 0)
+                    
+                    if actual_questions != expected_questions:
+                        self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                    f"Expected {expected_questions} questions, got {actual_questions}")
+                        return False
+                    
+                    if question_count_field != expected_questions:
+                        self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                    f"question_count field mismatch: expected {expected_questions}, got {question_count_field}")
+                        return False
+                    
+                    # Verify level and node_subtype match request
+                    if data.get("level") != level:
+                        self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                    f"Level mismatch: expected {level}, got {data.get('level')}")
+                        return False
+                    
+                    if data.get("node_subtype") != node_subtype:
+                        self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                    f"Node subtype mismatch: expected {node_subtype}, got {data.get('node_subtype')}")
+                        return False
+                    
+                    # Verify security_branches field is present and is array
+                    security_branches = data.get("security_branches", [])
+                    if not isinstance(security_branches, list):
+                        self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                    f"security_branches should be array, got {type(security_branches)}")
+                        return False
+                    
+                    # Verify metadata field is present
+                    metadata = data.get("metadata", {})
+                    if not isinstance(metadata, dict):
+                        self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                    f"metadata should be object, got {type(metadata)}")
+                        return False
+                    
+                    self.log_test(f"Phase 2 Primary - {node_subtype} {level}", True, 
+                                f"✅ {actual_questions} questions, {len(security_branches)} security branches, metadata present")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                f"❌ Questionnaire not found (404) - case sensitivity issue not fixed")
+                    return False
+                else:
+                    self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Phase 2 Primary - {node_subtype} {level}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_phase2_questionnaire_alternative_endpoint(self):
+        """Test Phase 2 ALTERNATIVE ENDPOINT: GET /api/expanded-nodes/{node_subtype}/questionnaire/{level}"""
+        test_cases = [
+            {"node_subtype": "WebApp", "level": "basic", "expected_questions": 8},
+            {"node_subtype": "API", "level": "basic", "expected_questions": 7},
+            {"node_subtype": "Database", "level": "basic", "expected_questions": 8},
+        ]
+        
+        for test_case in test_cases:
+            node_subtype = test_case["node_subtype"]
+            level = test_case["level"]
+            expected_questions = test_case["expected_questions"]
+            
+            try:
+                response = self.session.get(f"{self.base_url}/expanded-nodes/{node_subtype}/questionnaire/{level}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for expected response format (similar to primary endpoint)
+                    expected_fields = ["questions", "question_count", "level", "node_subtype"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, 
+                                    f"Missing required fields: {missing_fields}")
+                        return False
+                    
+                    # Verify question count matches expected
+                    actual_questions = len(data.get("questions", []))
+                    question_count_field = data.get("question_count", 0)
+                    
+                    if actual_questions != expected_questions:
+                        self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, 
+                                    f"Expected {expected_questions} questions, got {actual_questions}")
+                        return False
+                    
+                    if question_count_field != expected_questions:
+                        self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, 
+                                    f"question_count field mismatch: expected {expected_questions}, got {question_count_field}")
+                        return False
+                    
+                    # Verify level and node_subtype match request
+                    if data.get("level") != level:
+                        self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, 
+                                    f"Level mismatch: expected {level}, got {data.get('level')}")
+                        return False
+                    
+                    if data.get("node_subtype") != node_subtype:
+                        self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, 
+                                    f"Node subtype mismatch: expected {node_subtype}, got {data.get('node_subtype')}")
+                        return False
+                    
+                    self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", True, 
+                                f"✅ {actual_questions} questions, proper structured response")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, 
+                                f"❌ Questionnaire not found (404) - case sensitivity issue not fixed")
+                    return False
+                else:
+                    self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Phase 2 Alternative - {node_subtype} {level}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_phase2_case_insensitive_lookup(self):
+        """Test that case-insensitive lookup is working correctly"""
+        # Test various case combinations to ensure case-insensitive lookup works
+        test_cases = [
+            {"node_subtype": "webapp", "level": "basic"},  # lowercase
+            {"node_subtype": "WEBAPP", "level": "basic"},  # uppercase
+            {"node_subtype": "WebApp", "level": "basic"},  # mixed case
+            {"node_subtype": "api", "level": "basic"},     # lowercase
+            {"node_subtype": "API", "level": "basic"},     # uppercase
+            {"node_subtype": "database", "level": "basic"}, # lowercase
+            {"node_subtype": "DATABASE", "level": "basic"}, # uppercase
+            {"node_subtype": "Database", "level": "basic"}, # mixed case
+        ]
+        
+        for test_case in test_cases:
+            node_subtype = test_case["node_subtype"]
+            level = test_case["level"]
+            
+            try:
+                # Test primary endpoint
+                response = self.session.get(f"{self.base_url}/questionnaires/{node_subtype}?level={level}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Should have questions regardless of case
+                    questions = data.get("questions", [])
+                    if len(questions) == 0:
+                        self.log_test(f"Case Insensitive - {node_subtype}", False, 
+                                    f"No questions returned for {node_subtype}")
+                        return False
+                    
+                    self.log_test(f"Case Insensitive - {node_subtype}", True, 
+                                f"✅ {len(questions)} questions returned for case variant")
+                    
+                elif response.status_code == 404:
+                    self.log_test(f"Case Insensitive - {node_subtype}", False, 
+                                f"❌ Case sensitivity issue: {node_subtype} not found")
+                    return False
+                else:
+                    self.log_test(f"Case Insensitive - {node_subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Case Insensitive - {node_subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
