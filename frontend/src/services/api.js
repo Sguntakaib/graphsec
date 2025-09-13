@@ -225,4 +225,65 @@ export const getTemplateCategories = async () => {
   }
 };
 
+// Core Loop API functions
+export const completeQuestionnaire = async (nodeSubtype, requestData) => {
+  try {
+    const response = await apiClient.post(`/questionnaires/${nodeSubtype}/complete`, requestData);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to complete questionnaire: ${error.message}`);
+  }
+};
+
+export const getQuestionnairePrompts = async (nodeSubtype) => {
+  try {
+    const response = await apiClient.get(`/questionnaires/${nodeSubtype}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to get questionnaire prompts: ${error.message}`);
+  }
+};
+
+export const runStandaloneSimulation = async (simulationData) => {
+  try {
+    const response = await apiClient.post('/simulate', simulationData);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to run standalone simulation: ${error.message}`);
+  }
+};
+
+export const evaluateSecurityRules = async (rulesData) => {
+  try {
+    const response = await apiClient.post('/rules/evaluate', rulesData);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to evaluate security rules: ${error.message}`);
+  }
+};
+
+export const runCompleteCoreLoop = async (questionnaireData, simulationData, rulesData) => {
+  try {
+    // Run all 4 Core Loop endpoints
+    const [questionnaireResult, promptsResult, simulationResult, rulesResult] = await Promise.all([
+      completeQuestionnaire(questionnaireData.node_subtype, {
+        responses: questionnaireData.responses,
+        business_context: questionnaireData.business_context
+      }),
+      getQuestionnairePrompts(questionnaireData.node_subtype),
+      runStandaloneSimulation(simulationData),
+      evaluateSecurityRules(rulesData)
+    ]);
+
+    return {
+      questionnaire: questionnaireResult,
+      prompts: promptsResult,
+      simulation: simulationResult,
+      rules: rulesResult
+    };
+  } catch (error) {
+    throw new Error(`Failed to run complete Core Loop: ${error.message}`);
+  }
+};
+
 export default apiClient;
