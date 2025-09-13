@@ -25,6 +25,10 @@ from threat_intelligence import threat_intelligence_engine, ThreatIntelligenceEn
 from dsl_rule_engine import dsl_rule_engine, RuleEvaluationResult, SecurityGap, CompletenessAnalysis
 from probabilistic_simulation import probabilistic_engine, ProbabilisticAttackPath, ScenarioAnalysis, DefenseEffectivenessModel
 
+# Import new core loop completion modules
+from findings_management import FindingsManager, Finding, FindingSeverity, FindingStatus, FindingSource, FindingsFilter, FindingsSummary
+from questionnaire_completion_processor import QuestionnaireCompletionProcessor
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
