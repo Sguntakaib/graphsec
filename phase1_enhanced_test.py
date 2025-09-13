@@ -770,44 +770,167 @@ class Phase1EnhancedAPITester:
             self.log_test("Threat Intelligence Dashboard", False, f"Error: {str(e)}")
             return False
     
+    def test_review_request_specific_apis(self):
+        """Test the specific Phase 1 Enhanced APIs mentioned in the review request"""
+        print("🎯 REVIEW REQUEST SPECIFIC API TESTS")
+        print("-" * 50)
+        
+        # 1. Multi-Level Questionnaires - Test specific levels for EC2
+        print("1. Testing Multi-Level Questionnaires for EC2...")
+        levels = [("basic", 5, 8), ("advanced", 15, 20), ("expert", 25, 30)]
+        
+        for level, min_q, max_q in levels:
+            try:
+                response = self.session.get(f"{self.base_url}/expanded-nodes/EC2/questionnaire/{level}")
+                if response.status_code == 200:
+                    data = response.json()
+                    if "questions" in data:
+                        q_count = len(data["questions"])
+                        if min_q <= q_count <= max_q:
+                            self.log_test(f"EC2 Questionnaire {level}", True, f"{q_count} questions (expected {min_q}-{max_q})")
+                        else:
+                            self.log_test(f"EC2 Questionnaire {level}", False, f"{q_count} questions outside range {min_q}-{max_q}")
+                    else:
+                        self.log_test(f"EC2 Questionnaire {level}", False, "Missing 'questions' field")
+                else:
+                    self.log_test(f"EC2 Questionnaire {level}", False, f"HTTP {response.status_code}")
+            except Exception as e:
+                self.log_test(f"EC2 Questionnaire {level}", False, f"Error: {str(e)}")
+        
+        # 2. Categories API - Test direct category mapping
+        print("\n2. Testing Categories API for direct mapping...")
+        try:
+            response = self.session.get(f"{self.base_url}/expanded-nodes/categories")
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, dict) and "categories" not in data:
+                    category_keys = list(data.keys())
+                    if category_keys:
+                        self.log_test("Categories API Direct Mapping", True, f"Direct mapping with {len(category_keys)} categories")
+                    else:
+                        self.log_test("Categories API Direct Mapping", False, "Empty direct mapping")
+                else:
+                    self.log_test("Categories API Direct Mapping", False, "Returns categories array instead of direct mapping")
+            else:
+                self.log_test("Categories API Direct Mapping", False, f"HTTP {response.status_code}")
+        except Exception as e:
+            self.log_test("Categories API Direct Mapping", False, f"Error: {str(e)}")
+        
+        # 3. Enhanced Risk Calculation - Test 'risk_factors' field
+        print("\n3. Testing Enhanced Risk Calculation for 'risk_factors' field...")
+        try:
+            test_data = {
+                "responses": {
+                    "instance_type": "t3.large",
+                    "security_groups": "restrictive",
+                    "encryption_enabled": True,
+                    "monitoring_enabled": True,
+                    "backup_strategy": "automated"
+                },
+                "business_context": {
+                    "criticality": "high",
+                    "data_classification": "confidential",
+                    "compliance_requirements": ["SOC2", "GDPR"]
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/EC2/calculate-risk",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "risk_factors" in data:
+                    risk_factors = data.get("risk_factors", {})
+                    self.log_test("Enhanced Risk Calculation", True, f"'risk_factors' field present with {len(risk_factors)} factors")
+                else:
+                    self.log_test("Enhanced Risk Calculation", False, "'risk_factors' field missing from response")
+            else:
+                self.log_test("Enhanced Risk Calculation", False, f"HTTP {response.status_code}")
+        except Exception as e:
+            self.log_test("Enhanced Risk Calculation", False, f"Error: {str(e)}")
+        
+        # 4. Bulk Risk Assessment - Test field names
+        print("\n4. Testing Bulk Risk Assessment field names...")
+        try:
+            test_data = {
+                "assessments": [
+                    {
+                        "node_type": "EC2",
+                        "responses": {"instance_type": "t3.large", "security_groups": "restrictive"},
+                        "business_context": {"criticality": "high"}
+                    },
+                    {
+                        "node_type": "RDS", 
+                        "responses": {"engine": "postgresql", "encryption_enabled": True},
+                        "business_context": {"criticality": "critical"}
+                    }
+                ]
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/bulk-risk-assessment",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                expected_fields = ["individual_assessments", "overall_risk_summary"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if not missing_fields:
+                    individual_count = len(data.get("individual_assessments", []))
+                    self.log_test("Bulk Risk Assessment Fields", True, f"Correct field names: {individual_count} individual assessments")
+                else:
+                    self.log_test("Bulk Risk Assessment Fields", False, f"Missing expected fields: {missing_fields}")
+            else:
+                self.log_test("Bulk Risk Assessment Fields", False, f"HTTP {response.status_code}")
+        except Exception as e:
+            self.log_test("Bulk Risk Assessment Fields", False, f"Error: {str(e)}")
+        
+        # 5. Threat Intelligence Summary - Test field names
+        print("\n5. Testing Threat Intelligence Summary field names...")
+        try:
+            test_data = {
+                "node_types": ["EC2", "RDS", "S3"],
+                "time_range": "30d",
+                "include_cve_data": True,
+                "threat_sources": ["mitre", "cve", "threat_feeds"]
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/threat-intelligence-summary",
+                json=test_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                expected_fields = ["node_type_summaries", "cross_cutting_threats", "threat_trends", "recommendations"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if not missing_fields:
+                    node_summaries_count = len(data.get("node_type_summaries", {}))
+                    cross_threats_count = len(data.get("cross_cutting_threats", []))
+                    self.log_test("Threat Intelligence Summary Fields", True, f"Correct field names: {node_summaries_count} node summaries, {cross_threats_count} cross-cutting threats")
+                else:
+                    self.log_test("Threat Intelligence Summary Fields", False, f"Missing expected fields: {missing_fields}")
+            else:
+                self.log_test("Threat Intelligence Summary Fields", False, f"HTTP {response.status_code}")
+        except Exception as e:
+            self.log_test("Threat Intelligence Summary Fields", False, f"Error: {str(e)}")
+
     def run_all_tests(self):
-        """Run all Phase 1 Enhanced API tests"""
-        print("🚀 Starting Phase 1 Enhanced APIs Testing")
+        """Run the specific review request tests"""
+        print("🚀 Starting Phase 1 Enhanced APIs Testing - Review Request Focus")
         print(f"📡 Testing against: {self.base_url}")
         print("=" * 80)
         
-        # EXPANDED INTELLIGENT NODES ENDPOINTS (6 endpoints)
-        print("\n🔧 EXPANDED INTELLIGENT NODES ENDPOINTS")
-        print("-" * 50)
-        
-        tests = [
-            self.test_expanded_nodes_supported_types,
-            self.test_expanded_nodes_questionnaire,
-            self.test_expanded_nodes_calculate_risk,
-            self.test_bulk_risk_assessment,
-            self.test_expanded_nodes_categories,
-            self.test_threat_intelligence_summary,
-        ]
-        
-        for test in tests:
-            test()
-            print("-" * 40)
-        
-        # THREAT INTELLIGENCE ENDPOINTS (5 endpoints)
-        print("\n🛡️ THREAT INTELLIGENCE ENDPOINTS")
-        print("-" * 50)
-        
-        threat_tests = [
-            self.test_threat_intelligence_node_profile,
-            self.test_correlate_vulnerabilities,
-            self.test_real_time_threat_score,
-            self.test_mitre_technique_details,
-            self.test_threat_intelligence_dashboard,
-        ]
-        
-        for test in threat_tests:
-            test()
-            print("-" * 40)
+        # Run the specific review request tests
+        self.test_review_request_specific_apis()
         
         # Summary
         print("\n" + "=" * 80)
