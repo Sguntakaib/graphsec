@@ -3603,7 +3603,7 @@ async def get_merged_questionnaire_prompts(node_subtype: str):
             merged_prompts.append({
                 "id": prompt.id,
                 "question": prompt.question,
-                "type": prompt.question_type,
+                "type": prompt.type,  # Fixed: use 'type' instead of 'question_type'
                 "options": prompt.validation_rules.get("options", []) if prompt.validation_rules else [],
                 "help_text": prompt.help_text,
                 "related_branch": prompt.related_branch,
