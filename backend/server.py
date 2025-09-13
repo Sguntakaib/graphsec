@@ -1681,34 +1681,30 @@ async def get_node_categories():
         category = template.get("category", "Unknown")
         
         if category not in categories_info:
-            categories_info[category] = {
-                "category": category,
-                "node_types": [],
-                "total_nodes": 0,
-                "avg_cve_count": 0,
-                "common_threats": set()
+            categories_info[category] = []
+        
+        # Add node type information to category
+        node_info = {
+            "node_subtype": node_type,
+            "node_type": template.get("node_type", "Asset"),
+            "description": template.get("description", ""),
+            "threat_intelligence": {
+                "cve_count": 0,
+                "recent_threats": []
             }
+        }
         
-        categories_info[category]["node_types"].append(node_type)
-        categories_info[category]["total_nodes"] += 1
-        
-        # Add threat intelligence
+        # Add threat intelligence if available
         threat_intel = template.get("threat_intelligence", {})
         if hasattr(threat_intel, 'cve_count'):
-            categories_info[category]["avg_cve_count"] += threat_intel.cve_count
+            node_info["threat_intelligence"]["cve_count"] = threat_intel.cve_count
         if hasattr(threat_intel, 'recent_threats'):
-            categories_info[category]["common_threats"].update(threat_intel.recent_threats)
+            node_info["threat_intelligence"]["recent_threats"] = list(threat_intel.recent_threats)[:3]  # Top 3
+        
+        categories_info[category].append(node_info)
     
-    # Calculate averages and convert sets to lists
-    for category_info in categories_info.values():
-        if category_info["total_nodes"] > 0:
-            category_info["avg_cve_count"] = round(category_info["avg_cve_count"] / category_info["total_nodes"], 1)
-        category_info["common_threats"] = list(category_info["common_threats"])[:5]  # Top 5 common threats
-    
-    return {
-        "categories": list(categories_info.values()),
-        "total_categories": len(categories_info)
-    }
+    # Return direct category mapping instead of categories array
+    return categories_info
 
 @api_router.post("/expanded-nodes/threat-intelligence-summary")
 async def get_threat_intelligence_summary(request: Dict[str, Any]):
