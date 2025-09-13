@@ -1519,23 +1519,29 @@ async def get_expanded_supported_types():
     
     type_info = []
     for node_type in supported_types:
-        metadata = questionnaire_loader.get_metadata(node_type)
-        level_counts = questionnaire_loader.get_all_levels_count(node_type)
+        template = expanded_node_engine.node_templates.get(node_type, {})
+        threat_intel = template.get("threat_intelligence", {})
+        questionnaires = template.get("questionnaires", {})
         
-        if metadata:
+        if template:
+            # Count questionnaire questions for each level
+            level_counts = {}
+            for level_name, questions in questionnaires.items():
+                level_counts[level_name.value if hasattr(level_name, 'value') else str(level_name)] = len(questions)
+            
             type_info.append({
                 "node_subtype": node_type,
-                "node_type": metadata.node_type,
-                "category": metadata.category,
-                "description": metadata.description,
+                "node_type": template.get("node_type", "Asset"),
+                "category": template.get("category", "Unknown"),
+                "description": template.get("description", ""),
                 "threat_intelligence": {
-                    "cve_count": metadata.threat_intelligence.get("cve_count", 0),
-                    "recent_threat_count": len(metadata.threat_intelligence.get("recent_threats", []))
+                    "cve_count": threat_intel.cve_count if hasattr(threat_intel, 'cve_count') else 0,
+                    "recent_threat_count": len(threat_intel.recent_threats) if hasattr(threat_intel, 'recent_threats') else 0
                 },
                 "questionnaire_levels": list(level_counts.keys()),
                 "questionnaire_counts": level_counts,
-                "required_branches_count": len(metadata.required_branches),
-                "has_dependencies": len(metadata.dependencies) > 0
+                "required_branches_count": len(template.get("required_branches", [])),
+                "has_dependencies": False  # We can implement this later if needed
             })
     
     # Group by category
