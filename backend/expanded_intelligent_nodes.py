@@ -345,6 +345,144 @@ class ExpandedIntelligentNodeEngine:
                         "help_text": "Proper logging is essential for security monitoring and incident response.",
                         "related_branch": SecurityBranchType.LOGGING
                     }
+                ],
+                QuestionnaireLevel.ADVANCED: [
+                    {
+                        "id": "lambda_code_signing",
+                        "question": "Is code signing enabled for this Lambda function?",
+                        "type": "single_choice",
+                        "options": ["Yes - AWS Signer", "Yes - Third-party", "No Code Signing", "Unknown"],
+                        "help_text": "Code signing ensures function code integrity and authenticity.",
+                        "related_branch": SecurityBranchType.CODE_SECURITY
+                    },
+                    {
+                        "id": "lambda_dead_letter_queue",
+                        "question": "Is a Dead Letter Queue (DLQ) configured?",
+                        "type": "single_choice",
+                        "options": ["Yes - SQS DLQ", "Yes - SNS DLQ", "No DLQ", "Unknown"],
+                        "help_text": "DLQs help handle failed executions and prevent data loss.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_reserved_concurrency",
+                        "question": "Is reserved concurrency configured?",
+                        "type": "single_choice",
+                        "options": ["Yes - Conservative Limit", "Yes - High Limit", "No Limit Set", "Unknown"],
+                        "help_text": "Reserved concurrency prevents resource exhaustion attacks.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_layers_security",
+                        "question": "How are Lambda layers managed for security?",
+                        "type": "single_choice",
+                        "options": ["Verified Internal Layers", "AWS Managed Layers", "Third-party Layers", "No Layers Used", "Unknown"],
+                        "help_text": "Lambda layers can introduce security risks through dependencies.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "lambda_x_ray_tracing",
+                        "question": "Is AWS X-Ray tracing enabled?",
+                        "type": "single_choice",
+                        "options": ["Active Tracing", "Passive Tracing", "No Tracing", "Unknown"],
+                        "help_text": "X-Ray tracing provides visibility into function execution and dependencies.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_function_url_security",
+                        "question": "If using Function URLs, what authentication is configured?",
+                        "type": "single_choice",
+                        "options": ["AWS IAM Auth", "No Authentication", "Not Using Function URLs", "Unknown"],
+                        "help_text": "Function URLs without proper authentication can expose functions publicly.",
+                        "related_branch": SecurityBranchType.AUTHENTICATION
+                    },
+                    {
+                        "id": "lambda_dependency_scanning",
+                        "question": "Are function dependencies scanned for vulnerabilities?",
+                        "type": "single_choice",
+                        "options": ["Automated Scanning", "Manual Review", "Third-party Tools", "No Scanning", "Unknown"],
+                        "help_text": "Dependency scanning helps identify vulnerable packages in function code.",
+                        "related_branch": SecurityBranchType.VULNERABILITY_SCANNING
+                    },
+                    {
+                        "id": "lambda_timeout_configuration",
+                        "question": "How is the function timeout configured?",
+                        "type": "single_choice",
+                        "options": ["Conservative (< 30s)", "Moderate (30s-5min)", "High (> 5min)", "Default (3s)", "Unknown"],
+                        "help_text": "Proper timeout configuration prevents resource exhaustion and hanging executions.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_memory_allocation",
+                        "question": "How is memory allocation configured for security?",
+                        "type": "single_choice",
+                        "options": ["Right-sized for workload", "Over-provisioned", "Under-provisioned", "Default settings", "Unknown"],
+                        "help_text": "Proper memory allocation prevents resource exhaustion and performance issues.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_event_source_security",
+                        "question": "How are event sources secured?",
+                        "type": "multiple_choice",
+                        "options": ["Resource-based policies", "Event filtering", "Encryption in transit", "Access logging", "None"],
+                        "help_text": "Event source security prevents unauthorized function invocations.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    },
+                    {
+                        "id": "lambda_error_handling",
+                        "question": "How is error handling implemented for security?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive error handling", "Basic try-catch", "Minimal handling", "No error handling", "Unknown"],
+                        "help_text": "Proper error handling prevents information disclosure through error messages.",
+                        "related_branch": SecurityBranchType.CODE_SECURITY
+                    },
+                    {
+                        "id": "lambda_provisioned_concurrency",
+                        "question": "Is provisioned concurrency used for consistent performance?",
+                        "type": "single_choice",
+                        "options": ["Yes - Security-critical functions", "Yes - All functions", "No provisioned concurrency", "Unknown"],
+                        "help_text": "Provisioned concurrency reduces cold start latency and improves security response times.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_extension_security",
+                        "question": "If using Lambda extensions, how are they secured?",
+                        "type": "single_choice",
+                        "options": ["AWS managed extensions", "Verified third-party", "Custom extensions", "No extensions", "Unknown"],
+                        "help_text": "Lambda extensions can introduce security risks and should be carefully managed.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "lambda_vpc_endpoints",
+                        "question": "Are VPC endpoints used for AWS service access?",
+                        "type": "single_choice",
+                        "options": ["Yes - Interface endpoints", "Yes - Gateway endpoints", "No VPC endpoints", "Not applicable", "Unknown"],
+                        "help_text": "VPC endpoints provide secure access to AWS services without internet routing.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "lambda_secrets_rotation",
+                        "question": "Are secrets automatically rotated for this function?",
+                        "type": "single_choice",
+                        "options": ["Automatic rotation", "Manual rotation", "No rotation", "No secrets used", "Unknown"],
+                        "help_text": "Regular secret rotation reduces the impact of credential compromise.",
+                        "related_branch": SecurityBranchType.SECRETS_MANAGEMENT
+                    },
+                    {
+                        "id": "lambda_cloudwatch_insights",
+                        "question": "Is CloudWatch Logs Insights used for security analysis?",
+                        "type": "single_choice",
+                        "options": ["Yes - Active monitoring", "Yes - Occasional use", "No Insights", "Unknown"],
+                        "help_text": "CloudWatch Logs Insights enables advanced log analysis for security events.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_performance_monitoring",
+                        "question": "What performance monitoring is in place for security?",
+                        "type": "multiple_choice",
+                        "options": ["CloudWatch metrics", "Custom metrics", "Third-party APM", "Performance alarms", "None"],
+                        "help_text": "Performance monitoring can detect security-related resource exhaustion attacks.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
                 ]
             },
             "threat_intelligence": ThreatIntelligence(
