@@ -66,6 +66,30 @@ class AdvancedSimulationEngine:
         if nodes and edges:
             self._build_graph(nodes, edges)
         
+    def _build_graph(self, nodes: List[Dict[str, Any]], edges: List[Dict[str, Any]]):
+        """Build NetworkX graph from nodes and edges"""
+        try:
+            # Add nodes to graph
+            for node in nodes:
+                node_id = node.get("id")
+                if node_id:
+                    self.graph.add_node(node_id, **node)
+            
+            # Add edges to graph
+            for edge in edges:
+                source = edge.get("source")
+                target = edge.get("target")
+                if source and target:
+                    self.graph.add_edge(source, target, **edge)
+                    
+            logger.info(f"Built graph with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges")
+            
+        except Exception as e:
+            logger.error(f"Error building graph: {e}")
+            # Initialize empty graph on error
+            self.graph = nx.DiGraph()
+        
+        
     def _load_mitre_techniques(self) -> Dict[str, Dict[str, Any]]:
         """Load MITRE ATT&CK technique database (simplified version)"""
         return {
