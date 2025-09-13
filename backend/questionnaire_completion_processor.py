@@ -88,10 +88,13 @@ class QuestionnaireCompletionProcessor:
             )
             processing_results["processing_steps"].append(f"Generated {len(questionnaire_findings)} questionnaire findings")
             
-            # Step 3: Get current diagram state for rule evaluation
+            # Step 3: Get current diagram state for rule evaluation (support standalone mode)
             diagram = await self._get_diagram_with_updated_node(diagram_id, updated_node)
             if not diagram:
-                raise Exception(f"Could not retrieve diagram {diagram_id}")
+                # Create synthetic diagram for standalone mode
+                logger.info(f"Creating synthetic diagram for standalone questionnaire completion")
+                diagram = self._create_synthetic_diagram(diagram_id, updated_node)
+                processing_results["processing_steps"].append("Created synthetic diagram for standalone mode")
             
             # Step 4: Run DSL rule evaluation on modified node and neighbors
             rule_findings = await self._evaluate_security_rules(
