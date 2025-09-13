@@ -388,10 +388,17 @@ class QuestionnaireLoader:
     
     def get_all_levels_count(self, node_subtype: str) -> Dict[str, int]:
         """Get question count for all levels of a node type"""
-        if node_subtype not in self._cache:
+        # Handle case-insensitive lookup
+        actual_key = None
+        for key in self._cache.keys():
+            if key.upper() == node_subtype.upper():
+                actual_key = key
+                break
+        
+        if actual_key is None:
             return {}
         
-        questionnaires = self._cache[node_subtype]
+        questionnaires = self._cache[actual_key]
         return {
             level: len(questions) 
             for level, questions in questionnaires.items()
