@@ -82,6 +82,7 @@ class SecurityBranchType(str, Enum):
     # Additional Security Branches
     DDoS_PROTECTION = "DDoSProtection"
     MESSAGE_SECURITY = "MessageSecurity"
+    APPLICATION_SERVICES = "ApplicationServices"
 
 class QuestionnaireLevel(str, Enum):
     BASIC = "basic"           # 5-8 questions
