@@ -1,0 +1,288 @@
+node_type: "Control"
+node_subtype: "NetworkACL"
+category: "Network Security"
+description: "Network Access Control Lists for subnet-level traffic filtering"
+required_branches:
+  - "NetworkSecurity"
+  - "Firewall"
+  - "AccessControl"
+  - "Monitoring"
+  - "Compliance"
+
+questionnaires:
+  basic:
+    - id: "nacl_default_configuration"
+      question: "How are default Network ACLs configured?"
+      type: "single_choice"
+      options: ["Custom Restrictive Rules", "Modified Default Rules", "Default AWS Configuration", "No Configuration", "Unknown"]
+      help_text: "Custom NACLs provide better security control than default configurations."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_rule_principle"
+      question: "What principle is followed for Network ACL rules?"
+      type: "single_choice"
+      options: ["Least Privilege (Deny by Default)", "Explicit Allow Rules", "Permissive Rules", "Allow All Traffic", "Unknown"]
+      help_text: "Least privilege principle minimizes attack surface by denying unnecessary traffic."
+      related_branch: "AccessControl"
+    - id: "nacl_ingress_rules"
+      question: "How are ingress rules configured?"
+      type: "single_choice"
+      options: ["Specific Source/Port Rules", "Port-Based Rules", "Source-Based Rules", "Broad Allow Rules", "Unknown"]
+      help_text: "Specific ingress rules control inbound traffic to subnet resources."
+      related_branch: "Firewall"
+    - id: "nacl_egress_rules"
+      question: "How are egress rules configured?"
+      type: "single_choice"
+      options: ["Explicit Egress Rules", "Default Allow All", "Service-Specific Rules", "Unknown"]
+      help_text: "Explicit egress rules control outbound traffic from subnet resources."
+      related_branch: "Firewall"
+    - id: "nacl_rule_numbering"
+      question: "How is rule numbering organized?"
+      type: "single_choice"
+      options: ["Structured Numbering System", "Sequential Numbering", "Ad-hoc Numbering", "Default Numbering", "Unknown"]
+      help_text: "Structured numbering helps maintain and understand rule precedence."
+      related_branch: "NetworkSecurity"
+
+  advanced:
+    - id: "nacl_stateless_considerations"
+      question: "How are stateless characteristics of NACLs addressed?"
+      type: "single_choice"
+      options: ["Comprehensive Stateless Design", "Basic Bidirectional Rules", "Minimal Consideration", "Not Addressed", "Unknown"]
+      help_text: "Stateless design requires careful consideration of bidirectional traffic flows."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_custom_vs_default"
+      question: "Are custom Network ACLs used instead of default ACLs?"
+      type: "single_choice"
+      options: ["All Custom NACLs", "Mixed Custom/Default", "Mostly Default", "All Default NACLs", "Unknown"]
+      help_text: "Custom NACLs provide better security control and visibility than default ACLs."
+      related_branch: "AccessControl"
+    - id: "nacl_subnet_association"
+      question: "How are Network ACLs associated with subnets?"
+      type: "single_choice"
+      options: ["Purpose-Specific Associations", "Tier-Based Associations", "Single NACL for All", "Default Associations", "Unknown"]
+      help_text: "Purpose-specific associations provide granular control over different subnet types."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_rule_documentation"
+      question: "How are Network ACL rules documented?"
+      type: "single_choice"
+      options: ["Comprehensive Documentation", "Basic Documentation", "Inline Comments", "No Documentation", "Unknown"]
+      help_text: "Proper documentation helps understand rule purposes and facilitates maintenance."
+      related_branch: "Firewall"
+    - id: "nacl_testing_validation"
+      question: "What testing is performed on Network ACL changes?"
+      type: "single_choice"
+      options: ["Comprehensive Testing", "Basic Connectivity Testing", "Manual Validation", "No Testing", "Unknown"]
+      help_text: "Testing ensures Network ACL changes don't break legitimate traffic flows."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_change_management"
+      question: "What change management process exists for Network ACLs?"
+      type: "single_choice"
+      options: ["Formal Change Control", "Peer Review Process", "Automated Changes", "No Change Management", "Unknown"]
+      help_text: "Change management ensures Network ACL modifications are controlled and documented."
+      related_branch: "AccessControl"
+    - id: "nacl_monitoring_logging"
+      question: "What monitoring exists for Network ACL rule matches?"
+      type: "single_choice"
+      options: ["Comprehensive Rule Monitoring", "Basic Flow Logs", "No Specific Monitoring", "Unknown"]
+      help_text: "Monitoring Network ACL rule matches helps understand traffic patterns and potential issues."
+      related_branch: "Monitoring"
+    - id: "nacl_security_group_coordination"
+      question: "How are Network ACLs coordinated with Security Groups?"
+      type: "single_choice"
+      options: ["Coordinated Defense Strategy", "Basic Coordination", "Independent Configuration", "No Coordination", "Unknown"]
+      help_text: "Coordinated configuration provides defense in depth while avoiding conflicts."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_emergency_procedures"
+      question: "What emergency procedures exist for Network ACL issues?"
+      type: "single_choice"
+      options: ["Defined Emergency Procedures", "Basic Response Plan", "Ad-hoc Response", "No Emergency Procedures", "Unknown"]
+      help_text: "Emergency procedures enable rapid response to Network ACL-related connectivity issues."
+      related_branch: "AccessControl"
+    - id: "nacl_compliance_alignment"
+      question: "How do Network ACLs align with compliance requirements?"
+      type: "single_choice"
+      options: ["Compliance-Driven Configuration", "Basic Compliance Consideration", "No Compliance Alignment", "Unknown"]
+      help_text: "Compliance alignment ensures Network ACLs meet regulatory security requirements."
+      related_branch: "Compliance"
+    - id: "nacl_rule_optimization"
+      question: "How are Network ACL rules optimized?"
+      type: "single_choice"
+      options: ["Regular Rule Optimization", "Periodic Review", "No Optimization", "Unknown"]
+      help_text: "Rule optimization improves performance and maintainability of Network ACLs."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_cross_vpc_considerations"
+      question: "How are cross-VPC Network ACL considerations addressed?"
+      type: "single_choice"
+      options: ["Cross-VPC Security Strategy", "VPC-Specific Rules", "No Cross-VPC Considerations", "Unknown"]
+      help_text: "Cross-VPC considerations ensure consistent security across VPC boundaries."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_automation_tools"
+      question: "What automation tools are used for Network ACL management?"
+      type: "single_choice"
+      options: ["Comprehensive Automation", "Basic Automation Scripts", "Manual Management", "No Automation", "Unknown"]
+      help_text: "Automation tools improve consistency and reduce errors in Network ACL management."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_backup_recovery"
+      question: "What backup and recovery exists for Network ACL configurations?"
+      type: "single_choice"
+      options: ["Automated Backup + Recovery", "Manual Backup", "Version Control", "No Backup", "Unknown"]
+      help_text: "Backup and recovery enables restoration of Network ACL configurations after incidents."
+      related_branch: "AccessControl"
+    - id: "nacl_performance_impact"
+      question: "How is Network ACL performance impact monitored?"
+      type: "single_choice"
+      options: ["Performance Monitoring", "Basic Impact Assessment", "No Performance Monitoring", "Unknown"]
+      help_text: "Performance monitoring ensures Network ACLs don't negatively impact network performance."
+      related_branch: "Monitoring"
+    - id: "nacl_rule_conflicts"
+      question: "How are Network ACL rule conflicts detected and resolved?"
+      type: "single_choice"
+      options: ["Automated Conflict Detection", "Manual Conflict Resolution", "No Conflict Management", "Unknown"]
+      help_text: "Conflict detection prevents contradictory rules that could cause connectivity issues."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_multi_tier_architecture"
+      question: "How are Network ACLs implemented in multi-tier architectures?"
+      type: "single_choice"
+      options: ["Tier-Specific NACL Strategy", "Uniform NACL Configuration", "No Multi-Tier Consideration", "Unknown"]
+      help_text: "Multi-tier implementation provides appropriate security controls for different application layers."
+      related_branch: "NetworkSecurity"
+
+  expert:
+    - id: "nacl_zero_trust_networking"
+      question: "How are Network ACLs implemented in zero trust networking?"
+      type: "single_choice"
+      options: ["Full Zero Trust NACL Implementation", "Partial Zero Trust", "Traditional Networking Model", "Unknown"]
+      help_text: "Zero trust networking ensures all network communications are verified and authorized."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_ai_powered_management"
+      question: "Is AI-powered management used for Network ACLs?"
+      type: "single_choice"
+      options: ["AI-Driven Rule Optimization", "Machine Learning Analysis", "Basic AI Features", "No AI Management", "Unknown"]
+      help_text: "AI-powered management can optimize Network ACL configurations and detect anomalies."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for Network ACL architecture?"
+      type: "single_choice"
+      options: ["Comprehensive Network Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies network-specific attack vectors and defenses."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_dynamic_rule_management"
+      question: "Is dynamic rule management implemented for Network ACLs?"
+      type: "single_choice"
+      options: ["Context-Aware Dynamic Rules", "Time-Based Rules", "Static Rules Only", "Unknown"]
+      help_text: "Dynamic rules adapt to changing network conditions and security requirements."
+      related_branch: "AccessControl"
+    - id: "nacl_behavioral_analysis"
+      question: "Is behavioral analysis used for Network ACL traffic patterns?"
+      type: "single_choice"
+      options: ["Advanced Network Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual network patterns that may indicate attacks."
+      related_branch: "Monitoring"
+    - id: "nacl_micro_segmentation"
+      question: "How is micro-segmentation implemented with Network ACLs?"
+      type: "single_choice"
+      options: ["Full Network Micro-Segmentation", "Application-Based Segmentation", "Basic Segmentation", "No Micro-Segmentation", "Unknown"]
+      help_text: "Micro-segmentation limits lateral movement and provides granular network control."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to network security policies."
+      related_branch: "Compliance"
+    - id: "nacl_quantum_safe_networking"
+      question: "Are quantum-safe networking principles applied to Network ACLs?"
+      type: "single_choice"
+      options: ["Quantum-Safe Network Design", "Post-Quantum Considerations", "Classical Security Only", "Unknown"]
+      help_text: "Quantum-safe networking prepares for future quantum computing threats to network security."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for Network ACLs?"
+      type: "multiple_choice"
+      options: ["Automated Network Isolation", "Dynamic Rule Deployment", "Emergency Access Controls", "Network Forensics", "None"]
+      help_text: "Advanced incident response enables rapid network-level containment and analysis."
+      related_branch: "AccessControl"
+    - id: "nacl_supply_chain_considerations"
+      question: "How are supply chain security considerations applied to Network ACLs?"
+      type: "single_choice"
+      options: ["Supply Chain-Aware Network Rules", "Vendor Access Controls", "Basic Supply Chain Consideration", "No Supply Chain Integration", "Unknown"]
+      help_text: "Supply chain considerations ensure network controls account for third-party access."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_cross_cloud_integration"
+      question: "How are Network ACLs integrated with multi-cloud environments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Network Policy", "Cloud-Specific Rules", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud integration provides consistent network security across cloud environments."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_advanced_analytics"
+      question: "What advanced analytics are applied to Network ACL data?"
+      type: "single_choice"
+      options: ["Predictive Network Analytics", "Traffic Flow Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into network security patterns and performance."
+      related_branch: "Monitoring"
+    - id: "nacl_privacy_protection"
+      question: "How is privacy protection implemented in Network ACL configurations?"
+      type: "single_choice"
+      options: ["Privacy-Aware Network Design", "Traffic Flow Protection", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures network controls don't compromise user data privacy."
+      related_branch: "Compliance"
+    - id: "nacl_advanced_automation"
+      question: "What advanced automation is implemented for Network ACLs?"
+      type: "multiple_choice"
+      options: ["Self-Healing Networks", "Adaptive Security Policies", "Intelligent Rule Management", "Automated Threat Response", "None"]
+      help_text: "Advanced automation improves network security while reducing management overhead."
+      related_branch: "AccessControl"
+    - id: "nacl_edge_networking_security"
+      question: "How is edge networking security implemented with Network ACLs?"
+      type: "single_choice"
+      options: ["Edge-Specific Network Policies", "Centralized Edge Control", "Standard Network Rules", "No Edge Networking", "Unknown"]
+      help_text: "Edge networking security provides protection for distributed and remote network segments."
+      related_branch: "NetworkSecurity"
+    - id: "nacl_cognitive_security"
+      question: "Is cognitive security applied to Network ACL management?"
+      type: "single_choice"
+      options: ["Cognitive Network Security", "AI-Enhanced Decision Making", "Basic Cognitive Features", "No Cognitive Security", "Unknown"]
+      help_text: "Cognitive security uses AI to enhance Network ACL decision-making and management."
+      related_branch: "AccessControl"
+    - id: "nacl_advanced_visualization"
+      question: "What advanced visualization tools are used for Network ACL analysis?"
+      type: "single_choice"
+      options: ["Interactive Network Topology Maps", "3D Network Visualization", "Basic Network Diagrams", "No Advanced Visualization", "Unknown"]
+      help_text: "Advanced visualization helps understand complex network security relationships and traffic flows."
+      related_branch: "Monitoring"
+    - id: "nacl_regulatory_adaptation"
+      question: "How do Network ACLs adapt to changing regulatory requirements?"
+      type: "single_choice"
+      options: ["Proactive Regulatory Compliance", "Automated Policy Updates", "Manual Adaptation", "No Regulatory Adaptation", "Unknown"]
+      help_text: "Regulatory adaptation ensures network controls meet evolving compliance requirements."
+      related_branch: "Compliance"
+    - id: "nacl_crisis_management"
+      question: "What crisis management capabilities exist for Network ACLs?"
+      type: "multiple_choice"
+      options: ["Emergency Network Lockdown", "Crisis Communication Networks", "Priority Traffic Routing", "Network Recovery Procedures", "None"]
+      help_text: "Crisis management ensures network availability and security during major incidents."
+      related_branch: "AccessControl"
+    - id: "nacl_future_technology_integration"
+      question: "How prepared are Network ACLs for future networking technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures Network ACLs can evolve with new networking technologies."
+      related_branch: "NetworkSecurity"
+
+dependencies:
+  nacl_vpc_integration: "VPC"
+  nacl_security_group_coordination: "SecurityGroups"
+  nacl_monitoring_integration: "Monitoring"
+
+threat_intelligence:
+  cve_count: 20
+  recent_threats: ["Network Scanning", "Lateral Movement", "Traffic Interception"]
+  attack_vectors: ["Network Reconnaissance", "Protocol Exploitation", "Traffic Analysis"]
+  mitre_techniques: ["T1046", "T1090", "T1040"]
+  threat_actors: ["APT Groups", "Network Attackers", "Insider Threats"]
+
+risk_factors:
+  default_acl_usage: 3.0
+  overly_permissive_rules: 4.0
+  no_rule_documentation: 2.5
+  no_monitoring: 3.5
+  missing_egress_controls: 3.5

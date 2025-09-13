@@ -1,0 +1,288 @@
+node_type: "Control"
+node_subtype: "APIGateway"
+category: "Integration Services"
+description: "API Gateway Service (AWS API Gateway, Kong, Istio)"
+required_branches:
+  - "APISecurity"
+  - "Authentication"
+  - "RateLimiting"
+  - "Monitoring"
+  - "AccessControl"
+
+questionnaires:
+  basic:
+    - id: "apigw_service_type"
+      question: "What API Gateway service is used?"
+      type: "single_choice"
+      options: ["AWS API Gateway", "Kong", "Istio Gateway", "Azure API Management", "Google Cloud Endpoints", "Custom Solution", "Unknown"]
+      help_text: "Different API Gateway services offer varying security features and capabilities."
+      related_branch: "APISecurity"
+    - id: "apigw_authentication"
+      question: "What authentication mechanisms are implemented?"
+      type: "single_choice"
+      options: ["Multi-factor Authentication", "OAuth 2.0/OIDC", "API Keys", "Basic Authentication", "No Authentication", "Unknown"]
+      help_text: "Strong authentication ensures only authorized clients can access APIs."
+      related_branch: "Authentication"
+    - id: "apigw_authorization"
+      question: "How is API authorization implemented?"
+      type: "single_choice"
+      options: ["RBAC + Policy-Based", "Role-Based Access Control", "Simple Authorization", "No Authorization", "Unknown"]
+      help_text: "Proper authorization controls what authenticated users can access."
+      related_branch: "AccessControl"
+    - id: "apigw_rate_limiting"
+      question: "What rate limiting is configured?"
+      type: "single_choice"
+      options: ["Advanced Rate Limiting", "Basic Rate Limiting", "Simple Throttling", "No Rate Limiting", "Unknown"]
+      help_text: "Rate limiting prevents API abuse and protects backend services."
+      related_branch: "RateLimiting"
+    - id: "apigw_ssl_tls"
+      question: "How is SSL/TLS configured for the API Gateway?"
+      type: "single_choice"
+      options: ["TLS 1.3 Only", "TLS 1.2 + 1.3", "TLS 1.2 Only", "Mixed TLS Versions", "No SSL/TLS", "Unknown"]
+      help_text: "Modern TLS versions provide secure communication for API traffic."
+      related_branch: "APISecurity"
+
+  advanced:
+    - id: "apigw_input_validation"
+      question: "What input validation is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Input Validation", "Schema Validation", "Basic Validation", "No Validation", "Unknown"]
+      help_text: "Input validation prevents injection attacks and ensures data quality."
+      related_branch: "APISecurity"
+    - id: "apigw_output_filtering"
+      question: "How is API output filtered and sanitized?"
+      type: "single_choice"
+      options: ["Advanced Output Filtering", "Basic Response Filtering", "No Output Filtering", "Unknown"]
+      help_text: "Output filtering prevents sensitive data leakage through API responses."
+      related_branch: "APISecurity"
+    - id: "apigw_logging_monitoring"
+      question: "What API logging and monitoring is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive API Monitoring", "Basic Request Logging", "Minimal Monitoring", "No Logging", "Unknown"]
+      help_text: "Comprehensive monitoring enables security analysis and troubleshooting."
+      related_branch: "Monitoring"
+    - id: "apigw_cors_configuration"
+      question: "How is Cross-Origin Resource Sharing (CORS) configured?"
+      type: "single_choice"
+      options: ["Strict CORS Policy", "Permissive CORS", "Default CORS", "No CORS Configuration", "Unknown"]
+      help_text: "Proper CORS configuration prevents unauthorized cross-origin API access."
+      related_branch: "APISecurity"
+    - id: "apigw_api_versioning"
+      question: "How is API versioning implemented for security?"
+      type: "single_choice"
+      options: ["Security-Aware Versioning", "Basic Versioning", "No Versioning", "Unknown"]
+      help_text: "Proper versioning enables security updates while maintaining compatibility."
+      related_branch: "APISecurity"
+    - id: "apigw_caching_security"
+      question: "How is API caching configured for security?"
+      type: "single_choice"
+      options: ["Security-Aware Caching", "Basic Caching", "Aggressive Caching", "No Caching", "Unknown"]
+      help_text: "Secure caching balances performance with data freshness and security requirements."
+      related_branch: "APISecurity"
+    - id: "apigw_request_response_transformation"
+      question: "How are request/response transformations secured?"
+      type: "single_choice"
+      options: ["Secure Transformation Pipeline", "Basic Transformation", "No Transformation", "Unknown"]
+      help_text: "Secure transformations prevent injection attacks and data manipulation."
+      related_branch: "APISecurity"
+    - id: "apigw_backend_authentication"
+      question: "How does the API Gateway authenticate to backend services?"
+      type: "single_choice"
+      options: ["Mutual TLS", "Service-to-Service Authentication", "API Keys", "No Backend Authentication", "Unknown"]
+      help_text: "Backend authentication ensures secure communication between gateway and services."
+      related_branch: "Authentication"
+    - id: "apigw_api_documentation_security"
+      question: "How is API documentation secured?"
+      type: "single_choice"
+      options: ["Secured Documentation", "Access-Controlled Documentation", "Public Documentation", "No Documentation", "Unknown"]
+      help_text: "Secure documentation prevents information disclosure while enabling proper API usage."
+      related_branch: "APISecurity"
+    - id: "apigw_error_handling"
+      question: "How is API error handling implemented for security?"
+      type: "single_choice"
+      options: ["Security-Focused Error Handling", "Standard Error Responses", "Detailed Error Messages", "No Error Handling", "Unknown"]
+      help_text: "Secure error handling prevents information disclosure through error messages."
+      related_branch: "APISecurity"
+    - id: "apigw_webhook_security"
+      question: "How are webhooks secured if implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Webhook Security", "Basic Webhook Validation", "No Webhook Security", "No Webhooks", "Unknown"]
+      help_text: "Webhook security ensures integrity and authenticity of callback communications."
+      related_branch: "APISecurity"
+    - id: "apigw_api_analytics"
+      question: "What API analytics are implemented for security?"
+      type: "single_choice"
+      options: ["Security-Focused Analytics", "Usage Analytics", "Basic Analytics", "No Analytics", "Unknown"]
+      help_text: "Security analytics help identify attack patterns and abuse in API usage."
+      related_branch: "Monitoring"
+    - id: "apigw_circuit_breaker"
+      question: "Are circuit breakers implemented for API protection?"
+      type: "single_choice"
+      options: ["Advanced Circuit Breaker", "Basic Circuit Breaker", "No Circuit Breaker", "Unknown"]
+      help_text: "Circuit breakers protect backend services from overload and cascading failures."
+      related_branch: "APISecurity"
+    - id: "apigw_api_testing_security"
+      question: "What security testing is performed on APIs?"
+      type: "single_choice"
+      options: ["Comprehensive API Security Testing", "Basic Security Testing", "No Security Testing", "Unknown"]
+      help_text: "Security testing identifies vulnerabilities in API implementations."
+      related_branch: "APISecurity"
+    - id: "apigw_compliance_features"
+      question: "What compliance features are implemented?"
+      type: "multiple_choice"
+      options: ["PCI DSS Compliance", "GDPR Compliance", "HIPAA Compliance", "SOX Compliance", "None"]
+      help_text: "Compliance features ensure APIs meet regulatory requirements."
+      related_branch: "AccessControl"
+    - id: "apigw_load_balancing_security"
+      question: "How is load balancing secured?"
+      type: "single_choice"
+      options: ["Secure Load Balancing", "Basic Load Balancing", "No Load Balancing", "Unknown"]
+      help_text: "Secure load balancing distributes traffic while maintaining security controls."
+      related_branch: "APISecurity"
+    - id: "apigw_api_lifecycle_security"
+      question: "How is API lifecycle security managed?"
+      type: "single_choice"
+      options: ["Comprehensive Lifecycle Security", "Basic Lifecycle Management", "No Lifecycle Management", "Unknown"]
+      help_text: "Lifecycle security ensures APIs remain secure throughout their operational lifetime."
+      related_branch: "APISecurity"
+
+  expert:
+    - id: "apigw_zero_trust_api"
+      question: "How is zero trust implemented for API access?"
+      type: "single_choice"
+      options: ["Full Zero Trust API Architecture", "Partial Zero Trust", "Traditional API Security", "Unknown"]
+      help_text: "Zero trust APIs ensure every request is verified and authorized."
+      related_branch: "APISecurity"
+    - id: "apigw_ai_powered_security"
+      question: "Is AI-powered security used for API protection?"
+      type: "single_choice"
+      options: ["AI-Based API Threat Detection", "Machine Learning Analysis", "Basic AI Features", "No AI Security", "Unknown"]
+      help_text: "AI-powered security can identify sophisticated API attacks and anomalies."
+      related_branch: "APISecurity"
+    - id: "apigw_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for API architecture?"
+      type: "single_choice"
+      options: ["Comprehensive API Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies API-specific attack vectors and defenses."
+      related_branch: "APISecurity"
+    - id: "apigw_quantum_safe_api"
+      question: "Are quantum-safe cryptographic methods used for API security?"
+      type: "single_choice"
+      options: ["Post-Quantum API Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe cryptography prepares API infrastructure for future quantum computing threats."
+      related_branch: "APISecurity"
+    - id: "apigw_behavioral_analysis"
+      question: "Is behavioral analysis used for API traffic monitoring?"
+      type: "single_choice"
+      options: ["Advanced API Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual API usage patterns that may indicate attacks."
+      related_branch: "Monitoring"
+    - id: "apigw_api_mesh_security"
+      question: "How is API mesh security implemented?"
+      type: "single_choice"
+      options: ["Comprehensive API Mesh Security", "Basic Mesh Security", "No API Mesh", "Unknown"]
+      help_text: "API mesh security provides consistent protection across distributed API architectures."
+      related_branch: "APISecurity"
+    - id: "apigw_advanced_authentication"
+      question: "What advanced authentication mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["Biometric Authentication", "Hardware Security Keys", "Behavioral Authentication", "Continuous Authentication", "None"]
+      help_text: "Advanced authentication provides stronger security for sensitive API access."
+      related_branch: "Authentication"
+    - id: "apigw_supply_chain_security"
+      question: "How is supply chain security ensured for API components?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "Dependency Scanning", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures API components haven't been compromised."
+      related_branch: "APISecurity"
+    - id: "apigw_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for API security?"
+      type: "multiple_choice"
+      options: ["Automated API Isolation", "Real-time Attack Mitigation", "API Forensics", "Incident Correlation", "None"]
+      help_text: "Advanced incident response enables rapid mitigation of API security incidents."
+      related_branch: "APISecurity"
+    - id: "apigw_privacy_protection"
+      question: "How is user privacy protected in API operations?"
+      type: "single_choice"
+      options: ["Privacy-Preserving API Architecture", "Data Minimization", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures API operations don't compromise user data privacy."
+      related_branch: "AccessControl"
+    - id: "apigw_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to API security standards."
+      related_branch: "AccessControl"
+    - id: "apigw_serverless_api_security"
+      question: "How is serverless API security implemented?"
+      type: "single_choice"
+      options: ["Serverless-Specific Security Controls", "Standard API Security", "No Serverless APIs", "Unknown"]
+      help_text: "Serverless API security addresses unique requirements for function-based API implementations."
+      related_branch: "APISecurity"
+    - id: "apigw_advanced_api_analytics"
+      question: "What advanced API analytics are implemented?"
+      type: "single_choice"
+      options: ["Real-time API Intelligence", "Predictive API Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide deep insights into API usage, security, and performance."
+      related_branch: "Monitoring"
+    - id: "apigw_api_contract_security"
+      question: "How is API contract security enforced?"
+      type: "single_choice"
+      options: ["Automated Contract Validation", "Schema-Based Enforcement", "Basic Contract Checking", "No Contract Security", "Unknown"]
+      help_text: "Contract security ensures APIs behave according to their defined specifications."
+      related_branch: "APISecurity"
+    - id: "apigw_microservices_security"
+      question: "How is microservices API security implemented?"
+      type: "single_choice"
+      options: ["Service Mesh Security", "Service-to-Service Authentication", "Basic Microservices Security", "Monolithic Architecture", "Unknown"]
+      help_text: "Microservices security provides protection for distributed API architectures."
+      related_branch: "APISecurity"
+    - id: "apigw_advanced_rate_limiting"
+      question: "What advanced rate limiting mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["AI-Adaptive Rate Limiting", "Context-Aware Limiting", "Distributed Rate Limiting", "Burst Protection", "None"]
+      help_text: "Advanced rate limiting provides sophisticated protection against API abuse."
+      related_branch: "RateLimiting"
+    - id: "apigw_api_governance"
+      question: "What API governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive API Governance", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "API governance ensures consistent security practices across all API implementations."
+      related_branch: "AccessControl"
+    - id: "apigw_edge_api_security"
+      question: "How is edge API security implemented?"
+      type: "single_choice"
+      options: ["Edge-Specific API Security", "Standard API Security", "No Edge APIs", "Unknown"]
+      help_text: "Edge API security provides protection for APIs deployed at edge locations."
+      related_branch: "APISecurity"
+    - id: "apigw_crisis_management"
+      question: "What crisis management capabilities exist for API services?"
+      type: "multiple_choice"
+      options: ["Emergency API Shutdown", "Crisis Communication APIs", "Priority API Routing", "Service Degradation", "None"]
+      help_text: "Crisis management ensures API availability and security during major incidents."
+      related_branch: "APISecurity"
+    - id: "apigw_future_technology_integration"
+      question: "How prepared is the API Gateway for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures API security can evolve with new technologies."
+      related_branch: "APISecurity"
+
+dependencies:
+  apigw_lambda_integration: "Lambda"
+  apigw_authentication_iam: "IAM"
+  apigw_monitoring_integration: "Monitoring"
+
+threat_intelligence:
+  cve_count: 55
+  recent_threats: ["API Injection", "Broken Authentication", "Data Exposure"]
+  attack_vectors: ["Parameter Tampering", "Rate Limit Bypass", "Authorization Bypass"]
+  mitre_techniques: ["T1190", "T1078", "T1213"]
+  threat_actors: ["Web Attackers", "APT Groups", "Script Kiddies"]
+
+risk_factors:
+  no_authentication: 5.0
+  weak_rate_limiting: 4.0
+  no_input_validation: 4.5
+  information_exposure: 3.5
+  insufficient_logging: 3.0

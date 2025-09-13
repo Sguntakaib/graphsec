@@ -1,0 +1,288 @@
+node_type: "Control"
+node_subtype: "CDN"
+category: "Network Infrastructure"
+description: "Content Delivery Network (CloudFront, Cloudflare)"
+required_branches:
+  - "CDNSecurity"
+  - "SSL/TLS"
+  - "Caching"
+  - "AccessControl"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "cdn_provider"
+      question: "What CDN provider is used?"
+      type: "single_choice"
+      options: ["AWS CloudFront", "Cloudflare", "Azure CDN", "Google Cloud CDN", "Akamai", "Custom Solution", "Unknown"]
+      help_text: "Different CDN providers offer varying security features and configurations."
+      related_branch: "CDNSecurity"
+    - id: "cdn_ssl_tls"
+      question: "How is SSL/TLS configured for the CDN?"
+      type: "single_choice"
+      options: ["TLS 1.3 Only", "TLS 1.2 + 1.3", "TLS 1.2 Only", "Mixed TLS Versions", "No SSL/TLS", "Unknown"]
+      help_text: "Modern TLS versions provide better security for content delivery."
+      related_branch: "SSL/TLS"
+    - id: "cdn_origin_protection"
+      question: "How is the origin server protected?"
+      type: "single_choice"
+      options: ["Origin Shield + Access Controls", "Basic Origin Protection", "Direct Origin Access", "No Protection", "Unknown"]
+      help_text: "Origin protection prevents direct attacks on backend servers."
+      related_branch: "AccessControl"
+    - id: "cdn_caching_security"
+      question: "How is caching configured for security?"
+      type: "single_choice"
+      options: ["Security-Aware Caching", "Standard Caching", "Aggressive Caching", "No Caching", "Unknown"]
+      help_text: "Proper caching configuration balances performance with security requirements."
+      related_branch: "Caching"
+    - id: "cdn_geographic_restrictions"
+      question: "Are geographic restrictions implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Geo-blocking", "Country-Level Restrictions", "No Geographic Restrictions", "Unknown"]
+      help_text: "Geographic restrictions can reduce exposure to attacks from high-risk regions."
+      related_branch: "AccessControl"
+
+  advanced:
+    - id: "cdn_waf_integration"
+      question: "Is a Web Application Firewall integrated with the CDN?"
+      type: "single_choice"
+      options: ["Advanced WAF Integration", "Basic WAF Rules", "No WAF Integration", "Unknown"]
+      help_text: "WAF integration provides application-layer protection at the edge."
+      related_branch: "CDNSecurity"
+    - id: "cdn_ddos_protection"
+      question: "What DDoS protection is implemented?"
+      type: "single_choice"
+      options: ["Advanced DDoS Mitigation", "Basic DDoS Protection", "No DDoS Protection", "Unknown"]
+      help_text: "DDoS protection ensures content availability during volumetric attacks."
+      related_branch: "CDNSecurity"
+    - id: "cdn_bot_management"
+      question: "How is bot traffic managed?"
+      type: "single_choice"
+      options: ["Advanced Bot Management", "Basic Bot Detection", "Rate Limiting Only", "No Bot Management", "Unknown"]
+      help_text: "Bot management differentiates between legitimate and malicious automated traffic."
+      related_branch: "CDNSecurity"
+    - id: "cdn_edge_security"
+      question: "What edge security features are implemented?"
+      type: "multiple_choice"
+      options: ["Edge Computing Security", "Edge WAF", "Edge Rate Limiting", "Edge Authentication", "None"]
+      help_text: "Edge security provides protection closer to end users for better performance."
+      related_branch: "CDNSecurity"
+    - id: "cdn_logging_monitoring"
+      question: "What logging and monitoring is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Logging + Real-time Monitoring", "Basic Logging", "Minimal Monitoring", "No Logging", "Unknown"]
+      help_text: "Comprehensive logging enables security analysis and troubleshooting."
+      related_branch: "Monitoring"
+    - id: "cdn_certificate_management"
+      question: "How are SSL certificates managed?"
+      type: "single_choice"
+      options: ["Automated Certificate Management", "Manual Certificate Management", "Default Certificates", "No Certificate Management", "Unknown"]
+      help_text: "Proper certificate management ensures continuous SSL/TLS protection."
+      related_branch: "SSL/TLS"
+    - id: "cdn_content_integrity"
+      question: "How is content integrity protected?"
+      type: "single_choice"
+      options: ["Cryptographic Content Validation", "Hash-based Validation", "Basic Integrity Checks", "No Integrity Protection", "Unknown"]
+      help_text: "Content integrity protection ensures delivered content hasn't been tampered with."
+      related_branch: "CDNSecurity"
+    - id: "cdn_access_logs_analysis"
+      question: "How are CDN access logs analyzed for security?"
+      type: "single_choice"
+      options: ["Automated Security Analysis", "Manual Log Review", "Basic Analysis", "No Log Analysis", "Unknown"]
+      help_text: "Log analysis helps identify attack patterns and security threats."
+      related_branch: "Monitoring"
+    - id: "cdn_rate_limiting"
+      question: "What rate limiting is implemented?"
+      type: "single_choice"
+      options: ["Intelligent Rate Limiting", "Fixed Rate Limits", "Basic Rate Limiting", "No Rate Limiting", "Unknown"]
+      help_text: "Rate limiting prevents abuse and protects against certain types of attacks."
+      related_branch: "CDNSecurity"
+    - id: "cdn_custom_rules"
+      question: "Are custom security rules implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Custom Rules", "Application-Specific Rules", "Basic Custom Rules", "No Custom Rules", "Unknown"]
+      help_text: "Custom rules provide application-specific protection beyond standard CDN security."
+      related_branch: "CDNSecurity"
+    - id: "cdn_compliance_features"
+      question: "What compliance features are enabled?"
+      type: "multiple_choice"
+      options: ["PCI DSS Compliance", "GDPR Compliance", "HIPAA Compliance", "SOC 2 Compliance", "None"]
+      help_text: "Compliance features ensure the CDN meets regulatory requirements."
+      related_branch: "AccessControl"
+    - id: "cdn_performance_security"
+      question: "How is performance optimized without compromising security?"
+      type: "single_choice"
+      options: ["Security-Aware Performance Optimization", "Basic Performance Optimization", "Performance Over Security", "No Optimization", "Unknown"]
+      help_text: "Balanced optimization maintains both security and performance requirements."
+      related_branch: "CDNSecurity"
+    - id: "cdn_origin_authentication"
+      question: "How is origin authentication implemented?"
+      type: "single_choice"
+      options: ["Mutual TLS Authentication", "Token-based Authentication", "IP-based Authentication", "No Origin Authentication", "Unknown"]
+      help_text: "Origin authentication ensures only authorized CDN servers can access backend resources."
+      related_branch: "AccessControl"
+    - id: "cdn_cache_poisoning_protection"
+      question: "What protection exists against cache poisoning attacks?"
+      type: "single_choice"
+      options: ["Advanced Cache Poisoning Protection", "Basic Cache Validation", "Standard Caching", "No Protection", "Unknown"]
+      help_text: "Cache poisoning protection prevents malicious content from being cached and served to users."
+      related_branch: "Caching"
+    - id: "cdn_content_filtering"
+      question: "What content filtering is implemented?"
+      type: "single_choice"
+      options: ["Advanced Content Filtering", "Basic Content Validation", "No Content Filtering", "Unknown"]
+      help_text: "Content filtering prevents delivery of malicious or inappropriate content."
+      related_branch: "CDNSecurity"
+    - id: "cdn_api_security"
+      question: "How are CDN APIs secured?"
+      type: "single_choice"
+      options: ["Comprehensive API Security", "Basic API Authentication", "No API Security", "Unknown"]
+      help_text: "API security protects CDN management interfaces from unauthorized access."
+      related_branch: "AccessControl"
+    - id: "cdn_incident_response"
+      question: "What incident response capabilities exist for CDN security events?"
+      type: "single_choice"
+      options: ["Automated Incident Response", "Manual Response Procedures", "Basic Response", "No Incident Response", "Unknown"]
+      help_text: "Incident response enables rapid mitigation of CDN-related security incidents."
+      related_branch: "CDNSecurity"
+
+  expert:
+    - id: "cdn_zero_trust_edge"
+      question: "How is zero trust implemented at the CDN edge?"
+      type: "single_choice"
+      options: ["Full Zero Trust Edge Architecture", "Partial Zero Trust", "Traditional CDN Security", "Unknown"]
+      help_text: "Zero trust edge ensures all CDN traffic is verified and authorized."
+      related_branch: "CDNSecurity"
+    - id: "cdn_ai_powered_security"
+      question: "Is AI-powered security used for CDN protection?"
+      type: "single_choice"
+      options: ["AI-Based Threat Detection", "Machine Learning Analysis", "Basic AI Features", "No AI Security", "Unknown"]
+      help_text: "AI-powered security can identify sophisticated attacks and anomalies in CDN traffic."
+      related_branch: "CDNSecurity"
+    - id: "cdn_advanced_threat_intelligence"
+      question: "How is threat intelligence integrated with CDN security?"
+      type: "single_choice"
+      options: ["Real-time Threat Feed Integration", "Threat Intelligence Correlation", "Basic Integration", "No Threat Intelligence", "Unknown"]
+      help_text: "Threat intelligence integration enhances CDN security with current threat information."
+      related_branch: "CDNSecurity"
+    - id: "cdn_quantum_safe_encryption"
+      question: "Are quantum-safe encryption methods used in the CDN?"
+      type: "single_choice"
+      options: ["Post-Quantum Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe encryption prepares CDN infrastructure for future quantum computing threats."
+      related_branch: "SSL/TLS"
+    - id: "cdn_behavioral_analysis"
+      question: "Is behavioral analysis used for CDN traffic monitoring?"
+      type: "single_choice"
+      options: ["Advanced Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual traffic patterns that may indicate attacks."
+      related_branch: "Monitoring"
+    - id: "cdn_edge_computing_security"
+      question: "How is edge computing security implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Edge Security", "Basic Edge Protection", "No Edge Computing", "Unknown"]
+      help_text: "Edge computing security protects processing that occurs at CDN edge locations."
+      related_branch: "CDNSecurity"
+    - id: "cdn_advanced_caching_security"
+      question: "What advanced caching security mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["Cache Encryption", "Cache Isolation", "Dynamic Cache Control", "Cache Forensics", "None"]
+      help_text: "Advanced caching security protects cached content and prevents cache-based attacks."
+      related_branch: "Caching"
+    - id: "cdn_supply_chain_security"
+      question: "How is supply chain security ensured for CDN services?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "Vendor Security Assessment", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures CDN infrastructure hasn't been compromised."
+      related_branch: "CDNSecurity"
+    - id: "cdn_advanced_incident_forensics"
+      question: "What advanced forensic capabilities exist for CDN incidents?"
+      type: "multiple_choice"
+      options: ["Traffic Flow Analysis", "Content Forensics", "Attack Path Reconstruction", "Evidence Preservation", "None"]
+      help_text: "Advanced forensics enable thorough investigation of CDN security incidents."
+      related_branch: "CDNSecurity"
+    - id: "cdn_privacy_protection"
+      question: "How is user privacy protected in CDN operations?"
+      type: "single_choice"
+      options: ["Privacy-Preserving CDN Architecture", "Data Minimization", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures CDN operations don't compromise user data privacy."
+      related_branch: "AccessControl"
+    - id: "cdn_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to CDN security standards."
+      related_branch: "AccessControl"
+    - id: "cdn_multi_cloud_edge"
+      question: "How is security maintained across multi-cloud CDN deployments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud CDN Security", "Cloud-Specific Security", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud security ensures consistent protection across different CDN providers."
+      related_branch: "CDNSecurity"
+    - id: "cdn_advanced_analytics"
+      question: "What advanced analytics are applied to CDN data?"
+      type: "single_choice"
+      options: ["Real-time CDN Analytics", "Predictive Traffic Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into CDN performance, security, and user behavior."
+      related_branch: "Monitoring"
+    - id: "cdn_serverless_edge_security"
+      question: "How is serverless edge computing secured?"
+      type: "single_choice"
+      options: ["Serverless Edge Security Framework", "Basic Serverless Security", "No Serverless Edge", "Unknown"]
+      help_text: "Serverless edge security protects functions executed at CDN edge locations."
+      related_branch: "CDNSecurity"
+    - id: "cdn_content_security_policy"
+      question: "How are Content Security Policies managed at the CDN level?"
+      type: "single_choice"
+      options: ["Advanced CSP Management", "Basic CSP Implementation", "No CSP Management", "Unknown"]
+      help_text: "CSP management at the CDN level provides consistent security headers across all content."
+      related_branch: "CDNSecurity"
+    - id: "cdn_advanced_geo_security"
+      question: "What advanced geographic security features are implemented?"
+      type: "multiple_choice"
+      options: ["Geofencing", "Location-Based Access Control", "Regional Compliance", "Geographic Threat Analysis", "None"]
+      help_text: "Advanced geographic security provides location-based protection and compliance."
+      related_branch: "AccessControl"
+    - id: "cdn_iot_edge_security"
+      question: "How is IoT edge security implemented at CDN locations?"
+      type: "single_choice"
+      options: ["IoT-Specific Edge Security", "Standard Edge Security", "No IoT Edge Deployment", "Unknown"]
+      help_text: "IoT edge security addresses unique requirements for IoT device connectivity through CDN."
+      related_branch: "CDNSecurity"
+    - id: "cdn_advanced_performance_security"
+      question: "How is advanced performance security optimization implemented?"
+      type: "single_choice"
+      options: ["AI-Optimized Performance Security", "Adaptive Security Controls", "Static Optimization", "No Advanced Optimization", "Unknown"]
+      help_text: "Advanced optimization dynamically balances performance and security based on conditions."
+      related_branch: "CDNSecurity"
+    - id: "cdn_crisis_management"
+      question: "What crisis management capabilities exist for CDN services?"
+      type: "multiple_choice"
+      options: ["Emergency Traffic Routing", "Crisis Communication", "Rapid Mitigation", "Service Isolation", "None"]
+      help_text: "Crisis management ensures CDN availability and security during major incidents."
+      related_branch: "CDNSecurity"
+    - id: "cdn_future_technology_integration"
+      question: "How prepared is the CDN for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures CDN security can evolve with new technologies."
+      related_branch: "CDNSecurity"
+
+dependencies:
+  cdn_waf_integration: "WAF"
+  cdn_ssl_certificate: "CertificateManager"
+  cdn_monitoring_integration: "Monitoring"
+
+threat_intelligence:
+  cve_count: 35
+  recent_threats: ["Cache Poisoning", "DDoS Attacks", "Origin Bypass"]
+  attack_vectors: ["Edge Exploitation", "SSL/TLS Attacks", "Content Injection"]
+  mitre_techniques: ["T1190", "T1499", "T1565"]
+  threat_actors: ["APT Groups", "DDoS Botnets", "Web Attackers"]
+
+risk_factors:
+  weak_ssl_config: 3.5
+  no_waf_integration: 4.0
+  origin_exposure: 4.5
+  no_bot_protection: 3.0
+  insufficient_monitoring: 2.5
