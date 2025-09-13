@@ -4776,9 +4776,10 @@ class SecurityModelingAPITester:
                 probabilistic_score = risk_assessment.get("probabilistic_score", 0)
                 composite_score = risk_assessment.get("composite_risk_score", 0)
                 
-                if probabilistic_score == composite_score:
+                # Allow for small differences due to rounding - Monte Carlo should produce some variation
+                if abs(probabilistic_score - composite_score) < 0.001:
                     self.log_test("Priority 1 - EC2 Probabilistic Risk", False, 
-                                "Probabilistic score equals composite score - Monte Carlo may not be running")
+                                f"Probabilistic score too close to composite score: {probabilistic_score} vs {composite_score} - Monte Carlo may not be running properly")
                     return False
                 
                 self.log_test("Priority 1 - EC2 Probabilistic Risk", True, 
