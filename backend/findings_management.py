@@ -359,7 +359,8 @@ class FindingsManager:
     async def create_indexes(self):
         """Create database indexes for optimal query performance"""
         try:
-            indexes = [
+            # Single field indexes
+            single_indexes = [
                 ("id", 1),  # Unique index on finding ID
                 ("diagram_id", 1),  # Index on diagram ID
                 ("node_id", 1),  # Index on node ID
@@ -367,15 +368,21 @@ class FindingsManager:
                 ("status", 1),  # Index on status
                 ("created_at", -1),  # Index on creation date (descending)
                 ("risk_score", -1),  # Index on risk score (descending)
-                ([("diagram_id", 1), ("severity", 1), ("status", 1)]),  # Compound index
-                ([("created_at", -1), ("severity", 1)]),  # Compound index for time-based queries
             ]
             
-            for index in indexes:
-                if isinstance(index, tuple):
-                    await self.collection.create_index(index)
-                else:
-                    await self.collection.create_index(index)
+            # Compound indexes
+            compound_indexes = [
+                [("diagram_id", 1), ("severity", 1), ("status", 1)],  # Compound index
+                [("created_at", -1), ("severity", 1)],  # Compound index for time-based queries
+            ]
+            
+            # Create single field indexes
+            for field, direction in single_indexes:
+                await self.collection.create_index([(field, direction)])
+            
+            # Create compound indexes
+            for index_spec in compound_indexes:
+                await self.collection.create_index(index_spec)
             
             logger.info("Created database indexes for findings collection")
             
