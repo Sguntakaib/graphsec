@@ -3394,7 +3394,16 @@ async def enhanced_simulate(request: dict):
         
         return {
             "success": True,
-            "results": results
+            "simulation_id": str(uuid.uuid4()),
+            "attack_paths": results.get("attack_paths", results.get("advanced_simulation", {}).get("attack_paths", [])),
+            "risk_analysis": {
+                "total_paths": results.get("total_paths", results.get("advanced_simulation", {}).get("total_paths", 0)),
+                "simulation_type": results.get("simulation_type", "advanced"),
+                "diagram_id": diagram_id
+            },
+            "mitre_techniques": results.get("mitre_analysis", {}).get("techniques", []),
+            "recommendations": results.get("recommendations", []),
+            "detailed_results": results  # Keep original structure for advanced use
         }
         
     except Exception as e:
