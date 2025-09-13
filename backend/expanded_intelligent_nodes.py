@@ -105,6 +105,8 @@ class NodeCategory(str, Enum):
     COMPUTE_SERVICES = "Compute Services"
     MONITORING_LOGGING = "Monitoring & Logging"
     APPLICATION_SERVICES = "Application Services"
+    IOT_EDGE = "IoT & Edge Computing"
+    CRYPTOGRAPHIC_CONTROLS = "Cryptographic Controls"
 
 @dataclass
 class ThreatIntelligence:
