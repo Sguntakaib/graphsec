@@ -1611,87 +1611,35 @@ async def calculate_expanded_risk(node_subtype: str, request: Dict[str, Any]):
 
 @api_router.post("/expanded-nodes/bulk-risk-assessment")
 async def bulk_risk_assessment(request: Dict[str, Any]):
-    """Perform risk assessment for multiple nodes simultaneously"""
+    """Priority 2: Enhanced bulk risk assessment for multiple nodes simultaneously with cross-node correlations"""
     nodes_data = request.get("nodes", [])
     business_context = request.get("business_context", {})
     
     if not nodes_data:
         raise HTTPException(status_code=400, detail="No nodes provided for assessment")
     
-    assessment_results = []
-    overall_risk_scores = []
-    
-    for node_data in nodes_data:
-        node_subtype = node_data.get("node_subtype")
-        responses = node_data.get("responses", {})
+    try:
+        # Use the enhanced bulk assessment method
+        bulk_result = expanded_node_engine.perform_bulk_risk_assessment(nodes_data, business_context)
         
-        if not node_subtype:
-            continue
-        
-        try:
-            # Add business context to responses
-            enhanced_responses = {**responses, **business_context}
-            
-            risk_assessment = expanded_node_engine.calculate_comprehensive_risk(node_subtype, enhanced_responses)
-            recommendations = expanded_node_engine.generate_security_recommendations(
-                node_subtype, 
-                enhanced_responses, 
-                risk_assessment["composite_risk_score"]
-            )
-            
-            assessment_results.append({
-                "node_id": node_data.get("node_id", f"node_{len(assessment_results)}"),
-                "node_subtype": node_subtype,
-                "risk_assessment": risk_assessment,
-                "security_recommendations": recommendations[:3]  # Top 3 recommendations for bulk view
-            })
-            
-            overall_risk_scores.append(risk_assessment["composite_risk_score"])
-            
-        except Exception as e:
-            logger.error(f"Bulk risk calculation error for {node_subtype}: {str(e)}")
-            assessment_results.append({
-                "node_id": node_data.get("node_id", f"node_{len(assessment_results)}"),
-                "node_subtype": node_subtype,
-                "error": str(e),
-                "risk_assessment": {
-                    "composite_risk_score": 5.0,
-                    "risk_level": "Medium",
-                    "risk_components": {},
-                    "threat_intelligence": {}
-                },
-                "security_recommendations": []
-            })
-    
-    # Calculate overall statistics
-    if overall_risk_scores:
-        average_risk = sum(overall_risk_scores) / len(overall_risk_scores)
-        max_risk = max(overall_risk_scores)
-        min_risk = min(overall_risk_scores)
-        
-        # Risk distribution
-        risk_distribution = {
-            "critical": len([r for r in overall_risk_scores if r >= 8.0]),
-            "high": len([r for r in overall_risk_scores if 6.0 <= r < 8.0]),
-            "medium": len([r for r in overall_risk_scores if 4.0 <= r < 6.0]),
-            "low": len([r for r in overall_risk_scores if 2.0 <= r < 4.0]),
-            "minimal": len([r for r in overall_risk_scores if r < 2.0])
+        # Add comprehensive metadata
+        bulk_result["assessment_metadata"] = {
+            "assessment_timestamp": datetime.now(timezone.utc).isoformat(),
+            "assessment_version": "2.0_enhanced",
+            "features_enabled": [
+                "probabilistic_modeling",
+                "cross_node_correlations", 
+                "risk_amplification_factors",
+                "monte_carlo_simulation"
+            ],
+            "business_context_applied": len(business_context) > 0
         }
-    else:
-        average_risk = max_risk = min_risk = 0.0
-        risk_distribution = {"critical": 0, "high": 0, "medium": 0, "low": 0, "minimal": 0}
-    
-    return {
-        "assessment_results": assessment_results,
-        "summary_statistics": {
-            "total_nodes_assessed": len(assessment_results),
-            "average_risk_score": round(average_risk, 2),
-            "highest_risk_score": round(max_risk, 2),
-            "lowest_risk_score": round(min_risk, 2),
-            "risk_distribution": risk_distribution
-        },
-        "calculation_timestamp": datetime.now(timezone.utc).isoformat()
-    }
+        
+        return bulk_result
+        
+    except Exception as e:
+        logger.error(f"Bulk risk assessment error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Bulk risk assessment failed: {str(e)}")
 
 @api_router.get("/expanded-nodes/categories")
 async def get_node_categories():
