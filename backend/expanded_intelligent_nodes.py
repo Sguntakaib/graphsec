@@ -3017,7 +3017,122 @@ class ExpandedIntelligentNodeEngine:
         priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
         recommendations.sort(key=lambda x: priority_order.get(x["priority"], 4))
         
-        return recommendations[:10]  # Return top 10 recommendations
+    def _calculate_attack_surface_score(self, responses: dict, risk_factors: dict) -> float:
+        """Calculate attack surface score based on responses"""
+        base_score = 5.0
+        
+        # Check for public exposure
+        if responses.get("public_access") or responses.get("public_ip"):
+            base_score += 2.0
+        
+        # Check for network exposure
+        if responses.get("network_exposure", "").lower() in ["high", "public", "internet"]:
+            base_score += 1.5
+        
+        # Apply risk factors
+        for factor_key, factor_value in risk_factors.items():
+            if factor_key in responses and responses[factor_key]:
+                base_score += factor_value
+        
+        return min(base_score, 10.0)
+    
+    def _calculate_vulnerability_score(self, responses: dict, risk_factors: dict) -> float:
+        """Calculate vulnerability score based on responses"""
+        base_score = 5.0
+        
+        # Check for known vulnerabilities
+        vulnerability_indicators = ["unpatched", "outdated", "default_config", "weak_encryption"]
+        for indicator in vulnerability_indicators:
+            if any(indicator in key.lower() for key in responses.keys()):
+                if responses.get(indicator) in [True, "yes", "enabled"]:
+                    base_score += 1.0
+        
+        # Apply CVE-based risk factors
+        cve_risk = risk_factors.get("cve_exposure", 0)
+        base_score += cve_risk
+        
+        return min(base_score, 10.0)
+    
+    def _calculate_control_effectiveness_score(self, responses: dict) -> float:
+        """Calculate control effectiveness score"""
+        base_score = 5.0
+        
+        # Check for security controls
+        security_controls = ["encryption", "monitoring", "access_control", "firewall", "backup"]
+        control_count = 0
+        
+        for control in security_controls:
+            if any(control in key.lower() for key in responses.keys()):
+                if responses.get(control) in [True, "yes", "enabled", "strong", "comprehensive"]:
+                    control_count += 1
+                    base_score += 0.5
+        
+        # Bonus for comprehensive security
+        if control_count >= 4:
+            base_score += 1.0
+        
+        return min(base_score, 10.0)
+    
+    def _calculate_business_impact_score(self, responses: dict) -> float:
+        """Calculate business impact score"""
+        base_score = 5.0
+        
+        # Check for business criticality indicators
+        if responses.get("business_critical") or responses.get("high_availability"):
+            base_score += 2.0
+        
+        # Check for data sensitivity
+        data_sensitivity = responses.get("data_sensitivity", "").lower()
+        if data_sensitivity in ["high", "critical", "confidential"]:
+            base_score += 1.5
+        elif data_sensitivity in ["medium", "sensitive"]:
+            base_score += 1.0
+        
+        # Check for regulatory requirements
+        if responses.get("regulatory_compliance") or responses.get("compliance_required"):
+            base_score += 1.0
+        
+        return min(base_score, 10.0)
+    
+    def generate_security_recommendations(self, node_subtype: str, responses: dict, risk_score: float) -> list:
+        """Generate security recommendations based on risk assessment"""
+        recommendations = []
+        
+        # High-level recommendations based on risk score
+        if risk_score >= 8.0:
+            recommendations.append({
+                "priority": "CRITICAL",
+                "category": "Immediate Action Required",
+                "recommendation": "Immediate security review and remediation required - critical risk level detected",
+                "rationale": f"Risk score of {risk_score:.1f} indicates severe security exposure"
+            })
+        
+        # Specific recommendations based on responses
+        if responses.get("public_access"):
+            recommendations.append({
+                "priority": "HIGH",
+                "category": "Access Control",
+                "recommendation": "Implement network access controls and restrict public exposure",
+                "rationale": "Public access significantly increases attack surface"
+            })
+        
+        if not responses.get("encryption"):
+            recommendations.append({
+                "priority": "HIGH",
+                "category": "Data Protection",
+                "recommendation": "Implement encryption for data at rest and in transit",
+                "rationale": "Unencrypted data is vulnerable to interception and theft"
+            })
+        
+        if not responses.get("monitoring"):
+            recommendations.append({
+                "priority": "MEDIUM",
+                "category": "Detection",
+                "recommendation": "Deploy comprehensive monitoring and logging",
+                "rationale": "Monitoring is essential for threat detection and incident response"
+            })
+        
+        return recommendations[:5]  # Return top 5 recommendations
 
 
 # Global instance
