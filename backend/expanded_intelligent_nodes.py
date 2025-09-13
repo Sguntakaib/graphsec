@@ -3018,3 +3018,7 @@ class ExpandedIntelligentNodeEngine:
         recommendations.sort(key=lambda x: priority_order.get(x["priority"], 4))
         
         return recommendations[:10]  # Return top 10 recommendations
+
+
+# Global instance
+expanded_node_engine = ExpandedIntelligentNodeEngine()
