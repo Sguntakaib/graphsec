@@ -3502,9 +3502,12 @@ async def enhanced_rule_evaluation(request: dict):
         # Remove duplicates from recommendations
         impact_assessment["recommendations_summary"] = list(set(impact_assessment["recommendations_summary"]))
         
+        # Convert dataclass results to dictionaries (RuleEvaluationResult is a dataclass, not Pydantic)
+        from dataclasses import asdict
+        
         results = {
             "diagram_id": diagram_id,
-            "rule_results": [result.dict() for result in rule_results],
+            "rule_results": [asdict(result) for result in rule_results],
             "impact_assessment": impact_assessment,
             "evaluation_timestamp": datetime.now(timezone.utc).isoformat()
         }
