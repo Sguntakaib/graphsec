@@ -129,13 +129,15 @@ class ThreatIntelligence:
 class RiskMetrics:
     """Enhanced risk calculation metrics with probabilistic modeling"""
     
-    def __init__(self):
-        self.base_risk: float = 5.0
-        self.attack_surface_score: float = 5.0
-        self.vulnerability_score: float = 5.0
-        self.control_effectiveness: float = 5.0
-        self.business_impact: float = 5.0
-        self.threat_probability: float = 0.5
+    def __init__(self, base_risk: float = 5.0, attack_surface_score: float = 5.0, 
+                 vulnerability_score: float = 5.0, control_effectiveness: float = 5.0,
+                 business_impact: float = 5.0, threat_probability: float = 0.5):
+        self.base_risk: float = base_risk
+        self.attack_surface_score: float = attack_surface_score
+        self.vulnerability_score: float = vulnerability_score
+        self.control_effectiveness: float = control_effectiveness
+        self.business_impact: float = business_impact
+        self.threat_probability: float = threat_probability
         
         # Priority 1: Probabilistic Modeling Enhancement - NEW FIELDS
         self.confidence_interval: dict = {"lower_bound": 0.0, "upper_bound": 0.0, "confidence_level": 90}
