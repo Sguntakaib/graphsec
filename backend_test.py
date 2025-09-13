@@ -4783,9 +4783,12 @@ class SecurityModelingAPITester:
                                 f"Monte Carlo standard deviation is {std_dev} - simulation may not be running")
                     return False
                 
+                probabilistic_score = risk_assessment.get("probabilistic_score", 0)
+                composite_score = risk_assessment.get("composite_risk_score", 0)
+                
                 self.log_test("Priority 1 - EC2 Probabilistic Risk", True, 
                             f"Probabilistic modeling working: prob_score={probabilistic_score}, "
-                            f"composite_score={composite_score}, confidence={risk_assessment.get('confidence_interval')}")
+                            f"composite_score={composite_score}, std_dev={std_dev}, confidence={risk_assessment.get('confidence_interval')}")
                 return True
             else:
                 self.log_test("Priority 1 - EC2 Probabilistic Risk", False, 
