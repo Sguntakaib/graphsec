@@ -78,6 +78,10 @@ class SecurityBranchType(str, Enum):
     CI_CD_SECURITY = "CICDSecurity"
     SECRETS_MANAGEMENT = "SecretsManagement"
     SUPPLY_CHAIN = "SupplyChain"
+    
+    # Additional Security Branches
+    DDoS_PROTECTION = "DDoSProtection"
+    MESSAGE_SECURITY = "MessageSecurity"
 
 class QuestionnaireLevel(str, Enum):
     BASIC = "basic"           # 5-8 questions
