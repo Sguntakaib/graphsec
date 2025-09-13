@@ -134,6 +134,55 @@ class QuestionnaireLoader:
         
         return self._scale_questionnaire_for_level(basic_questions, level, node_subtype)
     
+    def _scale_questionnaire_for_level(self, basic_questions: List[Dict], level: QuestionnaireLevel, node_subtype: str) -> List[Dict]:
+        """Scale basic questionnaire to match the requested level"""
+        if level == QuestionnaireLevel.BASIC:
+            return basic_questions
+        
+        scaled_questions = []
+        
+        for question in basic_questions:
+            scaled_question = question.copy()
+            
+            if level == QuestionnaireLevel.ADVANCED:
+                # For advanced level, add more detailed help text and validation
+                scaled_question['help_text'] = f"Advanced: {question.get('help_text', '')}"
+                if question.get('type') == 'text':
+                    scaled_question['validation'] = {'min_length': 50}
+                elif question.get('type') in ['single_choice', 'multiple_choice']:
+                    # Add more nuanced options if available
+                    options = question.get('options', [])
+                    if len(options) >= 3:
+                        scaled_question['options'] = options + [{'value': 'other', 'label': 'Other (please specify)'}]
+            
+            elif level == QuestionnaireLevel.EXPERT:
+                # For expert level, add comprehensive help and advanced validation
+                scaled_question['help_text'] = f"Expert: {question.get('help_text', '')} Consider regulatory compliance, threat modeling, and risk assessment implications."
+                if question.get('type') == 'text':
+                    scaled_question['validation'] = {'min_length': 100, 'requires_justification': True}
+                elif question.get('type') in ['single_choice', 'multiple_choice']:
+                    # Add comprehensive options
+                    options = question.get('options', [])
+                    expert_options = options + [
+                        {'value': 'custom_implementation', 'label': 'Custom implementation (requires detailed explanation)'},
+                        {'value': 'regulatory_exception', 'label': 'Regulatory exception applies'},
+                        {'value': 'risk_accepted', 'label': 'Risk formally accepted by management'}
+                    ]
+                    scaled_question['options'] = expert_options
+                
+                # Add expert-level metadata
+                scaled_question['expert_considerations'] = [
+                    'Regulatory compliance requirements',
+                    'Threat landscape analysis',
+                    'Business impact assessment',
+                    'Technical debt implications'
+                ]
+            
+            scaled_questions.append(scaled_question)
+        
+        logger.info(f"Scaled {len(basic_questions)} questions from basic to {level.value} level for {node_subtype}")
+        return scaled_questions
+    
     def get_metadata(self, node_subtype: str) -> Optional[QuestionnaireMetadata]:
         """Get metadata for a specific node type"""
         return self._metadata_cache.get(node_subtype)
