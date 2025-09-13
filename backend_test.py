@@ -8128,7 +8128,23 @@ class SecurityModelingAPITester:
             self.test_threat_intelligence_correlate_vulnerabilities,
             self.test_threat_intelligence_real_time_score,
             self.test_threat_intelligence_mitre_technique,
-            self.test_threat_intelligence_dashboard
+            self.test_threat_intelligence_dashboard,
+            
+            # ============================================================================
+            # PHASE 2 QUESTIONNAIRE SYSTEM TESTS - CRITICAL PRIORITY NODE TYPES
+            # ============================================================================
+            self.test_phase2_webapp_questionnaire_basic,
+            self.test_phase2_webapp_questionnaire_advanced,
+            self.test_phase2_webapp_questionnaire_expert,
+            self.test_phase2_api_questionnaire_basic,
+            self.test_phase2_api_questionnaire_advanced,
+            self.test_phase2_api_questionnaire_expert,
+            self.test_phase2_database_questionnaire_basic,
+            self.test_phase2_database_questionnaire_advanced,
+            self.test_phase2_database_questionnaire_expert,
+            self.test_phase2_questionnaire_structure_validation,
+            self.test_phase2_questionnaire_loader_system,
+            self.test_phase2_3level_scaling_system
         ]
         
         passed = 0
