@@ -1,0 +1,288 @@
+node_type: "Asset"
+node_subtype: "MessageQueue"
+category: "Integration Services"
+description: "Message Queue Services (SQS, SNS, RabbitMQ, Apache Kafka)"
+required_branches:
+  - "MessageSecurity"
+  - "AccessControl"
+  - "Monitoring"
+  - "DataIntegrity"
+  - "Compliance"
+
+questionnaires:
+  basic:
+    - id: "mq_service_type"
+      question: "What type of message queue service is used?"
+      type: "single_choice"
+      options: ["AWS SQS/SNS", "Apache Kafka", "RabbitMQ", "Redis", "ActiveMQ", "Custom Solution", "Unknown"]
+      help_text: "Different message queue services have varying security characteristics and capabilities."
+      related_branch: "MessageSecurity"
+    - id: "mq_access_control"
+      question: "How is access to the message queue controlled?"
+      type: "single_choice"
+      options: ["IAM + Resource Policies", "Basic Authentication", "Network-Level Control", "No Access Control", "Unknown"]
+      help_text: "Proper access control ensures only authorized applications can access message queues."
+      related_branch: "AccessControl"
+    - id: "mq_encryption_transit"
+      question: "Is encryption in transit enabled for message queue communications?"
+      type: "single_choice"
+      options: ["TLS 1.3", "TLS 1.2", "Basic Encryption", "No Encryption", "Unknown"]
+      help_text: "Encryption in transit protects messages from interception during transmission."
+      related_branch: "MessageSecurity"
+    - id: "mq_encryption_rest"
+      question: "Is encryption at rest enabled for stored messages?"
+      type: "single_choice"
+      options: ["Customer Managed Keys", "Service Managed Keys", "Basic Encryption", "No Encryption", "Unknown"]
+      help_text: "Encryption at rest protects stored messages from unauthorized access."
+      related_branch: "MessageSecurity"
+    - id: "mq_message_retention"
+      question: "How is message retention configured?"
+      type: "single_choice"
+      options: ["Security-Focused Retention", "Business Requirements", "Default Settings", "Unlimited Retention", "Unknown"]
+      help_text: "Appropriate retention policies balance functionality with security and compliance requirements."
+      related_branch: "DataIntegrity"
+
+  advanced:
+    - id: "mq_dead_letter_queues"
+      question: "Are dead letter queues implemented for error handling?"
+      type: "single_choice"
+      options: ["Comprehensive DLQ Strategy", "Basic DLQ Implementation", "No DLQ", "Unknown"]
+      help_text: "Dead letter queues prevent message loss and enable investigation of processing failures."
+      related_branch: "MessageSecurity"
+    - id: "mq_message_filtering"
+      question: "What message filtering and validation is implemented?"
+      type: "single_choice"
+      options: ["Content Validation + Filtering", "Basic Message Validation", "Schema Validation", "No Validation", "Unknown"]
+      help_text: "Message validation prevents malicious or malformed messages from being processed."
+      related_branch: "MessageSecurity"
+    - id: "mq_monitoring_logging"
+      question: "What monitoring and logging is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Monitoring + Logging", "Basic Monitoring", "Minimal Logging", "No Monitoring", "Unknown"]
+      help_text: "Monitoring and logging enable detection of security issues and performance problems."
+      related_branch: "Monitoring"
+    - id: "mq_rate_limiting"
+      question: "Is rate limiting implemented for message queues?"
+      type: "single_choice"
+      options: ["Advanced Rate Limiting", "Basic Throttling", "Queue Size Limits", "No Rate Limiting", "Unknown"]
+      help_text: "Rate limiting prevents message queue abuse and resource exhaustion attacks."
+      related_branch: "MessageSecurity"
+    - id: "mq_cross_region_replication"
+      question: "Is cross-region replication implemented for high availability?"
+      type: "single_choice"
+      options: ["Secure Cross-Region Replication", "Basic Replication", "No Replication", "Unknown"]
+      help_text: "Cross-region replication ensures message availability during regional outages."
+      related_branch: "DataIntegrity"
+    - id: "mq_message_ordering"
+      question: "How is message ordering guaranteed?"
+      type: "single_choice"
+      options: ["FIFO Queues", "Partitioned Ordering", "Best Effort", "No Ordering Guarantee", "Unknown"]
+      help_text: "Message ordering is critical for applications that require sequential processing."
+      related_branch: "MessageSecurity"
+    - id: "mq_poison_message_handling"
+      question: "How are poison messages handled?"
+      type: "single_choice"
+      options: ["Automated Poison Message Detection", "Manual Investigation", "Basic Error Handling", "No Poison Message Handling", "Unknown"]
+      help_text: "Poison message handling prevents malicious messages from disrupting message processing."
+      related_branch: "MessageSecurity"
+    - id: "mq_message_deduplication"
+      question: "Is message deduplication implemented?"
+      type: "single_choice"
+      options: ["Automatic Deduplication", "Application-Level Deduplication", "No Deduplication", "Unknown"]
+      help_text: "Message deduplication prevents duplicate processing and ensures data consistency."
+      related_branch: "DataIntegrity"
+    - id: "mq_topic_security"
+      question: "How are topics/exchanges secured?"
+      type: "single_choice"
+      options: ["Topic-Level Access Control", "Basic Topic Security", "No Topic Security", "Unknown"]
+      help_text: "Topic security ensures proper access control for different message types."
+      related_branch: "AccessControl"
+    - id: "mq_consumer_authentication"
+      question: "How are message consumers authenticated?"
+      type: "single_choice"
+      options: ["Strong Consumer Authentication", "Basic Authentication", "Network-Based Authentication", "No Consumer Authentication", "Unknown"]
+      help_text: "Consumer authentication ensures only authorized applications can receive messages."
+      related_branch: "AccessControl"
+    - id: "mq_producer_authentication"
+      question: "How are message producers authenticated?"
+      type: "single_choice"
+      options: ["Strong Producer Authentication", "Basic Authentication", "Network-Based Authentication", "No Producer Authentication", "Unknown"]
+      help_text: "Producer authentication ensures only authorized applications can send messages."
+      related_branch: "AccessControl"
+    - id: "mq_message_transformation"
+      question: "How is message transformation secured?"
+      type: "single_choice"
+      options: ["Secure Transformation Pipeline", "Basic Transformation", "No Transformation", "Unknown"]
+      help_text: "Secure message transformation prevents injection attacks and data corruption."
+      related_branch: "MessageSecurity"
+    - id: "mq_compliance_logging"
+      question: "What compliance logging is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Compliance Logging", "Basic Audit Logging", "Minimal Logging", "No Compliance Logging", "Unknown"]
+      help_text: "Compliance logging supports regulatory requirements and security auditing."
+      related_branch: "Compliance"
+    - id: "mq_disaster_recovery"
+      question: "What disaster recovery capabilities are implemented?"
+      type: "single_choice"
+      options: ["Comprehensive DR Strategy", "Basic Backup/Restore", "No DR Capabilities", "Unknown"]
+      help_text: "Disaster recovery ensures message queue availability during major incidents."
+      related_branch: "DataIntegrity"
+    - id: "mq_performance_optimization"
+      question: "How is message queue performance optimized for security?"
+      type: "single_choice"
+      options: ["Security-Aware Optimization", "Basic Performance Tuning", "Default Configuration", "No Optimization", "Unknown"]
+      help_text: "Performance optimization ensures security controls don't impede message processing."
+      related_branch: "MessageSecurity"
+    - id: "mq_integration_security"
+      question: "How is integration security implemented with other services?"
+      type: "single_choice"
+      options: ["Secure Service Integration", "Basic Integration", "No Integration Security", "Unknown"]
+      help_text: "Integration security ensures secure communication with connected systems."
+      related_branch: "MessageSecurity"
+    - id: "mq_message_routing_security"
+      question: "How is message routing secured?"
+      type: "single_choice"
+      options: ["Secure Routing Rules", "Basic Routing", "No Routing Security", "Unknown"]
+      help_text: "Secure routing ensures messages reach only intended destinations."
+      related_branch: "AccessControl"
+
+  expert:
+    - id: "mq_zero_trust_messaging"
+      question: "How is zero trust implemented for message queue architecture?"
+      type: "single_choice"
+      options: ["Full Zero Trust Messaging", "Partial Zero Trust", "Traditional Security Model", "Unknown"]
+      help_text: "Zero trust ensures every message interaction is verified and authorized."
+      related_branch: "MessageSecurity"
+    - id: "mq_ai_powered_threat_detection"
+      question: "Is AI-powered threat detection used for message queue security?"
+      type: "single_choice"
+      options: ["AI-Based Message Analysis", "Machine Learning Anomaly Detection", "Basic AI Features", "No AI Detection", "Unknown"]
+      help_text: "AI-powered detection can identify sophisticated message-based attacks and anomalies."
+      related_branch: "Monitoring"
+    - id: "mq_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for message queue architecture?"
+      type: "single_choice"
+      options: ["Comprehensive Message Queue Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies message-specific attack vectors and defenses."
+      related_branch: "MessageSecurity"
+    - id: "mq_quantum_safe_messaging"
+      question: "Are quantum-safe cryptographic methods used for message protection?"
+      type: "single_choice"
+      options: ["Post-Quantum Message Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe cryptography prepares message systems for future quantum computing threats."
+      related_branch: "MessageSecurity"
+    - id: "mq_behavioral_analysis"
+      question: "Is behavioral analysis used for message pattern monitoring?"
+      type: "single_choice"
+      options: ["Advanced Message Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual message patterns that may indicate compromise."
+      related_branch: "Monitoring"
+    - id: "mq_confidential_messaging"
+      question: "Is confidential computing implemented for sensitive message processing?"
+      type: "single_choice"
+      options: ["Hardware-Based Confidential Messaging", "Software-Based Protection", "No Confidential Computing", "Unknown"]
+      help_text: "Confidential computing protects message processing from infrastructure-level attacks."
+      related_branch: "MessageSecurity"
+    - id: "mq_advanced_encryption"
+      question: "What advanced encryption techniques are used for messages?"
+      type: "multiple_choice"
+      options: ["End-to-End Encryption", "Homomorphic Encryption", "Envelope Encryption", "Field-Level Encryption", "None"]
+      help_text: "Advanced encryption provides enhanced protection for sensitive message content."
+      related_branch: "MessageSecurity"
+    - id: "mq_supply_chain_security"
+      question: "How is supply chain security ensured for message queue infrastructure?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "Vendor Security Assessment", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures message queue components haven't been compromised."
+      related_branch: "MessageSecurity"
+    - id: "mq_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for message queues?"
+      type: "multiple_choice"
+      options: ["Message Forensics", "Automated Incident Containment", "Message Replay Analysis", "Emergency Queue Isolation", "None"]
+      help_text: "Advanced incident response enables effective handling of message-related security incidents."
+      related_branch: "MessageSecurity"
+    - id: "mq_privacy_protection"
+      question: "How is privacy protection implemented in message processing?"
+      type: "single_choice"
+      options: ["Privacy-Preserving Message Processing", "Data Minimization", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures message processing doesn't compromise user data privacy."
+      related_branch: "Compliance"
+    - id: "mq_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to messaging security standards."
+      related_branch: "Compliance"
+    - id: "mq_edge_messaging_security"
+      question: "How is security implemented for edge message queue deployments?"
+      type: "single_choice"
+      options: ["Edge-Specific Security Controls", "Standard Message Security", "No Edge Deployments", "Unknown"]
+      help_text: "Edge computing requires specialized security measures for remote message processing."
+      related_branch: "MessageSecurity"
+    - id: "mq_multi_cloud_messaging"
+      question: "How is security maintained across multi-cloud message deployments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Messaging Security", "Cloud-Specific Security", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud security ensures consistent message protection across different cloud environments."
+      related_branch: "MessageSecurity"
+    - id: "mq_advanced_message_analytics"
+      question: "What advanced analytics are applied to message data?"
+      type: "single_choice"
+      options: ["Real-time Message Analytics", "Predictive Message Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into message patterns, security threats, and performance issues."
+      related_branch: "Monitoring"
+    - id: "mq_stream_processing_security"
+      question: "How is stream processing security implemented?"
+      type: "single_choice"
+      options: ["Secure Stream Processing", "Basic Stream Security", "No Stream Processing", "Unknown"]
+      help_text: "Stream processing security protects real-time message analysis and transformation."
+      related_branch: "MessageSecurity"
+    - id: "mq_advanced_access_patterns"
+      question: "What advanced access control patterns are implemented?"
+      type: "multiple_choice"
+      options: ["Attribute-Based Access Control", "Context-Aware Access", "Risk-Based Access", "Time-Based Access", "None"]
+      help_text: "Advanced access patterns provide fine-grained control over message queue operations."
+      related_branch: "AccessControl"
+    - id: "mq_message_governance"
+      question: "What message governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive Message Governance", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "Message governance ensures consistent security practices across message systems."
+      related_branch: "Compliance"
+    - id: "mq_advanced_disaster_recovery"
+      question: "What advanced disaster recovery capabilities are implemented?"
+      type: "multiple_choice"
+      options: ["Multi-Region Failover", "Real-time Replication", "Point-in-Time Recovery", "Message State Reconstruction", "None"]
+      help_text: "Advanced disaster recovery ensures message system resilience during major incidents."
+      related_branch: "DataIntegrity"
+    - id: "mq_crisis_management"
+      question: "What crisis management capabilities exist for message systems?"
+      type: "multiple_choice"
+      options: ["Emergency Message Routing", "Crisis Communication Channels", "Priority Message Handling", "Emergency Queue Isolation", "None"]
+      help_text: "Crisis management enables effective response to major message system incidents."
+      related_branch: "MessageSecurity"
+    - id: "mq_future_technology_integration"
+      question: "How prepared is the message system for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures message security can evolve with new messaging technologies."
+      related_branch: "MessageSecurity"
+
+dependencies:
+  mq_lambda_integration: "Lambda"
+  mq_kms_integration: "KMS"
+  mq_vpc_integration: "VPC"
+
+threat_intelligence:
+  cve_count: 40
+  recent_threats: ["Message Injection", "Queue Poisoning", "Data Exfiltration"]
+  attack_vectors: ["Message Tampering", "Unauthorized Access", "Denial of Service"]
+  mitre_techniques: ["T1565", "T1499", "T1530"]
+  threat_actors: ["APT Groups", "Malware Authors", "Script Kiddies"]
+
+risk_factors:
+  no_encryption: 4.0
+  weak_access_control: 3.5
+  no_message_validation: 3.0
+  insufficient_monitoring: 2.5
+  public_access: 4.5

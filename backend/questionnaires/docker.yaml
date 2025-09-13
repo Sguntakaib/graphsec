@@ -1,0 +1,288 @@
+node_type: "Asset"
+node_subtype: "Docker"
+category: "Container Infrastructure"
+description: "Docker Container Runtime and Images"
+required_branches:
+  - "ContainerSecurity"
+  - "ImageSecurity"
+  - "RuntimeSecurity"
+  - "Monitoring"
+  - "Compliance"
+
+questionnaires:
+  basic:
+    - id: "docker_image_source"
+      question: "What is the source of Docker images used?"
+      type: "single_choice"
+      options: ["Official Images Only", "Verified Publishers", "Internal Registry", "Public Repositories", "Mixed Sources", "Unknown"]
+      help_text: "Trusted image sources reduce the risk of malicious or vulnerable containers."
+      related_branch: "ImageSecurity"
+    - id: "docker_base_image_updates"
+      question: "How frequently are base images updated?"
+      type: "single_choice"
+      options: ["Continuous Updates", "Weekly Updates", "Monthly Updates", "Ad-hoc Updates", "No Regular Updates", "Unknown"]
+      help_text: "Regular base image updates ensure security patches are applied promptly."
+      related_branch: "ImageSecurity"
+    - id: "docker_container_privileges"
+      question: "How are container privileges configured?"
+      type: "single_choice"
+      options: ["Non-root User Only", "Limited Privileges", "Standard Configuration", "Root User", "Unknown"]
+      help_text: "Running containers with minimal privileges reduces potential attack impact."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_network_security"
+      question: "How is container network security implemented?"
+      type: "single_choice"
+      options: ["Custom Network Policies", "Bridge Networks", "Host Networking", "Default Settings", "Unknown"]
+      help_text: "Proper network configuration isolates containers and controls traffic flow."
+      related_branch: "ContainerSecurity"
+    - id: "docker_secrets_management"
+      question: "How are secrets managed in containers?"
+      type: "single_choice"
+      options: ["External Secret Management", "Docker Secrets", "Environment Variables", "Hardcoded Secrets", "Unknown"]
+      help_text: "Proper secrets management prevents credential exposure in containers."
+      related_branch: "ContainerSecurity"
+
+  advanced:
+    - id: "docker_image_scanning"
+      question: "What image vulnerability scanning is implemented?"
+      type: "single_choice"
+      options: ["Continuous Scanning", "Pre-deployment Scanning", "Periodic Scanning", "No Scanning", "Unknown"]
+      help_text: "Regular image scanning identifies vulnerabilities before container deployment."
+      related_branch: "ImageSecurity"
+    - id: "docker_runtime_security"
+      question: "What runtime security measures are in place?"
+      type: "multiple_choice"
+      options: ["AppArmor/SELinux", "Seccomp Profiles", "Capabilities Restrictions", "Resource Limits", "None"]
+      help_text: "Runtime security measures protect the host system from container breakouts."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_image_signing"
+      question: "Is Docker image signing and verification implemented?"
+      type: "single_choice"
+      options: ["Content Trust + Notary", "Basic Image Signing", "Hash Verification", "No Signing", "Unknown"]
+      help_text: "Image signing ensures integrity and authenticity of container images."
+      related_branch: "ImageSecurity"
+    - id: "docker_registry_security"
+      question: "How is the Docker registry secured?"
+      type: "single_choice"
+      options: ["Private Registry + RBAC", "Private Registry + Basic Auth", "Public Registry", "No Registry Security", "Unknown"]
+      help_text: "Secure registries protect container images from unauthorized access and tampering."
+      related_branch: "ImageSecurity"
+    - id: "docker_container_isolation"
+      question: "What container isolation mechanisms are used?"
+      type: "multiple_choice"
+      options: ["User Namespaces", "PID Namespaces", "Network Namespaces", "Mount Namespaces", "Cgroups", "None"]
+      help_text: "Container isolation prevents interference between containers and with the host."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_logging_monitoring"
+      question: "How is container logging and monitoring implemented?"
+      type: "single_choice"
+      options: ["Centralized Logging + Monitoring", "Local Logging", "Basic Monitoring", "No Logging", "Unknown"]
+      help_text: "Comprehensive logging enables security monitoring and incident investigation."
+      related_branch: "Monitoring"
+    - id: "docker_host_security"
+      question: "How is the Docker host secured?"
+      type: "single_choice"
+      options: ["Hardened Host + CIS Benchmarks", "Basic Host Security", "Default Configuration", "No Host Hardening", "Unknown"]
+      help_text: "Host security is critical as containers share the host kernel."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_orchestration_security"
+      question: "If using orchestration, how is it secured?"
+      type: "single_choice"
+      options: ["Secured Orchestration Platform", "Basic Orchestration Security", "No Orchestration", "Unknown"]
+      help_text: "Orchestration security protects container management and deployment systems."
+      related_branch: "ContainerSecurity"
+    - id: "docker_compliance_scanning"
+      question: "What compliance scanning is performed on containers?"
+      type: "single_choice"
+      options: ["CIS Docker Benchmarks", "Custom Compliance Checks", "Basic Compliance", "No Compliance Scanning", "Unknown"]
+      help_text: "Compliance scanning ensures containers meet security standards and regulations."
+      related_branch: "Compliance"
+    - id: "docker_patch_management"
+      question: "How is patch management handled for containers?"
+      type: "single_choice"
+      options: ["Automated Patching Pipeline", "Regular Rebuild Schedule", "Manual Patching", "No Patch Management", "Unknown"]
+      help_text: "Effective patch management keeps containers updated with security fixes."
+      related_branch: "ImageSecurity"
+    - id: "docker_resource_constraints"
+      question: "How are container resource constraints configured?"
+      type: "single_choice"
+      options: ["Strict Resource Limits", "Basic Limits", "Default Settings", "No Limits", "Unknown"]
+      help_text: "Resource constraints prevent containers from consuming excessive system resources."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_storage_security"
+      question: "How is container storage secured?"
+      type: "single_choice"
+      options: ["Encrypted Storage + Access Controls", "Basic Storage Security", "Default Storage", "No Storage Security", "Unknown"]
+      help_text: "Secure storage protects container data and prevents unauthorized access."
+      related_branch: "ContainerSecurity"
+    - id: "docker_network_policies"
+      question: "What network policies are implemented for containers?"
+      type: "single_choice"
+      options: ["Comprehensive Network Policies", "Basic Firewall Rules", "Default Networking", "No Policies", "Unknown"]
+      help_text: "Network policies control traffic flow between containers and external systems."
+      related_branch: "ContainerSecurity"
+    - id: "docker_incident_response"
+      question: "What incident response capabilities exist for containers?"
+      type: "single_choice"
+      options: ["Container-Specific IR Procedures", "General IR Procedures", "Basic Response", "No IR Capabilities", "Unknown"]
+      help_text: "Container-specific incident response enables effective handling of container security incidents."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_supply_chain_security"
+      question: "How is container supply chain security ensured?"
+      type: "single_choice"
+      options: ["End-to-End Supply Chain Security", "Image Provenance Tracking", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures containers haven't been compromised during the build process."
+      related_branch: "ImageSecurity"
+    - id: "docker_multi_tenancy"
+      question: "How is multi-tenancy security implemented?"
+      type: "single_choice"
+      options: ["Strong Multi-Tenant Isolation", "Basic Tenant Separation", "No Multi-Tenancy", "Unknown"]
+      help_text: "Multi-tenancy security prevents interference between different tenant containers."
+      related_branch: "ContainerSecurity"
+    - id: "docker_immutable_infrastructure"
+      question: "Is immutable infrastructure practiced for containers?"
+      type: "single_choice"
+      options: ["Full Immutable Infrastructure", "Partial Immutability", "Mutable Containers", "Unknown"]
+      help_text: "Immutable infrastructure reduces attack surface and improves security consistency."
+      related_branch: "RuntimeSecurity"
+
+  expert:
+    - id: "docker_zero_trust_containers"
+      question: "How is zero trust implemented for container environments?"
+      type: "single_choice"
+      options: ["Full Zero Trust Container Architecture", "Partial Zero Trust", "Traditional Security Model", "Unknown"]
+      help_text: "Zero trust ensures every container interaction is verified and authorized."
+      related_branch: "ContainerSecurity"
+    - id: "docker_ai_powered_security"
+      question: "Is AI-powered security used for container protection?"
+      type: "single_choice"
+      options: ["AI-Based Threat Detection", "Machine Learning Analysis", "Basic AI Features", "No AI Security", "Unknown"]
+      help_text: "AI-powered security can detect sophisticated container-based attacks and anomalies."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for container architecture?"
+      type: "single_choice"
+      options: ["Comprehensive Container Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies container-specific attack vectors and defenses."
+      related_branch: "ContainerSecurity"
+    - id: "docker_quantum_safe_containers"
+      question: "Are quantum-safe cryptographic methods used in containers?"
+      type: "single_choice"
+      options: ["Post-Quantum Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe cryptography prepares containers for future quantum computing threats."
+      related_branch: "ContainerSecurity"
+    - id: "docker_behavioral_analysis"
+      question: "Is behavioral analysis used for container security monitoring?"
+      type: "single_choice"
+      options: ["Advanced Behavioral Analysis", "Anomaly Detection", "Basic Monitoring", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual container behavior that may indicate compromise."
+      related_branch: "Monitoring"
+    - id: "docker_confidential_computing"
+      question: "Is confidential computing implemented for sensitive containers?"
+      type: "single_choice"
+      options: ["Hardware-Based Confidential Computing", "Software-Based Protection", "No Confidential Computing", "Unknown"]
+      help_text: "Confidential computing protects container workloads from infrastructure-level attacks."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_advanced_orchestration_security"
+      question: "What advanced orchestration security features are implemented?"
+      type: "multiple_choice"
+      options: ["Service Mesh Security", "Mutual TLS", "Policy Engines", "Advanced RBAC", "None"]
+      help_text: "Advanced orchestration security provides comprehensive protection for containerized applications."
+      related_branch: "ContainerSecurity"
+    - id: "docker_supply_chain_attestation"
+      question: "Is supply chain attestation implemented for container images?"
+      type: "single_choice"
+      options: ["SLSA Compliance", "Software Bill of Materials", "Basic Attestation", "No Attestation", "Unknown"]
+      help_text: "Supply chain attestation provides verifiable evidence of container build integrity."
+      related_branch: "ImageSecurity"
+    - id: "docker_advanced_incident_forensics"
+      question: "What advanced forensic capabilities exist for container incidents?"
+      type: "multiple_choice"
+      options: ["Container Memory Analysis", "Runtime Forensics", "Image Forensics", "Network Forensics", "None"]
+      help_text: "Advanced forensics enable thorough investigation of container security incidents."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_privacy_protection"
+      question: "How is privacy protection implemented in container environments?"
+      type: "single_choice"
+      options: ["Privacy-Preserving Container Architecture", "Data Minimization", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures container operations don't compromise user data privacy."
+      related_branch: "Compliance"
+    - id: "docker_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to container security standards."
+      related_branch: "Compliance"
+    - id: "docker_edge_computing_security"
+      question: "How is security implemented for edge container deployments?"
+      type: "single_choice"
+      options: ["Edge-Specific Security Controls", "Standard Container Security", "No Edge Deployments", "Unknown"]
+      help_text: "Edge computing requires specialized security measures for remote container deployments."
+      related_branch: "ContainerSecurity"
+    - id: "docker_multi_cloud_container_security"
+      question: "How is security maintained across multi-cloud container deployments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Security", "Cloud-Specific Security", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud security ensures consistent protection across different cloud environments."
+      related_branch: "ContainerSecurity"
+    - id: "docker_advanced_image_optimization"
+      question: "What advanced image optimization is performed for security?"
+      type: "multiple_choice"
+      options: ["Distroless Images", "Minimal Base Images", "Layer Optimization", "Security-Focused Builds", "None"]
+      help_text: "Image optimization reduces attack surface and improves container security posture."
+      related_branch: "ImageSecurity"
+    - id: "docker_runtime_threat_detection"
+      question: "What runtime threat detection is implemented?"
+      type: "single_choice"
+      options: ["Real-time Runtime Protection", "Behavioral Monitoring", "Basic Runtime Checks", "No Runtime Detection", "Unknown"]
+      help_text: "Runtime threat detection identifies and responds to threats during container execution."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_advanced_network_security"
+      question: "What advanced network security is implemented for containers?"
+      type: "multiple_choice"
+      options: ["Network Segmentation", "Traffic Encryption", "Network Monitoring", "Intrusion Detection", "None"]
+      help_text: "Advanced network security protects container communications and prevents lateral movement."
+      related_branch: "ContainerSecurity"
+    - id: "docker_container_governance"
+      question: "What container governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive Governance Framework", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "Container governance ensures consistent security practices across container deployments."
+      related_branch: "Compliance"
+    - id: "docker_advanced_secrets_management"
+      question: "What advanced secrets management is implemented?"
+      type: "single_choice"
+      options: ["Runtime Secret Injection", "Dynamic Secret Generation", "Vault Integration", "Basic Secret Management", "No Advanced Management"]
+      help_text: "Advanced secrets management minimizes secret exposure in container environments."
+      related_branch: "ContainerSecurity"
+    - id: "docker_crisis_management"
+      question: "What crisis management capabilities exist for container environments?"
+      type: "multiple_choice"
+      options: ["Emergency Container Isolation", "Rapid Rollback Capabilities", "Crisis Communication", "Emergency Patching", "None"]
+      help_text: "Crisis management enables rapid response to major container security incidents."
+      related_branch: "RuntimeSecurity"
+    - id: "docker_future_technology_integration"
+      question: "How prepared is the container environment for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures container security can evolve with new technologies."
+      related_branch: "ContainerSecurity"
+
+dependencies:
+  docker_kubernetes_integration: "Kubernetes"
+  docker_registry_s3: "S3"
+  docker_monitoring_integration: "Monitoring"
+
+threat_intelligence:
+  cve_count: 180
+  recent_threats: ["Container Escape", "Image Poisoning", "Resource Exhaustion"]
+  attack_vectors: ["Privilege Escalation", "Network Attacks", "Supply Chain Compromise"]
+  mitre_techniques: ["T1611", "T1610", "T1055"]
+  threat_actors: ["APT Groups", "Malware Authors", "Script Kiddies"]
+
+risk_factors:
+  privileged_containers: 4.5
+  unscanned_images: 4.0
+  public_registries: 3.5
+  no_network_policies: 3.0
+  weak_secrets_management: 3.5

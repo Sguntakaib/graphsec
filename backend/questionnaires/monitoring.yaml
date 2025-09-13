@@ -1,0 +1,288 @@
+node_type: "Control"
+node_subtype: "Monitoring"
+category: "Monitoring & Logging"
+description: "System Monitoring and Observability Platform (CloudWatch, Prometheus, Grafana)"
+required_branches:
+  - "Monitoring"
+  - "AuditLogging"
+  - "IncidentResponse"
+  - "Compliance"
+  - "DataIntegrity"
+
+questionnaires:
+  basic:
+    - id: "monitoring_platform"
+      question: "What monitoring platform is used?"
+      type: "single_choice"
+      options: ["AWS CloudWatch", "Prometheus + Grafana", "Datadog", "New Relic", "Splunk", "Custom Solution", "Unknown"]
+      help_text: "Different monitoring platforms have varying capabilities for security monitoring and alerting."
+      related_branch: "Monitoring"
+    - id: "monitoring_coverage"
+      question: "What is the scope of monitoring coverage?"
+      type: "single_choice"
+      options: ["Comprehensive (Infrastructure + Applications + Security)", "Infrastructure + Applications", "Infrastructure Only", "Basic Monitoring", "Unknown"]
+      help_text: "Comprehensive monitoring provides visibility across all system layers."
+      related_branch: "Monitoring"
+    - id: "monitoring_alerting"
+      question: "How is alerting configured?"
+      type: "single_choice"
+      options: ["Multi-Channel Intelligent Alerting", "Basic Email Alerts", "Dashboard Only", "No Alerting", "Unknown"]
+      help_text: "Effective alerting ensures rapid notification of security and performance issues."
+      related_branch: "Monitoring"
+    - id: "monitoring_data_retention"
+      question: "What is the monitoring data retention policy?"
+      type: "single_choice"
+      options: ["Long-term (>1 year)", "Medium-term (3-12 months)", "Short-term (<3 months)", "No Defined Policy", "Unknown"]
+      help_text: "Appropriate retention supports troubleshooting, compliance, and trend analysis."
+      related_branch: "AuditLogging"
+    - id: "monitoring_access_control"
+      question: "How is access to monitoring data controlled?"
+      type: "single_choice"
+      options: ["Role-Based Access + MFA", "Basic Access Control", "Shared Access", "No Access Control", "Unknown"]
+      help_text: "Proper access control protects sensitive monitoring data from unauthorized access."
+      related_branch: "Compliance"
+
+  advanced:
+    - id: "monitoring_real_time_analysis"
+      question: "Is real-time analysis and correlation implemented?"
+      type: "single_choice"
+      options: ["Advanced Real-time Correlation", "Basic Real-time Monitoring", "Batch Processing Only", "No Real-time Analysis", "Unknown"]
+      help_text: "Real-time analysis enables immediate detection and response to security incidents."
+      related_branch: "Monitoring"
+    - id: "monitoring_anomaly_detection"
+      question: "What anomaly detection capabilities are implemented?"
+      type: "single_choice"
+      options: ["AI/ML-based Anomaly Detection", "Statistical Anomaly Detection", "Threshold-based Detection", "No Anomaly Detection", "Unknown"]
+      help_text: "Anomaly detection identifies unusual patterns that may indicate security threats."
+      related_branch: "Monitoring"
+    - id: "monitoring_security_integration"
+      question: "How is monitoring integrated with security tools?"
+      type: "single_choice"
+      options: ["Full SIEM Integration", "Security Tool Integration", "Basic Integration", "No Security Integration", "Unknown"]
+      help_text: "Security integration enables comprehensive threat detection and response."
+      related_branch: "Monitoring"
+    - id: "monitoring_custom_metrics"
+      question: "What custom security metrics are monitored?"
+      type: "multiple_choice"
+      options: ["Security Event Metrics", "Compliance Metrics", "Threat Intelligence Metrics", "User Behavior Metrics", "None"]
+      help_text: "Custom security metrics provide specialized visibility into security-relevant events."
+      related_branch: "Monitoring"
+    - id: "monitoring_log_aggregation"
+      question: "How is log aggregation implemented?"
+      type: "single_choice"
+      options: ["Centralized Log Management", "Distributed Logging", "Local Logging Only", "No Log Aggregation", "Unknown"]
+      help_text: "Log aggregation enables comprehensive analysis across all system components."
+      related_branch: "AuditLogging"
+    - id: "monitoring_dashboards"
+      question: "What type of monitoring dashboards are implemented?"
+      type: "single_choice"
+      options: ["Security-Focused Dashboards", "Operational Dashboards", "Basic Dashboards", "No Dashboards", "Unknown"]
+      help_text: "Security-focused dashboards provide visibility into security metrics and threats."
+      related_branch: "Monitoring"
+    - id: "monitoring_automated_response"
+      question: "Is automated response implemented for monitoring alerts?"
+      type: "single_choice"
+      options: ["Comprehensive Automation", "Basic Automated Response", "Manual Response Only", "No Automated Response", "Unknown"]
+      help_text: "Automated response enables rapid mitigation of detected security issues."
+      related_branch: "IncidentResponse"
+    - id: "monitoring_data_encryption"
+      question: "How is monitoring data encrypted?"
+      type: "single_choice"
+      options: ["End-to-End Encryption", "Transit + Rest Encryption", "Basic Encryption", "No Encryption", "Unknown"]
+      help_text: "Encryption protects sensitive monitoring data from unauthorized access."
+      related_branch: "DataIntegrity"
+    - id: "monitoring_compliance_reporting"
+      question: "What compliance reporting is automated from monitoring data?"
+      type: "single_choice"
+      options: ["Automated Compliance Reports", "Manual Report Generation", "Basic Reporting", "No Compliance Reporting", "Unknown"]
+      help_text: "Automated compliance reporting streamlines regulatory compliance activities."
+      related_branch: "Compliance"
+    - id: "monitoring_performance_optimization"
+      question: "How is monitoring system performance optimized?"
+      type: "single_choice"
+      options: ["Advanced Performance Optimization", "Basic Optimization", "Default Configuration", "No Optimization", "Unknown"]
+      help_text: "Performance optimization ensures monitoring doesn't impact system performance."
+      related_branch: "Monitoring"
+    - id: "monitoring_data_quality"
+      question: "How is monitoring data quality ensured?"
+      type: "single_choice"
+      options: ["Comprehensive Data Quality Controls", "Basic Data Validation", "No Quality Controls", "Unknown"]
+      help_text: "Data quality controls ensure monitoring data is accurate and reliable."
+      related_branch: "DataIntegrity"
+    - id: "monitoring_multi_environment"
+      question: "How is monitoring implemented across multiple environments?"
+      type: "single_choice"
+      options: ["Unified Multi-Environment Monitoring", "Environment-Specific Monitoring", "Production Only", "Unknown"]
+      help_text: "Multi-environment monitoring provides comprehensive visibility across dev, test, and production."
+      related_branch: "Monitoring"
+    - id: "monitoring_incident_correlation"
+      question: "How is incident correlation performed across monitoring data?"
+      type: "single_choice"
+      options: ["Advanced Incident Correlation", "Basic Correlation", "Manual Correlation", "No Correlation", "Unknown"]
+      help_text: "Incident correlation helps identify relationships between different security events."
+      related_branch: "IncidentResponse"
+    - id: "monitoring_cost_optimization"
+      question: "How is monitoring cost optimized?"
+      type: "single_choice"
+      options: ["Intelligent Cost Optimization", "Basic Cost Controls", "No Cost Optimization", "Unknown"]
+      help_text: "Cost optimization maintains comprehensive monitoring while managing expenses."
+      related_branch: "Monitoring"
+    - id: "monitoring_backup_recovery"
+      question: "What backup and recovery exists for monitoring data?"
+      type: "single_choice"
+      options: ["Comprehensive Backup Strategy", "Basic Backup", "No Backup", "Unknown"]
+      help_text: "Backup and recovery ensures monitoring data availability during incidents."
+      related_branch: "DataIntegrity"
+    - id: "monitoring_integration_apis"
+      question: "How are external systems integrated with monitoring via APIs?"
+      type: "single_choice"
+      options: ["Secure API Integration", "Basic API Integration", "No API Integration", "Unknown"]
+      help_text: "API integration enables comprehensive monitoring across all system components."
+      related_branch: "Monitoring"
+    - id: "monitoring_scalability"
+      question: "How is monitoring system scalability ensured?"
+      type: "single_choice"
+      options: ["Auto-Scaling Monitoring Infrastructure", "Manual Scaling", "Fixed Capacity", "Unknown"]
+      help_text: "Scalability ensures monitoring can handle growing data volumes and complexity."
+      related_branch: "Monitoring"
+
+  expert:
+    - id: "monitoring_zero_trust_observability"
+      question: "How is zero trust implemented for monitoring and observability?"
+      type: "single_choice"
+      options: ["Full Zero Trust Observability", "Partial Zero Trust", "Traditional Monitoring Model", "Unknown"]
+      help_text: "Zero trust observability ensures all monitoring access is verified and authorized."
+      related_branch: "Monitoring"
+    - id: "monitoring_ai_powered_analysis"
+      question: "Is AI-powered analysis used for monitoring data?"
+      type: "single_choice"
+      options: ["Advanced AI Analytics", "Machine Learning Models", "Basic AI Features", "No AI Analysis", "Unknown"]
+      help_text: "AI-powered analysis can identify complex patterns and predict potential issues."
+      related_branch: "Monitoring"
+    - id: "monitoring_advanced_threat_detection"
+      question: "What advanced threat detection is implemented in monitoring?"
+      type: "single_choice"
+      options: ["Comprehensive Threat Detection", "Behavioral Analysis", "Pattern Recognition", "Basic Detection", "No Advanced Detection"]
+      help_text: "Advanced threat detection identifies sophisticated attacks through monitoring data analysis."
+      related_branch: "Monitoring"
+    - id: "monitoring_quantum_safe_security"
+      question: "Are quantum-safe security measures used for monitoring infrastructure?"
+      type: "single_choice"
+      options: ["Post-Quantum Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe security prepares monitoring systems for future quantum computing threats."
+      related_branch: "DataIntegrity"
+    - id: "monitoring_behavioral_analytics"
+      question: "Is behavioral analytics used for monitoring data analysis?"
+      type: "single_choice"
+      options: ["Advanced Behavioral Analytics", "User Behavior Analysis", "Basic Behavioral Monitoring", "No Behavioral Analytics", "Unknown"]
+      help_text: "Behavioral analytics identifies unusual patterns that may indicate security threats or operational issues."
+      related_branch: "Monitoring"
+    - id: "monitoring_confidential_computing"
+      question: "Is confidential computing implemented for sensitive monitoring workloads?"
+      type: "single_choice"
+      options: ["Hardware-Based Confidential Computing", "Software-Based Protection", "No Confidential Computing", "Unknown"]
+      help_text: "Confidential computing protects monitoring analysis from infrastructure-level attacks."
+      related_branch: "DataIntegrity"
+    - id: "monitoring_advanced_correlation"
+      question: "What advanced correlation techniques are used?"
+      type: "multiple_choice"
+      options: ["Cross-Service Correlation", "Temporal Analysis", "Geospatial Correlation", "Multi-Dimensional Analysis", "None"]
+      help_text: "Advanced correlation provides comprehensive understanding of complex system behaviors."
+      related_branch: "Monitoring"
+    - id: "monitoring_supply_chain_visibility"
+      question: "How is supply chain security monitored?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Monitoring", "Vendor Activity Monitoring", "Basic Supply Chain Visibility", "No Supply Chain Monitoring", "Unknown"]
+      help_text: "Supply chain monitoring identifies potential third-party security risks and dependencies."
+      related_branch: "Monitoring"
+    - id: "monitoring_advanced_incident_analytics"
+      question: "What advanced incident analytics are implemented?"
+      type: "multiple_choice"
+      options: ["Incident Prediction", "Root Cause Analysis", "Impact Assessment", "Recovery Time Prediction", "None"]
+      help_text: "Advanced incident analytics improve incident response and prevention capabilities."
+      related_branch: "IncidentResponse"
+    - id: "monitoring_privacy_protection"
+      question: "How is privacy protection implemented in monitoring systems?"
+      type: "single_choice"
+      options: ["Privacy-Preserving Monitoring", "Data Anonymization", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures monitoring doesn't compromise user data privacy."
+      related_branch: "Compliance"
+    - id: "monitoring_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Compliance Validation", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to monitoring and security standards."
+      related_branch: "Compliance"
+    - id: "monitoring_edge_monitoring"
+      question: "How is monitoring implemented for edge computing environments?"
+      type: "single_choice"
+      options: ["Edge-Specific Monitoring", "Centralized Edge Monitoring", "Standard Monitoring", "No Edge Monitoring", "Unknown"]
+      help_text: "Edge monitoring provides visibility into remote and distributed computing environments."
+      related_branch: "Monitoring"
+    - id: "monitoring_multi_cloud_observability"
+      question: "How is observability maintained across multi-cloud environments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Observability", "Cloud-Specific Monitoring", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud observability provides consistent monitoring across different cloud environments."
+      related_branch: "Monitoring"
+    - id: "monitoring_predictive_analytics"
+      question: "Is predictive analytics used with monitoring data?"
+      type: "single_choice"
+      options: ["Advanced Predictive Models", "Trend Analysis", "Basic Prediction", "No Predictive Analytics", "Unknown"]
+      help_text: "Predictive analytics help anticipate and prevent future system issues and security threats."
+      related_branch: "Monitoring"
+    - id: "monitoring_real_time_streaming"
+      question: "How is real-time streaming analytics implemented?"
+      type: "single_choice"
+      options: ["Advanced Stream Processing", "Basic Real-time Processing", "Batch Processing Only", "No Stream Analytics", "Unknown"]
+      help_text: "Real-time streaming enables immediate analysis and response to monitoring events."
+      related_branch: "Monitoring"
+    - id: "monitoring_advanced_visualization"
+      question: "What advanced visualization techniques are used?"
+      type: "single_choice"
+      options: ["Interactive 3D Visualization", "Advanced Dashboards", "Basic Charts", "No Advanced Visualization", "Unknown"]
+      help_text: "Advanced visualization helps analysts quickly understand complex monitoring data and relationships."
+      related_branch: "Monitoring"
+    - id: "monitoring_observability_governance"
+      question: "What observability governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive Observability Governance", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "Observability governance ensures consistent monitoring practices across all systems."
+      related_branch: "Compliance"
+    - id: "monitoring_advanced_data_analytics"
+      question: "What advanced data analytics are applied to monitoring data?"
+      type: "multiple_choice"
+      options: ["Time Series Analysis", "Statistical Analysis", "Pattern Mining", "Anomaly Clustering", "None"]
+      help_text: "Advanced data analytics extract deeper insights from monitoring data for better decision making."
+      related_branch: "Monitoring"
+    - id: "monitoring_crisis_management"
+      question: "What crisis management capabilities exist for monitoring systems?"
+      type: "multiple_choice"
+      options: ["Emergency Monitoring Escalation", "Crisis Dashboard", "Emergency Alert Channels", "Monitoring System Failover", "None"]
+      help_text: "Crisis management ensures monitoring capabilities during major incidents and emergencies."
+      related_branch: "IncidentResponse"
+    - id: "monitoring_future_technology_integration"
+      question: "How prepared is the monitoring system for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures monitoring can evolve with new technologies and requirements."
+      related_branch: "Monitoring"
+
+dependencies:
+  monitoring_cloudtrail_integration: "CloudTrail"
+  monitoring_vpc_integration: "VPC"
+  monitoring_kms_integration: "KMS"
+
+threat_intelligence:
+  cve_count: 25
+  recent_threats: ["Log Injection", "Monitoring Bypass", "Data Exfiltration"]
+  attack_vectors: ["Log Tampering", "Metric Manipulation", "Dashboard Compromise"]
+  mitre_techniques: ["T1562", "T1070", "T1027"]
+  threat_actors: ["APT Groups", "Insider Threats", "Script Kiddies"]
+
+risk_factors:
+  no_access_control: 3.5
+  insufficient_monitoring: 4.0
+  no_encryption: 3.0
+  weak_alerting: 2.5
+  no_backup: 2.0
