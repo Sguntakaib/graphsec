@@ -653,6 +653,276 @@ class ExpandedIntelligentNodeEngine:
         recommendations.extend(self._generate_pattern_based_recommendations(assessments))
         
         return recommendations
+    
+    def _assess_correlation_strength(self, risk_scores: list) -> float:
+        """Assess correlation strength between risk scores"""
+        if len(risk_scores) < 2:
+            return 0.0
+        
+        mean = sum(risk_scores) / len(risk_scores)
+        variance = sum((x - mean) ** 2 for x in risk_scores) / len(risk_scores)
+        
+        # Higher variance means lower correlation
+        # Scale to 0-1 where 1 is perfect correlation (no variance)
+        max_possible_variance = 25  # For 0-10 scale
+        correlation_strength = max(0, 1 - (variance / max_possible_variance))
+        
+        return correlation_strength
+    
+    def _analyze_vulnerability_clustering(self, assessments: list) -> dict:
+        """Analyze clustering of vulnerabilities"""
+        clustering = {
+            "vulnerability_types": {},
+            "geographic_clustering": {},  # Placeholder for future geo-analysis
+            "temporal_clustering": {}     # Placeholder for future time-based analysis
+        }
+        
+        # Group by common vulnerability indicators
+        vuln_indicators = {}
+        for assessment in assessments:
+            individual_risk = assessment.get("individual_risk", {})
+            risk_components = individual_risk.get("risk_components", {})
+            
+            vuln_score = risk_components.get("vulnerability_score", 0)
+            if vuln_score >= 7.0:
+                subtype = assessment["node_subtype"]
+                if subtype not in vuln_indicators:
+                    vuln_indicators[subtype] = 0
+                vuln_indicators[subtype] += 1
+        
+        clustering["vulnerability_types"] = vuln_indicators
+        return clustering
+    
+    def _calculate_network_density_amplification(self, assessments: list) -> float:
+        """Calculate amplification factor based on network density"""
+        node_count = len(assessments)
+        
+        # Simulate network density based on node types
+        # In practice, would analyze actual network topology
+        high_connectivity_types = ["API", "Database", "LoadBalancer", "WAF"]
+        connected_nodes = sum(1 for a in assessments if a["node_subtype"] in high_connectivity_types)
+        
+        density = connected_nodes / node_count if node_count > 0 else 0
+        
+        if density > 0.7:
+            return self.amplification_factors["network_density"]["high"]
+        elif density > 0.3:
+            return self.amplification_factors["network_density"]["medium"]
+        else:
+            return self.amplification_factors["network_density"]["low"]
+    
+    def _analyze_control_dependencies(self, assessments: list) -> dict:
+        """Analyze control dependencies for cascade risk"""
+        control_analysis = {
+            "independent_controls": 0,
+            "dependent_controls": 0,
+            "cascade_risk_factor": 1.0
+        }
+        
+        # Count control-type nodes
+        control_nodes = [a for a in assessments if "Control" in a.get("node_subtype", "")]
+        security_nodes = [a for a in assessments if a["node_subtype"] in ["WAF", "EDR", "IAM", "NetworkACL"]]
+        
+        total_controls = len(control_nodes) + len(security_nodes)
+        
+        if total_controls > 0:
+            # Simple heuristic: assume some dependency if multiple controls exist
+            if total_controls > 3:
+                control_analysis["cascade_risk_factor"] = self.amplification_factors["control_dependency"]["cascade_risk"]
+                control_analysis["dependent_controls"] = total_controls
+            elif total_controls > 1:
+                control_analysis["cascade_risk_factor"] = self.amplification_factors["control_dependency"]["dependent"]
+                control_analysis["dependent_controls"] = total_controls
+            else:
+                control_analysis["independent_controls"] = total_controls
+        
+        return control_analysis
+    
+    def _calculate_risk_concentration(self, risk_scores: list) -> float:
+        """Calculate risk concentration index"""
+        if not risk_scores:
+            return 0.0
+        
+        # Calculate Gini coefficient as a measure of concentration
+        sorted_scores = sorted(risk_scores)
+        n = len(sorted_scores)
+        cumsum = sum((i + 1) * score for i, score in enumerate(sorted_scores))
+        total = sum(sorted_scores)
+        
+        if total == 0:
+            return 0.0
+        
+        gini = (2 * cumsum) / (n * total) - (n + 1) / n
+        return gini
+    
+    def _calculate_overall_correlation_strength(self, assessments: list) -> float:
+        """Calculate overall correlation strength across all nodes"""
+        if len(assessments) < 2:
+            return 0.0
+        
+        risk_scores = [a["risk_score"] for a in assessments]
+        return self._assess_correlation_strength(risk_scores)
+    
+    def _calculate_vulnerability_diversity(self, assessments: list) -> float:
+        """Calculate diversity of vulnerability types"""
+        if not assessments:
+            return 0.0
+        
+        # Count unique node subtypes as a proxy for vulnerability diversity
+        unique_subtypes = set(a["node_subtype"] for a in assessments)
+        total_nodes = len(assessments)
+        
+        # Diversity index (0-1, where 1 is maximum diversity)
+        return len(unique_subtypes) / total_nodes if total_nodes > 0 else 0.0
+    
+    def _get_fallback_risk_assessment(self, node_subtype: str) -> dict:
+        """Provide fallback risk assessment in case of errors"""
+        return {
+            "composite_risk_score": 5.0,
+            "probabilistic_score": 5.0,
+            "confidence_interval": (3.0, 7.0),
+            "threat_likelihood": 0.5,
+            "uncertainty_factor": 0.5,
+            "risk_components": {
+                "attack_surface_score": 5.0,
+                "vulnerability_score": 5.0,
+                "control_effectiveness": 5.0,
+                "business_impact": 5.0,
+                "threat_probability": 0.5
+            },
+            "monte_carlo_analysis": {
+                "mean_risk": 5.0,
+                "standard_deviation": 1.0,
+                "confidence_interval_90": (3.0, 7.0),
+                "risk_distribution": {
+                    "p5": 3.0, "p25": 4.0, "p50": 5.0, "p75": 6.0, "p95": 7.0
+                },
+                "probability_high_risk": 0.1,
+                "probability_critical_risk": 0.05
+            },
+            "threat_intelligence_impact": {"enhancement_factor": 1.0},
+            "risk_level": "Medium",
+            "risk_trend": "Stable",
+            "attack_complexity": "Medium",
+            "defense_depth": "Moderate",
+            "recovery_time": "4-8 hours"
+        }
+    
+    def _calculate_threat_intelligence_enhancement(self, node_subtype: str) -> dict:
+        """Calculate threat intelligence enhancement factor"""
+        threat_intel = self.threat_intelligence.get(node_subtype, {})
+        
+        enhancement_factor = 1.0
+        details = {}
+        
+        # CVE impact
+        cve_count = threat_intel.get("cve_count", 0)
+        if cve_count > 100:
+            enhancement_factor += 0.2
+            details["cve_impact"] = "High"
+        elif cve_count > 50:
+            enhancement_factor += 0.1
+            details["cve_impact"] = "Medium"
+        else:
+            details["cve_impact"] = "Low"
+        
+        # Recent threats impact
+        recent_threats = len(threat_intel.get("recent_threats", []))
+        if recent_threats > 5:
+            enhancement_factor += 0.15
+            details["threat_activity"] = "Very High"
+        elif recent_threats > 2:
+            enhancement_factor += 0.08
+            details["threat_activity"] = "High"
+        else:
+            details["threat_activity"] = "Moderate"
+        
+        return {
+            "enhancement_factor": enhancement_factor,
+            "details": details,
+            "threat_intelligence_score": min(enhancement_factor, 2.0)
+        }
+    
+    def _categorize_risk_level(self, risk_score: float) -> str:
+        """Categorize risk level based on score"""
+        if risk_score >= 8.5:
+            return "Critical"
+        elif risk_score >= 7.0:
+            return "High"
+        elif risk_score >= 4.0:
+            return "Medium"
+        elif risk_score >= 2.0:
+            return "Low"
+        else:
+            return "Minimal"
+    
+    def _calculate_risk_trend(self, node_subtype: str, responses: dict) -> str:
+        """Calculate risk trend analysis"""
+        # Simplified trend analysis - in practice would use historical data
+        high_risk_indicators = self._identify_high_risk_responses(responses)
+        
+        if len(high_risk_indicators) > 3:
+            return "Increasing"
+        elif len(high_risk_indicators) > 1:
+            return "Stable"
+        else:
+            return "Decreasing"
+    
+    def _assess_attack_complexity(self, node_subtype: str, responses: dict) -> str:
+        """Assess attack complexity based on configuration"""
+        complexity_score = 5.0  # Base medium complexity
+        
+        # Reduce complexity for common misconfigurations
+        if any(indicator in str(responses).lower() for indicator in ["default", "weak", "none", "disabled"]):
+            complexity_score -= 2.0
+        
+        # Increase complexity for good security practices
+        if any(indicator in str(responses).lower() for indicator in ["mfa", "encrypted", "monitored", "restricted"]):
+            complexity_score += 2.0
+        
+        if complexity_score >= 7.0:
+            return "Very High"
+        elif complexity_score >= 5.5:
+            return "High"
+        elif complexity_score >= 4.0:
+            return "Medium"
+        elif complexity_score >= 2.5:
+            return "Low"
+        else:
+            return "Very Low"
+    
+    def _assess_defense_depth(self, node_subtype: str, responses: dict) -> str:
+        """Assess defense in depth based on responses"""
+        defense_indicators = ["firewall", "monitoring", "encryption", "backup", "access_control", "logging"]
+        
+        defense_count = sum(1 for indicator in defense_indicators 
+                          if any(indicator in key.lower() for key in responses.keys()))
+        
+        if defense_count >= 5:
+            return "Excellent"
+        elif defense_count >= 3:
+            return "Good"
+        elif defense_count >= 2:
+            return "Moderate"
+        elif defense_count >= 1:
+            return "Basic"
+        else:
+            return "Minimal"
+    
+    def _estimate_recovery_time(self, node_subtype: str, responses: dict) -> str:
+        """Estimate recovery time based on configuration"""
+        # Check for backup and recovery indicators
+        recovery_indicators = responses.get("backup", False) or responses.get("disaster_recovery", False)
+        monitoring = responses.get("monitoring", False)
+        
+        if recovery_indicators and monitoring:
+            return "1-2 hours"
+        elif recovery_indicators:
+            return "2-4 hours"
+        elif monitoring:
+            return "4-8 hours"
+        else:
+            return "8+ hours"
         
     def _generate_pattern_based_recommendations(self, assessments: list) -> list:
         """Generate recommendations based on identified patterns"""
