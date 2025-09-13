@@ -3278,13 +3278,12 @@ async def complete_questionnaire(
     4. Return comprehensive results
     """
     try:
-        diagram_id = request.get("diagram_id")
-        node_id = request.get("node_id")
+        # Support both formats: with diagram context and standalone completion
+        diagram_id = request.get("diagram_id") or str(uuid.uuid4())
+        node_id = request.get("node_id") or str(uuid.uuid4())
         responses = request.get("responses", {})
         user_id = request.get("user_id")
-        
-        if not diagram_id or not node_id:
-            raise HTTPException(status_code=400, detail="diagram_id and node_id are required")
+        business_context = request.get("business_context", {})
         
         # Process questionnaire completion with full end-to-end flow
         results = await questionnaire_processor.process_questionnaire_completion(
