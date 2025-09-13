@@ -3281,7 +3281,12 @@ async def complete_questionnaire(
         # Support both formats: with diagram context and standalone completion
         diagram_id = request.get("diagram_id") or str(uuid.uuid4())
         node_id = request.get("node_id") or str(uuid.uuid4())
-        responses = request.get("responses", {})
+        
+        # Validate required data
+        questionnaire_responses = request.get("questionnaire_responses")
+        if not questionnaire_responses:
+            raise HTTPException(status_code=400, detail="questionnaire_responses are required")
+        
         user_id = request.get("user_id")
         business_context = request.get("business_context", {})
         
@@ -3290,7 +3295,7 @@ async def complete_questionnaire(
             diagram_id=diagram_id,
             node_id=node_id,
             node_subtype=node_subtype,
-            questionnaire_responses=responses,
+            questionnaire_responses=questionnaire_responses,
             user_id=user_id,
             business_context=business_context
         )
@@ -3298,15 +3303,17 @@ async def complete_questionnaire(
         return {
             "completion_id": str(uuid.uuid4()),
             "node_subtype": node_subtype,
-            "security_analysis": results.get("security_analysis", {}),
-            "findings_generated": results.get("findings", []),
-            "framework_mappings": results.get("framework_mappings", {}),
+            "findings_generated": results.get("findings_generated", 0),
             "risk_assessment": results.get("risk_assessment", {}),
+            "security_recommendations": results.get("recommendations", []),
+            "framework_mappings": results.get("framework_mappings", {}),
             "success": True,
             "message": f"Questionnaire completed successfully for {node_subtype} node",
             "processing_results": results
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error completing questionnaire: {e}")
         raise HTTPException(status_code=500, detail=str(e))
