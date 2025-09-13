@@ -1514,25 +1514,28 @@ async def get_supported_intelligent_types():
 
 @api_router.get("/expanded-nodes/supported-types")
 async def get_expanded_supported_types():
-    """Get all supported node types from expanded intelligent node system"""
-    supported_types = expanded_node_engine.get_supported_node_types()
+    """Get all supported node types with enhanced metadata and questionnaire information"""
+    supported_types = questionnaire_loader.get_supported_node_types()
     
     type_info = []
     for node_type in supported_types:
-        template = expanded_node_engine.node_templates.get(node_type, {})
-        if template:
+        metadata = questionnaire_loader.get_metadata(node_type)
+        level_counts = questionnaire_loader.get_all_levels_count(node_type)
+        
+        if metadata:
             type_info.append({
                 "node_subtype": node_type,
-                "node_type": template.get("node_type", "Asset"),
-                "category": template.get("category", "Unknown"),
-                "description": template.get("description", ""),
+                "node_type": metadata.node_type,
+                "category": metadata.category,
+                "description": metadata.description,
                 "threat_intelligence": {
-                    "cve_count": template.get("threat_intelligence", {}).cve_count if hasattr(template.get("threat_intelligence", {}), 'cve_count') else 0,
-                    "recent_threat_count": len(template.get("threat_intelligence", {}).recent_threats) if hasattr(template.get("threat_intelligence", {}), 'recent_threats') else 0
+                    "cve_count": metadata.threat_intelligence.get("cve_count", 0),
+                    "recent_threat_count": len(metadata.threat_intelligence.get("recent_threats", []))
                 },
-                "questionnaire_levels": list(template.get("questionnaires", {}).keys()),
-                "required_branches_count": len(template.get("required_branches", [])),
-                "has_dependencies": len(template.get("dependencies", {})) > 0
+                "questionnaire_levels": list(level_counts.keys()),
+                "questionnaire_counts": level_counts,
+                "required_branches_count": len(metadata.required_branches),
+                "has_dependencies": len(metadata.dependencies) > 0
             })
     
     # Group by category
