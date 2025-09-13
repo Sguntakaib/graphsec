@@ -3504,8 +3504,6 @@ async def enhanced_rule_evaluation(request: dict):
         impact_assessment["recommendations_summary"] = list(set(impact_assessment["recommendations_summary"]))
         
         # Convert dataclass results to dictionaries (RuleEvaluationResult is a dataclass, not Pydantic)
-        from dataclasses import asdict
-        
         results = {
             "diagram_id": diagram_id,
             "rule_results": [asdict(result) for result in rule_results],
