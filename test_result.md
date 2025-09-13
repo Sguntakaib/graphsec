@@ -671,6 +671,171 @@ agent_communication:
   - agent: "main"
     message: "🚀 DEPENDENCY RE-TRIGGERING BUG FIX: Resolved critical issue where child dependency questionnaires (API/Database) were re-opening unnecessarily at the end of parent WebApp questionnaire completion. ISSUE: Final dependency check was returning ALL dependencies regardless of completion state, causing already completed questionnaires to re-trigger. SOLUTION: ✅ **Dependency State Tracking**: Implemented comprehensive tracking system with PENDING → CREATED → COMPLETED states ✅ **Smart Dependency Filtering**: Added getIncompleteDependencies function to filter out completed dependencies before triggering ✅ **State Management**: Enhanced handleDependentNodeCreation to track dependency states when nodes are created ✅ **Completion Tracking**: Modified completion flow to mark dependencies as COMPLETED when questionnaires finish ✅ **Component Integration**: Updated SecurityQuestionnaire to use dependency state checking for filtering. EXPECTED FLOW: WebApp Q1-Q2 → API dependency → API Q1-Q5 → Resume WebApp Q3-Q5 → Database dependency → Database Q1-Q5 → Complete WebApp (NO RE-TRIGGERING). This fixes the core issue where questionnaires would inappropriately re-open after completion."
 
+  - task: "Expanded Intelligent Nodes - Supported Types API"
+    implemented: true
+    working: false
+    file: "backend/expanded_intelligent_nodes.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - GET /api/expanded-nodes/supported-types endpoint implemented with 9 node types covering basic cloud infrastructure"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL GAP: Only 9 node types implemented instead of expected 25+. Missing comprehensive node types for Cloud Infrastructure (LoadBalancer, KMS, CloudTrail), Security Services, Network Components, Container & DevOps, Data & Storage, Compute Services, Monitoring & Logging, Application Services categories. Current implementation has EC2, Lambda, S3, RDS, VPC, WAF, IAM, Kubernetes, CICD but needs 16+ additional node types including LoadBalancer, KMS, CloudTrail, SecurityGroups, Docker, MessageQueue, Monitoring, etc."
+
+  - task: "Expanded Intelligent Nodes - Multi-Level Questionnaires API"
+    implemented: true
+    working: false
+    file: "backend/expanded_intelligent_nodes.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - GET /api/expanded-nodes/{node_subtype}/questionnaire/{level} endpoint implemented with basic/advanced/expert levels"
+      - working: false
+        agent: "testing"
+        comment: "❌ PARTIAL IMPLEMENTATION: Only EC2 basic level questionnaire working (5 questions). Lambda advanced and other node types return 404 'Questionnaire not found'. Missing advanced/expert level questionnaires for most node types. Expected: basic (5-8 questions), advanced (15-20 questions), expert (25-30 questions) for all 25+ node types."
+
+  - task: "Expanded Intelligent Nodes - Probabilistic Risk Calculation API"
+    implemented: true
+    working: false
+    file: "backend/expanded_intelligent_nodes.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - POST /api/expanded-nodes/{node_subtype}/calculate-risk endpoint implemented with enhanced risk calculation"
+      - working: false
+        agent: "testing"
+        comment: "❌ MISSING PROBABILISTIC MODELING: Risk assessment missing required probabilistic modeling fields: confidence_interval, threat_likelihood, probabilistic_score. Current implementation returns basic risk_assessment but lacks the advanced probabilistic modeling expected for Phase 1 Enhanced APIs. Need to enhance RiskMetrics class and calculation methods."
+
+  - task: "Expanded Intelligent Nodes - Bulk Risk Assessment API"
+    implemented: true
+    working: false
+    file: "backend/expanded_intelligent_nodes.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - POST /api/expanded-nodes/bulk-risk-assessment endpoint implemented for multiple node assessment"
+      - working: false
+        agent: "testing"
+        comment: "❌ MISSING BULK ANALYSIS FEATURES: Bulk assessment missing required fields: aggregated_metrics, cross_node_correlations. Current implementation only returns assessment_results array but lacks cross-node correlation analysis, risk amplification factors, and aggregated risk metrics expected for comprehensive bulk assessment."
+
+  - task: "Expanded Intelligent Nodes - Categories API"
+    implemented: true
+    working: false
+    file: "backend/expanded_intelligent_nodes.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - GET /api/expanded-nodes/categories endpoint implemented for category organization"
+      - working: false
+        agent: "testing"
+        comment: "❌ INCOMPLETE CATEGORIES DATA: Categories endpoint missing required fields: category_descriptions, node_type_mappings. Current implementation returns basic categories list but lacks comprehensive category descriptions and detailed node type mappings expected for Phase 1 Enhanced APIs."
+
+  - task: "Expanded Intelligent Nodes - Threat Intelligence Summary API"
+    implemented: true
+    working: false
+    file: "backend/expanded_intelligent_nodes.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - POST /api/expanded-nodes/threat-intelligence-summary endpoint implemented for threat intelligence aggregation"
+      - working: false
+        agent: "testing"
+        comment: "❌ MISSING THREAT INTELLIGENCE INTEGRATION: Threat intelligence summary missing required fields: threat_summary, cve_data, mitre_techniques, aggregated_intelligence. Current implementation lacks comprehensive threat intelligence integration with CVE data and MITRE technique mappings expected for Phase 1 Enhanced APIs."
+
+  - task: "Threat Intelligence - Node Profile API"
+    implemented: true
+    working: false
+    file: "backend/threat_intelligence.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - GET /api/threat-intelligence/node/{node_type}/profile endpoint implemented for comprehensive threat profiles"
+      - working: false
+        agent: "testing"
+        comment: "❌ INCOMPLETE THREAT PROFILES: Node profile missing required fields: cve_data, recent_threats, attack_vectors, mitre_techniques. Current implementation returns basic threat_profile but lacks comprehensive CVE data, recent threat analysis, and detailed attack vector information expected for Phase 1 Enhanced APIs."
+
+  - task: "Threat Intelligence - Vulnerability Correlation API"
+    implemented: true
+    working: false
+    file: "backend/threat_intelligence.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - POST /api/threat-intelligence/correlate-vulnerabilities endpoint implemented for vulnerability correlation analysis"
+      - working: false
+        agent: "testing"
+        comment: "❌ API CONTRACT ISSUE: Vulnerability correlation endpoint returns HTTP 400 'No node configurations provided'. API expects different request format than implemented. Need to fix request parsing and ensure proper correlation analysis with shared_attack_patterns and amplification_factors."
+
+  - task: "Threat Intelligence - Real-time Threat Score API"
+    implemented: true
+    working: false
+    file: "backend/threat_intelligence.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - POST /api/threat-intelligence/real-time-score endpoint implemented for dynamic threat scoring"
+      - working: false
+        agent: "testing"
+        comment: "❌ API CONTRACT ISSUE: Real-time threat score endpoint returns HTTP 400 'Node type is required'. API request format mismatch - expects node_type field but receives node_configuration object. Need to fix request parsing and ensure proper real-time scoring with score_breakdown and threat_factors."
+
+  - task: "Threat Intelligence - Enhanced MITRE Technique API"
+    implemented: true
+    working: false
+    file: "backend/threat_intelligence.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - GET /api/threat-intelligence/mitre/{technique_id} endpoint implemented for enhanced MITRE technique details"
+      - working: false
+        agent: "testing"
+        comment: "❌ INCOMPLETE MITRE INTEGRATION: MITRE technique details missing required fields: name, description, tactics, platforms, data_sources, detection_methods, mitigations, threat_intelligence. Current implementation lacks comprehensive MITRE ATT&CK integration with enhanced threat intelligence data expected for Phase 1 Enhanced APIs."
+
+  - task: "Threat Intelligence - Dashboard API"
+    implemented: true
+    working: false
+    file: "backend/threat_intelligence.py, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Phase 1 Enhanced APIs - GET /api/threat-intelligence/dashboard endpoint implemented for comprehensive threat intelligence dashboard"
+      - working: false
+        agent: "testing"
+        comment: "❌ MISSING DASHBOARD FEATURES: Threat intelligence dashboard missing required fields: overall_threat_landscape, trending_threats, risk_metrics, threat_actor_activity, vulnerability_trends, mitigation_effectiveness. Current implementation lacks comprehensive dashboard data aggregation expected for Phase 1 Enhanced APIs."
+
   - task: "Probabilistic Attack Path Analysis"
     implemented: true
     working: "NA"
