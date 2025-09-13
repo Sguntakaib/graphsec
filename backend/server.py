@@ -3654,78 +3654,62 @@ async def get_findings_summary(diagram_id: Optional[str] = None):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/questionnaires/{node_subtype}")
-async def get_merged_questionnaire_prompts(node_subtype: str):
-    """Get merged questionnaire prompts from intelligent nodes and loader"""
+async def get_phase2_questionnaire(node_subtype: str, level: str = "basic"):
+    """Get Phase 2 file-based questionnaire for specific node type and level"""
     try:
-        # Get prompts from intelligent nodes engine
-        intelligent_prompts = intelligent_node_engine.get_security_prompts(node_subtype)
-        
-        # Get prompts from questionnaire loader (YAML files)
+        # Validate level parameter
         try:
-            loader_prompts = questionnaire_loader.get_questionnaire(node_subtype, LoaderQuestionnaireLevel.BASIC)
-        except:
-            loader_prompts = []
+            questionnaire_level = LoaderQuestionnaireLevel(level.lower())
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid questionnaire level. Must be one of: {[l.value for l in LoaderQuestionnaireLevel]}")
         
-        # Merge and structure the prompts
-        merged_prompts = []
+        # Use the new file-based questionnaire system
+        response = questionnaire_loader.create_questionnaire_response(node_subtype, questionnaire_level)
         
-        # Add intelligent node prompts
-        for prompt in intelligent_prompts:
-            merged_prompts.append({
-                "id": prompt.id,
-                "question": prompt.question,
-                "type": prompt.type,  # Fixed: use 'type' instead of 'question_type'
-                "options": prompt.validation_rules.get("options", []) if prompt.validation_rules else [],
-                "help_text": prompt.help_text,
-                "related_branch": prompt.related_branch,
-                "source": "intelligent_nodes"
-            })
+        if "error" in response:
+            raise HTTPException(status_code=404, detail=response["error"])
         
-        # Add loader prompts (avoiding duplicates)
-        existing_ids = {p["id"] for p in merged_prompts}
-        for prompt in loader_prompts:
-            prompt_id = getattr(prompt, 'id', f"loader_{len(merged_prompts)}")
-            if prompt_id not in existing_ids:
-                merged_prompts.append({
-                    "id": prompt_id,
-                    "question": getattr(prompt, 'question', str(prompt)),
-                    "type": getattr(prompt, 'type', 'text'),
-                    "options": getattr(prompt, 'options', []),
-                    "help_text": getattr(prompt, 'help_text', ''),
-                    "related_branch": getattr(prompt, 'related_branch', ''),
-                    "source": "yaml_loader"
-                })
+        # Get metadata for enhanced information
+        metadata = questionnaire_loader.get_metadata(node_subtype)
         
-        # Add enhanced fields requested by testing agent
+        # Add threat intelligence if available
+        threat_intelligence = {}
+        if metadata and metadata.threat_intelligence:
+            threat_intelligence = metadata.threat_intelligence
+        
+        # Create comprehensive response that matches expected format
         enhanced_response = {
             "success": True,
             "node_subtype": node_subtype,
-            "prompts": merged_prompts,
-            "total_prompts": len(merged_prompts),
-            "sources": {
-                "intelligent_nodes": len(intelligent_prompts),
-                "yaml_loader": len(loader_prompts)
+            "level": level,
+            "questions": response["questions"],
+            "question_count": len(response["questions"]),
+            "estimated_time": response.get("estimated_time", f"{len(response['questions']) * 30} seconds"),
+            "metadata": {
+                "category": metadata.category if metadata else "Unknown",
+                "description": metadata.description if metadata else f"{node_subtype} security questionnaire",
+                "required_branches": metadata.required_branches if metadata else [],
+                "threat_intelligence": threat_intelligence,
+                "risk_factors": metadata.risk_factors if metadata else {}
             },
-            # Enhanced fields for comprehensive questionnaire data
-            "security_prompts": merged_prompts,  # Alias for compatibility
-            "threat_intelligence": {
-                "node_type_threats": expanded_node_engine.get_threat_profile(node_subtype) if hasattr(expanded_node_engine, 'get_threat_profile') else {},
-                "common_vulnerabilities": [],
-                "attack_vectors": []
-            },
+            # Legacy compatibility fields
+            "prompts": response["questions"],  # Alias for backward compatibility
+            "security_branches": [{"name": branch, "required": True} for branch in (metadata.required_branches if metadata else [])],
+            "total_prompts": len(response["questions"]),
+            "threat_intelligence": threat_intelligence,
             "framework_mappings": {
-                "MITRE": [],
-                "OWASP": [],
-                "NIST": [],
-                "ISO27001": [],
-                "CIS": [],
-                "ASVS": [],
-                "SOC2": [],
-                "GDPR": []
+                "MITRE": threat_intelligence.get("mitre_techniques", []),
+                "OWASP": ["OWASP Top 10"],
+                "NIST": ["NIST Cybersecurity Framework"],
+                "ISO27001": ["ISO 27001 Controls"],
+                "CIS": ["CIS Controls"],
+                "ASVS": ["ASVS Requirements"] if node_subtype == "WebApp" else [],
+                "SOC2": ["SOC 2 Type II"],
+                "GDPR": ["GDPR Article 32"] if "data" in node_subtype.lower() else []
             },
             "risk_factors": [
                 f"{node_subtype} configuration complexity",
-                "Integration dependencies",
+                "Integration dependencies", 
                 "Exposure to external networks",
                 "Data sensitivity level"
             ],
