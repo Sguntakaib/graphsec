@@ -45,7 +45,8 @@ class QuestionnaireCompletionProcessor:
         node_id: str,
         node_subtype: str,
         questionnaire_responses: Dict[str, Any],
-        user_id: Optional[str] = None
+        user_id: Optional[str] = None,
+        business_context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         Complete end-to-end processing of questionnaire completion
