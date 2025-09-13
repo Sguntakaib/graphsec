@@ -266,6 +266,208 @@ class ExpandedIntelligentNodeEngine:
                         "help_text": "Endpoint protection helps detect and prevent malware infections.",
                         "related_branch": SecurityBranchType.MONITORING
                     }
+                ],
+                QuestionnaireLevel.EXPERT: [
+                    {
+                        "id": "ec2_incident_response_integration",
+                        "question": "How is this instance integrated with incident response workflows?",
+                        "type": "single_choice",
+                        "options": ["Automated SOAR integration", "Manual playbooks", "Basic alerting", "No integration", "Unknown"],
+                        "help_text": "Incident response integration ensures rapid response to security events.",
+                        "related_branch": SecurityBranchType.INCIDENT_RESPONSE
+                    },
+                    {
+                        "id": "ec2_vulnerability_assessment_schedule",
+                        "question": "What is the vulnerability assessment schedule?",
+                        "type": "single_choice",
+                        "options": ["Continuous scanning", "Weekly scans", "Monthly scans", "Quarterly scans", "No regular scans"],
+                        "help_text": "Regular vulnerability assessments are critical for maintaining security posture.",
+                        "related_branch": SecurityBranchType.VULNERABILITY_SCANNING
+                    },
+                    {
+                        "id": "ec2_compliance_framework_alignment",
+                        "question": "Which compliance frameworks does this instance align with?",
+                        "type": "multiple_choice",
+                        "options": ["SOC 2", "ISO 27001", "PCI DSS", "HIPAA", "NIST", "CIS Controls", "None"],
+                        "help_text": "Compliance framework alignment ensures adherence to security standards.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "ec2_network_micro_segmentation",
+                        "question": "Is network micro-segmentation implemented?",
+                        "type": "single_choice",
+                        "options": ["Full micro-segmentation", "Partial segmentation", "Basic network isolation", "No segmentation", "Unknown"],
+                        "help_text": "Micro-segmentation limits lateral movement in case of compromise.",
+                        "related_branch": SecurityBranchType.NETWORK_SEGMENTATION
+                    },
+                    {
+                        "id": "ec2_privilege_escalation_prevention",
+                        "question": "What privilege escalation prevention measures are in place?",
+                        "type": "multiple_choice",
+                        "options": ["SELinux/AppArmor", "Sudo restrictions", "User account policies", "Kernel hardening", "Container isolation", "None"],
+                        "help_text": "Privilege escalation prevention limits damage from compromised accounts.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    },
+                    {
+                        "id": "ec2_data_classification_handling",
+                        "question": "How is data classification implemented on this instance?",
+                        "type": "single_choice",
+                        "options": ["Automated classification", "Manual tagging", "Basic sensitivity levels", "No classification", "Unknown"],
+                        "help_text": "Data classification ensures appropriate protection levels for different data types.",
+                        "related_branch": SecurityBranchType.DATA_CLASSIFICATION
+                    },
+                    {
+                        "id": "ec2_forensic_readiness",
+                        "question": "What forensic readiness measures are implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Comprehensive logging", "Memory dump capability", "Disk imaging", "Chain of custody", "Evidence preservation", "None"],
+                        "help_text": "Forensic readiness enables effective investigation of security incidents.",
+                        "related_branch": SecurityBranchType.INCIDENT_RESPONSE
+                    },
+                    {
+                        "id": "ec2_threat_hunting_integration",
+                        "question": "How is this instance integrated with threat hunting activities?",
+                        "type": "single_choice",
+                        "options": ["Active hunting integration", "Periodic analysis", "Alert-based review", "No hunting activities", "Unknown"],
+                        "help_text": "Threat hunting integration enables proactive threat detection.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "ec2_supply_chain_validation",
+                        "question": "How is software supply chain validation performed?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive validation", "Signature verification", "Basic checks", "No validation", "Unknown"],
+                        "help_text": "Supply chain validation prevents installation of compromised software.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "ec2_zero_trust_implementation",
+                        "question": "What zero trust principles are implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Never trust, always verify", "Least privilege access", "Micro-segmentation", "Continuous monitoring", "Identity verification", "None"],
+                        "help_text": "Zero trust implementation reduces attack surface and limits breach impact.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    },
+                    {
+                        "id": "ec2_advanced_persistent_threat_detection",
+                        "question": "What APT detection capabilities are deployed?",
+                        "type": "single_choice",
+                        "options": ["AI/ML-based detection", "Behavioral analysis", "Signature-based", "Basic monitoring", "No APT detection"],
+                        "help_text": "APT detection is crucial for identifying sophisticated, long-term attacks.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "ec2_security_orchestration",
+                        "question": "How is security orchestration and automation implemented?",
+                        "type": "single_choice",
+                        "options": ["Full SOAR integration", "Partial automation", "Basic scripting", "Manual processes", "No orchestration"],
+                        "help_text": "Security orchestration enables rapid, consistent response to threats.",
+                        "related_branch": SecurityBranchType.INCIDENT_RESPONSE
+                    },
+                    {
+                        "id": "ec2_insider_threat_monitoring",
+                        "question": "What insider threat monitoring is in place?",
+                        "type": "multiple_choice",
+                        "options": ["User behavior analytics", "Privileged access monitoring", "Data access tracking", "Anomaly detection", "None"],
+                        "help_text": "Insider threat monitoring detects malicious or negligent insider activities.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "ec2_recovery_time_objective",
+                        "question": "What is the Recovery Time Objective (RTO) for this instance?",
+                        "type": "single_choice",
+                        "options": ["< 1 hour", "1-4 hours", "4-24 hours", "> 24 hours", "Not defined"],
+                        "help_text": "Defined RTO ensures appropriate backup and recovery capabilities.",
+                        "related_branch": SecurityBranchType.BACKUP
+                    },
+                    {
+                        "id": "ec2_security_metrics_kpis",
+                        "question": "What security metrics and KPIs are tracked?",
+                        "type": "multiple_choice",
+                        "options": ["Mean time to detection", "Mean time to response", "Vulnerability remediation time", "Security incident count", "Compliance score", "None"],
+                        "help_text": "Security metrics enable measurement and improvement of security posture.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "ec2_third_party_risk_assessment",
+                        "question": "How are third-party software risks assessed?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive risk assessment", "Vendor security reviews", "Basic license checks", "No assessment", "Unknown"],
+                        "help_text": "Third-party risk assessment is crucial for supply chain security.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "ec2_security_training_integration",
+                        "question": "How are security training requirements integrated?",
+                        "type": "single_choice",
+                        "options": ["Mandatory training tracking", "Role-based training", "General awareness", "No training requirements", "Unknown"],
+                        "help_text": "Security training integration ensures proper security practices by users.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "ec2_business_continuity_integration",
+                        "question": "How is this instance integrated with business continuity plans?",
+                        "type": "single_choice",
+                        "options": ["Critical system designation", "Standard recovery procedures", "Basic backup inclusion", "No BCP integration", "Unknown"],
+                        "help_text": "Business continuity integration ensures operational resilience.",
+                        "related_branch": SecurityBranchType.BACKUP
+                    },
+                    {
+                        "id": "ec2_regulatory_change_management",
+                        "question": "How are regulatory changes managed for this instance?",
+                        "type": "single_choice",
+                        "options": ["Automated compliance monitoring", "Regular compliance reviews", "Manual tracking", "No change management", "Unknown"],
+                        "help_text": "Regulatory change management ensures ongoing compliance.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "ec2_security_culture_integration",
+                        "question": "How is security culture promoted for this instance?",
+                        "type": "multiple_choice",
+                        "options": ["Security champions program", "Regular security discussions", "Security awareness campaigns", "Security feedback loops", "None"],
+                        "help_text": "Security culture integration promotes proactive security behaviors.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "ec2_emerging_threat_adaptation",
+                        "question": "How does the security posture adapt to emerging threats?",
+                        "type": "single_choice",
+                        "options": ["Proactive threat intelligence", "Reactive updates", "Periodic reviews", "No adaptation process", "Unknown"],
+                        "help_text": "Emerging threat adaptation ensures protection against new attack vectors.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "ec2_security_investment_roi",
+                        "question": "How is security investment ROI measured for this instance?",
+                        "type": "single_choice",
+                        "options": ["Quantitative risk reduction", "Cost-benefit analysis", "Compliance cost savings", "No ROI measurement", "Unknown"],
+                        "help_text": "Security ROI measurement justifies and optimizes security investments.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "ec2_cross_platform_security_integration",
+                        "question": "How is security integrated across different platforms?",
+                        "type": "single_choice",
+                        "options": ["Unified security platform", "Integrated SIEM", "Manual correlation", "Isolated systems", "Unknown"],
+                        "help_text": "Cross-platform integration provides comprehensive security visibility.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "ec2_quantum_computing_readiness",
+                        "question": "What quantum computing readiness measures are in place?",
+                        "type": "single_choice",
+                        "options": ["Post-quantum cryptography", "Quantum-safe algorithms", "Future migration planning", "No quantum readiness", "Unknown"],
+                        "help_text": "Quantum readiness prepares for future cryptographic threats.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "ec2_ai_ml_security_integration",
+                        "question": "How is AI/ML integrated into security operations?",
+                        "type": "multiple_choice",
+                        "options": ["Automated threat detection", "Behavioral analysis", "Predictive analytics", "Anomaly detection", "None"],
+                        "help_text": "AI/ML integration enhances threat detection and response capabilities.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
                 ]
             },
             "dependencies": {
