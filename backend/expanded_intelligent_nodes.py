@@ -235,6 +235,444 @@ class ExpandedIntelligentNodeEngine:
         self.node_templates = self._initialize_expanded_templates()
         self.threat_intelligence = self._initialize_threat_intelligence()
         self.risk_calculators = self._initialize_risk_calculators()
+        # Priority 2: Bulk Risk Assessment Enhancement - NEW FEATURES
+        self.correlation_cache = {}
+        self.amplification_factors = self._initialize_amplification_factors()
+    
+    def _initialize_amplification_factors(self) -> dict:
+        """Initialize risk amplification factors for node correlations"""
+        return {
+            # Network interconnectedness amplifies risk
+            "network_density": {
+                "low": 1.0,      # < 0.3 edge density
+                "medium": 1.2,   # 0.3-0.7 edge density  
+                "high": 1.5      # > 0.7 edge density
+            },
+            # Asset criticality combinations
+            "critical_asset_cluster": {
+                "single": 1.0,
+                "pair": 1.3,
+                "cluster": 1.8   # 3+ critical assets connected
+            },
+            # Control failure cascades
+            "control_dependency": {
+                "independent": 1.0,
+                "dependent": 1.4,    # Controls depend on each other
+                "cascade_risk": 2.0  # Single point of failure
+            },
+            # Attack surface concentration
+            "surface_concentration": {
+                "distributed": 1.0,
+                "concentrated": 1.6,  # Multiple surfaces on same asset
+                "overlapping": 2.2    # Surfaces enable each other
+            }
+        }
+    
+    def calculate_comprehensive_risk(self, node_subtype: str, responses: dict) -> dict:
+        """Enhanced comprehensive risk calculation with probabilistic modeling"""
+        try:
+            # Get base risk metrics
+            base_metrics = self._calculate_base_risk_metrics(node_subtype, responses)
+            
+            # Priority 1: Enhanced Probabilistic Modeling
+            probabilistic_analysis = base_metrics.calculate_probabilistic_risk()
+            
+            # Calculate threat intelligence enhancement
+            threat_enhancement = self._calculate_threat_intelligence_enhancement(node_subtype)
+            
+            # Apply probabilistic enhancements
+            enhanced_risk = {
+                "composite_risk_score": base_metrics.calculate_composite_risk(),
+                "probabilistic_score": base_metrics.probabilistic_score,
+                "confidence_interval": base_metrics.confidence_interval,
+                "threat_likelihood": base_metrics.threat_likelihood,
+                "uncertainty_factor": base_metrics.uncertainty_factor,
+                
+                # Enhanced risk breakdown
+                "risk_components": {
+                    "attack_surface_score": base_metrics.attack_surface_score,
+                    "vulnerability_score": base_metrics.vulnerability_score,
+                    "control_effectiveness": base_metrics.control_effectiveness,
+                    "business_impact": base_metrics.business_impact,
+                    "threat_probability": base_metrics.threat_probability
+                },
+                
+                # Probabilistic analysis results
+                "monte_carlo_analysis": probabilistic_analysis,
+                
+                # Threat intelligence integration
+                "threat_intelligence_impact": threat_enhancement,
+                
+                # Risk level categorization
+                "risk_level": self._categorize_risk_level(base_metrics.probabilistic_score),
+                "risk_trend": self._calculate_risk_trend(node_subtype, responses),
+                
+                # Additional metrics
+                "attack_complexity": self._assess_attack_complexity(node_subtype, responses),
+                "defense_depth": self._assess_defense_depth(node_subtype, responses),
+                "recovery_time": self._estimate_recovery_time(node_subtype, responses)
+            }
+            
+            return enhanced_risk
+            
+        except Exception as e:
+            logger.error(f"Risk calculation error for {node_subtype}: {str(e)}")
+            return self._get_fallback_risk_assessment(node_subtype)
+    
+    def _calculate_base_risk_metrics(self, node_subtype: str, responses: dict) -> RiskMetrics:
+        """Calculate base risk metrics with enhanced logic"""
+        # Get node template for baseline risk factors
+        template = self.node_templates.get(node_subtype, {})
+        risk_factors = template.get("risk_factors", {})
+        
+        # Initialize base metrics
+        metrics = RiskMetrics()
+        
+        # Calculate attack surface based on responses
+        metrics.attack_surface_score = self._calculate_attack_surface_score(responses, risk_factors)
+        
+        # Calculate vulnerability score
+        metrics.vulnerability_score = self._calculate_vulnerability_score(responses, risk_factors)
+        
+        # Calculate control effectiveness
+        metrics.control_effectiveness = self._calculate_control_effectiveness_score(responses)
+        
+        # Calculate business impact
+        metrics.business_impact = self._calculate_business_impact_score(responses)
+        
+        # Calculate threat probability with intelligence enhancement
+        metrics.threat_probability = self._calculate_enhanced_threat_probability(node_subtype, responses)
+        
+        # Set uncertainty factor based on response completeness
+        response_completeness = len([v for v in responses.values() if v]) / max(len(responses), 1)
+        metrics.uncertainty_factor = 0.3 * (1 - response_completeness)  # Higher uncertainty with fewer responses
+        
+        return metrics
+    
+    def _calculate_enhanced_threat_probability(self, node_subtype: str, responses: dict) -> float:
+        """Calculate threat probability enhanced with threat intelligence"""
+        base_probability = 0.5
+        
+        # Get threat intelligence for this node type
+        threat_intel = self.threat_intelligence.get(node_subtype, {})
+        
+        # Adjust based on recent threats
+        recent_threats = threat_intel.get("recent_threats", [])
+        if len(recent_threats) > 5:
+            base_probability += 0.2
+        elif len(recent_threats) > 2:
+            base_probability += 0.1
+        
+        # Adjust based on CVE count
+        cve_count = threat_intel.get("cve_count", 0)
+        if cve_count > 100:
+            base_probability += 0.15
+        elif cve_count > 50:
+            base_probability += 0.1
+        
+        # Adjust based on configuration responses
+        high_risk_responses = self._identify_high_risk_responses(responses)
+        base_probability += len(high_risk_responses) * 0.05
+        
+        return min(base_probability, 1.0)
+    
+    def _identify_high_risk_responses(self, responses: dict) -> list:
+        """Identify responses that indicate higher risk"""
+        high_risk_indicators = [
+            "no_encryption", "public_access", "weak_authentication", 
+            "no_monitoring", "no_backup", "default_config",
+            "admin_access", "no_patching", "weak_passwords"
+        ]
+        
+        return [key for key, value in responses.items() 
+                if any(indicator in key.lower() for indicator in high_risk_indicators) 
+                and value in [True, "yes", "enabled", "public", "weak", "none"]]
+    
+    def perform_bulk_risk_assessment(self, nodes_data: list, business_context: dict = None) -> dict:
+        """Priority 2: Enhanced bulk risk assessment with cross-node correlations"""
+        if not nodes_data:
+            return {"error": "No nodes provided for assessment"}
+        
+        # Individual assessments
+        individual_assessments = []
+        overall_risk_scores = []
+        
+        for node_data in nodes_data:
+            node_subtype = node_data.get("node_subtype")
+            responses = node_data.get("responses", {})
+            
+            if not node_subtype:
+                continue
+            
+            # Add business context to responses
+            enhanced_responses = {**responses}
+            if business_context:
+                enhanced_responses.update(business_context)
+            
+            # Calculate individual risk
+            risk_assessment = self.calculate_comprehensive_risk(node_subtype, enhanced_responses)
+            
+            individual_assessments.append({
+                "node_id": node_data.get("node_id", f"node_{len(individual_assessments)}"),
+                "node_subtype": node_subtype,
+                "individual_risk": risk_assessment,
+                "risk_score": risk_assessment.get("probabilistic_score", 5.0)
+            })
+            
+            overall_risk_scores.append(risk_assessment.get("probabilistic_score", 5.0))
+        
+        # Priority 2: Cross-node correlation analysis
+        cross_correlations = self._analyze_cross_node_correlations(individual_assessments)
+        
+        # Priority 2: Risk amplification factors
+        amplification_analysis = self._calculate_risk_amplification(individual_assessments, cross_correlations)
+        
+        # Priority 2: Aggregated metrics
+        aggregated_metrics = self._calculate_aggregated_metrics(individual_assessments, amplification_analysis)
+        
+        return {
+            "assessment_results": individual_assessments,
+            "aggregated_metrics": aggregated_metrics,
+            "cross_node_correlations": cross_correlations,
+            "risk_amplification": amplification_analysis,
+            "assessment_summary": {
+                "total_nodes": len(individual_assessments),
+                "average_risk_score": sum(overall_risk_scores) / len(overall_risk_scores) if overall_risk_scores else 0,
+                "highest_risk_score": max(overall_risk_scores) if overall_risk_scores else 0,
+                "lowest_risk_score": min(overall_risk_scores) if overall_risk_scores else 0,
+                "critical_nodes": len([s for s in overall_risk_scores if s >= 8.0]),
+                "high_risk_nodes": len([s for s in overall_risk_scores if 6.0 <= s < 8.0]),
+                "medium_risk_nodes": len([s for s in overall_risk_scores if 4.0 <= s < 6.0]),
+                "low_risk_nodes": len([s for s in overall_risk_scores if s < 4.0])
+            },
+            "correlation_insights": self._generate_correlation_insights(cross_correlations),
+            "bulk_recommendations": self._generate_bulk_recommendations(individual_assessments, amplification_analysis)
+        }
+    
+    def _analyze_cross_node_correlations(self, assessments: list) -> dict:
+        """Analyze correlations between different nodes"""
+        correlations = {
+            "node_type_correlations": {},
+            "risk_pattern_correlations": {},
+            "vulnerability_clustering": {},
+            "control_dependencies": {}
+        }
+        
+        # Group by node subtype
+        type_groups = {}
+        for assessment in assessments:
+            subtype = assessment["node_subtype"]
+            if subtype not in type_groups:
+                type_groups[subtype] = []
+            type_groups[subtype].append(assessment)
+        
+        # Analyze node type correlations
+        for subtype, nodes in type_groups.items():
+            if len(nodes) > 1:
+                risk_scores = [node["risk_score"] for node in nodes]
+                correlations["node_type_correlations"][subtype] = {
+                    "count": len(nodes),
+                    "avg_risk": sum(risk_scores) / len(risk_scores),
+                    "risk_variance": self._calculate_variance(risk_scores),
+                    "correlation_strength": self._assess_correlation_strength(risk_scores)
+                }
+        
+        # Analyze risk pattern correlations
+        high_risk_nodes = [a for a in assessments if a["risk_score"] >= 7.0]
+        medium_risk_nodes = [a for a in assessments if 4.0 <= a["risk_score"] < 7.0]
+        
+        correlations["risk_pattern_correlations"] = {
+            "high_risk_clusters": self._find_risk_clusters(high_risk_nodes),
+            "medium_risk_clusters": self._find_risk_clusters(medium_risk_nodes),
+            "isolated_high_risk": len(high_risk_nodes)
+        }
+        
+        # Analyze vulnerability clustering
+        correlations["vulnerability_clustering"] = self._analyze_vulnerability_clustering(assessments)
+        
+        return correlations
+    
+    def _calculate_risk_amplification(self, assessments: list, correlations: dict) -> dict:
+        """Calculate risk amplification factors"""
+        amplification = {
+            "network_effects": {},
+            "cascade_risks": {},
+            "concentration_risks": {},
+            "overall_amplification_factor": 1.0
+        }
+        
+        # Network density amplification
+        node_count = len(assessments)
+        if node_count > 1:
+            density_factor = self._calculate_network_density_amplification(assessments)
+            amplification["network_effects"]["density_amplification"] = density_factor
+            amplification["overall_amplification_factor"] *= density_factor
+        
+        # Critical asset clustering
+        critical_assets = [a for a in assessments if a["risk_score"] >= 8.0]
+        if len(critical_assets) > 1:
+            cluster_factor = self.amplification_factors["critical_asset_cluster"]["cluster"]
+            amplification["concentration_risks"]["critical_cluster_amplification"] = cluster_factor
+            amplification["overall_amplification_factor"] *= cluster_factor
+        
+        # Control dependency analysis
+        control_amplification = self._analyze_control_dependencies(assessments)
+        amplification["cascade_risks"] = control_amplification
+        if control_amplification.get("cascade_risk_factor", 1.0) > 1.0:
+            amplification["overall_amplification_factor"] *= control_amplification["cascade_risk_factor"]
+        
+        return amplification
+    
+    def _calculate_aggregated_metrics(self, assessments: list, amplification: dict) -> dict:
+        """Calculate comprehensive aggregated metrics"""
+        if not assessments:
+            return {}
+        
+        risk_scores = [a["risk_score"] for a in assessments]
+        amplification_factor = amplification.get("overall_amplification_factor", 1.0)
+        
+        # Basic aggregations
+        mean_risk = sum(risk_scores) / len(risk_scores)
+        adjusted_mean_risk = min(mean_risk * amplification_factor, 10.0)
+        
+        aggregated = {
+            "overall_risk_score": adjusted_mean_risk,
+            "risk_distribution": {
+                "mean": mean_risk,
+                "median": self._calculate_median(risk_scores),
+                "std_deviation": self._calculate_std_deviation(risk_scores),
+                "percentiles": {
+                    "p25": self._calculate_percentile(risk_scores, 25),
+                    "p50": self._calculate_percentile(risk_scores, 50),
+                    "p75": self._calculate_percentile(risk_scores, 75),
+                    "p90": self._calculate_percentile(risk_scores, 90),
+                    "p95": self._calculate_percentile(risk_scores, 95)
+                }
+            },
+            "risk_categories": {
+                "critical": len([s for s in risk_scores if s >= 8.0]),
+                "high": len([s for s in risk_scores if 6.0 <= s < 8.0]),
+                "medium": len([s for s in risk_scores if 4.0 <= s < 6.0]),
+                "low": len([s for s in risk_scores if s < 4.0])
+            },
+            "amplification_effects": {
+                "base_risk": mean_risk,
+                "amplified_risk": adjusted_mean_risk,
+                "amplification_factor": amplification_factor,
+                "amplification_sources": list(amplification.keys())
+            },
+            "systemic_risk_indicators": {
+                "risk_concentration": self._calculate_risk_concentration(risk_scores),
+                "correlation_strength": self._calculate_overall_correlation_strength(assessments),
+                "vulnerability_diversity": self._calculate_vulnerability_diversity(assessments)
+            }
+        }
+        
+        return aggregated
+    
+    # Helper methods for bulk assessment calculations
+    def _calculate_variance(self, values: list) -> float:
+        if len(values) <= 1:
+            return 0.0
+        mean = sum(values) / len(values)
+        return sum((x - mean) ** 2 for x in values) / len(values)
+    
+    def _calculate_std_deviation(self, values: list) -> float:
+        return math.sqrt(self._calculate_variance(values))
+    
+    def _calculate_median(self, values: list) -> float:
+        sorted_values = sorted(values)
+        n = len(sorted_values)
+        if n % 2 == 0:
+            return (sorted_values[n//2 - 1] + sorted_values[n//2]) / 2
+        return sorted_values[n//2]
+    
+    def _calculate_percentile(self, values: list, percentile: int) -> float:
+        sorted_values = sorted(values)
+        index = (percentile / 100) * (len(sorted_values) - 1)
+        if index.is_integer():
+            return sorted_values[int(index)]
+        lower = sorted_values[int(index)]
+        upper = sorted_values[int(index) + 1]
+        return lower + (upper - lower) * (index - int(index))
+    
+    def _find_risk_clusters(self, nodes: list) -> list:
+        """Find clusters of related high-risk nodes"""
+        # Simplified clustering - in practice would use more sophisticated algorithms
+        clusters = []
+        node_subtypes = {}
+        
+        for node in nodes:
+            subtype = node["node_subtype"]
+            if subtype not in node_subtypes:
+                node_subtypes[subtype] = []
+            node_subtypes[subtype].append(node)
+        
+        for subtype, subtype_nodes in node_subtypes.items():
+            if len(subtype_nodes) > 1:
+                clusters.append({
+                    "cluster_type": subtype,
+                    "node_count": len(subtype_nodes),
+                    "avg_risk": sum(n["risk_score"] for n in subtype_nodes) / len(subtype_nodes)
+                })
+        
+        return clusters
+    
+    def _generate_correlation_insights(self, correlations: dict) -> list:
+        """Generate insights from correlation analysis"""
+        insights = []
+        
+        # Node type correlation insights
+        type_corr = correlations.get("node_type_correlations", {})
+        for subtype, data in type_corr.items():
+            if data["correlation_strength"] > 0.7:
+                insights.append(f"Strong risk correlation detected in {subtype} nodes (correlation: {data['correlation_strength']:.2f})")
+        
+        # Risk pattern insights
+        pattern_corr = correlations.get("risk_pattern_correlations", {})
+        high_risk_clusters = pattern_corr.get("high_risk_clusters", [])
+        if len(high_risk_clusters) > 0:
+            insights.append(f"Identified {len(high_risk_clusters)} high-risk node clusters - may indicate systemic vulnerabilities")
+        
+        return insights
+    
+    def _generate_bulk_recommendations(self, assessments: list, amplification: dict) -> list:
+        """Generate recommendations for bulk assessment"""
+        recommendations = []
+        
+        amplification_factor = amplification.get("overall_amplification_factor", 1.0)
+        
+        if amplification_factor > 1.5:
+            recommendations.append("HIGH PRIORITY: Risk amplification detected - systemic vulnerabilities may exist")
+        
+        critical_nodes = [a for a in assessments if a["risk_score"] >= 8.0]
+        if len(critical_nodes) > len(assessments) * 0.3:
+            recommendations.append("CRITICAL: High percentage of critical-risk nodes - immediate security review recommended")
+        
+        # Add specific recommendations based on correlation patterns
+        recommendations.extend(self._generate_pattern_based_recommendations(assessments))
+        
+        return recommendations
+        
+    def _generate_pattern_based_recommendations(self, assessments: list) -> list:
+        """Generate recommendations based on identified patterns"""
+        recommendations = []
+        
+        # Check for common vulnerability patterns
+        vulnerability_patterns = {}
+        for assessment in assessments:
+            subtype = assessment["node_subtype"]
+            risk_score = assessment["risk_score"]
+            
+            if subtype not in vulnerability_patterns:
+                vulnerability_patterns[subtype] = []
+            vulnerability_patterns[subtype].append(risk_score)
+        
+        for subtype, scores in vulnerability_patterns.items():
+            if len(scores) > 1 and sum(scores) / len(scores) > 7.0:
+                recommendations.append(f"Pattern detected: All {subtype} nodes show high risk - review {subtype} security configuration standards")
+        
+        return recommendations
     
     def _initialize_expanded_templates(self) -> Dict[str, Dict]:
         """Initialize all 25+ node types with comprehensive templates"""
