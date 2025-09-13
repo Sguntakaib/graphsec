@@ -946,7 +946,7 @@ agent_communication:
         comment: "Phase 1 Enhanced APIs - POST /api/expanded-nodes/bulk-risk-assessment endpoint implemented for multiple node assessment"
       - working: false
         agent: "testing"
-        comment: "❌ MISSING BULK ANALYSIS FEATURES: Bulk assessment missing required fields: aggregated_metrics, cross_node_correlations. Current implementation only returns assessment_results array but lacks cross-node correlation analysis, risk amplification factors, and aggregated risk metrics expected for comprehensive bulk assessment."
+        comment: "❌ API RESPONSE STRUCTURE MISMATCH: Bulk assessment returns different structure than expected. API returns 'assessment_results' array but test expects 'individual_assessments'. Missing 'overall_risk_summary' field but has 'assessment_summary'. Has comprehensive aggregated_metrics, cross_node_correlations, risk_amplification features but field names don't match expected API contract from review request."
 
   - task: "Expanded Intelligent Nodes - Categories API"
     implemented: true
