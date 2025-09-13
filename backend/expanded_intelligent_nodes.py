@@ -685,6 +685,200 @@ class ExpandedIntelligentNodeEngine:
                         "help_text": "Performance monitoring can detect security-related resource exhaustion attacks.",
                         "related_branch": SecurityBranchType.MONITORING
                     }
+                ],
+                QuestionnaireLevel.EXPERT: [
+                    {
+                        "id": "lambda_serverless_security_architecture",
+                        "question": "How is serverless security architecture designed for this function?",
+                        "type": "single_choice",
+                        "options": ["Defense in depth", "Zero trust serverless", "Basic isolation", "No specific architecture", "Unknown"],
+                        "help_text": "Serverless security architecture ensures comprehensive protection across all layers.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_advanced_threat_modeling",
+                        "question": "Has advanced threat modeling been performed for this function?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive STRIDE analysis", "Basic threat analysis", "Informal review", "No threat modeling", "Unknown"],
+                        "help_text": "Advanced threat modeling identifies specific serverless attack vectors.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_runtime_security_hardening",
+                        "question": "What runtime security hardening measures are implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Custom runtime patches", "Security-focused dependencies", "Runtime sandboxing", "Resource constraints", "None"],
+                        "help_text": "Runtime hardening protects against execution environment vulnerabilities.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_supply_chain_attestation",
+                        "question": "How is software supply chain attestation implemented?",
+                        "type": "single_choice",
+                        "options": ["Full SLSA compliance", "Partial attestation", "Basic verification", "No attestation", "Unknown"],
+                        "help_text": "Supply chain attestation ensures integrity of function dependencies.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "lambda_zero_day_protection",
+                        "question": "What zero-day protection mechanisms are in place?",
+                        "type": "multiple_choice",
+                        "options": ["Behavioral monitoring", "Runtime protection", "Anomaly detection", "Sandboxing", "None"],
+                        "help_text": "Zero-day protection defends against unknown vulnerabilities.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_advanced_logging_analysis",
+                        "question": "What advanced logging analysis is performed?",
+                        "type": "single_choice",
+                        "options": ["AI-powered analysis", "Machine learning detection", "Pattern recognition", "Basic log review", "No analysis"],
+                        "help_text": "Advanced logging analysis identifies sophisticated attack patterns.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_incident_forensics_capability",
+                        "question": "What incident forensics capabilities are available?",
+                        "type": "multiple_choice",
+                        "options": ["Execution tracing", "Memory analysis", "Code path reconstruction", "Timeline analysis", "None"],
+                        "help_text": "Forensics capabilities enable detailed incident investigation in serverless environments.",
+                        "related_branch": SecurityBranchType.INCIDENT_RESPONSE
+                    },
+                    {
+                        "id": "lambda_compliance_automation",
+                        "question": "How is compliance automated for this function?",
+                        "type": "single_choice",
+                        "options": ["Continuous compliance monitoring", "Automated policy enforcement", "Regular compliance scans", "Manual compliance checks", "No automation"],
+                        "help_text": "Compliance automation ensures consistent adherence to regulatory requirements.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "lambda_advanced_encryption_patterns",
+                        "question": "What advanced encryption patterns are implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Envelope encryption", "Client-side encryption", "Field-level encryption", "Homomorphic encryption", "None"],
+                        "help_text": "Advanced encryption patterns provide enhanced data protection in serverless environments.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "lambda_serverless_attack_detection",
+                        "question": "How are serverless-specific attacks detected?",
+                        "type": "single_choice",
+                        "options": ["Specialized serverless SIEM", "Custom detection rules", "Generic monitoring", "No specific detection", "Unknown"],
+                        "help_text": "Serverless attack detection addresses unique serverless threat vectors.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_quantum_safe_cryptography",
+                        "question": "Is quantum-safe cryptography implemented?",
+                        "type": "single_choice",
+                        "options": ["Post-quantum algorithms", "Quantum-resistant protocols", "Hybrid approach", "Classical cryptography only", "Unknown"],
+                        "help_text": "Quantum-safe cryptography protects against future quantum computing threats.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "lambda_advanced_dependency_management",
+                        "question": "How is advanced dependency management implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Software bill of materials", "Dependency pinning", "Vulnerability scanning", "License compliance", "None"],
+                        "help_text": "Advanced dependency management reduces third-party security risks.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "lambda_business_logic_security",
+                        "question": "How is business logic security validated?",
+                        "type": "single_choice",
+                        "options": ["Formal verification", "Comprehensive testing", "Code review", "Basic validation", "No validation"],
+                        "help_text": "Business logic security prevents exploitation of application-specific vulnerabilities.",
+                        "related_branch": SecurityBranchType.CODE_SECURITY
+                    },
+                    {
+                        "id": "lambda_advanced_rate_limiting",
+                        "question": "What advanced rate limiting mechanisms are implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Adaptive rate limiting", "Distributed rate limiting", "User-based limits", "Resource-based limits", "None"],
+                        "help_text": "Advanced rate limiting protects against sophisticated abuse patterns.",
+                        "related_branch": SecurityBranchType.RATE_LIMITING
+                    },
+                    {
+                        "id": "lambda_serverless_security_metrics",
+                        "question": "What serverless-specific security metrics are tracked?",
+                        "type": "multiple_choice",
+                        "options": ["Cold start security time", "Function invocation patterns", "Resource utilization anomalies", "Execution path analysis", "None"],
+                        "help_text": "Serverless security metrics provide visibility into function-specific security events.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_advanced_secret_management",
+                        "question": "How is advanced secret management implemented?",
+                        "type": "single_choice",
+                        "options": ["Runtime secret injection", "Dynamic secret generation", "Secret versioning", "Basic secret storage", "No secret management"],
+                        "help_text": "Advanced secret management minimizes secret exposure in serverless environments.",
+                        "related_branch": SecurityBranchType.SECRETS_MANAGEMENT
+                    },
+                    {
+                        "id": "lambda_serverless_governance",
+                        "question": "What serverless governance framework is in place?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive governance", "Policy-based controls", "Basic guidelines", "No governance", "Unknown"],
+                        "help_text": "Serverless governance ensures consistent security practices across functions.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "lambda_advanced_monitoring_correlation",
+                        "question": "How is advanced monitoring correlation implemented?",
+                        "type": "single_choice",
+                        "options": ["Cross-service correlation", "Multi-dimensional analysis", "Basic correlation", "No correlation", "Unknown"],
+                        "help_text": "Advanced correlation provides comprehensive visibility across serverless architectures.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_serverless_disaster_recovery",
+                        "question": "What serverless disaster recovery capabilities are implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Multi-region deployment", "Function versioning", "State backup", "Automated failover", "None"],
+                        "help_text": "Serverless disaster recovery ensures function availability during incidents.",
+                        "related_branch": SecurityBranchType.BACKUP
+                    },
+                    {
+                        "id": "lambda_advanced_performance_security",
+                        "question": "How is performance security optimized?",
+                        "type": "single_choice",
+                        "options": ["Security-optimized performance", "Balanced approach", "Performance-first", "No optimization", "Unknown"],
+                        "help_text": "Performance security balances security controls with serverless performance requirements.",
+                        "related_branch": SecurityBranchType.SERVERLESS_SECURITY
+                    },
+                    {
+                        "id": "lambda_serverless_threat_intelligence",
+                        "question": "How is serverless threat intelligence integrated?",
+                        "type": "single_choice",
+                        "options": ["Serverless-specific feeds", "Generic threat intel", "Basic indicators", "No threat intelligence", "Unknown"],
+                        "help_text": "Serverless threat intelligence provides relevant threat information for function-based architectures.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "lambda_advanced_testing_security",
+                        "question": "What advanced security testing is performed?",
+                        "type": "multiple_choice",
+                        "options": ["Serverless penetration testing", "Chaos engineering", "Security fuzzing", "Load testing", "None"],
+                        "help_text": "Advanced security testing validates serverless security under various conditions.",
+                        "related_branch": SecurityBranchType.VULNERABILITY_SCANNING
+                    },
+                    {
+                        "id": "lambda_serverless_security_culture",
+                        "question": "How is serverless security culture promoted?",
+                        "type": "single_choice",
+                        "options": ["Serverless security training", "Security-first development", "Basic awareness", "No specific culture", "Unknown"],
+                        "help_text": "Serverless security culture ensures developers understand unique serverless security challenges.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "lambda_future_security_roadmap",
+                        "question": "Is there a future security roadmap for serverless?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive roadmap", "Technology evolution planning", "Basic future planning", "No roadmap", "Unknown"],
+                        "help_text": "Future security roadmap ensures preparedness for evolving serverless security challenges.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    }
                 ]
             },
             "threat_intelligence": ThreatIntelligence(
