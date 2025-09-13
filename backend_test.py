@@ -4441,10 +4441,42 @@ class SecurityModelingAPITester:
             print(f"⚠️  {total - passed} tests failed. See details above.")
             return False
 
+def test_multi_level_questionnaires_only():
+    """Test only the multi-level questionnaires as requested by user"""
+    print("🎯 FOCUSED TESTING: Multi-Level Questionnaires Implementation")
+    print("=" * 80)
+    
+    tester = SecurityModelingAPITester()
+    
+    # First test health check to ensure API is accessible
+    if not tester.test_health_check():
+        print("❌ API health check failed - cannot proceed with testing")
+        return False
+    
+    # Run the specific multi-level questionnaire test
+    success = tester.test_multi_level_questionnaires_implementation()
+    
+    print("\n" + "=" * 80)
+    if success:
+        print("✅ MULTI-LEVEL QUESTIONNAIRES TESTING COMPLETED SUCCESSFULLY!")
+        print("🎉 All requested questionnaire endpoints are working correctly:")
+        print("   • EC2 EXPERT level: 25+ questions ✅")
+        print("   • Lambda ADVANCED level: 17 questions ✅") 
+        print("   • Lambda EXPERT level: 24+ questions ✅")
+    else:
+        print("❌ MULTI-LEVEL QUESTIONNAIRES TESTING FAILED!")
+        print("⚠️  Some questionnaire endpoints need attention - see details above")
+    
+    return success
+
 def main():
     """Main test execution"""
-    tester = SecurityModelingAPITester()
-    success = tester.run_all_tests()
+    # Check if we should run focused testing
+    if len(sys.argv) > 1 and sys.argv[1] == "--multi-level-only":
+        success = test_multi_level_questionnaires_only()
+    else:
+        tester = SecurityModelingAPITester()
+        success = tester.run_all_tests()
     
     if success:
         print("\n✅ Backend API testing completed successfully!")
