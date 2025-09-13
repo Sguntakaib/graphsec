@@ -20,7 +20,7 @@ from advanced_simulation import AdvancedSimulationEngine
 from mitre_integration import MitreAttackDatabase
 from intelligent_nodes import intelligent_node_engine, SecurityBranch, SecurityPrompt, IntelligentNodeTemplate
 from expanded_intelligent_nodes import ExpandedIntelligentNodeEngine, QuestionnaireLevel
-from questionnaire_loader import get_questionnaire_loader, QuestionnaireLevel as LoaderQuestionnaireLevel, ThreatLevel, NodeCategory
+from questionnaire_loader import get_questionnaire_loader, QuestionnaireLevel as LoaderQuestionnaireLevel
 from threat_intelligence import threat_intelligence_engine, ThreatIntelligenceEngine
 from dsl_rule_engine import dsl_rule_engine, RuleEvaluationResult, SecurityGap, CompletenessAnalysis
 from probabilistic_simulation import probabilistic_engine, ProbabilisticAttackPath, ScenarioAnalysis, DefenseEffectivenessModel
