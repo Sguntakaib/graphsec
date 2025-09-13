@@ -6612,10 +6612,416 @@ def run_focused_node_count_tests():
     
     return analysis_result
 
+    # ============================================================================
+    # PHASE 1 CORE LOOP COMPLETION - CRITICAL ENDPOINT TESTS
+    # ============================================================================
+    
+    def test_questionnaire_completion_standalone(self):
+        """Test POST /api/questionnaires/{node_subtype}/complete in standalone mode"""
+        test_subtypes = ["WebApp", "Database"]
+        
+        for subtype in test_subtypes:
+            try:
+                # Test standalone questionnaire completion without diagram_id/node_id
+                completion_data = {
+                    "responses": {
+                        "authentication_method": "oauth2",
+                        "encryption_enabled": True,
+                        "input_validation": "comprehensive",
+                        "access_control": "rbac",
+                        "monitoring_enabled": True
+                    },
+                    "business_context": {
+                        "criticality": "high",
+                        "data_classification": "confidential",
+                        "compliance_requirements": ["SOX", "PCI-DSS"]
+                    }
+                }
+                
+                response = self.session.post(
+                    f"{self.base_url}/questionnaires/{subtype}/complete",
+                    json=completion_data,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for expected completion response fields
+                    expected_fields = ["completion_id", "findings", "security_analysis", "recommendations"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Questionnaire Completion Standalone - {subtype}", False, 
+                                    f"Missing response fields: {missing_fields}")
+                        return False
+                    
+                    findings = data.get("findings", [])
+                    recommendations = data.get("recommendations", [])
+                    
+                    self.log_test(f"Questionnaire Completion Standalone - {subtype}", True, 
+                                f"Standalone completion: {len(findings)} findings, {len(recommendations)} recommendations")
+                    
+                elif response.status_code == 500:
+                    error_text = response.text
+                    if "diagram_id and node_id are required" in error_text:
+                        self.log_test(f"Questionnaire Completion Standalone - {subtype}", False, 
+                                    f"CRITICAL: Endpoint requires diagram_id/node_id - not working in standalone mode. Error: {error_text}")
+                        return False
+                    else:
+                        self.log_test(f"Questionnaire Completion Standalone - {subtype}", False, 
+                                    f"HTTP 500 error: {error_text}")
+                        return False
+                else:
+                    self.log_test(f"Questionnaire Completion Standalone - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Questionnaire Completion Standalone - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_questionnaire_get_prompts_standalone(self):
+        """Test GET /api/questionnaires/{node_subtype} in standalone mode"""
+        test_subtypes = ["WebApp", "Database", "API"]
+        
+        for subtype in test_subtypes:
+            try:
+                response = self.session.get(f"{self.base_url}/questionnaires/{subtype}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check for expected questionnaire response fields
+                    expected_fields = ["node_subtype", "prompts", "security_branches"]
+                    missing_fields = [f for f in expected_fields if f not in data]
+                    
+                    if missing_fields:
+                        self.log_test(f"Questionnaire Get Prompts - {subtype}", False, 
+                                    f"Missing response fields: {missing_fields}")
+                        return False
+                    
+                    prompts = data.get("prompts", [])
+                    security_branches = data.get("security_branches", [])
+                    
+                    if not prompts:
+                        self.log_test(f"Questionnaire Get Prompts - {subtype}", False, 
+                                    "No prompts returned")
+                        return False
+                    
+                    # Verify prompt structure
+                    first_prompt = prompts[0]
+                    required_prompt_fields = ["id", "question", "type", "options"]
+                    missing_prompt_fields = [f for f in required_prompt_fields if f not in first_prompt]
+                    
+                    if missing_prompt_fields:
+                        self.log_test(f"Questionnaire Get Prompts - {subtype}", False, 
+                                    f"Missing prompt fields: {missing_prompt_fields}")
+                        return False
+                    
+                    self.log_test(f"Questionnaire Get Prompts - {subtype}", True, 
+                                f"Retrieved {len(prompts)} prompts, {len(security_branches)} branches")
+                    
+                elif response.status_code == 500:
+                    error_text = response.text
+                    if "SecurityPrompt object has no attribute question_type" in error_text:
+                        self.log_test(f"Questionnaire Get Prompts - {subtype}", False, 
+                                    f"CRITICAL: SecurityPrompt attribute error - implementation bug. Error: {error_text}")
+                        return False
+                    else:
+                        self.log_test(f"Questionnaire Get Prompts - {subtype}", False, 
+                                    f"HTTP 500 error: {error_text}")
+                        return False
+                else:
+                    self.log_test(f"Questionnaire Get Prompts - {subtype}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log_test(f"Questionnaire Get Prompts - {subtype}", False, f"Error: {str(e)}")
+                return False
+        
+        return True
+
+    def test_enhanced_simulation_standalone(self):
+        """Test POST /api/simulate in standalone mode"""
+        try:
+            # Test enhanced simulation without diagram_id
+            simulation_data = {
+                "nodes": [
+                    {
+                        "id": "webapp-1",
+                        "type": "Asset",
+                        "subtype": "WebApp",
+                        "label": "Customer Portal",
+                        "security_attributes": {
+                            "authentication": "oauth2",
+                            "encryption": "tls1.3",
+                            "input_validation": "comprehensive"
+                        }
+                    },
+                    {
+                        "id": "db-1", 
+                        "type": "Asset",
+                        "subtype": "Database",
+                        "label": "Customer Database",
+                        "security_attributes": {
+                            "encryption_at_rest": True,
+                            "access_control": "rbac",
+                            "backup_enabled": True
+                        }
+                    },
+                    {
+                        "id": "attacker-1",
+                        "type": "Actor",
+                        "subtype": "ExternalAttacker",
+                        "label": "External Threat Actor"
+                    }
+                ],
+                "edges": [
+                    {
+                        "id": "edge-1",
+                        "source": "attacker-1",
+                        "target": "webapp-1",
+                        "type": "attack",
+                        "label": "Initial Access"
+                    },
+                    {
+                        "id": "edge-2", 
+                        "source": "webapp-1",
+                        "target": "db-1",
+                        "type": "attack",
+                        "label": "Data Access"
+                    }
+                ],
+                "simulation_parameters": {
+                    "max_paths": 10,
+                    "include_mitre_mapping": True,
+                    "risk_threshold": 5.0
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/simulate",
+                json=simulation_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for enhanced simulation response fields
+                expected_fields = ["simulation_id", "attack_paths", "risk_analysis", "mitre_techniques", "recommendations"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Enhanced Simulation Standalone", False, 
+                                f"Missing response fields: {missing_fields}")
+                    return False
+                
+                attack_paths = data.get("attack_paths", [])
+                risk_analysis = data.get("risk_analysis", {})
+                mitre_techniques = data.get("mitre_techniques", [])
+                
+                self.log_test("Enhanced Simulation Standalone", True, 
+                            f"Standalone simulation: {len(attack_paths)} paths, {len(mitre_techniques)} MITRE techniques, "
+                            f"risk score: {risk_analysis.get('overall_risk_score', 0)}")
+                return True
+                
+            elif response.status_code == 500:
+                error_text = response.text
+                if "Diagram not found" in error_text:
+                    self.log_test("Enhanced Simulation Standalone", False, 
+                                f"CRITICAL: Endpoint expects diagram_id - not working in standalone mode. Error: {error_text}")
+                    return False
+                else:
+                    self.log_test("Enhanced Simulation Standalone", False, 
+                                f"HTTP 500 error: {error_text}")
+                    return False
+            else:
+                self.log_test("Enhanced Simulation Standalone", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Enhanced Simulation Standalone", False, f"Error: {str(e)}")
+            return False
+
+    def test_enhanced_rule_evaluation_standalone(self):
+        """Test POST /api/rules/evaluate in standalone mode"""
+        try:
+            # Test enhanced rule evaluation without diagram_id
+            rule_evaluation_data = {
+                "nodes": [
+                    {
+                        "id": "webapp-1",
+                        "type": "Asset", 
+                        "subtype": "WebApp",
+                        "label": "Customer Portal",
+                        "security_attributes": {
+                            "authentication": "basic",
+                            "encryption": "none",
+                            "input_validation": "minimal"
+                        }
+                    },
+                    {
+                        "id": "db-1",
+                        "type": "Asset",
+                        "subtype": "Database", 
+                        "label": "Customer Database",
+                        "security_attributes": {
+                            "encryption_at_rest": False,
+                            "access_control": "weak",
+                            "backup_enabled": False
+                        }
+                    }
+                ],
+                "rule_categories": ["web_security", "database_security", "api_security"],
+                "evaluation_parameters": {
+                    "include_recommendations": True,
+                    "severity_threshold": "medium",
+                    "include_mitre_mapping": True
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/rules/evaluate",
+                json=rule_evaluation_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for enhanced rule evaluation response fields
+                expected_fields = ["evaluation_id", "triggered_rules", "risk_score", "recommendations", "compliance_gaps"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Enhanced Rule Evaluation Standalone", False, 
+                                f"Missing response fields: {missing_fields}")
+                    return False
+                
+                triggered_rules = data.get("triggered_rules", [])
+                risk_score = data.get("risk_score", 0)
+                recommendations = data.get("recommendations", [])
+                
+                # Verify rule structure
+                if triggered_rules:
+                    first_rule = triggered_rules[0]
+                    required_rule_fields = ["rule_id", "rule_name", "severity", "description", "recommendations"]
+                    missing_rule_fields = [f for f in required_rule_fields if f not in first_rule]
+                    
+                    if missing_rule_fields:
+                        self.log_test("Enhanced Rule Evaluation Standalone", False, 
+                                    f"Missing rule fields: {missing_rule_fields}")
+                        return False
+                
+                self.log_test("Enhanced Rule Evaluation Standalone", True, 
+                            f"Standalone rule evaluation: {len(triggered_rules)} rules triggered, "
+                            f"risk score: {risk_score}, {len(recommendations)} recommendations")
+                return True
+                
+            elif response.status_code == 500:
+                error_text = response.text
+                if "Diagram not found" in error_text:
+                    self.log_test("Enhanced Rule Evaluation Standalone", False, 
+                                f"CRITICAL: Endpoint expects diagram_id - not working in standalone mode. Error: {error_text}")
+                    return False
+                else:
+                    self.log_test("Enhanced Rule Evaluation Standalone", False, 
+                                f"HTTP 500 error: {error_text}")
+                    return False
+            else:
+                self.log_test("Enhanced Rule Evaluation Standalone", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Enhanced Rule Evaluation Standalone", False, f"Error: {str(e)}")
+            return False
+
+    def run_critical_phase1_tests(self):
+        """Run the 4 critical Phase 1 Core Loop endpoint tests"""
+        print("🚨 CRITICAL PHASE 1 CORE LOOP ENDPOINT TESTING")
+        print(f"Testing against: {self.base_url}")
+        print("Focus: 4 critical endpoints that need to work in standalone mode")
+        print("=" * 80)
+        
+        # Critical Phase 1 Core Loop Tests
+        critical_tests = [
+            ("POST /api/questionnaires/{node_subtype}/complete - Standalone Mode", self.test_questionnaire_completion_standalone),
+            ("GET /api/questionnaires/{node_subtype} - Standalone Mode", self.test_questionnaire_get_prompts_standalone), 
+            ("POST /api/simulate - Enhanced Simulation Standalone", self.test_enhanced_simulation_standalone),
+            ("POST /api/rules/evaluate - Enhanced Rule Evaluation Standalone", self.test_enhanced_rule_evaluation_standalone)
+        ]
+        
+        passed = 0
+        failed = 0
+        
+        for test_name, test_func in critical_tests:
+            try:
+                print(f"\n🔍 Testing: {test_name}")
+                if test_func():
+                    passed += 1
+                else:
+                    failed += 1
+            except Exception as e:
+                self.log_test(test_name, False, f"Test execution error: {str(e)}")
+                failed += 1
+            
+            print()  # Add spacing between tests
+        
+        # Print summary
+        print("=" * 80)
+        print(f"🎯 CRITICAL PHASE 1 CORE LOOP TEST SUMMARY")
+        print(f"✅ Passed: {passed}")
+        print(f"❌ Failed: {failed}")
+        print(f"📊 Success Rate: {(passed/(passed+failed)*100):.1f}%")
+        
+        if failed > 0:
+            print(f"🚨 CRITICAL ISSUES FOUND: {failed} endpoints not working in standalone mode")
+            print("These endpoints need immediate fixes to support standalone operation")
+        else:
+            print("🎉 ALL CRITICAL ENDPOINTS WORKING IN STANDALONE MODE")
+        
+        print("=" * 80)
+        
+        return passed, failed
+
+def run_critical_phase1_tests_only():
+    """Run only the 4 critical Phase 1 Core Loop endpoint tests"""
+    print("🎯 CRITICAL PHASE 1 CORE LOOP TESTING")
+    print("=" * 80)
+    
+    tester = SecurityModelingAPITester()
+    
+    # First test health check to ensure API is accessible
+    if not tester.test_health_check():
+        print("❌ API health check failed - cannot proceed with testing")
+        return False
+    
+    # Run the critical Phase 1 tests
+    passed, failed = tester.run_critical_phase1_tests()
+    
+    print("\n" + "=" * 80)
+    if failed == 0:
+        print("✅ CRITICAL PHASE 1 CORE LOOP TESTING COMPLETED SUCCESSFULLY!")
+        print("🎉 All 4 critical endpoints are working in standalone mode")
+    else:
+        print("❌ CRITICAL PHASE 1 CORE LOOP TESTING FAILED!")
+        print(f"⚠️  {failed} critical endpoints need immediate attention")
+    
+    return failed == 0
+
 def main():
     """Main test execution"""
     # Check if we should run focused testing
-    if len(sys.argv) > 1 and sys.argv[1] == "--multi-level-only":
+    if len(sys.argv) > 1 and sys.argv[1] == "--critical-phase1":
+        success = run_critical_phase1_tests_only()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--multi-level-only":
         success = test_multi_level_questionnaires_only()
     elif len(sys.argv) > 1 and sys.argv[1] == "--focused":
         analysis_result = run_focused_node_count_tests()
