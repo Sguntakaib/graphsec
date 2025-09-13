@@ -1,0 +1,365 @@
+node_type: "Asset"
+node_subtype: "WebApp"
+category: "Application Services"
+description: "Web Application"
+required_branches:
+  - "Authentication"
+  - "Authorization"
+  - "InputValidation"
+  - "SessionManagement"
+  - "ErrorHandling"
+  - "Logging"
+  - "HTTPS"
+  - "CSP"
+
+questionnaires:
+  basic:
+    - id: "webapp_authentication_method"
+      question: "What authentication method is implemented?"
+      type: "single_choice"
+      options: ["OAuth2/OIDC", "SAML", "Username/Password with MFA", "Username/Password only", "No Authentication", "Unknown"]
+      help_text: "Strong authentication methods prevent unauthorized access to the web application."
+      related_branch: "Authentication"
+    - id: "webapp_input_validation"
+      question: "How is input validation implemented?"
+      type: "single_choice"
+      options: ["Comprehensive server-side validation", "Basic validation", "Client-side only", "No validation", "Unknown"]
+      help_text: "Proper input validation prevents injection attacks and data corruption."
+      related_branch: "InputValidation"
+    - id: "webapp_https_enforcement"
+      question: "Is HTTPS enforced?"
+      type: "single_choice"
+      options: ["HTTPS only (HSTS enabled)", "HTTPS preferred", "Mixed HTTP/HTTPS", "HTTP only", "Unknown"]
+      help_text: "HTTPS encryption protects data in transit and prevents man-in-the-middle attacks."
+      related_branch: "HTTPS"
+    - id: "webapp_session_management"
+      question: "How are user sessions managed?"
+      type: "single_choice"
+      options: ["Secure session management", "Standard sessions", "Basic sessions", "No session management", "Unknown"]
+      help_text: "Secure session management prevents session hijacking and fixation attacks."
+      related_branch: "SessionManagement"
+    - id: "webapp_error_handling"
+      question: "How are application errors handled?"
+      type: "single_choice"
+      options: ["Secure error handling (no info disclosure)", "Generic error messages", "Detailed error messages", "No error handling", "Unknown"]
+      help_text: "Proper error handling prevents information disclosure to attackers."
+      related_branch: "ErrorHandling"
+    - id: "webapp_logging_monitoring"
+      question: "What logging and monitoring is in place?"
+      type: "single_choice"
+      options: ["Comprehensive security logging", "Basic application logging", "Minimal logging", "No logging", "Unknown"]
+      help_text: "Security logging enables threat detection and incident response."
+      related_branch: "Logging"
+    - id: "webapp_data_encryption"
+      question: "How is sensitive data encrypted?"
+      type: "single_choice"
+      options: ["Encryption at rest and in transit", "Encryption in transit only", "Basic encryption", "No encryption", "Unknown"]
+      help_text: "Data encryption protects sensitive information from unauthorized access."
+      related_branch: "Encryption"
+    - id: "webapp_security_headers"
+      question: "Are security headers implemented?"
+      type: "single_choice"
+      options: ["Comprehensive security headers", "Basic headers", "Minimal headers", "No security headers", "Unknown"]
+      help_text: "Security headers provide protection against common web vulnerabilities."
+      related_branch: "CSP"
+
+  advanced:
+    - id: "webapp_authorization_model"
+      question: "What authorization model is implemented?"
+      type: "single_choice"
+      options: ["RBAC with fine-grained permissions", "RBAC with basic roles", "Simple permissions", "No authorization", "Unknown"]
+      help_text: "Proper authorization ensures users can only access appropriate resources."
+      related_branch: "Authorization"
+    - id: "webapp_content_security_policy"
+      question: "Is Content Security Policy (CSP) implemented?"
+      type: "single_choice"
+      options: ["Strict CSP with nonce/hash", "Basic CSP", "Report-only CSP", "No CSP", "Unknown"]
+      help_text: "CSP prevents cross-site scripting and code injection attacks."
+      related_branch: "CSP"
+    - id: "webapp_sql_injection_protection"
+      question: "How is SQL injection prevented?"
+      type: "single_choice"
+      options: ["Parameterized queries + ORM", "Parameterized queries", "Input sanitization", "No protection", "Unknown"]
+      help_text: "Proper SQL injection protection prevents database attacks."
+      related_branch: "InputValidation"
+    - id: "webapp_xss_protection"
+      question: "How is Cross-Site Scripting (XSS) prevented?"
+      type: "single_choice"
+      options: ["Output encoding + CSP + validation", "Output encoding", "Input filtering", "No XSS protection", "Unknown"]
+      help_text: "XSS protection prevents malicious script execution in user browsers."
+      related_branch: "InputValidation"
+    - id: "webapp_csrf_protection"
+      question: "How is Cross-Site Request Forgery (CSRF) prevented?"
+      type: "single_choice"
+      options: ["CSRF tokens + SameSite cookies", "CSRF tokens", "Referer validation", "No CSRF protection", "Unknown"]
+      help_text: "CSRF protection prevents unauthorized actions on behalf of authenticated users."
+      related_branch: "SessionManagement"
+    - id: "webapp_file_upload_security"
+      question: "How are file uploads secured?"
+      type: "single_choice"
+      options: ["Comprehensive file validation", "File type validation", "Size limits only", "No file upload security", "Unknown"]
+      help_text: "Secure file uploads prevent malicious file execution and storage attacks."
+      related_branch: "InputValidation"
+    - id: "webapp_rate_limiting"
+      question: "Is rate limiting implemented?"
+      type: "single_choice"
+      options: ["Adaptive rate limiting", "Fixed rate limiting", "Basic throttling", "No rate limiting", "Unknown"]
+      help_text: "Rate limiting prevents brute force attacks and resource exhaustion."
+      related_branch: "RateLimiting"
+    - id: "webapp_api_security"
+      question: "How are API endpoints secured?"
+      type: "single_choice"
+      options: ["OAuth2 + API gateway", "API keys", "Basic authentication", "No API security", "Unknown"]
+      help_text: "API security prevents unauthorized access to application interfaces."
+      related_branch: "ApiSecurity"
+    - id: "webapp_dependency_management"
+      question: "How are third-party dependencies managed?"
+      type: "single_choice"
+      options: ["Automated vulnerability scanning", "Regular updates", "Manual tracking", "No dependency management", "Unknown"]
+      help_text: "Dependency management prevents exploitation of vulnerable third-party components."
+      related_branch: "SupplyChain"
+    - id: "webapp_security_testing"
+      question: "What security testing is performed?"
+      type: "single_choice"
+      options: ["Automated SAST/DAST + penetration testing", "Basic automated scanning", "Manual testing", "No security testing", "Unknown"]
+      help_text: "Security testing identifies vulnerabilities before deployment."
+      related_branch: "VulnerabilityScanning"
+    - id: "webapp_access_logging"
+      question: "How comprehensive is access logging?"
+      type: "single_choice"
+      options: ["Detailed access logs with correlation", "Standard access logs", "Basic logs", "No access logging", "Unknown"]
+      help_text: "Comprehensive logging enables security monitoring and forensics."
+      related_branch: "Logging"
+    - id: "webapp_backup_recovery"
+      question: "What backup and recovery procedures exist?"
+      type: "single_choice"
+      options: ["Automated backups with tested recovery", "Regular backups", "Manual backups", "No backup procedures", "Unknown"]
+      help_text: "Backup procedures ensure application availability and data recovery."
+      related_branch: "Backup"
+    - id: "webapp_configuration_management"
+      question: "How is application configuration managed?"
+      type: "single_choice"
+      options: ["Secure configuration management", "Version controlled config", "Manual configuration", "No configuration management", "Unknown"]
+      help_text: "Secure configuration management prevents configuration-related vulnerabilities."
+      related_branch: "ConfigurationManagement"
+    - id: "webapp_secrets_management" 
+      question: "How are application secrets managed?"
+      type: "single_choice"
+      options: ["Dedicated secrets manager", "Environment variables", "Configuration files", "Hardcoded secrets", "Unknown"]
+      help_text: "Proper secrets management prevents credential exposure."
+      related_branch: "SecretsManagement"
+    - id: "webapp_database_security"
+      question: "How is database connectivity secured?"
+      type: "single_choice"
+      options: ["Encrypted connections + least privilege", "Encrypted connections", "Basic authentication", "No database security", "Unknown"]
+      help_text: "Database security prevents unauthorized data access."
+      related_branch: "DatabaseSecurity"
+    - id: "webapp_container_security"
+      question: "If containerized, how is container security implemented?"
+      type: "single_choice"
+      options: ["Hardened containers + scanning", "Basic container security", "Default configuration", "Not containerized", "Unknown"]
+      help_text: "Container security prevents container-based attacks."
+      related_branch: "ContainerSecurity"
+    - id: "webapp_compliance_frameworks"
+      question: "What compliance frameworks are followed?"
+      type: "multiple_choice"
+      options: ["OWASP ASVS", "NIST Cybersecurity Framework", "ISO 27001", "SOC 2", "PCI DSS", "None"]
+      help_text: "Compliance frameworks provide structured security requirements."
+      related_branch: "Compliance"
+    - id: "webapp_incident_response"
+      question: "Is there an incident response plan for security events?"
+      type: "single_choice"
+      options: ["Comprehensive IR plan with automation", "Basic IR procedures", "Informal response", "No incident response", "Unknown"]
+      help_text: "Incident response enables rapid containment of security breaches."
+      related_branch: "IncidentResponse"
+
+  expert:
+    - id: "webapp_zero_trust_implementation"
+      question: "How is zero trust architecture implemented?"
+      type: "single_choice"
+      options: ["Full zero trust with continuous verification", "Partial zero trust", "Traditional perimeter security", "No zero trust", "Unknown"]
+      help_text: "Zero trust architecture assumes no implicit trust and verifies every request."
+      related_branch: "AccessControl"
+    - id: "webapp_advanced_threat_modeling"
+      question: "What threat modeling methodology is used?"
+      type: "single_choice"
+      options: ["STRIDE with regular updates", "PASTA methodology", "TRIKE methodology", "Basic threat analysis", "No threat modeling"]
+      help_text: "Advanced threat modeling identifies and mitigates application-specific threats."
+      related_branch: "ThreatModeling"
+    - id: "webapp_runtime_application_security"
+      question: "Is Runtime Application Self-Protection (RASP) implemented?"
+      type: "single_choice"
+      options: ["RASP with behavioral analysis", "Basic RASP", "WAF only", "No runtime protection", "Unknown"]
+      help_text: "RASP provides real-time protection against application attacks."
+      related_branch: "RuntimeProtection"
+    - id: "webapp_advanced_authentication"
+      question: "What advanced authentication features are implemented?"
+      type: "multiple_choice"
+      options: ["Risk-based authentication", "Behavioral biometrics", "Device fingerprinting", "Adaptive MFA", "None"]
+      help_text: "Advanced authentication adapts security based on risk context."
+      related_branch: "Authentication"
+    - id: "webapp_privacy_by_design"
+      question: "How is privacy by design implemented?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Data minimization", "Basic privacy measures", "No privacy design", "Unknown"]
+      help_text: "Privacy by design ensures data protection is built into the application architecture."
+      related_branch: "DataClassification"
+    - id: "webapp_supply_chain_security"
+      question: "How is software supply chain security managed?"
+      type: "single_choice"
+      options: ["Software Bill of Materials (SBOM)", "Dependency signing", "Basic dependency scanning", "No supply chain security", "Unknown"]
+      help_text: "Supply chain security ensures integrity of third-party components."
+      related_branch: "SupplyChain"
+    - id: "webapp_devsecops_integration"
+      question: "How is DevSecOps integrated into the development process?"
+      type: "single_choice"
+      options: ["Automated security in CI/CD", "Manual security reviews", "Post-deployment security", "No DevSecOps", "Unknown"]
+      help_text: "DevSecOps integration builds security into the development lifecycle."
+      related_branch: "CICDSecurity"
+    - id: "webapp_api_security_governance"
+      question: "How is API security governance implemented?"
+      type: "single_choice"
+      options: ["API security framework", "API gateway with policies", "Basic API management", "No API governance", "Unknown"]
+      help_text: "API governance ensures consistent security across all application interfaces."
+      related_branch: "ApiSecurity"
+    - id: "webapp_advanced_monitoring_correlation"
+      question: "How is advanced security monitoring implemented?"
+      type: "single_choice"
+      options: ["AI-powered threat detection", "SIEM with correlation rules", "Basic log monitoring", "No advanced monitoring", "Unknown"]
+      help_text: "Advanced monitoring detects sophisticated attack patterns."
+      related_branch: "Monitoring"
+    - id: "webapp_quantum_safe_cryptography"
+      question: "Is quantum-safe cryptography implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Hybrid classical/quantum-safe", "Classical cryptography only", "No encryption", "Unknown"]
+      help_text: "Quantum-safe cryptography protects against future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "webapp_advanced_session_security"
+      question: "What advanced session security measures are implemented?"
+      type: "multiple_choice"
+      options: ["Session fingerprinting", "Concurrent session management", "Session risk scoring", "Device binding", "None"]
+      help_text: "Advanced session security prevents sophisticated session-based attacks."
+      related_branch: "SessionManagement"
+    - id: "webapp_business_logic_security"
+      question: "How is business logic security validated?"
+      type: "single_choice"
+      options: ["Formal verification", "Comprehensive testing", "Code review", "Basic validation", "No validation"]
+      help_text: "Business logic security prevents exploitation of application-specific vulnerabilities."
+      related_branch: "BusinessLogic"
+    - id: "webapp_advanced_input_validation"
+      question: "What advanced input validation techniques are used?"
+      type: "multiple_choice"
+      options: ["Schema validation", "Semantic validation", "Context-aware validation", "ML-based anomaly detection", "None"]
+      help_text: "Advanced input validation prevents sophisticated injection attacks."
+      related_branch: "InputValidation"
+    - id: "webapp_security_orchestration"
+      question: "How is security orchestration implemented?"
+      type: "single_choice"
+      options: ["Automated incident response", "Security workflow automation", "Manual security processes", "No orchestration", "Unknown"]
+      help_text: "Security orchestration enables automated response to security events."
+      related_branch: "IncidentResponse"
+    - id: "webapp_advanced_error_handling"
+      question: "What advanced error handling strategies are implemented?"
+      type: "single_choice"
+      options: ["Secure error handling with forensics", "Error correlation and analysis", "Basic error suppression", "No error handling", "Unknown"]
+      help_text: "Advanced error handling prevents information disclosure while enabling security analysis."
+      related_branch: "ErrorHandling"
+    - id: "webapp_compliance_automation"
+      question: "How is compliance monitoring automated?"
+      type: "single_choice"
+      options: ["Continuous compliance monitoring", "Automated compliance reporting", "Regular compliance scans", "Manual compliance", "No automation"]
+      help_text: "Compliance automation ensures ongoing adherence to regulatory requirements."
+      related_branch: "Compliance"
+    - id: "webapp_advanced_backup_security"
+      question: "What advanced backup security measures are implemented?"
+      type: "multiple_choice"
+      options: ["Encrypted backups", "Immutable backups", "Cross-region replication", "Backup integrity verification", "None"]
+      help_text: "Advanced backup security ensures data protection and recovery capabilities."
+      related_branch: "Backup"
+    - id: "webapp_threat_intelligence_integration"
+      question: "How is threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Real-time threat feeds", "Automated threat correlation", "Manual threat analysis", "No threat intelligence", "Unknown"]
+      help_text: "Threat intelligence integration provides contextual security information."
+      related_branch: "ThreatIntelligence"
+    - id: "webapp_advanced_configuration_security"
+      question: "How is advanced configuration security implemented?"
+      type: "single_choice"
+      options: ["Configuration drift detection", "Immutable infrastructure", "Basic configuration management", "No configuration security", "Unknown"]
+      help_text: "Advanced configuration security prevents configuration-based vulnerabilities."
+      related_branch: "ConfigurationManagement"
+    - id: "webapp_security_metrics_kpis"
+      question: "What security metrics and KPIs are tracked?"
+      type: "multiple_choice"
+      options: ["Security posture scoring", "Vulnerability trends", "Incident response metrics", "Compliance metrics", "None"]
+      help_text: "Security metrics enable data-driven security decision making."
+      related_branch: "Monitoring"
+    - id: "webapp_advanced_secrets_security"
+      question: "What advanced secrets security measures are implemented?"
+      type: "multiple_choice"
+      options: ["Secret rotation automation", "Just-in-time secrets", "Secret usage monitoring", "Zero-knowledge architectures", "None"]
+      help_text: "Advanced secrets security minimizes credential exposure and compromise impact."
+      related_branch: "SecretsManagement"
+    - id: "webapp_resilience_security"
+      question: "How is security resilience implemented?"
+      type: "single_choice"
+      options: ["Chaos engineering for security", "Failure mode analysis", "Basic resilience testing", "No resilience measures", "Unknown"]
+      help_text: "Security resilience ensures the application maintains security under adverse conditions."
+      related_branch: "Resilience"
+    - id: "webapp_advanced_access_controls"
+      question: "What advanced access control mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["Attribute-based access control", "Dynamic permissions", "Context-aware access", "Time-based access", "None"]
+      help_text: "Advanced access controls provide fine-grained authorization based on multiple factors."
+      related_branch: "Authorization"
+    - id: "webapp_security_culture_integration"
+      question: "How is security culture promoted in the development team?"
+      type: "single_choice"
+      options: ["Security champions program", "Regular security training", "Basic security awareness", "No security culture", "Unknown"]
+      help_text: "Security culture ensures developers understand and implement security best practices."
+      related_branch: "SecurityCulture"
+    - id: "webapp_advanced_testing_automation"
+      question: "What advanced security testing automation is implemented?"
+      type: "multiple_choice"
+      options: ["Continuous security testing", "Security regression testing", "Chaos security testing", "Automated penetration testing", "None"]
+      help_text: "Advanced testing automation ensures comprehensive security validation."
+      related_branch: "VulnerabilityScanning"
+    - id: "webapp_future_security_roadmap"
+      question: "Is there a future security roadmap for this application?"
+      type: "single_choice"
+      options: ["Comprehensive security roadmap", "Technology evolution planning", "Basic security planning", "No roadmap", "Unknown"]
+      help_text: "Future security roadmap ensures preparedness for evolving threats and technologies."
+      related_branch: "SecurityCulture"
+    - id: "webapp_regulatory_compliance_integration"
+      question: "How is multi-regulatory compliance managed?"
+      type: "single_choice"
+      options: ["Unified compliance framework", "Framework-specific controls", "Basic compliance", "No compliance management", "Unknown"]
+      help_text: "Multi-regulatory compliance ensures adherence to all applicable requirements."
+      related_branch: "Compliance"
+    - id: "webapp_advanced_forensics_capability"
+      question: "What advanced forensics capabilities are available?"
+      type: "multiple_choice"
+      options: ["Application-level forensics", "User behavior forensics", "Code execution tracing", "Timeline reconstruction", "None"]
+      help_text: "Advanced forensics capabilities enable detailed incident investigation."
+      related_branch: "IncidentResponse"
+
+dependencies:
+  webapp_api_enabled: "API"
+  webapp_database_connection: "Database"
+  webapp_authentication_sso: "SSO"
+
+threat_intelligence:
+  cve_count: 180
+  recent_threats: ["SQL Injection", "Cross-Site Scripting", "Authentication Bypass", "CSRF", "Insecure Deserialization"]
+  attack_vectors: ["Web Application Attacks", "Injection Flaws", "Broken Authentication", "Security Misconfigurations"]
+  mitre_techniques: ["T1190", "T1059", "T1078", "T1505", "T1562"]
+  threat_actors: ["Cybercriminals", "Script Kiddies", "APT Groups", "Insider Threats"]
+
+risk_factors:
+  no_authentication: 4.5
+  weak_input_validation: 4.0
+  no_https: 3.5
+  poor_session_management: 3.8
+  no_error_handling: 2.5
+  missing_security_headers: 3.0
+  no_logging: 2.0
