@@ -1,0 +1,318 @@
+node_type: "Control" 
+node_subtype: "LoadBalancer"
+category: "Network Infrastructure"
+description: "Application Load Balancer or Network Load Balancer"
+required_branches:
+  - "LoadBalancer"
+  - "NetworkSecurity"
+  - "Monitoring"
+  - "Encryption"
+  - "AccessControl"
+
+questionnaires:
+  basic:
+    - id: "lb_type"
+      question: "What type of load balancer is deployed?"
+      type: "single_choice"
+      options: ["Application Load Balancer (ALB)", "Network Load Balancer (NLB)", "Classic Load Balancer", "Third-party load balancer", "Unknown"]
+      help_text: "Different load balancer types provide varying security features and capabilities."
+      related_branch: "LoadBalancer"
+    - id: "lb_internet_facing"
+      question: "Is the load balancer internet-facing or internal?"
+      type: "single_choice"
+      options: ["Internal only", "Internet-facing with restrictions", "Fully public", "Unknown"]
+      help_text: "Internet-facing load balancers increase attack surface and require additional security."
+      related_branch: "NetworkSecurity"
+    - id: "lb_ssl_termination"
+      question: "How is SSL/TLS termination configured?"
+      type: "single_choice"
+      options: ["SSL termination with strong ciphers", "Basic SSL termination", "No SSL termination", "Unknown"]
+      help_text: "SSL termination provides encryption for client connections."
+      related_branch: "Encryption"
+    - id: "lb_health_checks"
+      question: "How are health checks configured?"
+      type: "single_choice"
+      options: ["Comprehensive health checks", "Basic health checks", "No health checks", "Unknown"]
+      help_text: "Health checks ensure traffic is only routed to healthy backend instances."
+      related_branch: "LoadBalancer"
+    - id: "lb_logging"
+      question: "Is access logging enabled?"
+      type: "single_choice"
+      options: ["Comprehensive access logging", "Basic logging", "No logging", "Unknown"]
+      help_text: "Access logs provide visibility into load balancer traffic for security monitoring."
+      related_branch: "Monitoring"
+
+  advanced:
+    - id: "lb_waf_integration"
+      question: "Is a Web Application Firewall integrated?"
+      type: "single_choice"
+      options: ["WAF with custom rules", "Basic WAF protection", "No WAF integration", "Unknown"]
+      help_text: "WAF integration provides application-layer protection against attacks."
+      related_branch: "WAF"
+    - id: "lb_ddos_protection"
+      question: "What DDoS protection is implemented?"
+      type: "single_choice"
+      options: ["AWS Shield Advanced", "AWS Shield Standard", "Third-party DDoS protection", "No DDoS protection", "Unknown"]
+      help_text: "DDoS protection prevents availability attacks against the load balancer."
+      related_branch: "DDoSProtection"
+    - id: "lb_security_groups"
+      question: "How are security groups configured?"
+      type: "single_choice"
+      options: ["Least privilege security groups", "Standard security groups", "Default security groups", "Unknown"]
+      help_text: "Security groups control network access to the load balancer."
+      related_branch: "Firewall"
+    - id: "lb_target_group_health"
+      question: "How is target group health monitoring configured?"
+      type: "single_choice"
+      options: ["Advanced health monitoring", "Standard health checks", "Basic health checks", "Unknown"]
+      help_text: "Target group monitoring ensures backend availability and security."
+      related_branch: "Monitoring"
+    - id: "lb_sticky_sessions"
+      question: "How are sticky sessions configured for security?"
+      type: "single_choice"
+      options: ["Secure cookie-based stickiness", "IP-based stickiness", "No sticky sessions", "Unknown"]
+      help_text: "Sticky session configuration affects session security and load distribution."
+      related_branch: "LoadBalancer"
+    - id: "lb_cross_zone_balancing"
+      question: "Is cross-zone load balancing enabled?"
+      type: "single_choice"
+      options: ["Cross-zone balancing enabled", "Single-zone balancing", "Unknown"]
+      help_text: "Cross-zone balancing improves availability and resilience."
+      related_branch: "LoadBalancer"
+    - id: "lb_connection_draining"
+      question: "Is connection draining configured?"
+      type: "single_choice"
+      options: ["Connection draining with timeout", "Basic connection handling", "No connection draining", "Unknown"]
+      help_text: "Connection draining ensures graceful handling of backend changes."
+      related_branch: "LoadBalancer"
+    - id: "lb_idle_timeout"
+      question: "How is idle timeout configured?"
+      type: "single_choice"
+      options: ["Optimized idle timeout", "Standard timeout", "Default timeout", "Unknown"]
+      help_text: "Idle timeout configuration affects resource usage and connection security."
+      related_branch: "LoadBalancer"
+    - id: "lb_deletion_protection"
+      question: "Is deletion protection enabled?"
+      type: "single_choice"
+      options: ["Deletion protection enabled", "No deletion protection", "Unknown"]
+      help_text: "Deletion protection prevents accidental load balancer removal."
+      related_branch: "AccessControl"
+    - id: "lb_monitoring_integration"
+      question: "What monitoring integration is configured?"
+      type: "multiple_choice"
+      options: ["CloudWatch metrics", "Custom metrics", "Third-party monitoring", "Alerting", "None"]
+      help_text: "Monitoring integration provides visibility into load balancer performance and security."
+      related_branch: "Monitoring"
+    - id: "lb_certificate_management"
+      question: "How are SSL certificates managed?"
+      type: "single_choice"
+      options: ["ACM with auto-renewal", "Manual certificate management", "Self-signed certificates", "Unknown"]
+      help_text: "Proper certificate management ensures secure and valid SSL/TLS connections."
+      related_branch: "CertificateManager"
+    - id: "lb_routing_rules"
+      question: "How are routing rules configured for security?"
+      type: "single_choice"
+      options: ["Security-focused routing rules", "Standard routing", "Basic routing", "Unknown"]
+      help_text: "Routing rules can be configured to enhance application security."
+      related_branch: "LoadBalancer"
+    - id: "lb_backend_authentication"
+      question: "How is backend authentication configured?"
+      type: "single_choice"
+      options: ["Mutual TLS authentication", "Basic authentication", "No backend authentication", "Unknown"]
+      help_text: "Backend authentication ensures secure communication with target instances."
+      related_branch: "Authentication"
+    - id: "lb_geolocation_routing"
+      question: "Is geolocation-based routing implemented?"
+      type: "single_choice"
+      options: ["Geolocation routing with restrictions", "Basic geolocation", "No geolocation routing", "Unknown"]
+      help_text: "Geolocation routing can help block traffic from high-risk regions."
+      related_branch: "LoadBalancer"
+    - id: "lb_rate_limiting"
+      question: "Is rate limiting implemented at the load balancer?"
+      type: "single_choice"
+      options: ["Comprehensive rate limiting", "Basic rate limiting", "No rate limiting", "Unknown"]
+      help_text: "Rate limiting prevents abuse and resource exhaustion attacks."
+      related_branch: "RateLimiting"
+    - id: "lb_protocol_security"
+      question: "What protocol security is enforced?"
+      type: "single_choice"
+      options: ["HTTPS only with HSTS", "HTTPS preferred", "HTTP allowed", "Unknown"]
+      help_text: "Protocol security ensures encrypted communication with clients."
+      related_branch: "Encryption"
+    - id: "lb_desync_protection"
+      question: "Is HTTP desync protection enabled?"
+      type: "single_choice"
+      options: ["Strict desync protection", "Defensive protection", "No desync protection", "Unknown"]
+      help_text: "Desync protection prevents HTTP request smuggling attacks."
+      related_branch: "LoadBalancer"
+
+  expert:
+    - id: "lb_zero_trust_implementation"
+      question: "How is zero trust implemented for load balancing?"
+      type: "single_choice"
+      options: ["Full zero trust with identity verification", "Partial zero trust", "Traditional load balancing", "Unknown"]
+      help_text: "Zero trust load balancing verifies every connection regardless of source."
+      related_branch: "AccessControl"
+    - id: "lb_advanced_threat_protection"
+      question: "What advanced threat protection is implemented?"
+      type: "multiple_choice"
+      options: ["ML-based threat detection", "Behavioral analysis", "IP reputation filtering", "Bot protection", "None"]
+      help_text: "Advanced threat protection detects sophisticated attacks on load balancers."
+      related_branch: "Monitoring"
+    - id: "lb_supply_chain_security"
+      question: "How is load balancer supply chain security managed?"
+      type: "single_choice"
+      options: ["Comprehensive supply chain validation", "Basic security checks", "No supply chain security", "Unknown"]
+      help_text: "Supply chain security ensures integrity of load balancer components."
+      related_branch: "SupplyChain"
+    - id: "lb_quantum_safe_encryption"
+      question: "Is quantum-safe encryption implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum-resistant protocols", "Classical encryption", "Unknown"]
+      help_text: "Quantum-safe encryption prepares for future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "lb_incident_response_automation"
+      question: "How is incident response automated for load balancers?"
+      type: "single_choice"
+      options: ["Automated response playbooks", "Semi-automated response", "Manual incident response", "Unknown"]
+      help_text: "Automated incident response enables rapid mitigation of load balancer threats."
+      related_branch: "IncidentResponse"
+    - id: "lb_behavioral_analytics"
+      question: "Are behavioral analytics applied to load balancer traffic?"
+      type: "single_choice"
+      options: ["AI-powered behavioral analysis", "Basic anomaly detection", "No behavioral analytics", "Unknown"]
+      help_text: "Behavioral analytics detect unusual traffic patterns that may indicate attacks."
+      related_branch: "Monitoring"
+    - id: "lb_compliance_automation"
+      question: "How is compliance automated for load balancers?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance checks", "Manual compliance", "Unknown"]
+      help_text: "Automated compliance ensures load balancer configurations meet requirements."
+      related_branch: "Compliance"
+    - id: "lb_forensic_capabilities"
+      question: "What forensic capabilities are available?"
+      type: "multiple_choice"
+      options: ["Traffic analysis", "Connection tracking", "Request reconstruction", "Evidence preservation", "None"]
+      help_text: "Forensic capabilities enable investigation of load balancer security incidents."
+      related_branch: "IncidentResponse"
+    - id: "lb_advanced_logging_analysis"
+      question: "What advanced logging analysis is performed?"
+      type: "single_choice"
+      options: ["AI-powered log analysis", "Pattern recognition", "Basic log review", "No analysis", "Unknown"]
+      help_text: "Advanced logging analysis identifies sophisticated attack patterns."
+      related_branch: "Monitoring"
+    - id: "lb_threat_intelligence_integration"
+      question: "How is threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Real-time threat intelligence feeds", "Periodic threat updates", "No threat intelligence", "Unknown"]
+      help_text: "Threat intelligence provides context for load balancer security events."
+      related_branch: "Monitoring"
+    - id: "lb_advanced_monitoring_correlation"
+      question: "How is advanced monitoring correlation implemented?"
+      type: "single_choice"
+      options: ["Cross-service correlation", "Load balancer-specific monitoring", "Basic monitoring", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive load balancer security visibility."
+      related_branch: "Monitoring"
+    - id: "lb_chaos_engineering"
+      question: "Is chaos engineering applied to load balancer security?"
+      type: "single_choice"
+      options: ["Security-focused chaos engineering", "Basic chaos testing", "No chaos engineering", "Unknown"]
+      help_text: "Chaos engineering validates load balancer resilience under attack conditions."
+      related_branch: "IncidentResponse"
+    - id: "lb_multi_region_security"
+      question: "How is multi-region load balancing secured?"
+      type: "single_choice"
+      options: ["Unified multi-region security", "Region-specific security", "Single region only", "Unknown"]
+      help_text: "Multi-region security provides consistent protection across regions."
+      related_branch: "LoadBalancer"
+    - id: "lb_api_security_integration"
+      question: "How is API security integrated with load balancing?"
+      type: "single_choice"
+      options: ["API-specific security controls", "Standard web protection", "No API-specific security", "Unknown"]
+      help_text: "API security integration provides specialized protection for API traffic."
+      related_branch: "API"
+    - id: "lb_performance_security_balance"
+      question: "How is performance-security balance optimized?"
+      type: "single_choice"
+      options: ["Dynamic optimization", "Security-first approach", "Performance-first approach", "Unknown"]
+      help_text: "Performance-security balance ensures protection without impacting user experience."
+      related_branch: "LoadBalancer"
+    - id: "lb_container_orchestration_integration"
+      question: "How is load balancer integrated with container orchestration?"
+      type: "single_choice"
+      options: ["Secure container integration", "Basic container support", "No container integration", "Unknown"]
+      help_text: "Container integration provides secure load balancing for containerized applications."
+      related_branch: "ContainerOrchestration"
+    - id: "lb_edge_security_integration"
+      question: "How is edge security integrated?"
+      type: "single_choice"
+      options: ["Integrated edge security", "Separate edge controls", "No edge integration", "Unknown"]
+      help_text: "Edge integration provides comprehensive protection from edge to backend."
+      related_branch: "CDN"
+    - id: "lb_cost_security_optimization"
+      question: "How is cost-security optimization balanced?"
+      type: "single_choice"
+      options: ["Optimized balance", "Security-focused", "Cost-focused", "Unknown"]
+      help_text: "Cost-security optimization ensures efficient resource utilization."
+      related_branch: "Compliance"
+    - id: "lb_future_security_roadmap"
+      question: "Is there a future load balancer security roadmap?"
+      type: "single_choice"
+      options: ["Comprehensive roadmap", "Basic planning", "No roadmap", "Unknown"]
+      help_text: "Security roadmap ensures preparedness for evolving load balancer threats."
+      related_branch: "LoadBalancer"
+    - id: "lb_privacy_protection"
+      question: "How is privacy protection implemented?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Basic data protection", "No privacy measures", "Unknown"]
+      help_text: "Privacy protection ensures load balancer operations don't compromise user privacy."
+      related_branch: "DataClassification"
+    - id: "lb_automated_scaling_security"
+      question: "How is automated scaling secured?"
+      type: "single_choice"
+      options: ["Secure auto-scaling policies", "Basic auto-scaling", "Manual scaling", "Unknown"]
+      help_text: "Secure auto-scaling prevents resource exhaustion attacks."
+      related_branch: "LoadBalancer"
+    - id: "lb_third_party_integration_security"
+      question: "How are third-party integrations secured?"
+      type: "single_choice"
+      options: ["Comprehensive third-party security", "Basic integration security", "No specific security", "Unknown"]
+      help_text: "Third-party integration security prevents supply chain compromises."
+      related_branch: "SupplyChain"
+    - id: "lb_security_orchestration"
+      question: "How is security orchestration implemented?"
+      type: "single_choice"
+      options: ["Automated orchestration", "Semi-automated", "Manual processes", "Unknown"]
+      help_text: "Security orchestration enables coordinated response to load balancer threats."
+      related_branch: "IncidentResponse"
+    - id: "lb_continuous_security_testing"
+      question: "How is continuous security testing implemented?"
+      type: "single_choice"
+      options: ["Automated security testing", "Regular manual testing", "Ad-hoc testing", "Unknown"]
+      help_text: "Continuous testing validates load balancer security controls."
+      related_branch: "VulnerabilityScanning"
+    - id: "lb_security_culture_integration"
+      question: "How is security culture promoted for load balancer management?"
+      type: "single_choice"
+      options: ["Comprehensive training", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Security culture ensures teams understand load balancer security best practices."
+      related_branch: "Compliance"
+
+dependencies:
+  lb_waf_integration: "WAF"
+  lb_ssl_certificates: "CertificateManager"
+  lb_monitoring_enabled: "Monitoring"
+
+threat_intelligence:
+  cve_count: 45
+  recent_threats: ["DDoS Attacks", "SSL Stripping", "HTTP Request Smuggling"]
+  attack_vectors: ["Volume-based DDoS", "Application Layer Attacks", "Protocol Exploitation"]
+  mitre_techniques: ["T1498", "T1499", "T1190", "T1565"]
+  threat_actors: ["Botnets", "Cybercriminals", "APT Groups"]
+
+risk_factors:
+  internet_facing: 2.5
+  no_waf_protection: 3.0
+  weak_ssl_configuration: 2.5
+  no_ddos_protection: 3.5
+  default_security_groups: 2.0

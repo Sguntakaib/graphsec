@@ -1,0 +1,318 @@
+node_type: "Control"
+node_subtype: "IAM"
+category: "Security Services"
+description: "AWS Identity and Access Management"
+required_branches:
+  - "IAM"
+  - "Authentication"
+  - "Authorization"
+  - "AccessControl"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "iam_root_account_usage"
+      question: "How is the root account secured?"
+      type: "single_choice"
+      options: ["MFA enabled, unused", "MFA enabled, limited use", "No MFA", "Unknown"]
+      help_text: "Root account should have MFA enabled and be used minimally."
+      related_branch: "Authentication"
+    - id: "iam_mfa_enforcement"
+      question: "Is MFA enforced for users?"
+      type: "single_choice"
+      options: ["MFA required for all users", "MFA for privileged users", "MFA optional", "No MFA", "Unknown"]
+      help_text: "MFA provides additional security for user authentication."
+      related_branch: "MFA"
+    - id: "iam_password_policy"
+      question: "What password policy is configured?"
+      type: "single_choice"
+      options: ["Strong policy (complexity + rotation)", "Standard policy", "Weak policy", "No password policy", "Unknown"]
+      help_text: "Strong password policies prevent weak credential attacks."
+      related_branch: "AccessControl"
+    - id: "iam_user_groups"
+      question: "How are users organized into groups?"
+      type: "single_choice"
+      options: ["Role-based groups", "Department-based groups", "Mixed organization", "No groups used", "Unknown"]
+      help_text: "User groups simplify permission management and enforce least privilege."
+      related_branch: "Authorization"
+    - id: "iam_access_keys"
+      question: "How are programmatic access keys managed?"
+      type: "single_choice"
+      options: ["Regular rotation", "Monitored usage", "Basic management", "No key management", "Unknown"]
+      help_text: "Access key management prevents credential compromise."
+      related_branch: "AccessControl"
+
+  advanced:
+    - id: "iam_roles_instead_users"
+      question: "Are IAM roles used instead of users where possible?"
+      type: "single_choice"
+      options: ["Roles for all services", "Mixed roles and users", "Primarily users", "Unknown"]
+      help_text: "IAM roles provide temporary credentials and better security than permanent user credentials."
+      related_branch: "IAM"
+    - id: "iam_least_privilege"
+      question: "How is least privilege enforced?"
+      type: "single_choice"
+      options: ["Comprehensive least privilege", "Basic permission restrictions", "Broad permissions", "Unknown"]
+      help_text: "Least privilege limits access to only what's necessary for each user or service."
+      related_branch: "Authorization"
+    - id: "iam_permission_boundaries"
+      question: "Are permission boundaries implemented?"
+      type: "single_choice"
+      options: ["Permission boundaries for all roles", "Selective boundary usage", "No permission boundaries", "Unknown"]
+      help_text: "Permission boundaries set maximum permissions that IAM entities can have."
+      related_branch: "Authorization"
+    - id: "iam_access_analyzer"
+      question: "Is IAM Access Analyzer enabled?"
+      type: "single_choice"
+      options: ["Access Analyzer with findings review", "Basic Access Analyzer", "Not enabled", "Unknown"]
+      help_text: "Access Analyzer identifies resources shared with external entities."
+      related_branch: "Monitoring"
+    - id: "iam_cloudtrail_integration"
+      question: "Is CloudTrail logging IAM activities?"
+      type: "single_choice"
+      options: ["Comprehensive IAM logging", "Basic IAM events", "No IAM logging", "Unknown"]
+      help_text: "CloudTrail provides audit trails for IAM activities."
+      related_branch: "Monitoring"
+    - id: "iam_identity_providers"
+      question: "Are external identity providers integrated?"
+      type: "single_choice"
+      options: ["SAML/OIDC identity providers", "Basic external integration", "No external providers", "Unknown"]
+      help_text: "External identity providers enable centralized identity management."
+      related_branch: "SSO"
+    - id: "iam_service_linked_roles"
+      question: "Are service-linked roles used appropriately?"
+      type: "single_choice"
+      options: ["Service-linked roles where available", "Mixed usage", "Manual role creation", "Unknown"]
+      help_text: "Service-linked roles provide pre-defined permissions for AWS services."
+      related_branch: "IAM"
+    - id: "iam_cross_account_access"
+      question: "How is cross-account access managed?"
+      type: "single_choice"
+      options: ["Cross-account roles with conditions", "Basic cross-account setup", "No cross-account access", "Unknown"]
+      help_text: "Cross-account access should use roles with appropriate conditions."
+      related_branch: "AccessControl"
+    - id: "iam_policy_validation"
+      question: "Are IAM policies validated before deployment?"
+      type: "single_choice"
+      options: ["Automated policy validation", "Manual policy review", "No validation", "Unknown"]
+      help_text: "Policy validation prevents overly permissive or malformed policies."
+      related_branch: "IAM"
+    - id: "iam_temporary_credentials"
+      question: "How are temporary credentials managed?"
+      type: "single_choice"
+      options: ["STS with short durations", "Standard STS usage", "Long-lived credentials", "Unknown"]
+      help_text: "Temporary credentials reduce the risk of credential compromise."
+      related_branch: "Authentication"
+    - id: "iam_unused_access_removal"
+      question: "How are unused access permissions identified and removed?"
+      type: "single_choice"
+      options: ["Automated access review", "Regular manual review", "No access review", "Unknown"]
+      help_text: "Regular access review removes unnecessary permissions and reduces attack surface."
+      related_branch: "AccessControl"
+    - id: "iam_condition_keys"
+      question: "Are condition keys used in policies for enhanced security?"
+      type: "single_choice"
+      options: ["Comprehensive condition usage", "Basic conditions", "No conditions", "Unknown"]
+      help_text: "Condition keys provide fine-grained access control based on context."
+      related_branch: "Authorization"
+    - id: "iam_resource_based_policies"
+      question: "How are resource-based policies managed?"
+      type: "single_choice"
+      options: ["Consistent resource policies", "Ad-hoc resource policies", "No resource policies", "Unknown"]
+      help_text: "Resource-based policies control access at the resource level."
+      related_branch: "Authorization"
+    - id: "iam_session_policies"
+      question: "Are session policies used for temporary access?"
+      type: "single_choice"
+      options: ["Session policies for specific cases", "Standard session management", "No session policies", "Unknown"]
+      help_text: "Session policies provide additional restrictions for temporary sessions."
+      related_branch: "Authorization"
+    - id: "iam_external_id_usage"
+      question: "Is external ID used for cross-account role assumptions?"
+      type: "single_choice"
+      options: ["External ID for all cross-account roles", "Selective external ID usage", "No external ID", "Unknown"]
+      help_text: "External ID prevents confused deputy attacks in cross-account scenarios."
+      related_branch: "AccessControl"
+    - id: "iam_policy_simulator"
+      question: "Is IAM Policy Simulator used for testing?"
+      type: "single_choice"
+      options: ["Regular policy simulation", "Occasional testing", "No policy simulation", "Unknown"]
+      help_text: "Policy Simulator helps validate policy effectiveness before deployment."
+      related_branch: "IAM"
+    - id: "iam_access_keys_rotation"
+      question: "How frequently are access keys rotated?"
+      type: "single_choice"
+      options: ["Automated rotation (90 days)", "Manual rotation (quarterly)", "Annual rotation", "No rotation", "Unknown"]
+      help_text: "Regular key rotation limits the impact of compromised credentials."
+      related_branch: "AccessControl"
+
+  expert:
+    - id: "iam_zero_trust_implementation"
+      question: "How is zero trust implemented in IAM?"
+      type: "single_choice"
+      options: ["Full zero trust identity model", "Partial zero trust", "Traditional access model", "Unknown"]
+      help_text: "Zero trust IAM assumes no implicit trust and verifies every access request."
+      related_branch: "AccessControl"
+    - id: "iam_privileged_access_management"
+      question: "What privileged access management (PAM) is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive PAM solution", "Basic privileged access controls", "No PAM", "Unknown"]
+      help_text: "PAM provides enhanced security for high-privilege accounts."
+      related_branch: "AccessControl"
+    - id: "iam_identity_governance"
+      question: "How is identity governance implemented?"
+      type: "single_choice"
+      options: ["Automated identity lifecycle", "Manual identity management", "No identity governance", "Unknown"]
+      help_text: "Identity governance ensures proper provisioning and de-provisioning of access."
+      related_branch: "AccessControl"
+    - id: "iam_risk_based_authentication"
+      question: "Is risk-based authentication implemented?"
+      type: "single_choice"
+      options: ["Comprehensive risk assessment", "Basic risk factors", "No risk-based auth", "Unknown"]
+      help_text: "Risk-based authentication adapts security requirements based on context."
+      related_branch: "Authentication"
+    - id: "iam_behavioral_analytics"
+      question: "Are behavioral analytics applied to IAM activities?"
+      type: "single_choice"
+      options: ["AI-powered behavioral analysis", "Basic anomaly detection", "No behavioral analytics", "Unknown"]
+      help_text: "Behavioral analytics detect unusual access patterns that may indicate compromise."
+      related_branch: "Monitoring"
+    - id: "iam_just_in_time_access"
+      question: "Is just-in-time (JIT) access implemented?"
+      type: "single_choice"
+      options: ["Comprehensive JIT access", "Limited JIT implementation", "No JIT access", "Unknown"]
+      help_text: "JIT access provides temporary elevated permissions when needed."
+      related_branch: "AccessControl"
+    - id: "iam_continuous_compliance"
+      question: "How is continuous compliance monitoring implemented?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance checks", "Manual compliance", "Unknown"]
+      help_text: "Continuous compliance ensures IAM configurations meet regulatory requirements."
+      related_branch: "Compliance"
+    - id: "iam_threat_intelligence_integration"
+      question: "How is threat intelligence integrated with IAM?"
+      type: "single_choice"
+      options: ["Real-time threat intelligence", "Periodic threat updates", "No threat integration", "Unknown"]
+      help_text: "Threat intelligence helps identify compromised identities and malicious activities."
+      related_branch: "Monitoring"
+    - id: "iam_quantum_safe_cryptography"
+      question: "Is quantum-safe cryptography implemented for IAM?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum-resistant protocols", "Classical cryptography", "Unknown"]
+      help_text: "Quantum-safe cryptography prepares IAM for future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "iam_supply_chain_identity"
+      question: "How is supply chain identity security managed?"
+      type: "single_choice"
+      options: ["Comprehensive supply chain identity", "Basic vendor access", "No supply chain security", "Unknown"]
+      help_text: "Supply chain identity security manages third-party access to systems."
+      related_branch: "SupplyChain"
+    - id: "iam_incident_response_automation"
+      question: "How is IAM incident response automated?"
+      type: "single_choice"
+      options: ["Automated incident response", "Semi-automated response", "Manual response", "Unknown"]
+      help_text: "Automated incident response enables rapid containment of identity-related threats."
+      related_branch: "IncidentResponse"
+    - id: "iam_identity_federation_security"
+      question: "How is identity federation security implemented?"
+      type: "single_choice"
+      options: ["Secure federation protocols", "Basic federation", "No federation", "Unknown"]
+      help_text: "Secure identity federation ensures trusted identity provider integration."
+      related_branch: "SSO"
+    - id: "iam_machine_identity_management"
+      question: "How are machine identities managed?"
+      type: "single_choice"
+      options: ["Comprehensive machine identity management", "Basic service accounts", "No machine identity strategy", "Unknown"]
+      help_text: "Machine identity management secures non-human identities like services and applications."
+      related_branch: "IAM"
+    - id: "iam_access_certification"
+      question: "How is access certification implemented?"
+      type: "single_choice"
+      options: ["Automated access certification", "Manual access reviews", "No access certification", "Unknown"]
+      help_text: "Access certification ensures access rights remain appropriate over time."
+      related_branch: "AccessControl"
+    - id: "iam_identity_analytics"
+      question: "What identity analytics are implemented?"
+      type: "multiple_choice"
+      options: ["User behavior analytics", "Access pattern analysis", "Privilege escalation detection", "Identity risk scoring", "None"]
+      help_text: "Identity analytics provide insights into identity-related security risks."
+      related_branch: "Monitoring"
+    - id: "iam_privacy_protection"
+      question: "How is privacy protection implemented in IAM?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Basic data protection", "No privacy features", "Unknown"]
+      help_text: "Privacy protection ensures IAM systems don't compromise user privacy."
+      related_branch: "DataClassification"
+    - id: "iam_cross_cloud_identity"
+      question: "How is cross-cloud identity management implemented?"
+      type: "single_choice"
+      options: ["Unified cross-cloud identity", "Cloud-specific identities", "Single cloud only", "Unknown"]
+      help_text: "Cross-cloud identity management provides consistent access across multiple cloud platforms."
+      related_branch: "IAM"
+    - id: "iam_devsecops_integration"
+      question: "How is IAM integrated into DevSecOps processes?"
+      type: "single_choice"
+      options: ["Full DevSecOps integration", "Partial automation", "Manual IAM management", "Unknown"]
+      help_text: "DevSecOps integration ensures identity security is built into development workflows."
+      related_branch: "CICDSecurity"
+    - id: "iam_identity_orchestration"
+      question: "How is identity orchestration implemented?"
+      type: "single_choice"
+      options: ["Automated identity orchestration", "Semi-automated processes", "Manual identity management", "Unknown"]
+      help_text: "Identity orchestration automates identity lifecycle management across systems."
+      related_branch: "IAM"
+    - id: "iam_adaptive_authentication"
+      question: "Is adaptive authentication implemented?"
+      type: "single_choice"
+      options: ["Context-aware adaptive auth", "Basic adaptive features", "Static authentication", "Unknown"]
+      help_text: "Adaptive authentication adjusts security requirements based on risk context."
+      related_branch: "Authentication"
+    - id: "iam_identity_threat_hunting"
+      question: "How is identity threat hunting implemented?"
+      type: "single_choice"
+      options: ["Proactive identity threat hunting", "Reactive investigation", "No threat hunting", "Unknown"]
+      help_text: "Identity threat hunting proactively searches for identity-related threats."
+      related_branch: "Monitoring"
+    - id: "iam_business_continuity"
+      question: "How is identity integrated with business continuity?"
+      type: "single_choice" 
+      options: ["Identity disaster recovery", "Basic backup procedures", "No identity BCP", "Unknown"]
+      help_text: "Identity business continuity ensures access during disasters and outages."
+      related_branch: "Backup"
+    - id: "iam_regulatory_compliance_automation"
+      question: "How is regulatory compliance automated for IAM?"
+      type: "single_choice"
+      options: ["Automated compliance monitoring", "Regular compliance reviews", "Manual compliance", "Unknown"]
+      help_text: "Automated compliance ensures IAM meets regulatory requirements continuously."
+      related_branch: "Compliance"
+    - id: "iam_future_identity_roadmap"
+      question: "Is there a future identity roadmap?"
+      type: "single_choice"
+      options: ["Comprehensive identity roadmap", "Basic planning", "No roadmap", "Unknown"]
+      help_text: "Future identity roadmap ensures preparedness for evolving identity threats."
+      related_branch: "IAM"
+    - id: "iam_security_culture_integration"
+      question: "How is security culture promoted around identity management?"
+      type: "single_choice"
+      options: ["Comprehensive training", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Security culture ensures teams understand identity security best practices."
+      related_branch: "Compliance"
+
+dependencies:
+  iam_cloudtrail_logging: "CloudTrail"
+  iam_mfa_enabled: "MFA"
+  iam_external_providers: "SSO"
+
+threat_intelligence:
+  cve_count: 60
+  recent_threats: ["Credential Stuffing", "Privilege Escalation", "Account Takeover"]
+  attack_vectors: ["Stolen Credentials", "Social Engineering", "Insider Threats"]
+  mitre_techniques: ["T1078", "T1110", "T1484", "T1098"]
+  threat_actors: ["Cybercriminals", "APT Groups", "Insider Threats"]
+
+risk_factors:
+  no_mfa: 4.0
+  weak_passwords: 3.5
+  overprivileged_users: 3.0
+  no_key_rotation: 2.5
+  shared_accounts: 4.5

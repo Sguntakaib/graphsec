@@ -1,0 +1,324 @@
+node_type: "Asset"
+node_subtype: "CICD"
+category: "DevOps Infrastructure"
+description: "Continuous Integration/Continuous Deployment Pipeline"
+required_branches:
+  - "CICDSecurity"
+  - "SupplyChain"
+  - "SecretsManagement"
+  - "AccessControl"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "cicd_platform_type"
+      question: "What CI/CD platform is used?"
+      type: "single_choice"
+      options: ["Jenkins", "GitHub Actions", "GitLab CI", "AWS CodePipeline", "Azure DevOps", "Other", "Unknown"]
+      help_text: "Different CI/CD platforms have varying security features and considerations."
+      related_branch: "CICDSecurity"
+    - id: "cicd_source_control_integration"
+      question: "How is source control integrated securely?"
+      type: "single_choice"
+      options: ["Secure Git integration with signing", "Basic Git integration", "Insecure integration", "Unknown"]
+      help_text: "Secure source control integration prevents code tampering."
+      related_branch: "SupplyChain"
+    - id: "cicd_secrets_management"
+      question: "How are secrets managed in pipelines?"
+      type: "single_choice"
+      options: ["External secrets management", "Platform-native secret store", "Environment variables", "Hardcoded secrets", "Unknown"]
+      help_text: "Proper secrets management prevents credential exposure in CI/CD."
+      related_branch: "SecretsManagement"
+    - id: "cicd_access_control"
+      question: "What access controls are implemented?"
+      type: "single_choice"
+      options: ["Role-based access with MFA", "Basic role-based access", "Shared accounts", "No access controls", "Unknown"]
+      help_text: "Access controls determine who can modify and execute pipelines."
+      related_branch: "AccessControl"
+    - id: "cicd_build_isolation"
+      question: "How are builds isolated?"
+      type: "single_choice"
+      options: ["Containerized builds", "VM-based isolation", "Shared build environments", "Unknown"]
+      help_text: "Build isolation prevents cross-contamination between different projects."
+      related_branch: "CICDSecurity"
+
+  advanced:
+    - id: "cicd_code_scanning"
+      question: "What code scanning is integrated into pipelines?"
+      type: "multiple_choice"
+      options: ["SAST", "DAST", "Dependency scanning", "Container scanning", "License compliance", "None"]
+      help_text: "Code scanning detects security vulnerabilities early in development."
+      related_branch: "VulnerabilityScanning"
+    - id: "cicd_artifact_signing"
+      question: "Are build artifacts signed?"
+      type: "single_choice"
+      options: ["Cryptographic signing with verification", "Basic artifact integrity", "No artifact signing", "Unknown"]
+      help_text: "Artifact signing ensures integrity and authenticity of build outputs."
+      related_branch: "SupplyChain"
+    - id: "cicd_pipeline_as_code"
+      question: "Are pipelines defined as code?"
+      type: "single_choice"
+      options: ["Version-controlled pipeline definitions", "GUI-configured pipelines", "Mixed approach", "Unknown"]
+      help_text: "Pipeline as code enables version control and review of build processes."
+      related_branch: "CICDSecurity"
+    - id: "cicd_deployment_approvals"
+      question: "What approval processes are implemented?"
+      type: "single_choice"
+      options: ["Multi-stage approvals with segregation", "Basic approvals", "Automated deployments", "Unknown"]
+      help_text: "Approval processes ensure proper review before production deployments."
+      related_branch: "AccessControl"
+    - id: "cicd_environment_segregation"
+      question: "How are deployment environments segregated?"
+      type: "single_choice"
+      options: ["Strict environment isolation", "Basic environment separation", "Shared environments", "Unknown"]
+      help_text: "Environment segregation prevents accidental production deployments."
+      related_branch: "CICDSecurity"
+    - id: "cicd_vulnerability_gates"
+      question: "Are vulnerability gates implemented?"
+      type: "single_choice"
+      options: ["Automated gates with severity thresholds", "Manual vulnerability review", "No vulnerability gates", "Unknown"]
+      help_text: "Vulnerability gates prevent deployment of insecure code."
+      related_branch: "VulnerabilityScanning"
+    - id: "cicd_compliance_checks"
+      question: "Are compliance checks automated in pipelines?"
+      type: "single_choice"
+      options: ["Comprehensive compliance automation", "Basic compliance checks", "Manual compliance", "Unknown"]
+      help_text: "Automated compliance ensures adherence to regulatory requirements."
+      related_branch: "Compliance"
+    - id: "cicd_rollback_capabilities"
+      question: "What rollback capabilities are implemented?"
+      type: "single_choice"
+      options: ["Automated rollback with verification", "Manual rollback procedures", "No rollback capabilities", "Unknown"]
+      help_text: "Rollback capabilities enable quick recovery from failed deployments."
+      related_branch: "IncidentResponse"
+    - id: "cicd_testing_automation"
+      question: "What security testing is automated?"
+      type: "multiple_choice"
+      options: ["Unit tests", "Integration tests", "Security tests", "Performance tests", "None"]
+      help_text: "Automated testing ensures code quality and security before deployment."
+      related_branch: "CICDSecurity"
+    - id: "cicd_infrastructure_as_code"
+      question: "Is infrastructure as code integrated?"
+      type: "single_choice"
+      options: ["IaC with security scanning", "Basic IaC integration", "No IaC", "Unknown"]
+      help_text: "Infrastructure as code enables versioned and reviewable infrastructure changes."
+      related_branch: "CICDSecurity"
+    - id: "cicd_dependency_management"
+      question: "How are dependencies managed securely?"
+      type: "single_choice"
+      options: ["Dependency scanning and management", "Basic dependency tracking", "No dependency management", "Unknown"]
+      help_text: "Secure dependency management prevents supply chain attacks."
+      related_branch: "SupplyChain"
+    - id: "cicd_build_reproducibility"
+      question: "Are builds reproducible?"
+      type: "single_choice"
+      options: ["Fully reproducible builds", "Partially reproducible", "Non-reproducible builds", "Unknown"]
+      help_text: "Reproducible builds enable verification of build integrity."
+      related_branch: "SupplyChain"
+    - id: "cicd_logging_monitoring"
+      question: "What logging and monitoring is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive pipeline monitoring", "Basic logging", "No monitoring", "Unknown"]
+      help_text: "Pipeline monitoring provides visibility into build and deployment activities."
+      related_branch: "Monitoring"
+    - id: "cicd_branch_protection"
+      question: "How are critical branches protected?"
+      type: "single_choice"
+      options: ["Branch protection with required reviews", "Basic branch protection", "No branch protection", "Unknown"]
+      help_text: "Branch protection prevents unauthorized changes to critical code branches."
+      related_branch: "AccessControl"
+    - id: "cicd_container_registry_security"
+      question: "How is the container registry secured?"
+      type: "single_choice"
+      options: ["Private registry with scanning", "Basic registry security", "Public registry usage", "Unknown"]
+      help_text: "Secure registries prevent deployment of malicious or vulnerable images."
+      related_branch: "ContainerSecurity"
+    - id: "cicd_deployment_verification"
+      question: "How are deployments verified?"
+      type: "single_choice"
+      options: ["Automated deployment verification", "Manual verification", "No deployment verification", "Unknown"]
+      help_text: "Deployment verification ensures successful and secure deployments."
+      related_branch: "CICDSecurity"
+    - id: "cicd_backup_recovery"
+      question: "Are CI/CD configurations backed up?"
+      type: "single_choice"
+      options: ["Automated backup with recovery testing", "Basic backups", "No backups", "Unknown"]
+      help_text: "Backup and recovery ensure CI/CD availability during disasters."
+      related_branch: "Backup"
+
+  expert:
+    - id: "cicd_zero_trust_implementation"
+      question: "How is zero trust implemented in CI/CD?"
+      type: "single_choice"
+      options: ["Full zero trust pipeline security", "Partial zero trust", "Traditional pipeline security", "Unknown"]
+      help_text: "Zero trust CI/CD assumes no implicit trust in pipeline components."
+      related_branch: "CICDSecurity"
+    - id: "cicd_supply_chain_attestation"
+      question: "Is supply chain attestation implemented?"
+      type: "single_choice"
+      options: ["SLSA compliance with full attestation", "Basic attestation", "No attestation", "Unknown"]
+      help_text: "Supply chain attestation provides verifiable provenance of build artifacts."
+      related_branch: "SupplyChain"
+    - id: "cicd_threat_modeling"
+      question: "Has CI/CD threat modeling been performed?"
+      type: "single_choice"
+      options: ["Comprehensive CI/CD threat model", "Basic threat analysis", "No threat modeling", "Unknown"]
+      help_text: "Threat modeling identifies specific attack vectors in CI/CD pipelines."
+      related_branch: "CICDSecurity"
+    - id: "cicd_behavioral_analytics"
+      question: "Are behavioral analytics applied to CI/CD activities?"
+      type: "single_choice"
+      options: ["AI-powered behavioral analysis", "Basic anomaly detection", "No behavioral analytics", "Unknown"]
+      help_text: "Behavioral analytics detect unusual patterns in CI/CD usage."
+      related_branch: "Monitoring"
+    - id: "cicd_incident_response_automation"
+      question: "How is incident response automated for CI/CD?"
+      type: "single_choice"
+      options: ["Automated response playbooks", "Semi-automated response", "Manual incident response", "Unknown"]
+      help_text: "Automated incident response enables rapid containment of CI/CD threats."
+      related_branch: "IncidentResponse"
+    - id: "cicd_advanced_secrets_management"
+      question: "What advanced secrets management is implemented?"
+      type: "single_choice"
+      options: ["Dynamic secrets with rotation", "Static secrets with rotation", "Basic secrets management", "Unknown"]
+      help_text: "Advanced secrets management minimizes credential exposure in pipelines."
+      related_branch: "SecretsManagement"
+    - id: "cicd_quantum_safe_cryptography"
+      question: "Is quantum-safe cryptography implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum-resistant protocols", "Classical cryptography", "Unknown"]
+      help_text: "Quantum-safe cryptography prepares CI/CD for future quantum threats."
+      related_branch: "Encryption"
+    - id: "cicd_advanced_threat_detection"
+      question: "What advanced threat detection is deployed?"
+      type: "multiple_choice"
+      options: ["ML-based threat detection", "Behavioral analysis", "Signature-based detection", "Honeypots", "None"]
+      help_text: "Advanced threat detection identifies sophisticated attacks on CI/CD."
+      related_branch: "Monitoring"
+    - id: "cicd_forensic_capabilities"
+      question: "What forensic capabilities are available?"
+      type: "multiple_choice"
+      options: ["Build forensics", "Pipeline state reconstruction", "Timeline analysis", "Evidence preservation", "None"]
+      help_text: "Forensic capabilities enable investigation of CI/CD security incidents."
+      related_branch: "IncidentResponse"
+    - id: "cicd_compliance_automation_advanced"
+      question: "How is advanced compliance automation implemented?"
+      type: "single_choice"
+      options: ["Continuous compliance with attestation", "Regular compliance scans", "Manual compliance checks", "Unknown"]
+      help_text: "Advanced compliance automation ensures ongoing regulatory adherence."
+      related_branch: "Compliance"
+    - id: "cicd_policy_as_code"
+      question: "Is policy as code implemented for security?"
+      type: "single_choice"
+      options: ["Comprehensive policy as code", "Basic policy automation", "Manual policy management", "Unknown"]
+      help_text: "Policy as code ensures consistent security policy enforcement."
+      related_branch: "CICDSecurity"
+    - id: "cicd_immutable_infrastructure"
+      question: "Is immutable infrastructure implemented?"
+      type: "single_choice"
+      options: ["Fully immutable infrastructure", "Partially immutable", "Mutable infrastructure", "Unknown"]
+      help_text: "Immutable infrastructure reduces configuration drift and security risks."
+      related_branch: "CICDSecurity"
+    - id: "cicd_chaos_engineering_security"
+      question: "Is chaos engineering applied to security testing?"
+      type: "single_choice"
+      options: ["Security chaos engineering", "Basic chaos testing", "No chaos engineering", "Unknown"]
+      help_text: "Security chaos engineering validates resilience under attack conditions."
+      related_branch: "IncidentResponse"
+    - id: "cicd_ai_ml_integration"
+      question: "How is AI/ML integrated into CI/CD security?"
+      type: "single_choice"
+      options: ["AI-powered security automation", "Basic ML integration", "No AI/ML integration", "Unknown"]
+      help_text: "AI/ML integration enhances threat detection and security automation."
+      related_branch: "Monitoring"
+    - id: "cicd_privileged_access_management"
+      question: "How is privileged access managed in CI/CD?"
+      type: "single_choice"
+      options: ["Just-in-time privileged access", "Role-based privileged access", "No privileged access controls", "Unknown"]
+      help_text: "Privileged access management controls administrative access to CI/CD."
+      related_branch: "AccessControl"
+    - id: "cicd_threat_intelligence_integration"
+      question: "How is threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Real-time threat intelligence feeds", "Periodic threat updates", "No threat intelligence", "Unknown"]
+      help_text: "Threat intelligence provides context for CI/CD security events."
+      related_branch: "Monitoring"
+    - id: "cicd_advanced_monitoring_correlation"
+      question: "How is advanced monitoring correlation implemented?"
+      type: "single_choice"
+      options: ["Cross-pipeline correlation", "Single pipeline monitoring", "Basic monitoring", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive visibility across pipelines."
+      related_branch: "Monitoring"
+    - id: "cicd_multi_cloud_deployment_security"
+      question: "How is multi-cloud deployment security managed?"
+      type: "single_choice"
+      options: ["Unified multi-cloud security", "Cloud-specific security", "Single cloud only", "Unknown"]
+      help_text: "Multi-cloud security provides consistent protection across platforms."
+      related_branch: "CICDSecurity"
+    - id: "cicd_cost_security_optimization"
+      question: "How is cost-security optimization balanced?"
+      type: "single_choice"
+      options: ["Optimized balance", "Security-first approach", "Cost-first approach", "Unknown"]
+      help_text: "Cost-security optimization ensures efficient resource utilization."
+      related_branch: "Compliance"
+    - id: "cicd_future_security_roadmap"
+      question: "Is there a future CI/CD security roadmap?"
+      type: "single_choice"
+      options: ["Comprehensive roadmap", "Basic planning", "No roadmap", "Unknown"]
+      help_text: "Security roadmap ensures preparedness for evolving CI/CD threats."
+      related_branch: "CICDSecurity"
+    - id: "cicd_developer_security_training"
+      question: "How is developer security training integrated?"
+      type: "single_choice"
+      options: ["Comprehensive security training", "Basic awareness", "No specific training", "Unknown"]
+      help_text: "Developer training ensures secure coding practices in CI/CD."
+      related_branch: "Compliance"
+    - id: "cicd_security_culture_integration"
+      question: "How is security culture promoted in DevOps?"
+      type: "single_choice"
+      options: ["Comprehensive security culture", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Security culture ensures teams understand CI/CD security best practices."
+      related_branch: "Compliance"
+    - id: "cicd_continuous_security_improvement"
+      question: "How is continuous security improvement implemented?"
+      type: "single_choice"
+      options: ["Automated improvement cycles", "Regular security reviews", "Ad-hoc improvements", "Unknown"]
+      help_text: "Continuous improvement ensures CI/CD security evolves with threats."
+      related_branch: "CICDSecurity"
+    - id: "cicd_third_party_integration_security"
+      question: "How are third-party integrations secured?"
+      type: "single_choice"
+      options: ["Comprehensive third-party security", "Basic integration security", "No specific security", "Unknown"]
+      help_text: "Third-party integration security prevents supply chain compromises."
+      related_branch: "SupplyChain"
+    - id: "cicd_data_privacy_protection"
+      question: "How is data privacy protected in CI/CD?"
+      type: "single_choice"
+      options: ["Comprehensive privacy controls", "Basic data protection", "No privacy measures", "Unknown"]
+      help_text: "Privacy protection ensures CI/CD processes don't compromise data privacy."
+      related_branch: "DataClassification"
+    - id: "cicd_audit_trail_integrity"
+      question: "How is audit trail integrity maintained?"
+      type: "single_choice"
+      options: ["Immutable audit trails", "Protected audit logs", "Basic logging", "Unknown"]
+      help_text: "Audit trail integrity ensures reliable forensic evidence."
+      related_branch: "Monitoring"
+
+dependencies:
+  cicd_secrets_external: "SecretsManager"
+  cicd_container_scanning: "ContainerSecurity"
+  cicd_monitoring_enabled: "Monitoring"
+
+threat_intelligence:
+  cve_count: 90
+  recent_threats: ["Supply Chain Attacks", "Pipeline Injection", "Credential Theft"]
+  attack_vectors: ["Malicious Dependencies", "Code Injection", "Privilege Escalation"]
+  mitre_techniques: ["T1195", "T1190", "T1078", "T1543"]
+  threat_actors: ["APT Groups", "Cybercriminals", "Insider Threats"]
+
+risk_factors:
+  hardcoded_secrets: 4.5
+  no_code_scanning: 3.5
+  insecure_dependencies: 3.0
+  no_access_controls: 4.0
+  shared_credentials: 4.5

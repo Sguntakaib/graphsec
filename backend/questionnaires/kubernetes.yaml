@@ -1,0 +1,318 @@
+node_type: "Asset"
+node_subtype: "Kubernetes"
+category: "Container Infrastructure"
+description: "Kubernetes Container Orchestration Platform"
+required_branches:
+  - "ContainerSecurity"
+  - "ContainerOrchestration"
+  - "AccessControl"
+  - "NetworkSecurity"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "k8s_cluster_version"
+      question: "What Kubernetes version is running?"
+      type: "single_choice"
+      options: ["Latest stable (1.28+)", "Recent version (1.25-1.27)", "Older version (1.20-1.24)", "Legacy version (<1.20)", "Unknown"]
+      help_text: "Keeping Kubernetes updated is critical for security patches and features."
+      related_branch: "ContainerOrchestration"
+    - id: "k8s_rbac_enabled"
+      question: "Is Role-Based Access Control (RBAC) enabled?"
+      type: "single_choice"
+      options: ["RBAC fully configured", "RBAC partially configured", "RBAC enabled but default", "RBAC disabled", "Unknown"]
+      help_text: "RBAC controls who can access what resources in the Kubernetes cluster."
+      related_branch: "AccessControl"
+    - id: "k8s_network_policies"
+      question: "Are network policies implemented?"
+      type: "single_choice"
+      options: ["Comprehensive network policies", "Basic network policies", "Default network access", "Unknown"]
+      help_text: "Network policies control pod-to-pod communication and external access."
+      related_branch: "NetworkSecurity"
+    - id: "k8s_pod_security_standards"
+      question: "Are Pod Security Standards enforced?"
+      type: "single_choice"
+      options: ["Restricted security standards", "Baseline security standards", "Privileged mode allowed", "No pod security", "Unknown"]
+      help_text: "Pod Security Standards prevent insecure pod configurations."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_secrets_management"
+      question: "How are secrets managed in the cluster?"
+      type: "single_choice"
+      options: ["External secret management", "Kubernetes secrets with encryption", "Basic Kubernetes secrets", "Secrets in ConfigMaps", "Unknown"]
+      help_text: "Proper secret management prevents credential exposure in containers."
+      related_branch: "SecretsManagement"
+
+  advanced:
+    - id: "k8s_admission_controllers"
+      question: "What admission controllers are configured?"
+      type: "multiple_choice"
+      options: ["PodSecurityPolicy", "OPA Gatekeeper", "Falco", "Custom admission controllers", "Default controllers only", "None"]
+      help_text: "Admission controllers enforce security policies when objects are created or modified."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_image_scanning"
+      question: "Is container image scanning implemented?"
+      type: "single_choice"
+      options: ["Automated scanning with blocking", "Automated scanning with alerts", "Manual scanning", "No image scanning", "Unknown"]
+      help_text: "Image scanning detects vulnerabilities in container images before deployment."
+      related_branch: "VulnerabilityScanning"
+    - id: "k8s_runtime_security"
+      question: "What runtime security monitoring is deployed?"
+      type: "single_choice"
+      options: ["Comprehensive runtime security", "Basic runtime monitoring", "No runtime security", "Unknown"]
+      help_text: "Runtime security monitors container behavior for malicious activities."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_service_mesh"
+      question: "Is a service mesh implemented?"
+      type: "single_choice"
+      options: ["Service mesh with mTLS", "Basic service mesh", "No service mesh", "Unknown"]
+      help_text: "Service mesh provides secure service-to-service communication."
+      related_branch: "NetworkSecurity"
+    - id: "k8s_logging_monitoring"
+      question: "What logging and monitoring is configured?"
+      type: "multiple_choice"
+      options: ["Centralized logging", "Metrics collection", "Alerting", "Distributed tracing", "None"]
+      help_text: "Comprehensive monitoring provides visibility into cluster security events."
+      related_branch: "Monitoring"
+    - id: "k8s_backup_disaster_recovery"
+      question: "Are backup and disaster recovery configured?"
+      type: "single_choice"
+      options: ["Automated backup with tested recovery", "Basic backup configuration", "No backup strategy", "Unknown"]
+      help_text: "Backup and DR ensure cluster availability during disasters."
+      related_branch: "Backup"
+    - id: "k8s_cluster_hardening"
+      question: "Is the cluster hardened according to security benchmarks?"
+      type: "single_choice"
+      options: ["CIS Kubernetes Benchmark compliant", "Partially hardened", "Default configuration", "Unknown"]
+      help_text: "Cluster hardening follows security best practices and benchmarks."
+      related_branch: "ContainerOrchestration"
+    - id: "k8s_certificate_management"
+      question: "How are certificates managed in the cluster?"
+      type: "single_choice"
+      options: ["Automated certificate management", "Manual certificate handling", "Default certificates", "Unknown"]
+      help_text: "Proper certificate management ensures secure cluster communication."
+      related_branch: "Encryption"
+    - id: "k8s_resource_quotas"
+      question: "Are resource quotas and limits configured?"
+      type: "single_choice"
+      options: ["Comprehensive resource controls", "Basic quotas configured", "No resource limits", "Unknown"]
+      help_text: "Resource quotas prevent resource exhaustion attacks."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_ingress_security"
+      question: "How is ingress traffic secured?"
+      type: "single_choice"
+      options: ["WAF-protected ingress with TLS", "Basic ingress with TLS", "Unprotected ingress", "Unknown"]
+      help_text: "Secure ingress protects applications from external threats."
+      related_branch: "NetworkSecurity"
+    - id: "k8s_multi_tenancy"
+      question: "How is multi-tenancy implemented?"
+      type: "single_choice"
+      options: ["Strong multi-tenant isolation", "Basic namespace separation", "Single tenant cluster", "Unknown"]
+      help_text: "Multi-tenancy requires careful isolation between different users or applications."
+      related_branch: "AccessControl"
+    - id: "k8s_compliance_scanning"
+      question: "Is compliance scanning automated?"
+      type: "single_choice"
+      options: ["Automated compliance scanning", "Manual compliance checks", "No compliance scanning", "Unknown"]
+      help_text: "Compliance scanning ensures cluster meets regulatory requirements."
+      related_branch: "Compliance"
+    - id: "k8s_image_registry_security"
+      question: "How is the container registry secured?"
+      type: "single_choice"
+      options: ["Private registry with scanning", "Private registry basic", "Public registry usage", "Unknown"]
+      help_text: "Secure registries prevent deployment of malicious or vulnerable images."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_etcd_security"
+      question: "How is etcd secured?"
+      type: "single_choice"
+      options: ["etcd with encryption and backup", "Basic etcd security", "Default etcd configuration", "Unknown"]
+      help_text: "etcd security is critical as it stores all cluster data and secrets."
+      related_branch: "Encryption"
+    - id: "k8s_api_server_security"
+      question: "How is the API server secured?"
+      type: "single_choice"
+      options: ["API server hardened with authentication", "Basic API security", "Default API configuration", "Unknown"]
+      help_text: "API server security controls access to the entire Kubernetes cluster."
+      related_branch: "AccessControl"
+    - id: "k8s_node_security"
+      question: "How are worker nodes secured?"
+      type: "single_choice"
+      options: ["Hardened nodes with CIS compliance", "Basic node security", "Default node configuration", "Unknown"]
+      help_text: "Node security prevents compromise of the underlying infrastructure."
+      related_branch: "OSHardening"
+    - id: "k8s_workload_identity"
+      question: "Is workload identity implemented?"
+      type: "single_choice"
+      options: ["Workload identity with service accounts", "Basic service accounts", "No workload identity", "Unknown"]
+      help_text: "Workload identity provides secure identity for applications running in pods."
+      related_branch: "AccessControl"
+
+  expert:
+    - id: "k8s_zero_trust_architecture"
+      question: "How is zero trust implemented in Kubernetes?"
+      type: "single_choice"
+      options: ["Full zero trust with mTLS everywhere", "Partial zero trust implementation", "Traditional cluster security", "Unknown"]
+      help_text: "Zero trust Kubernetes assumes no implicit trust between cluster components."
+      related_branch: "NetworkSecurity"
+    - id: "k8s_supply_chain_security"
+      question: "How is supply chain security implemented?"
+      type: "single_choice"
+      options: ["SLSA compliance with signed images", "Basic image signing", "No supply chain security", "Unknown"]
+      help_text: "Supply chain security ensures integrity of container images and dependencies."
+      related_branch: "SupplyChain"
+    - id: "k8s_threat_modeling"
+      question: "Has comprehensive threat modeling been performed?"
+      type: "single_choice"
+      options: ["Kubernetes-specific threat model", "Generic threat modeling", "No threat modeling", "Unknown"]
+      help_text: "Threat modeling identifies specific attack vectors in Kubernetes environments."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_behavioral_analytics"
+      question: "Are behavioral analytics applied to cluster activities?"
+      type: "single_choice"
+      options: ["AI-powered behavioral analysis", "Basic anomaly detection", "No behavioral analytics", "Unknown"]
+      help_text: "Behavioral analytics detect unusual patterns that may indicate attacks."
+      related_branch: "Monitoring"
+    - id: "k8s_incident_response_automation"
+      question: "How is incident response automated?"
+      type: "single_choice"
+      options: ["Automated response playbooks", "Semi-automated response", "Manual incident response", "Unknown"]
+      help_text: "Automated incident response enables rapid containment of cluster threats."
+      related_branch: "IncidentResponse"
+    - id: "k8s_chaos_engineering"
+      question: "Is chaos engineering implemented for security testing?"
+      type: "single_choice"
+      options: ["Regular chaos engineering", "Occasional chaos testing", "No chaos engineering", "Unknown"]
+      help_text: "Chaos engineering validates cluster resilience under attack conditions."
+      related_branch: "IncidentResponse"
+    - id: "k8s_quantum_safe_cryptography"
+      question: "Is quantum-safe cryptography implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Quantum-resistant protocols", "Classical cryptography", "Unknown"]
+      help_text: "Quantum-safe cryptography prepares for future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "k8s_advanced_threat_detection"
+      question: "What advanced threat detection is deployed?"
+      type: "multiple_choice"
+      options: ["ML-based threat detection", "Signature-based detection", "Behavioral analysis", "Honeypots", "None"]
+      help_text: "Advanced threat detection identifies sophisticated attacks on Kubernetes."
+      related_branch: "Monitoring"
+    - id: "k8s_forensic_capabilities"
+      question: "What forensic capabilities are available?"
+      type: "multiple_choice"
+      options: ["Container forensics", "Cluster state reconstruction", "Timeline analysis", "Evidence preservation", "None"]
+      help_text: "Forensic capabilities enable investigation of container security incidents."
+      related_branch: "IncidentResponse"
+    - id: "k8s_compliance_automation"
+      question: "How is compliance automated?"
+      type: "single_choice"
+      options: ["Continuous compliance monitoring", "Regular compliance scans", "Manual compliance checks", "Unknown"]
+      help_text: "Automated compliance ensures ongoing adherence to security standards."
+      related_branch: "Compliance"
+    - id: "k8s_advanced_secrets_management"
+      question: "What advanced secrets management is implemented?"
+      type: "single_choice"
+      options: ["External secrets operator with rotation", "Sealed secrets", "Basic Kubernetes secrets", "Unknown"]
+      help_text: "Advanced secrets management provides secure handling of sensitive data."
+      related_branch: "SecretsManagement"
+    - id: "k8s_policy_as_code"
+      question: "Is policy as code implemented?"
+      type: "single_choice"
+      options: ["Comprehensive policy as code", "Basic policy automation", "Manual policy management", "Unknown"]
+      help_text: "Policy as code ensures consistent security policy enforcement."
+      related_branch: "Compliance"
+    - id: "k8s_container_runtime_security"
+      question: "What container runtime security is implemented?"
+      type: "single_choice"
+      options: ["gVisor or Kata containers", "runc with seccomp/AppArmor", "Default container runtime", "Unknown"]
+      help_text: "Secure container runtimes provide additional isolation and security."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_network_segmentation_testing"
+      question: "Is network segmentation regularly tested?"
+      type: "single_choice"
+      options: ["Automated segmentation testing", "Manual testing", "No testing", "Unknown"]
+      help_text: "Regular testing validates network segmentation effectiveness."
+      related_branch: "NetworkSecurity"
+    - id: "k8s_privileged_access_management"
+      question: "How is privileged access managed in Kubernetes?"
+      type: "single_choice"
+      options: ["Just-in-time privileged access", "Role-based privileged access", "No privileged access controls", "Unknown"]
+      help_text: "Privileged access management controls administrative access to the cluster."
+      related_branch: "AccessControl"
+    - id: "k8s_threat_intelligence_integration"
+      question: "How is threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Real-time threat intelligence feeds", "Periodic threat updates", "No threat intelligence", "Unknown"]
+      help_text: "Threat intelligence provides context for Kubernetes security events."
+      related_branch: "Monitoring"
+    - id: "k8s_advanced_monitoring_correlation"
+      question: "How is advanced monitoring correlation implemented?"
+      type: "single_choice"
+      options: ["Cross-cluster correlation", "Single cluster monitoring", "Basic monitoring", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive visibility across clusters."
+      related_branch: "Monitoring"
+    - id: "k8s_devsecops_integration"
+      question: "How is Kubernetes integrated into DevSecOps?"
+      type: "single_choice"
+      options: ["Full GitOps with security scanning", "Basic CI/CD integration", "Manual deployments", "Unknown"]
+      help_text: "DevSecOps integration ensures security is built into deployment workflows."
+      related_branch: "CICDSecurity"
+    - id: "k8s_multi_cluster_security"
+      question: "How is multi-cluster security managed?"
+      type: "single_choice"
+      options: ["Unified multi-cluster security", "Per-cluster security", "Single cluster only", "Unknown"]
+      help_text: "Multi-cluster security provides consistent protection across clusters."
+      related_branch: "ContainerOrchestration"
+    - id: "k8s_cost_security_optimization"
+      question: "How is cost-security optimization balanced?"
+      type: "single_choice"
+      options: ["Optimized balance", "Security-first approach", "Cost-first approach", "Unknown"]
+      help_text: "Cost-security optimization ensures efficient resource utilization."
+      related_branch: "Compliance"
+    - id: "k8s_future_security_roadmap"
+      question: "Is there a future Kubernetes security roadmap?"
+      type: "single_choice"
+      options: ["Comprehensive roadmap", "Basic planning", "No roadmap", "Unknown"]
+      help_text: "Security roadmap ensures preparedness for evolving container threats."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_edge_computing_security"
+      question: "How is edge computing security handled?"
+      type: "single_choice"
+      options: ["Edge-specific security controls", "Standard cluster security", "No edge deployments", "Unknown"]
+      help_text: "Edge computing requires additional security considerations."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_ai_ml_workload_security"
+      question: "How are AI/ML workloads secured?"
+      type: "single_choice"
+      options: ["ML-specific security controls", "Standard workload security", "No ML workloads", "Unknown"]
+      help_text: "AI/ML workloads have unique security requirements."
+      related_branch: "ContainerSecurity"
+    - id: "k8s_security_culture_integration"
+      question: "How is security culture promoted for Kubernetes?"
+      type: "single_choice"
+      options: ["Comprehensive training", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Security culture ensures teams understand Kubernetes security best practices."
+      related_branch: "Compliance"
+    - id: "k8s_continuous_security_improvement"
+      question: "How is continuous security improvement implemented?"
+      type: "single_choice"
+      options: ["Automated improvement cycles", "Regular security reviews", "Ad-hoc improvements", "Unknown"]
+      help_text: "Continuous improvement ensures Kubernetes security evolves with threats."
+      related_branch: "ContainerSecurity"
+
+dependencies:
+  k8s_logging_enabled: "Monitoring"
+  k8s_backup_configured: "Backup"
+  k8s_secrets_external: "SecretsManager"
+
+threat_intelligence:
+  cve_count: 120
+  recent_threats: ["Container Escape", "Privilege Escalation", "Supply Chain Attacks"]
+  attack_vectors: ["Malicious Images", "Cluster Misconfiguration", "API Server Attacks"]
+  mitre_techniques: ["T1610", "T1611", "T1525", "T1055"]
+  threat_actors: ["APT Groups", "Cybercriminals", "Insider Threats"]
+
+risk_factors:
+  privileged_containers: 4.0
+  no_network_policies: 3.5
+  weak_rbac: 3.0
+  unscanned_images: 3.5
+  default_configuration: 2.5
