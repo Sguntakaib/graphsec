@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://secmodel-tester.preview.emergentagent.com/api"
+BASE_URL = "https://phase2-evolution.preview.emergentagent.com/api"
 
 class SecurityModelingAPITester:
     def __init__(self):
