@@ -961,7 +961,7 @@ agent_communication:
         comment: "Phase 1 Enhanced APIs - GET /api/expanded-nodes/categories endpoint implemented for category organization"
       - working: false
         agent: "testing"
-        comment: "❌ INCOMPLETE CATEGORIES DATA: Categories endpoint missing required fields: category_descriptions, node_type_mappings. Current implementation returns basic categories list but lacks comprehensive category descriptions and detailed node type mappings expected for Phase 1 Enhanced APIs."
+        comment: "❌ API RESPONSE STRUCTURE MISMATCH: Categories endpoint returns different structure than expected. API returns 'categories' array with comprehensive data (category, node_types, total_nodes, avg_cve_count, common_threats) but test expects direct category mapping with keys like 'Infrastructure', 'Security', 'Development', 'Monitoring', 'Storage'. Actual categories are: 'Cloud Infrastructure', 'Compute Services', 'Data & Storage', 'Network Components', 'Security Services', 'Container & DevOps', 'Monitoring & Logging', 'Application Services', 'IoT & Edge Computing', 'Cryptographic Controls'."
 
   - task: "Expanded Intelligent Nodes - Threat Intelligence Summary API"
     implemented: true
