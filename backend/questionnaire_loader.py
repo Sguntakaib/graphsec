@@ -380,7 +380,11 @@ class QuestionnaireLoader:
     
     def get_metadata(self, node_subtype: str) -> Optional[QuestionnaireMetadata]:
         """Get metadata for a specific node type"""
-        return self._metadata_cache.get(node_subtype)
+        # Handle case-insensitive lookup
+        for key in self._metadata_cache.keys():
+            if key.upper() == node_subtype.upper():
+                return self._metadata_cache[key]
+        return None
     
     def get_all_levels_count(self, node_subtype: str) -> Dict[str, int]:
         """Get question count for all levels of a node type"""
