@@ -1648,6 +1648,7 @@ async def calculate_expanded_risk(node_subtype: str, request: Dict[str, Any]):
         return {
             "node_subtype": node_subtype,
             "risk_assessment": risk_assessment,
+            "risk_factors": _extract_risk_factors(node_subtype, enhanced_responses, risk_assessment),
             "security_recommendations": recommendations,
             "calculation_timestamp": datetime.now(timezone.utc).isoformat(),
             "input_summary": {
