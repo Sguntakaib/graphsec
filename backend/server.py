@@ -1765,14 +1765,25 @@ async def get_threat_intelligence_summary(request: Dict[str, Any]):
     
     # Convert sets to lists and limit to top items
     return {
-        "aggregated_intelligence": {
-            "total_cve_count": aggregated_intelligence["total_cve_count"],
+        "node_type_summaries": aggregated_intelligence["node_summaries"],  # Changed from node_summaries
+        "cross_cutting_threats": {  # New field combining multiple threat categories
             "unique_threats": list(aggregated_intelligence["all_threats"])[:10],
             "unique_attack_vectors": list(aggregated_intelligence["all_attack_vectors"])[:10],
             "unique_mitre_techniques": list(aggregated_intelligence["all_mitre_techniques"])[:15],
             "unique_threat_actors": list(aggregated_intelligence["all_threat_actors"])[:10]
         },
-        "node_summaries": aggregated_intelligence["node_summaries"],
+        "threat_trends": {  # Changed from aggregated_intelligence
+            "total_cve_count": aggregated_intelligence["total_cve_count"],
+            "threat_landscape_evolution": "Analysis based on recent threat intelligence data",
+            "emerging_patterns": list(aggregated_intelligence["all_threats"])[:5]
+        },
+        "recommendations": [  # New field with actionable recommendations
+            "Implement multi-layered defense strategies across all analyzed node types",
+            "Prioritize patching for CVE vulnerabilities identified in the threat intelligence",
+            "Enhance monitoring for identified MITRE ATT&CK techniques",
+            "Strengthen controls against identified attack vectors",
+            "Develop incident response procedures for known threat actor TTPs"
+        ],
         "summary_stats": {
             "nodes_analyzed": len(node_types),
             "total_unique_threats": len(aggregated_intelligence["all_threats"]),
