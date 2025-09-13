@@ -564,6 +564,9 @@ test_plan:
       - working: true
         agent: "main"
         comment: "✅ CRITICAL ENDPOINT FIXED: POST /api/questionnaires/WebApp/complete now working in standalone mode! Fixed response format (findings_generated→findings, security_recommendations→recommendations) and standalone mode operation. Backend dependencies resolved (multidict, attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed). All 4 Phase 1 Core Loop endpoints now passing with 100% success rate."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED WORKING: POST /api/questionnaires/WebApp/complete endpoint confirmed working in standalone mode. Returns proper response structure with completion_id, findings, recommendations, risk_assessment, and framework_mappings. Accepts exact data structure from review request (responses with authentication_method, encryption_enabled, input_validation + business_context with criticality, data_classification). Standalone questionnaire completion flow operational."
 
   - task: "Phase 1 Core Loop Critical Endpoints - GET /api/questionnaires/{node_subtype}"
     implemented: true
@@ -579,6 +582,9 @@ test_plan:
       - working: true
         agent: "main"
         comment: "✅ CRITICAL ENDPOINT FIXED: GET /api/questionnaires/WebApp now working correctly! Method signature error in create_security_branches resolved. Returns proper response with security_branches field present (5 branches, 5 prompts). All 4 Phase 1 Core Loop endpoints now passing with 100% success rate."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED WORKING: GET /api/questionnaires/WebApp endpoint confirmed working correctly. Returns proper response structure with both security_branches field (5 branches) and prompts field (5 prompts) as expected. No HTTP 500 errors with SecurityPrompt attribute issues. Method signature error resolved."
 
   - task: "Phase 1 Core Loop Critical Endpoints - POST /api/simulate"
     implemented: true
@@ -591,6 +597,9 @@ test_plan:
       - working: true
         agent: "testing"
         comment: "✅ ENDPOINT WORKING: POST /api/simulate returns HTTP 200 with all required fields (simulation_id, attack_paths, risk_analysis, mitre_techniques, recommendations) when testing standalone simulation with nodes/edges data. The endpoint successfully processes standalone simulation requests without requiring diagram_id dependencies."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED WORKING: POST /api/simulate endpoint confirmed working in standalone mode. Returns HTTP 200 with all expected response fields (simulation_id, attack_paths, risk_analysis, mitre_techniques, recommendations). Successfully processes nodes/edges data structure without diagram dependencies. Standalone simulation operational."
 
   - task: "Phase 1 Core Loop Critical Endpoints - POST /api/rules/evaluate"
     implemented: true
@@ -606,6 +615,9 @@ test_plan:
       - working: true
         agent: "main"
         comment: "✅ CRITICAL ENDPOINT FIXED: POST /api/rules/evaluate now working correctly! Fixed response format with expected fields (evaluation_id, triggered_rules, risk_score, recommendations) and RuleEvaluationResult serialization using asdict(). Standalone rule evaluation working with 3 rules triggered and proper risk score calculation. All 4 Phase 1 Core Loop endpoints now passing with 100% success rate."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED WORKING: POST /api/rules/evaluate endpoint confirmed working in standalone mode. Returns HTTP 200 with all expected response fields (evaluation_id, triggered_rules, risk_score, recommendations). No RuleEvaluationResult attribute errors. Successfully evaluates 3 rules with risk_score=8.17 and 11 recommendations. Standalone rule evaluation operational."
 
 frontend:
 
