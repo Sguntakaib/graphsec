@@ -117,11 +117,18 @@ class QuestionnaireLoader:
     
     def get_questionnaire(self, node_subtype: str, level: QuestionnaireLevel) -> List[Dict]:
         """Get questionnaire for specific level with proper scaling"""
-        if node_subtype not in self._cache:
-            logger.warning(f"Node type {node_subtype} not found")
+        # Handle case-insensitive lookup
+        actual_key = None
+        for key in self._cache.keys():
+            if key.upper() == node_subtype.upper():
+                actual_key = key
+                break
+        
+        if actual_key is None:
+            logger.warning(f"Node type {node_subtype} not found in cache. Available keys: {list(self._cache.keys())}")
             return []
         
-        questionnaires = self._cache[node_subtype]
+        questionnaires = self._cache[actual_key]
         
         # If level exists in YAML, return it
         if level.value in questionnaires:
