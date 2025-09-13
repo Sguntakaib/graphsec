@@ -631,39 +631,48 @@ frontend:
 
   - task: "Phase 1 Core Loop Completion - Findings Management System"
     implemented: true
-    working: "NA"
+    working: false
     file: "backend/findings_management.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ CORE LOOP PHASE 1 IMPLEMENTED: Complete findings management system with normalized data model, CRUD operations, MongoDB optimization, framework mappings (MITRE, ASVS, OWASP, CIS, NIST, ISO27001, SOC2, GDPR), severity tracking, and comprehensive analytics. 482 lines of production-ready code with strategic database indexing."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL API CONTRACT ISSUES: POST /api/findings endpoint has validation errors - missing required 'diagram_id' and 'category' fields, incorrect enum values for severity ('High' not 'HIGH'), status ('New' not 'OPEN'), and source ('Questionnaire' not 'QUESTIONNAIRE_COMPLETION'). The findings data model doesn't match the expected API contract. HTTP 422 validation errors indicate Pydantic model mismatch."
 
   - task: "Phase 1 Core Loop Completion - Questionnaire Completion Processor"
     implemented: true
-    working: "NA"
+    working: false
     file: "backend/questionnaire_completion_processor.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ END-TO-END ORCHESTRATION IMPLEMENTED: Complete questionnaire completion processor with security attribute extraction, risk assessment algorithms, DSL rule engine integration, advanced simulation integration, findings generation pipeline, and comprehensive completion flow management. 674 lines orchestrating the complete questionnaire → findings pipeline."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ENDPOINT MISSING: POST /api/questionnaires/{node_subtype}/complete endpoint returns HTTP 500 with error 'diagram_id and node_id are required'. This suggests the endpoint expects different parameters than implemented. The core questionnaire completion flow is not accessible via the expected API contract."
 
   - task: "Phase 1 Core Loop Completion - Enhanced API Endpoints"
     implemented: true
-    working: "NA"
+    working: false
     file: "backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ ENHANCED API SURFACE IMPLEMENTED: Added 10 new endpoints including POST /api/questionnaires/{node_subtype}/complete (core completion flow), POST /api/simulate (enhanced simulation), POST /api/rules/evaluate (enhanced rule evaluation), complete findings CRUD API, and GET /api/questionnaires/{node_subtype} (merged prompts). All endpoints include comprehensive error handling, validation, and framework integration."
+      - working: false
+        agent: "testing"
+        comment: "❌ MULTIPLE CRITICAL ENDPOINT FAILURES: 1) GET /api/questionnaires/{node_subtype} returns HTTP 500 'SecurityPrompt object has no attribute question_type' 2) POST /api/simulate returns HTTP 500 'Diagram not found' 3) POST /api/rules/evaluate returns HTTP 500 'Diagram not found' 4) POST /api/questionnaires/{node_subtype}/complete returns HTTP 500 'diagram_id and node_id are required'. The enhanced API endpoints have implementation issues preventing core functionality."
 
 agent_communication:
   - agent: "main"
