@@ -260,7 +260,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Threat Modeling Wizard endpoints testing completed successfully"
+    - "Expanded Intelligent Nodes - Supported Types API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
