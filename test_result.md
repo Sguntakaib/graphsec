@@ -260,8 +260,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Expanded Intelligent Nodes - Supported Types API"
-  stuck_tasks: []
+    - "Phase 1 Core Loop Critical Endpoints - POST /api/questionnaires/{node_subtype}/complete"
+    - "Phase 1 Core Loop Critical Endpoints - GET /api/questionnaires/{node_subtype}" 
+    - "Phase 1 Core Loop Critical Endpoints - POST /api/simulate"
+    - "Phase 1 Core Loop Critical Endpoints - POST /api/rules/evaluate"
+  stuck_tasks: 
+    - "Phase 1 Core Loop Completion - Findings Management System"
+    - "Phase 1 Core Loop Completion - Questionnaire Completion Processor"
+    - "Phase 1 Core Loop Completion - Enhanced API Endpoints"
   test_all: false
   test_priority: "high_first"
 
