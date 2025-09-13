@@ -658,6 +658,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL ENDPOINT MISSING: POST /api/questionnaires/{node_subtype}/complete endpoint returns HTTP 500 with error 'diagram_id and node_id are required'. This suggests the endpoint expects different parameters than implemented. The core questionnaire completion flow is not accessible via the expected API contract."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL API CONTRACT ISSUE: POST /api/questionnaires/{node_subtype}/complete returns HTTP 400 'questionnaire_responses are required' when testing standalone mode with proper request data including responses and business_context. The endpoint expects different parameter structure than implemented. Standalone mode not working - requires diagram_id/node_id dependencies."
 
   - task: "Phase 1 Core Loop Completion - Enhanced API Endpoints"
     implemented: true
@@ -673,6 +676,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ MULTIPLE CRITICAL ENDPOINT FAILURES: 1) GET /api/questionnaires/{node_subtype} returns HTTP 500 'SecurityPrompt object has no attribute question_type' 2) POST /api/simulate returns HTTP 500 'Diagram not found' 3) POST /api/rules/evaluate returns HTTP 500 'Diagram not found' 4) POST /api/questionnaires/{node_subtype}/complete returns HTTP 500 'diagram_id and node_id are required'. The enhanced API endpoints have implementation issues preventing core functionality."
+      - working: false
+        agent: "testing"
+        comment: "❌ COMPREHENSIVE ENDPOINT TESTING FAILED: 1) GET /api/questionnaires/{node_subtype} - Missing 'security_branches' field in response, only returns prompts 2) POST /api/simulate - Missing all expected response fields (simulation_id, attack_paths, risk_analysis, mitre_techniques, recommendations) 3) POST /api/rules/evaluate - HTTP 500 'RuleEvaluationResult object has no attribute category' implementation error 4) POST /api/questionnaires/{node_subtype}/complete - HTTP 400 'questionnaire_responses are required' parameter mismatch. All 4 critical endpoints have fundamental implementation issues preventing standalone operation."
 
 agent_communication:
   - agent: "main"
