@@ -4348,6 +4348,367 @@ class SecurityModelingAPITester:
         
         return all_tests_passed
 
+    # ============================================================================
+    # PRIORITY 1 & 2 ENHANCED FEATURES TESTS
+    # ============================================================================
+    
+    def test_priority1_probabilistic_risk_ec2(self):
+        """Priority 1: Test POST /api/expanded-nodes/EC2/calculate-risk with probabilistic modeling"""
+        try:
+            # Sample EC2 responses as specified in review request
+            request_data = {
+                "responses": {
+                    "public_access": True,
+                    "encryption": False,
+                    "security_groups": "permissive",
+                    "monitoring": True,
+                    "backup": False
+                },
+                "business_context": {
+                    "business_critical": True,
+                    "compliance_required": True
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/EC2/calculate-risk",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify required probabilistic modeling fields
+                risk_assessment = data.get("risk_assessment", {})
+                
+                # Priority 1 Required Fields
+                required_fields = [
+                    "confidence_interval", "threat_likelihood", "probabilistic_score", 
+                    "uncertainty_factor", "monte_carlo_analysis"
+                ]
+                
+                missing_fields = [f for f in required_fields if f not in risk_assessment]
+                if missing_fields:
+                    self.log_test("Priority 1 - Probabilistic Risk (EC2)", False, 
+                                f"Missing probabilistic modeling fields: {missing_fields}")
+                    return False
+                
+                # Verify monte_carlo_analysis structure
+                monte_carlo = risk_assessment.get("monte_carlo_analysis", {})
+                required_mc_fields = [
+                    "mean_risk", "standard_deviation", "confidence_interval_90", 
+                    "risk_distribution", "probability_high_risk", "probability_critical_risk"
+                ]
+                
+                missing_mc_fields = [f for f in required_mc_fields if f not in monte_carlo]
+                if missing_mc_fields:
+                    self.log_test("Priority 1 - Probabilistic Risk (EC2)", False, 
+                                f"Missing monte_carlo_analysis fields: {missing_mc_fields}")
+                    return False
+                
+                # Verify risk_distribution has required percentiles
+                risk_distribution = monte_carlo.get("risk_distribution", {})
+                required_percentiles = ["p5", "p25", "p50", "p75", "p95"]
+                missing_percentiles = [p for p in required_percentiles if p not in risk_distribution]
+                
+                if missing_percentiles:
+                    self.log_test("Priority 1 - Probabilistic Risk (EC2)", False, 
+                                f"Missing risk_distribution percentiles: {missing_percentiles}")
+                    return False
+                
+                # Verify confidence_interval is tuple format
+                confidence_interval = risk_assessment.get("confidence_interval", {})
+                if not ("lower_bound" in confidence_interval and "upper_bound" in confidence_interval):
+                    self.log_test("Priority 1 - Probabilistic Risk (EC2)", False, 
+                                "confidence_interval missing lower_bound/upper_bound")
+                    return False
+                
+                # Verify probabilistic_score differs from base score (Monte Carlo simulation working)
+                probabilistic_score = risk_assessment.get("probabilistic_score", 0)
+                composite_risk_score = risk_assessment.get("composite_risk_score", 0)
+                
+                if probabilistic_score == composite_risk_score:
+                    self.log_test("Priority 1 - Probabilistic Risk (EC2)", False, 
+                                "probabilistic_score identical to composite_risk_score - Monte Carlo may not be running")
+                    return False
+                
+                self.log_test("Priority 1 - Probabilistic Risk (EC2)", True, 
+                            f"✅ All probabilistic modeling fields present: probabilistic_score={probabilistic_score}, "
+                            f"confidence_interval=({confidence_interval['lower_bound']:.2f}, {confidence_interval['upper_bound']:.2f}), "
+                            f"monte_carlo mean_risk={monte_carlo['mean_risk']:.2f}")
+                return True
+                
+            else:
+                self.log_test("Priority 1 - Probabilistic Risk (EC2)", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Priority 1 - Probabilistic Risk (EC2)", False, f"Error: {str(e)}")
+            return False
+    
+    def test_priority1_probabilistic_risk_lambda(self):
+        """Priority 1: Test POST /api/expanded-nodes/Lambda/calculate-risk with probabilistic modeling"""
+        try:
+            request_data = {
+                "responses": {
+                    "vpc_config": False,
+                    "monitoring": True,
+                    "environment_variables": "encrypted",
+                    "execution_role": "least_privilege",
+                    "timeout": 300
+                },
+                "business_context": {
+                    "business_critical": False,
+                    "compliance_required": False
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/Lambda/calculate-risk",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                risk_assessment = data.get("risk_assessment", {})
+                
+                # Verify key probabilistic fields
+                required_fields = ["probabilistic_score", "monte_carlo_analysis", "uncertainty_factor"]
+                missing_fields = [f for f in required_fields if f not in risk_assessment]
+                
+                if missing_fields:
+                    self.log_test("Priority 1 - Probabilistic Risk (Lambda)", False, 
+                                f"Missing fields: {missing_fields}")
+                    return False
+                
+                monte_carlo = risk_assessment.get("monte_carlo_analysis", {})
+                if "probability_high_risk" not in monte_carlo or "probability_critical_risk" not in monte_carlo:
+                    self.log_test("Priority 1 - Probabilistic Risk (Lambda)", False, 
+                                "Missing probability risk assessments in monte_carlo_analysis")
+                    return False
+                
+                self.log_test("Priority 1 - Probabilistic Risk (Lambda)", True, 
+                            f"✅ Probabilistic modeling working: probabilistic_score={risk_assessment['probabilistic_score']:.2f}")
+                return True
+                
+            else:
+                self.log_test("Priority 1 - Probabilistic Risk (Lambda)", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Priority 1 - Probabilistic Risk (Lambda)", False, f"Error: {str(e)}")
+            return False
+    
+    def test_priority1_probabilistic_risk_s3(self):
+        """Priority 1: Test POST /api/expanded-nodes/S3/calculate-risk with probabilistic modeling"""
+        try:
+            request_data = {
+                "responses": {
+                    "public_read": True,
+                    "versioning": False,
+                    "encryption": "sse-s3",
+                    "access_logging": True,
+                    "mfa_delete": False
+                },
+                "business_context": {
+                    "business_critical": True,
+                    "compliance_required": True
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/S3/calculate-risk",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                risk_assessment = data.get("risk_assessment", {})
+                
+                # Verify threat_likelihood and uncertainty_factor
+                if "threat_likelihood" not in risk_assessment:
+                    self.log_test("Priority 1 - Probabilistic Risk (S3)", False, "Missing threat_likelihood")
+                    return False
+                
+                if "uncertainty_factor" not in risk_assessment:
+                    self.log_test("Priority 1 - Probabilistic Risk (S3)", False, "Missing uncertainty_factor")
+                    return False
+                
+                # Verify monte_carlo_analysis has standard_deviation
+                monte_carlo = risk_assessment.get("monte_carlo_analysis", {})
+                if "standard_deviation" not in monte_carlo:
+                    self.log_test("Priority 1 - Probabilistic Risk (S3)", False, 
+                                "Missing standard_deviation in monte_carlo_analysis")
+                    return False
+                
+                self.log_test("Priority 1 - Probabilistic Risk (S3)", True, 
+                            f"✅ Probabilistic modeling complete: threat_likelihood={risk_assessment['threat_likelihood']:.2f}, "
+                            f"uncertainty_factor={risk_assessment['uncertainty_factor']:.2f}")
+                return True
+                
+            else:
+                self.log_test("Priority 1 - Probabilistic Risk (S3)", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Priority 1 - Probabilistic Risk (S3)", False, f"Error: {str(e)}")
+            return False
+    
+    def test_priority2_bulk_risk_assessment(self):
+        """Priority 2: Test POST /api/expanded-nodes/bulk-risk-assessment with cross-node correlations"""
+        try:
+            # Sample test data as specified in review request
+            request_data = {
+                "nodes": [
+                    {
+                        "node_id": "node1", 
+                        "node_subtype": "EC2", 
+                        "responses": {
+                            "public_access": True, 
+                            "encryption": False,
+                            "security_groups": "permissive",
+                            "monitoring": True
+                        }
+                    },
+                    {
+                        "node_id": "node2", 
+                        "node_subtype": "Lambda", 
+                        "responses": {
+                            "vpc_config": False, 
+                            "monitoring": True,
+                            "environment_variables": "plaintext",
+                            "execution_role": "overprivileged"
+                        }
+                    }, 
+                    {
+                        "node_id": "node3", 
+                        "node_subtype": "S3", 
+                        "responses": {
+                            "public_read": True, 
+                            "versioning": False,
+                            "encryption": "none",
+                            "access_logging": False
+                        }
+                    }
+                ],
+                "business_context": {
+                    "business_critical": True, 
+                    "compliance_required": True
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/expanded-nodes/bulk-risk-assessment",
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Priority 2 Required Fields - NEW REQUIRED FIELDS
+                required_top_level_fields = [
+                    "aggregated_metrics", "cross_node_correlations", "risk_amplification"
+                ]
+                
+                missing_top_fields = [f for f in required_top_level_fields if f not in data]
+                if missing_top_fields:
+                    self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                                f"Missing NEW REQUIRED top-level fields: {missing_top_fields}")
+                    return False
+                
+                # Verify aggregated_metrics structure
+                aggregated_metrics = data.get("aggregated_metrics", {})
+                required_agg_fields = [
+                    "overall_risk_score", "risk_distribution", "risk_categories", 
+                    "amplification_effects", "systemic_risk_indicators"
+                ]
+                
+                missing_agg_fields = [f for f in required_agg_fields if f not in aggregated_metrics]
+                if missing_agg_fields:
+                    self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                                f"Missing aggregated_metrics fields: {missing_agg_fields}")
+                    return False
+                
+                # Verify cross_node_correlations structure
+                cross_correlations = data.get("cross_node_correlations", {})
+                required_corr_fields = [
+                    "node_type_correlations", "risk_pattern_correlations", 
+                    "vulnerability_clustering", "control_dependencies"
+                ]
+                
+                missing_corr_fields = [f for f in required_corr_fields if f not in cross_correlations]
+                if missing_corr_fields:
+                    self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                                f"Missing cross_node_correlations fields: {missing_corr_fields}")
+                    return False
+                
+                # Verify risk_amplification structure
+                risk_amplification = data.get("risk_amplification", {})
+                required_amp_fields = [
+                    "network_effects", "cascade_risks", "concentration_risks", 
+                    "overall_amplification_factor"
+                ]
+                
+                missing_amp_fields = [f for f in required_amp_fields if f not in risk_amplification]
+                if missing_amp_fields:
+                    self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                                f"Missing risk_amplification fields: {missing_amp_fields}")
+                    return False
+                
+                # Verify assessment_metadata has required features
+                assessment_metadata = data.get("assessment_metadata", {})
+                features_enabled = assessment_metadata.get("features_enabled", [])
+                required_features = [
+                    "probabilistic_modeling", "cross_node_correlations", 
+                    "risk_amplification_factors", "monte_carlo_simulation"
+                ]
+                
+                missing_features = [f for f in required_features if f not in features_enabled]
+                if missing_features:
+                    self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                                f"Missing required features in assessment_metadata: {missing_features}")
+                    return False
+                
+                # Verify version is enhanced
+                assessment_version = assessment_metadata.get("assessment_version", "")
+                if "2.0_enhanced" not in assessment_version:
+                    self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                                f"Expected version '2.0_enhanced', got: {assessment_version}")
+                    return False
+                
+                # Verify meaningful cross-node correlation insights
+                node_type_correlations = cross_correlations.get("node_type_correlations", {})
+                if not node_type_correlations:
+                    self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                                "No node_type_correlations found - cross-node analysis may not be working")
+                    return False
+                
+                overall_risk_score = aggregated_metrics.get("overall_risk_score", 0)
+                amplification_factor = risk_amplification.get("overall_amplification_factor", 1.0)
+                
+                self.log_test("Priority 2 - Bulk Risk Assessment", True, 
+                            f"✅ All enhanced bulk assessment fields present: overall_risk_score={overall_risk_score:.2f}, "
+                            f"amplification_factor={amplification_factor:.2f}, "
+                            f"cross_correlations={len(node_type_correlations)} node types, "
+                            f"version={assessment_version}")
+                return True
+                
+            else:
+                self.log_test("Priority 2 - Bulk Risk Assessment", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Priority 2 - Bulk Risk Assessment", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all API tests in sequence"""
         print(f"🚀 Starting Enhanced Security Modeling Platform API Tests")
