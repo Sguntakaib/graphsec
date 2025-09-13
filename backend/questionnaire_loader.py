@@ -199,6 +199,178 @@ class QuestionnaireLoader:
         logger.info(f"Scaled {len(basic_questions)} questions to {len(scaled_questions)} questions from basic to {level.value} level for {node_subtype}")
         return scaled_questions
     
+    def _generate_additional_questions(self, node_subtype: str, count: int, level: QuestionnaireLevel) -> List[Dict]:
+        """Generate additional questions for advanced/expert levels"""
+        if count <= 0:
+            return []
+        
+        # Get metadata to understand the node type
+        metadata = self.get_metadata(node_subtype)
+        category = metadata.category if metadata else "Unknown"
+        
+        additional_questions = []
+        
+        # Generate questions based on common security patterns
+        question_templates = self._get_question_templates_for_category(category, level)
+        
+        for i, template in enumerate(question_templates[:count]):
+            question_id = f"{node_subtype.lower()}_{level.value}_gen_{i+1}"
+            
+            additional_question = {
+                "id": question_id,
+                "question": template["question"].format(node_type=node_subtype),
+                "type": template["type"],
+                "options": template.get("options", []),
+                "help_text": template["help_text"].format(node_type=node_subtype),
+                "related_branch": template["related_branch"],
+                "generated": True,  # Mark as auto-generated
+                "level": level.value
+            }
+            
+            if level == QuestionnaireLevel.EXPERT:
+                additional_question["expert_considerations"] = template.get("expert_considerations", [])
+                additional_question["compliance_relevance"] = template.get("compliance_relevance", [])
+            
+            additional_questions.append(additional_question)
+        
+        return additional_questions
+    
+    def _get_question_templates_for_category(self, category: str, level: QuestionnaireLevel) -> List[Dict]:
+        """Get question templates based on category and level"""
+        
+        # Common security question templates
+        common_templates = [
+            {
+                "question": "What incident response procedures are in place for {node_type} security events?",
+                "type": "single_choice",
+                "options": ["Automated Response", "Manual Procedures", "Hybrid Approach", "No Procedures", "Unknown"],
+                "help_text": "Proper incident response procedures are critical for {node_type} security.",
+                "related_branch": "IncidentResponse",
+                "expert_considerations": ["Response time requirements", "Escalation procedures", "Communication protocols"],
+                "compliance_relevance": ["SOC2", "ISO27001", "GDPR"]
+            },
+            {
+                "question": "How is access to {node_type} logged and monitored?",
+                "type": "single_choice", 
+                "options": ["Comprehensive Logging", "Basic Logging", "Minimal Logging", "No Logging", "Unknown"],
+                "help_text": "Access logging is essential for {node_type} security monitoring.",
+                "related_branch": "AuditLogging",
+                "expert_considerations": ["Log retention policies", "SIEM integration", "Real-time alerting"],
+                "compliance_relevance": ["PCI-DSS", "SOX", "HIPAA"]
+            },
+            {
+                "question": "What backup and recovery procedures exist for {node_type}?",
+                "type": "single_choice",
+                "options": ["Automated Regular Backups", "Scheduled Backups", "Manual Backups", "No Backup", "Unknown"],
+                "help_text": "Backup procedures ensure {node_type} data integrity and availability.",
+                "related_branch": "Backup",
+                "expert_considerations": ["RTO/RPO requirements", "Cross-region replication", "Backup encryption"],
+                "compliance_relevance": ["SOC2", "ISO27001"]
+            },
+            {
+                "question": "How is {node_type} configuration managed and validated?",
+                "type": "single_choice",
+                "options": ["Infrastructure as Code", "Configuration Management Tools", "Manual Configuration", "Ad-hoc Changes", "Unknown"],
+                "help_text": "Proper configuration management reduces {node_type} security risks.",
+                "related_branch": "ConfigurationManagement",
+                "expert_considerations": ["Configuration drift detection", "Change approval process", "Version control"],
+                "compliance_relevance": ["SOC2", "ISO27001", "CIS Controls"]
+            },
+            {
+                "question": "What vulnerability management processes are applied to {node_type}?",
+                "type": "single_choice",
+                "options": ["Automated Scanning & Patching", "Regular Scanning", "Periodic Assessment", "No Process", "Unknown"],
+                "help_text": "Vulnerability management is crucial for {node_type} security posture.",
+                "related_branch": "VulnerabilityManagement",
+                "expert_considerations": ["Patch testing procedures", "Emergency patching", "Risk-based prioritization"],
+                "compliance_relevance": ["PCI-DSS", "SOC2", "ISO27001"]
+            }
+        ]
+        
+        # Category-specific templates
+        category_templates = {
+            "Cloud Infrastructure": [
+                {
+                    "question": "How is {node_type} integrated with cloud security services?",
+                    "type": "multiple_choice",
+                    "options": ["AWS Security Hub", "Azure Security Center", "GCP Security Command Center", "Third-party CSPM", "None"],
+                    "help_text": "Cloud security integration enhances {node_type} threat detection.",
+                    "related_branch": "CloudSecurity",
+                    "expert_considerations": ["Multi-cloud security", "Compliance automation", "Cost optimization"],
+                    "compliance_relevance": ["SOC2", "ISO27001", "CSA CCM"]
+                },
+                {
+                    "question": "What cloud governance policies apply to {node_type}?",
+                    "type": "text",
+                    "help_text": "Cloud governance ensures {node_type} compliance and security standards.",
+                    "related_branch": "CloudGovernance",
+                    "expert_considerations": ["Policy automation", "Exception handling", "Audit trails"],
+                    "compliance_relevance": ["SOC2", "ISO27001", "GDPR"]
+                }
+            ],
+            "Data Storage": [
+                {
+                    "question": "What data classification scheme is applied to {node_type}?",
+                    "type": "single_choice",
+                    "options": ["Automated Classification", "Manual Classification", "Basic Labels", "No Classification", "Unknown"],
+                    "help_text": "Data classification drives {node_type} security controls.",
+                    "related_branch": "DataClassification",
+                    "expert_considerations": ["Sensitive data identification", "Retention policies", "Cross-border transfers"],
+                    "compliance_relevance": ["GDPR", "CCPA", "HIPAA"]
+                },
+                {
+                    "question": "How is data integrity verified for {node_type}?",
+                    "type": "single_choice",
+                    "options": ["Cryptographic Hashing", "Digital Signatures", "Checksums", "No Verification", "Unknown"],
+                    "help_text": "Data integrity verification protects {node_type} from tampering.",
+                    "related_branch": "DataIntegrity",
+                    "expert_considerations": ["Hash algorithm selection", "Key management", "Verification frequency"],
+                    "compliance_relevance": ["PCI-DSS", "SOX", "FDA 21 CFR Part 11"]
+                }
+            ],
+            "Security Services": [
+                {
+                    "question": "How is {node_type} threat intelligence integrated?",
+                    "type": "single_choice",
+                    "options": ["Real-time Feeds", "Daily Updates", "Weekly Updates", "No Integration", "Unknown"],
+                    "help_text": "Threat intelligence enhances {node_type} detection capabilities.",
+                    "related_branch": "ThreatIntelligence",
+                    "expert_considerations": ["Feed quality assessment", "False positive management", "Attribution analysis"],
+                    "compliance_relevance": ["NIST Cybersecurity Framework", "ISO27001"]
+                }
+            ]
+        }
+        
+        # Combine common and category-specific templates
+        templates = common_templates.copy()
+        if category in category_templates:
+            templates.extend(category_templates[category])
+        
+        # Add level-specific complexity
+        if level == QuestionnaireLevel.EXPERT:
+            expert_templates = [
+                {
+                    "question": "What threat modeling methodologies have been applied to {node_type}?",
+                    "type": "multiple_choice",
+                    "options": ["STRIDE", "PASTA", "TRIKE", "OCTAVE", "Custom Methodology", "None"],
+                    "help_text": "Threat modeling provides systematic {node_type} security analysis.",
+                    "related_branch": "ThreatModeling",
+                    "expert_considerations": ["Model maintenance", "Threat landscape evolution", "Risk quantification"],
+                    "compliance_relevance": ["ISO27001", "NIST Cybersecurity Framework"]
+                },
+                {
+                    "question": "How is {node_type} security measured and reported to stakeholders?",
+                    "type": "text",
+                    "help_text": "Security metrics enable {node_type} risk management and decision making.",
+                    "related_branch": "SecurityMetrics",
+                    "expert_considerations": ["KPI selection", "Dashboard design", "Executive reporting"],
+                    "compliance_relevance": ["SOC2", "ISO27001", "Board oversight requirements"]
+                }
+            ]
+            templates.extend(expert_templates)
+        
+        return templates
+    
     def get_metadata(self, node_subtype: str) -> Optional[QuestionnaireMetadata]:
         """Get metadata for a specific node type"""
         return self._metadata_cache.get(node_subtype)
