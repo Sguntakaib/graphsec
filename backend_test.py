@@ -5188,11 +5188,186 @@ def test_multi_level_questionnaires_only():
     
     return success
 
+def test_expanded_nodes_debug_endpoint():
+    """Test GET /api/expanded-nodes/debug for node count diagnostics"""
+    tester = SecurityModelingAPITester()
+    try:
+        response = tester.session.get(f"{tester.base_url}/expanded-nodes/debug")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Check for debug information
+            expected_fields = ["source", "count", "types", "first_5", "new_types"]
+            missing_fields = [f for f in expected_fields if f not in data]
+            
+            if missing_fields:
+                tester.log_test("Expanded Nodes Debug", False, f"Missing debug fields: {missing_fields}")
+                return False
+            
+            count = data.get("count", 0)
+            types = data.get("types", [])
+            new_types = data.get("new_types", [])
+            
+            # Expected new node types from the review request
+            expected_new_types = [
+                'ElasticLoadBalancer', 'ConfigurationManagement', 'ServiceMesh', 
+                'DataLakeStorage', 'EdgeComputing', 'QuantumSafeEncryption'
+            ]
+            
+            found_new_types = [t for t in expected_new_types if t in types]
+            missing_new_types = [t for t in expected_new_types if t not in types]
+            
+            tester.log_test("Expanded Nodes Debug", True, 
+                        f"Debug info: {count} total types, {len(new_types)} new types found, "
+                        f"Expected new types found: {found_new_types}, Missing: {missing_new_types}")
+            
+            return {
+                "total_count": count,
+                "all_types": types,
+                "found_new_types": found_new_types,
+                "missing_new_types": missing_new_types,
+                "debug_data": data
+            }
+        else:
+            tester.log_test("Expanded Nodes Debug", False, f"HTTP {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        tester.log_test("Expanded Nodes Debug", False, f"Error: {str(e)}")
+        return False
+
+def test_expanded_nodes_supported_types_focused():
+    """FOCUSED TEST: GET /api/expanded-nodes/supported-types for node count discrepancy analysis"""
+    tester = SecurityModelingAPITester()
+    try:
+        response = tester.session.get(f"{tester.base_url}/expanded-nodes/supported-types")
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Check for required fields
+            expected_fields = ["supported_types", "total_count"]
+            missing_fields = [f for f in expected_fields if f not in data]
+            
+            if missing_fields:
+                tester.log_test("FOCUSED - Expanded Nodes Supported Types", False, f"Missing fields: {missing_fields}")
+                return False
+            
+            supported_types = data.get("supported_types", [])
+            total_count = data.get("total_count", 0)
+            
+            # Extract node type names
+            node_type_names = []
+            if supported_types:
+                node_type_names = [t.get("node_subtype", "") for t in supported_types]
+            
+            # Expected new node types from the review request
+            expected_new_types = [
+                'ElasticLoadBalancer', 'ConfigurationManagement', 'ServiceMesh', 
+                'DataLakeStorage', 'EdgeComputing', 'QuantumSafeEncryption'
+            ]
+            
+            found_new_types = [t for t in expected_new_types if t in node_type_names]
+            missing_new_types = [t for t in expected_new_types if t not in node_type_names]
+            
+            # Detailed analysis
+            analysis_result = {
+                "actual_count": total_count,
+                "expected_count": 30,
+                "count_discrepancy": 30 - total_count,
+                "all_node_types": node_type_names,
+                "expected_new_types": expected_new_types,
+                "found_new_types": found_new_types,
+                "missing_new_types": missing_new_types,
+                "new_types_found_count": len(found_new_types),
+                "new_types_missing_count": len(missing_new_types)
+            }
+            
+            # Determine if test passes based on count and new types
+            if total_count == 30 and len(missing_new_types) == 0:
+                tester.log_test("FOCUSED - Expanded Nodes Supported Types", True, 
+                            f"✅ EXPECTED COUNT ACHIEVED: {total_count}/30 node types, all 6 new types present: {found_new_types}")
+            elif total_count == 24:
+                tester.log_test("FOCUSED - Expanded Nodes Supported Types", False, 
+                            f"❌ COUNT DISCREPANCY CONFIRMED: {total_count}/30 node types (missing {30-total_count}), "
+                            f"New types found: {len(found_new_types)}/6 ({found_new_types}), "
+                            f"Missing new types: {missing_new_types}")
+            else:
+                tester.log_test("FOCUSED - Expanded Nodes Supported Types", False, 
+                            f"❌ UNEXPECTED COUNT: {total_count} node types (expected 30), "
+                            f"New types status: {len(found_new_types)}/6 found")
+            
+            return analysis_result
+        else:
+            tester.log_test("FOCUSED - Expanded Nodes Supported Types", False, f"HTTP {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        tester.log_test("FOCUSED - Expanded Nodes Supported Types", False, f"Error: {str(e)}")
+        return False
+
+def run_focused_node_count_tests():
+    """Run focused tests for node count discrepancy debugging"""
+    print("🎯 FOCUSED NODE COUNT DISCREPANCY TESTING")
+    print(f"Testing against: {BASE_URL}")
+    print("Target: GET /api/expanded-nodes/supported-types endpoint")
+    print("Issue: Only 24 node types returned instead of expected 30")
+    print("Expected new types: ElasticLoadBalancer, ConfigurationManagement, ServiceMesh, DataLakeStorage, EdgeComputing, QuantumSafeEncryption")
+    print("=" * 100)
+    
+    # Run focused tests
+    debug_result = test_expanded_nodes_debug_endpoint()
+    analysis_result = test_expanded_nodes_supported_types_focused()
+    
+    print("\n" + "=" * 100)
+    print("🔍 DETAILED ANALYSIS RESULTS:")
+    
+    if analysis_result:
+        print(f"📊 ACTUAL COUNT: {analysis_result['actual_count']}")
+        print(f"📊 EXPECTED COUNT: {analysis_result['expected_count']}")
+        print(f"📊 COUNT DISCREPANCY: {analysis_result['count_discrepancy']}")
+        print(f"📊 NEW TYPES FOUND: {analysis_result['new_types_found_count']}/6")
+        print(f"✅ FOUND NEW TYPES: {analysis_result['found_new_types']}")
+        print(f"❌ MISSING NEW TYPES: {analysis_result['missing_new_types']}")
+        print(f"📋 ALL NODE TYPES ({len(analysis_result['all_node_types'])}): {analysis_result['all_node_types']}")
+    
+    if debug_result and isinstance(debug_result, dict):
+        print(f"🔧 DEBUG ENDPOINT DATA: {debug_result['debug_data']}")
+    
+    print("\n" + "=" * 100)
+    print("🎯 ROOT CAUSE ANALYSIS:")
+    
+    if analysis_result:
+        if analysis_result['actual_count'] == 24:
+            print("❌ CONFIRMED: Only 24 node types returned instead of expected 30")
+            print("❌ MISSING: 6 node types are not being returned by the API")
+            
+            if analysis_result['new_types_missing_count'] > 0:
+                print(f"❌ NEW TYPES ISSUE: {analysis_result['new_types_missing_count']}/6 expected new types are missing")
+                print(f"   Missing types: {analysis_result['missing_new_types']}")
+            else:
+                print("✅ NEW TYPES OK: All 6 expected new types are present")
+                print("❌ OTHER TYPES MISSING: The discrepancy is in other node types, not the new ones")
+        elif analysis_result['actual_count'] == 30:
+            print("✅ COUNT RESOLVED: 30 node types returned as expected")
+            if analysis_result['new_types_missing_count'] == 0:
+                print("✅ NEW TYPES RESOLVED: All 6 expected new types are present")
+            else:
+                print(f"❌ NEW TYPES ISSUE: {analysis_result['new_types_missing_count']}/6 new types still missing")
+        else:
+            print(f"❓ UNEXPECTED COUNT: {analysis_result['actual_count']} node types (neither 24 nor 30)")
+    
+    return analysis_result
+
 def main():
     """Main test execution"""
     # Check if we should run focused testing
     if len(sys.argv) > 1 and sys.argv[1] == "--multi-level-only":
         success = test_multi_level_questionnaires_only()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--focused":
+        analysis_result = run_focused_node_count_tests()
+        success = analysis_result and analysis_result.get('actual_count') == 30
     else:
         tester = SecurityModelingAPITester()
         success = tester.run_all_tests()
