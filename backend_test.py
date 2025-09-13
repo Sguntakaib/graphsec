@@ -8131,6 +8131,13 @@ class SecurityModelingAPITester:
             self.test_threat_intelligence_dashboard,
             
             # ============================================================================
+            # PHASE 2 QUESTIONNAIRE SYSTEM TESTS - CRITICAL ENDPOINTS (REVIEW REQUEST)
+            # ============================================================================
+            self.test_phase2_questionnaire_primary_endpoint,
+            self.test_phase2_questionnaire_alternative_endpoint,
+            self.test_phase2_questionnaire_response_format_comparison,
+            
+            # ============================================================================
             # PHASE 2 QUESTIONNAIRE SYSTEM TESTS - CRITICAL PRIORITY NODE TYPES
             # ============================================================================
             self.test_phase2_webapp_questionnaire_basic,
