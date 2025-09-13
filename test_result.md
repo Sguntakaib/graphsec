@@ -914,9 +914,9 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "❌ PARTIAL IMPLEMENTATION: Only EC2 basic level questionnaire working (5 questions). Lambda advanced and other node types return 404 'Questionnaire not found'. Missing advanced/expert level questionnaires for most node types. Expected: basic (5-8 questions), advanced (15-20 questions), expert (25-30 questions) for all 25+ node types."
-      - working: true
+      - working: false
         agent: "testing"
-        comment: "✅ MULTI-LEVEL QUESTIONNAIRES IMPLEMENTATION COMPLETE: Successfully tested all 3 requested questionnaire levels. EC2 EXPERT level: 25 questions (meets ≥25 requirement), Lambda ADVANCED level: 17 questions (meets requirement), Lambda EXPERT level: 24 questions (meets ≥24 requirement). All endpoints return HTTP 200, proper question structure with required fields (id, question, type, options, help_text, related_branch), valid question types, and relevant content. No HTTP 404 errors. Implementation progress verified as requested."
+        comment: "❌ QUESTIONNAIRE LEVEL IMPLEMENTATION ISSUE: All questionnaire levels (basic/advanced/expert) return only 5 questions instead of expected ranges. Expected: basic (5-8), advanced (15-20), expert (25-30). Tested EC2 basic/advanced/expert, Lambda basic/advanced, S3 basic/expert - all return 5 questions. API structure is correct with proper fields (node_subtype, questionnaire_level, questions, metadata, threat_intelligence) but question count doesn't scale by level."
 
   - task: "Expanded Intelligent Nodes - Probabilistic Risk Calculation API"
     implemented: true
