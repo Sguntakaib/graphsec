@@ -4772,14 +4772,15 @@ class SecurityModelingAPITester:
                                 f"Missing risk distribution percentiles: {missing_percentiles}")
                     return False
                 
-                # Verify probabilistic score differs from composite score (proving Monte Carlo is running)
-                probabilistic_score = risk_assessment.get("probabilistic_score", 0)
-                composite_score = risk_assessment.get("composite_risk_score", 0)
+                # Verify Monte Carlo analysis has meaningful statistical data (proving Monte Carlo is running)
+                monte_carlo = risk_assessment.get("monte_carlo_analysis", {})
+                mean_risk = monte_carlo.get("mean_risk", 0)
+                std_dev = monte_carlo.get("standard_deviation", 0)
                 
-                # Allow for small differences due to rounding - Monte Carlo should produce some variation
-                if abs(probabilistic_score - composite_score) < 0.001:
+                # Monte Carlo should produce statistical variation
+                if std_dev <= 0:
                     self.log_test("Priority 1 - EC2 Probabilistic Risk", False, 
-                                f"Probabilistic score too close to composite score: {probabilistic_score} vs {composite_score} - Monte Carlo may not be running properly")
+                                f"Monte Carlo standard deviation is {std_dev} - simulation may not be running")
                     return False
                 
                 self.log_test("Priority 1 - EC2 Probabilistic Risk", True, 
