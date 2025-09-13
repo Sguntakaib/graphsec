@@ -254,7 +254,7 @@ questionnaires:
       type: "single_choice"
       options: ["Full DevSecOps integration", "Partial automation", "Manual deployment", "No DevSecOps integration", "Unknown"]
       help_text: "DevSecOps integration ensures security is built into development workflows."
-      related_branch = "CICDSecurity"
+      related_branch: "CICDSecurity"
     - id: "waf_privacy_protection"
       question: "How does WAF implement privacy protection?"
       type: "single_choice"
