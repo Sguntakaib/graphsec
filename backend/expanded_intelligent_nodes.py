@@ -2934,9 +2934,12 @@ class ExpandedIntelligentNodeEngine:
         return questionnaires.get(level, [])
     
     def calculate_comprehensive_risk(self, node_type: str, responses: Dict[str, Any]) -> Dict[str, Any]:
-        """Calculate comprehensive risk assessment"""
+        """Calculate comprehensive risk assessment with Priority 1 probabilistic modeling"""
         risk_metrics = self._probabilistic_risk_model(node_type, responses)
         composite_risk = risk_metrics.calculate_composite_risk()
+        
+        # Priority 1: Enhanced Probabilistic Modeling
+        probabilistic_analysis = risk_metrics.calculate_probabilistic_risk()
         
         # Determine risk level
         if composite_risk >= 8.0:
@@ -2952,6 +2955,11 @@ class ExpandedIntelligentNodeEngine:
         
         return {
             "composite_risk_score": round(composite_risk, 2),
+            "probabilistic_score": round(risk_metrics.probabilistic_score, 2),
+            "confidence_interval": risk_metrics.confidence_interval,
+            "threat_likelihood": round(risk_metrics.threat_likelihood, 2),
+            "uncertainty_factor": round(risk_metrics.uncertainty_factor, 2),
+            "monte_carlo_analysis": probabilistic_analysis,
             "risk_level": risk_level,
             "risk_components": {
                 "attack_surface": round(risk_metrics.attack_surface_score, 2),
