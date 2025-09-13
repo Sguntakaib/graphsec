@@ -931,7 +931,7 @@ agent_communication:
         comment: "Phase 1 Enhanced APIs - POST /api/expanded-nodes/{node_subtype}/calculate-risk endpoint implemented with enhanced risk calculation"
       - working: false
         agent: "testing"
-        comment: "❌ MISSING PROBABILISTIC MODELING: Risk assessment missing required probabilistic modeling fields: confidence_interval, threat_likelihood, probabilistic_score. Current implementation returns basic risk_assessment but lacks the advanced probabilistic modeling expected for Phase 1 Enhanced APIs. Need to enhance RiskMetrics class and calculation methods."
+        comment: "❌ MISSING RISK_FACTORS FIELD: Enhanced risk calculation has all probabilistic modeling fields (confidence_interval, threat_likelihood, probabilistic_score, monte_carlo_analysis) but missing 'risk_factors' field in risk_assessment. API returns proper structure with composite_risk_score, risk_level, risk_components, threat_intelligence, security_recommendations, but test expects 'risk_factors' field specifically."
 
   - task: "Expanded Intelligent Nodes - Bulk Risk Assessment API"
     implemented: true
