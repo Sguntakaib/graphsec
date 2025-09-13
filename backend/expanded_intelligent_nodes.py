@@ -2840,6 +2840,402 @@ class ExpandedIntelligentNodeEngine:
             )
         }
         
+        # ===== PHASE 1 EXPANSION - NEW NODE TYPES FOR 25+ COVERAGE =====
+        
+        # Elastic Load Balancer (Advanced)
+        templates["ElasticLoadBalancer"] = {
+            "node_type": "Control",
+            "node_subtype": "ElasticLoadBalancer",
+            "category": NodeCategory.NETWORK_COMPONENTS,
+            "description": "Advanced Elastic Load Balancer (ALB/NLB/GLB)",
+            "required_branches": [
+                SecurityBranchType.NETWORK_SECURITY,
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.DDoS_PROTECTION
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "elb_type",
+                        "question": "What type of load balancer is deployed?",
+                        "type": "single_choice",
+                        "options": ["Application Load Balancer (ALB)", "Network Load Balancer (NLB)", "Gateway Load Balancer (GLB)", "Classic Load Balancer", "Third-party LB"],
+                        "help_text": "Different load balancer types have different security capabilities and attack surfaces.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "elb_ssl_termination",
+                        "question": "How is SSL/TLS termination configured?",
+                        "type": "single_choice",
+                        "options": ["Load Balancer Terminates SSL", "End-to-End Encryption", "Pass-through Mode", "No SSL/TLS", "Mixed Configuration"],
+                        "help_text": "SSL termination affects encryption, certificate management, and performance.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "elb_health_checks",
+                        "question": "Are health checks properly configured?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive Health Checks", "Basic HTTP Checks", "TCP Checks Only", "No Health Checks", "Unknown"],
+                        "help_text": "Proper health checks prevent routing to unhealthy instances.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "elb_access_logs",
+                        "question": "Are access logs enabled and monitored?",
+                        "type": "boolean",
+                        "help_text": "Access logs provide visibility into traffic patterns and potential attacks.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "elb_waf_integration",
+                        "question": "Is WAF integrated with the load balancer?",
+                        "type": "single_choice",
+                        "options": ["AWS WAF v2", "AWS WAF Classic", "Third-party WAF", "No WAF Protection", "Unknown"],
+                        "help_text": "WAF integration provides application-layer attack protection.",
+                        "related_branch": SecurityBranchType.WAF
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=18,
+                recent_threats=["DDoS Attacks", "SSL Stripping", "Session Hijacking"],
+                attack_vectors=["Layer 7 DDoS", "Certificate Attacks", "Health Check Bypass"],
+                mitre_techniques=["T1499", "T1040", "T1557"],
+                threat_actors=["DDoS Groups", "Web Attackers"]
+            )
+        }
+        
+        # Configuration Management
+        templates["ConfigurationManagement"] = {
+            "node_type": "Control",
+            "node_subtype": "ConfigurationManagement",
+            "category": NodeCategory.CONTAINER_DEVOPS,
+            "description": "Infrastructure as Code and Configuration Management",
+            "required_branches": [
+                SecurityBranchType.SUPPLY_CHAIN,
+                SecurityBranchType.SECRETS_MANAGEMENT,
+                SecurityBranchType.COMPLIANCE,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.MONITORING
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "iac_tool",
+                        "question": "What Infrastructure as Code tool is primarily used?",
+                        "type": "single_choice",
+                        "options": ["Terraform", "AWS CloudFormation", "Azure ARM Templates", "Google Cloud Deployment Manager", "Ansible", "Puppet", "Chef", "Manual"],
+                        "help_text": "Different IaC tools have varying security features and best practices.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "iac_version_control",
+                        "question": "Is infrastructure code stored in version control?",
+                        "type": "single_choice",
+                        "options": ["Git with Branch Protection", "Git without Protection", "Other VCS", "No Version Control", "Unknown"],
+                        "help_text": "Version control provides audit trails and change management for infrastructure.",
+                        "related_branch": SecurityBranchType.SUPPLY_CHAIN
+                    },
+                    {
+                        "id": "iac_secret_management",
+                        "question": "How are secrets handled in infrastructure code?",
+                        "type": "single_choice",
+                        "options": ["External Secret Manager", "Encrypted Variables", "Environment Variables", "Hardcoded Secrets", "No Secrets in Code"],
+                        "help_text": "Proper secret management prevents credential exposure in infrastructure code.",
+                        "related_branch": SecurityBranchType.SECRETS_MANAGEMENT
+                    },
+                    {
+                        "id": "iac_drift_detection",
+                        "question": "Is configuration drift detection implemented?",
+                        "type": "single_choice",
+                        "options": ["Automated Drift Detection", "Manual Drift Checks", "No Drift Detection", "Unknown"],
+                        "help_text": "Drift detection identifies unauthorized changes to infrastructure.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "iac_approval_process",
+                        "question": "What approval process exists for infrastructure changes?",
+                        "type": "single_choice",
+                        "options": ["Multi-person Approval", "Single Approver", "Automated Approval", "No Approval Process", "Unknown"],
+                        "help_text": "Approval processes prevent unauthorized infrastructure changes.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=12,
+                recent_threats=["Supply Chain Attacks", "Configuration Drift", "Secret Exposure"],
+                attack_vectors=["Malicious Modules", "Credential Theft", "Infrastructure Takeover"],
+                mitre_techniques=["T1195", "T1552", "T1078"],
+                threat_actors=["Supply Chain Attackers", "Insider Threats"]
+            )
+        }
+        
+        # Service Mesh
+        templates["ServiceMesh"] = {
+            "node_type": "Control",
+            "node_subtype": "ServiceMesh",
+            "category": NodeCategory.NETWORK_COMPONENTS,
+            "description": "Service Mesh (Istio/Linkerd/AWS App Mesh)",
+            "required_branches": [
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.AUTHENTICATION,
+                SecurityBranchType.AUTHORIZATION,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.NETWORK_SEGMENTATION
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "mesh_technology",
+                        "question": "What service mesh technology is deployed?",
+                        "type": "single_choice",
+                        "options": ["Istio", "Linkerd", "AWS App Mesh", "Consul Connect", "Envoy Proxy", "Custom Solution"],
+                        "help_text": "Different service mesh technologies have varying security capabilities.",
+                        "related_branch": SecurityBranchType.NETWORK_SEGMENTATION
+                    },
+                    {
+                        "id": "mesh_mtls",
+                        "question": "Is mutual TLS (mTLS) enabled for service-to-service communication?",
+                        "type": "single_choice",
+                        "options": ["Enabled and Enforced", "Enabled but Permissive", "Partially Enabled", "Disabled", "Unknown"],
+                        "help_text": "mTLS provides encryption and authentication for service communication.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "mesh_service_discovery",
+                        "question": "How is service discovery secured?",
+                        "type": "single_choice",
+                        "options": ["Authenticated Discovery", "Basic Discovery", "DNS-based Discovery", "No Security", "Unknown"],
+                        "help_text": "Secure service discovery prevents service impersonation attacks.",
+                        "related_branch": SecurityBranchType.AUTHENTICATION
+                    },
+                    {
+                        "id": "mesh_traffic_policies",
+                        "question": "Are traffic routing policies implemented?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive Policies", "Basic Routing", "Default Routing", "No Policies", "Unknown"],
+                        "help_text": "Traffic policies control how services communicate and can prevent attacks.",
+                        "related_branch": SecurityBranchType.AUTHORIZATION
+                    },
+                    {
+                        "id": "mesh_observability",
+                        "question": "What observability features are enabled?",
+                        "type": "multiple_choice",
+                        "options": ["Distributed Tracing", "Metrics Collection", "Access Logging", "Service Map", "Alerting", "None"],
+                        "help_text": "Observability features provide visibility into service mesh behavior.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=8,
+                recent_threats=["Service Impersonation", "Certificate Attacks", "Traffic Interception"],
+                attack_vectors=["mTLS Bypass", "Policy Violation", "Sidecar Compromise"],
+                mitre_techniques=["T1557", "T1040", "T1055"],
+                threat_actors=["Internal Attackers", "APT Groups"]
+            )
+        }
+        
+        # Data Lake Storage
+        templates["DataLakeStorage"] = {
+            "node_type": "Asset",
+            "node_subtype": "DataLakeStorage",
+            "category": NodeCategory.DATA_STORAGE,
+            "description": "Big Data Lake Storage (Hadoop/Delta Lake/Data Warehouses)",
+            "required_branches": [
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.DATA_CLASSIFICATION,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.COMPLIANCE,
+                SecurityBranchType.MONITORING
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "datalake_platform",
+                        "question": "What data lake platform is used?",
+                        "type": "single_choice",
+                        "options": ["AWS S3 + Lake Formation", "Azure Data Lake", "Google Cloud Storage", "Hadoop HDFS", "Delta Lake", "Snowflake", "Custom Solution"],
+                        "help_text": "Different platforms have varying security and governance capabilities.",
+                        "related_branch": SecurityBranchType.DATA_CLASSIFICATION
+                    },
+                    {
+                        "id": "datalake_data_classification",
+                        "question": "Is data classification implemented?",
+                        "type": "single_choice",
+                        "options": ["Automated Classification", "Manual Tagging", "Basic Categories", "No Classification", "Unknown"],
+                        "help_text": "Data classification enables appropriate security controls based on sensitivity.",
+                        "related_branch": SecurityBranchType.DATA_CLASSIFICATION
+                    },
+                    {
+                        "id": "datalake_access_control",
+                        "question": "What access control model is implemented?",
+                        "type": "single_choice",
+                        "options": ["Attribute-Based (ABAC)", "Role-Based (RBAC)", "ACL-Based", "No Access Control", "Unknown"],
+                        "help_text": "Access control prevents unauthorized data access and modification.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    },
+                    {
+                        "id": "datalake_encryption",
+                        "question": "What encryption is implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Encryption at Rest", "Encryption in Transit", "Column-level Encryption", "Field-level Encryption", "No Encryption"],
+                        "help_text": "Encryption protects data from unauthorized access and breaches.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "datalake_audit_logging",
+                        "question": "Is comprehensive audit logging enabled?",
+                        "type": "single_choice",
+                        "options": ["Detailed Access Logs", "Basic Activity Logs", "Limited Logging", "No Audit Logs", "Unknown"],
+                        "help_text": "Audit logging provides accountability and incident investigation capabilities.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=22,
+                recent_threats=["Data Exfiltration", "Privilege Escalation", "Data Poisoning"],
+                attack_vectors=["SQL Injection", "Access Control Bypass", "API Exploitation"],
+                mitre_techniques=["T1530", "T1078", "T1213"],
+                threat_actors=["Data Thieves", "Insider Threats", "APT Groups"]
+            )
+        }
+        
+        # Edge Computing
+        templates["EdgeComputing"] = {
+            "node_type": "Asset",
+            "node_subtype": "EdgeComputing",
+            "category": NodeCategory.IOT_EDGE,
+            "description": "Edge Computing Devices and Infrastructure",
+            "required_branches": [
+                SecurityBranchType.AUTHENTICATION,
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.PATCH_MANAGEMENT,
+                SecurityBranchType.NETWORK_SECURITY
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "edge_device_type",
+                        "question": "What type of edge computing devices are deployed?",
+                        "type": "multiple_choice",
+                        "options": ["AWS IoT Greengrass", "Azure IoT Edge", "Google Cloud IoT Edge", "NVIDIA Jetson", "Intel NUC", "Industrial IoT Gateways", "Custom Hardware"],
+                        "help_text": "Different edge devices have varying security capabilities and constraints.",
+                        "related_branch": SecurityBranchType.AUTHENTICATION
+                    },
+                    {
+                        "id": "edge_connectivity",
+                        "question": "How do edge devices connect to the cloud?",
+                        "type": "single_choice",
+                        "options": ["Cellular (4G/5G)", "WiFi", "Ethernet", "Satellite", "Multiple Methods", "Offline/Air-gapped"],
+                        "help_text": "Connectivity method affects security protocols and attack surface.",
+                        "related_branch": SecurityBranchType.NETWORK_SECURITY
+                    },
+                    {
+                        "id": "edge_authentication",
+                        "question": "How are edge devices authenticated?",
+                        "type": "single_choice",
+                        "options": ["Certificate-based", "Shared Keys", "Hardware Security Module", "Software Tokens", "No Authentication", "Unknown"],
+                        "help_text": "Strong authentication prevents device impersonation and unauthorized access.",
+                        "related_branch": SecurityBranchType.AUTHENTICATION
+                    },
+                    {
+                        "id": "edge_local_processing",
+                        "question": "What local processing capabilities exist?",
+                        "type": "multiple_choice",
+                        "options": ["AI/ML Inference", "Data Filtering", "Protocol Translation", "Local Storage", "Real-time Processing", "None"],
+                        "help_text": "Local processing capabilities affect security requirements and attack vectors.",
+                        "related_branch": SecurityBranchType.MONITORING
+                    },
+                    {
+                        "id": "edge_updates",
+                        "question": "How are edge devices updated?",
+                        "type": "single_choice",
+                        "options": ["Secure OTA Updates", "Manual Updates", "Automatic Updates", "No Update Mechanism", "Unknown"],
+                        "help_text": "Secure update mechanisms are critical for patching vulnerabilities.",
+                        "related_branch": SecurityBranchType.PATCH_MANAGEMENT
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=35,
+                recent_threats=["Device Hijacking", "Firmware Attacks", "Network Intrusion"],
+                attack_vectors=["Physical Access", "Network Exploitation", "Supply Chain Compromise"],
+                mitre_techniques=["T1200", "T1542", "T1557"],
+                threat_actors=["IoT Botnets", "State Actors", "Physical Attackers"]
+            )
+        }
+        
+        # Quantum Safe Encryption
+        templates["QuantumSafeEncryption"] = {
+            "node_type": "Control",
+            "node_subtype": "QuantumSafeEncryption",
+            "category": NodeCategory.CRYPTOGRAPHIC_CONTROLS,
+            "description": "Post-Quantum Cryptography and Quantum-Safe Security",
+            "required_branches": [
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.KEY_MANAGEMENT,
+                SecurityBranchType.COMPLIANCE,
+                SecurityBranchType.MONITORING
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "quantum_threat_assessment",
+                        "question": "Has a quantum threat assessment been conducted?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive Assessment", "Basic Assessment", "Planned Assessment", "No Assessment", "Unknown"],
+                        "help_text": "Quantum threat assessment identifies vulnerable cryptographic implementations.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "current_cryptography",
+                        "question": "What cryptographic standards are currently used?",
+                        "type": "multiple_choice",
+                        "options": ["RSA", "ECC", "AES", "SHA-256", "TLS 1.3", "Legacy Algorithms", "Unknown"],
+                        "help_text": "Current cryptography inventory helps plan quantum-safe migration.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "quantum_readiness_timeline",
+                        "question": "What is the timeline for quantum-safe cryptography adoption?",
+                        "type": "single_choice",
+                        "options": ["Already Implemented", "Within 1 Year", "1-3 Years", "3-5 Years", "No Timeline", "Unknown"],
+                        "help_text": "Timeline planning ensures proactive quantum threat mitigation.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "pqc_algorithms",
+                        "question": "Which post-quantum cryptography algorithms are being considered?",
+                        "type": "multiple_choice",
+                        "options": ["NIST Approved (CRYSTALS-KYBER)", "NIST Approved (CRYSTALS-Dilithium)", "NIST Approved (FALCON)", "NIST Approved (SPHINCS+)", "Other Algorithms", "Not Evaluated"],
+                        "help_text": "NIST-approved algorithms provide standardized quantum-safe cryptography.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "quantum_key_management",
+                        "question": "How is quantum-safe key management planned?",
+                        "type": "single_choice",
+                        "options": ["Hybrid Key Management", "Pure Post-Quantum", "Extended Current Keys", "No Planning", "Unknown"],
+                        "help_text": "Quantum-safe key management ensures long-term cryptographic security.",
+                        "related_branch": SecurityBranchType.KEY_MANAGEMENT
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=3,
+                recent_threats=["Quantum Computing Advances", "Cryptographic Breaks", "Implementation Flaws"],
+                attack_vectors=["Quantum Algorithms", "Side-channel Attacks", "Hybrid Attacks"],
+                mitre_techniques=["T1600", "T1140", "T1552"],
+                threat_actors=["Nation-State Actors", "Quantum Researchers", "Future Threats"]
+            )
+        }
+        
         return templates
     
     def _initialize_threat_intelligence(self) -> Dict[str, ThreatIntelligence]:
