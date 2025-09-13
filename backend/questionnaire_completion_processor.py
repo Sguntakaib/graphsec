@@ -132,7 +132,19 @@ class QuestionnaireCompletionProcessor:
             
         except Exception as e:
             logger.error(f"Error processing questionnaire completion: {e}")
-            raise
+            raise Exception(f"Questionnaire completion processing failed: {str(e)}")
+    
+    def _create_synthetic_diagram(self, diagram_id: str, updated_node: Dict[str, Any]) -> Dict[str, Any]:
+        """Create synthetic diagram for standalone questionnaire completion"""
+        
+        return {
+            "id": diagram_id,
+            "name": f"Standalone Analysis - {updated_node.get('subtype', 'Unknown')}",
+            "nodes": [updated_node],
+            "edges": [],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "synthetic": True
+        }
     
     async def _update_node_attributes(
         self,
