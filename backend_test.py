@@ -4766,6 +4766,11 @@ class SecurityModelingAPITester:
             self.test_questionnaire_get_responses,
             self.test_questionnaire_update_responses,
             self.test_check_dependencies,
+            # PRIORITY 1 & 2 ENHANCED FEATURES TESTS
+            self.test_priority1_probabilistic_risk_ec2,
+            self.test_priority1_probabilistic_risk_lambda,
+            self.test_priority1_probabilistic_risk_s3,
+            self.test_priority2_bulk_risk_assessment,
             # Phase 1 Enhanced APIs - Expanded Intelligent Nodes & Threat Intelligence
             self.test_expanded_nodes_supported_types,
             self.test_expanded_nodes_questionnaire_levels,
