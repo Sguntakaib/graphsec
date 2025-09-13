@@ -1,0 +1,365 @@
+node_type: "Asset"
+node_subtype: "Database"
+category: "Data Storage"
+description: "Database Management System"
+required_branches:
+  - "DatabaseSecurity"
+  - "AccessControl"
+  - "Encryption"
+  - "Backup"
+  - "Monitoring"
+  - "PatchManagement"
+  - "NetworkSecurity"
+  - "AuditLogging"
+
+questionnaires:
+  basic:
+    - id: "database_authentication"
+      question: "How is database authentication configured?"
+      type: "single_choice"
+      options: ["Strong authentication with MFA", "Username/password with complexity", "Basic authentication", "No authentication", "Unknown"]
+      help_text: "Strong database authentication prevents unauthorized data access."
+      related_branch: "AccessControl"
+    - id: "database_encryption_at_rest"
+      question: "Is data encrypted at rest?"
+      type: "single_choice"
+      options: ["Transparent Data Encryption (TDE)", "File-level encryption", "Disk encryption", "No encryption", "Unknown"]
+      help_text: "Encryption at rest protects stored data from unauthorized access."
+      related_branch: "Encryption"
+    - id: "database_encryption_in_transit"
+      question: "Is data encrypted in transit?"
+      type: "single_choice"
+      options: ["SSL/TLS enforced", "SSL/TLS available", "Unencrypted connections", "Unknown"]
+      help_text: "Encryption in transit protects data during transmission."
+      related_branch: "Encryption"
+    - id: "database_access_control"
+      question: "How is database access controlled?"
+      type: "single_choice"
+      options: ["Role-based access with least privilege", "Basic user roles", "Shared accounts", "No access control", "Unknown"]
+      help_text: "Proper access control ensures users can only access necessary data."
+      related_branch: "AccessControl"
+    - id: "database_backup_strategy"
+      question: "What backup strategy is implemented?"
+      type: "single_choice"
+      options: ["Automated encrypted backups", "Regular backups", "Manual backups", "No backup strategy", "Unknown"]
+      help_text: "Database backups ensure data recovery in case of loss or corruption."
+      related_branch: "Backup"
+    - id: "database_patch_management"
+      question: "How is database patch management handled?"
+      type: "single_choice"
+      options: ["Automated patching with testing", "Regular manual patching", "Irregular patching", "No patch management", "Unknown"]
+      help_text: "Regular patching protects against known database vulnerabilities."
+      related_branch: "PatchManagement"
+    - id: "database_network_security"
+      question: "How is database network access secured?"
+      type: "single_choice"
+      options: ["Private network with firewall", "Firewall protection", "Network restrictions", "No network security", "Unknown"]
+      help_text: "Network security controls limit database access to authorized systems."
+      related_branch: "NetworkSecurity"
+    - id: "database_logging"
+      question: "What database logging is configured?"
+      type: "single_choice"
+      options: ["Comprehensive audit logging", "Basic query logging", "Connection logging only", "No logging", "Unknown"]
+      help_text: "Database logging enables security monitoring and compliance."
+      related_branch: "AuditLogging"
+
+  advanced:
+    - id: "database_privilege_management"
+      question: "How are database privileges managed?"
+      type: "single_choice"
+      options: ["Dynamic privilege management", "Role-based privileges", "Static user privileges", "Excessive privileges", "Unknown"]
+      help_text: "Proper privilege management implements least privilege access principles."
+      related_branch: "AccessControl"
+    - id: "database_column_level_encryption"
+      question: "Is column-level encryption implemented for sensitive data?"
+      type: "single_choice"
+      options: ["Selective column encryption", "Table-level encryption", "Database-level encryption", "No column encryption", "Unknown"]
+      help_text: "Column-level encryption provides granular protection for sensitive data."
+      related_branch: "Encryption"
+    - id: "database_key_management"
+      question: "How are encryption keys managed?"
+      type: "single_choice"
+      options: ["Hardware Security Module (HSM)", "Key management service", "Application-managed keys", "Static keys", "Unknown"]
+      help_text: "Proper key management ensures encryption key security and rotation."
+      related_branch: "KeyManagement"
+    - id: "database_data_masking"
+      question: "Is data masking implemented for non-production environments?"
+      type: "single_choice"
+      options: ["Dynamic data masking", "Static data masking", "Anonymization", "No data masking", "Unknown"]
+      help_text: "Data masking protects sensitive information in development and testing."
+      related_branch: "DataClassification"
+    - id: "database_vulnerability_scanning"
+      question: "Is database vulnerability scanning performed?"
+      type: "single_choice"
+      options: ["Automated vulnerability scanning", "Manual security assessments", "Periodic scanning", "No vulnerability scanning", "Unknown"]
+      help_text: "Vulnerability scanning identifies database security weaknesses."
+      related_branch: "VulnerabilityScanning"
+    - id: "database_connection_pooling"
+      question: "How is database connection pooling secured?"
+      type: "single_choice"
+      options: ["Secure connection pooling", "Basic connection limits", "Unlimited connections", "No connection management", "Unknown"]
+      help_text: "Secure connection pooling prevents resource exhaustion attacks."
+      related_branch: "DatabaseSecurity"
+    - id: "database_query_monitoring"
+      question: "What database query monitoring is implemented?"
+      type: "single_choice"
+      options: ["Real-time query analysis", "Query performance monitoring", "Basic query logging", "No query monitoring", "Unknown"]
+      help_text: "Query monitoring detects suspicious database activities and performance issues."
+      related_branch: "Monitoring"
+    - id: "database_data_classification"
+      question: "Is data classification implemented?"
+      type: "single_choice"
+      options: ["Comprehensive data classification", "Basic data labeling", "Informal classification", "No data classification", "Unknown"]
+      help_text: "Data classification drives appropriate security controls based on data sensitivity."
+      related_branch: "DataClassification"
+    - id: "database_backup_encryption"
+      question: "Are database backups encrypted?"
+      type: "single_choice"
+      options: ["Encrypted backups with key management", "Basic backup encryption", "Unencrypted backups", "Unknown"]
+      help_text: "Encrypted backups protect data during storage and transit."
+      related_branch: "Backup"
+    - id: "database_disaster_recovery"
+      question: "What disaster recovery capabilities exist?"
+      type: "single_choice"
+      options: ["Automated disaster recovery", "Manual recovery procedures", "Basic backup restore", "No disaster recovery", "Unknown"]
+      help_text: "Disaster recovery ensures database availability during major incidents."
+      related_branch: "Backup"
+    - id: "database_compliance_controls"
+      question: "What compliance controls are implemented?"
+      type: "multiple_choice"
+      options: ["GDPR compliance", "PCI DSS compliance", "HIPAA compliance", "SOX compliance", "None"]
+      help_text: "Compliance controls ensure database meets regulatory requirements."
+      related_branch: "Compliance"
+    - id: "database_change_management"
+      question: "How are database changes managed?"
+      type: "single_choice"
+      options: ["Formal change control", "Version controlled schemas", "Manual change tracking", "No change management", "Unknown"]
+      help_text: "Change management ensures secure and controlled database modifications."
+      related_branch: "ConfigurationManagement"
+    - id: "database_performance_monitoring"
+      question: "What database performance monitoring is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive performance monitoring", "Basic performance metrics", "Ad-hoc monitoring", "No performance monitoring", "Unknown"]
+      help_text: "Performance monitoring detects resource exhaustion and potential security issues."
+      related_branch: "Monitoring"
+    - id: "database_replication_security"
+      question: "How is database replication secured?"
+      type: "single_choice"
+      options: ["Encrypted replication", "Authenticated replication", "Basic replication", "No replication", "Unknown"]
+      help_text: "Secure replication protects data during synchronization between database instances."
+      related_branch: "NetworkSecurity"
+    - id: "database_maintenance_security"
+      question: "How are database maintenance activities secured?"
+      type: "single_choice"
+      options: ["Secure maintenance procedures", "Standard maintenance", "Ad-hoc maintenance", "No security measures", "Unknown"]
+      help_text: "Secure maintenance prevents vulnerabilities during database updates and repairs."
+      related_branch: "PatchManagement"
+    - id: "database_user_activity_monitoring"
+      question: "Is database user activity monitoring implemented?"
+      type: "single_choice"
+      options: ["Real-time activity monitoring", "Periodic activity reviews", "Basic user tracking", "No activity monitoring", "Unknown"]
+      help_text: "Activity monitoring detects unauthorized or suspicious database access."
+      related_branch: "AuditLogging"
+    - id: "database_data_retention"
+      question: "How is data retention managed?"
+      type: "single_choice"
+      options: ["Automated retention policies", "Manual data archival", "Basic retention", "No retention management", "Unknown"]
+      help_text: "Data retention policies ensure compliance and reduce data exposure."
+      related_branch: "DataClassification"
+    - id: "database_connection_security"
+      question: "What connection security measures are implemented?"
+      type: "multiple_choice"
+      options: ["Connection encryption", "Client authentication", "Connection limits", "IP restrictions", "None"]
+      help_text: "Connection security prevents unauthorized database access and attacks."
+      related_branch: "NetworkSecurity"
+    - id: "database_stored_procedure_security"
+      question: "How are stored procedures secured?"
+      type: "single_choice"
+      options: ["Secure coding practices", "Input validation", "Basic implementation", "No security measures", "Unknown"]
+      help_text: "Secure stored procedures prevent SQL injection and privilege escalation."
+      related_branch: "DatabaseSecurity"
+
+  expert:
+    - id: "database_zero_trust_implementation"
+      question: "How is zero trust implemented for database access?"
+      type: "single_choice"
+      options: ["Full zero trust with continuous verification", "Database-level zero trust", "Traditional security", "No zero trust", "Unknown"]
+      help_text: "Zero trust database architecture assumes no implicit trust and verifies every access."
+      related_branch: "AccessControl"
+    - id: "database_advanced_threat_detection"
+      question: "What advanced threat detection is implemented?"
+      type: "multiple_choice"
+      options: ["ML-based anomaly detection", "Behavioral analysis", "Real-time threat intelligence", "Custom detection rules", "None"]
+      help_text: "Advanced threat detection identifies sophisticated database attacks."
+      related_branch: "ThreatIntelligence"
+    - id: "database_quantum_safe_encryption"
+      question: "Is quantum-safe encryption implemented?"
+      type: "single_choice"
+      options: ["Post-quantum cryptography", "Hybrid quantum-safe approach", "Classical encryption only", "No encryption", "Unknown"]
+      help_text: "Quantum-safe encryption protects database data against future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "database_advanced_access_analytics"
+      question: "What advanced access analytics are implemented?"
+      type: "multiple_choice"
+      options: ["User behavior analytics", "Access pattern analysis", "Privilege analytics", "Risk scoring", "None"]
+      help_text: "Advanced analytics detect unusual database access patterns and potential threats."
+      related_branch: "Monitoring"
+    - id: "database_homomorphic_encryption"
+      question: "Is homomorphic encryption used for sensitive computations?"
+      type: "single_choice"
+      options: ["Fully homomorphic encryption", "Partially homomorphic encryption", "No homomorphic encryption", "Unknown"]
+      help_text: "Homomorphic encryption enables computation on encrypted data without decryption."
+      related_branch: "Encryption"
+    - id: "database_differential_privacy"
+      question: "Is differential privacy implemented?"
+      type: "single_choice"
+      options: ["Comprehensive differential privacy", "Basic privacy techniques", "No privacy protection", "Unknown"]
+      help_text: "Differential privacy provides mathematical guarantees for data privacy."
+      related_branch: "DataClassification"
+    - id: "database_advanced_backup_security"
+      question: "What advanced backup security measures are implemented?"
+      type: "multiple_choice"
+      options: ["Immutable backups", "Air-gapped backups", "Cross-region replication", "Backup integrity verification", "None"]
+      help_text: "Advanced backup security ensures data protection and recovery capabilities."
+      related_branch: "Backup"
+    - id: "database_supply_chain_security"
+      question: "How is database software supply chain security managed?"
+      type: "single_choice"
+      options: ["Software Bill of Materials", "Vendor security assessment", "Basic supply chain controls", "No supply chain security", "Unknown"]
+      help_text: "Supply chain security ensures integrity of database software and components."
+      related_branch: "SupplyChain"
+    - id: "database_advanced_key_management"
+      question: "What advanced key management techniques are implemented?"
+      type: "multiple_choice"
+      options: ["Key escrow", "Multi-party computation", "Threshold cryptography", "Key rotation automation", "None"]
+      help_text: "Advanced key management provides enhanced security for encryption keys."
+      related_branch: "KeyManagement"
+    - id: "database_federated_learning_privacy"
+      question: "If using machine learning, is federated learning implemented for privacy?"
+      type: "single_choice"
+      options: ["Federated learning with privacy", "Centralized ML with privacy", "Basic ML implementation", "No ML", "Unknown"]
+      help_text: "Federated learning enables ML while preserving data privacy and location."
+      related_branch: "DataClassification"
+    - id: "database_advanced_audit_correlation"
+      question: "What advanced audit correlation is implemented?"
+      type: "single_choice"
+      options: ["Cross-system audit correlation", "Advanced log analysis", "Basic audit logging", "No correlation", "Unknown"]
+      help_text: "Advanced audit correlation provides comprehensive security visibility."
+      related_branch: "AuditLogging"
+    - id: "database_chaos_engineering"
+      question: "Is chaos engineering applied to database security?"
+      type: "single_choice"
+      options: ["Security chaos testing", "Basic resilience testing", "No chaos engineering", "Unknown"]
+      help_text: "Chaos engineering validates database security under failure conditions."
+      related_branch: "Resilience"
+    - id: "database_advanced_compliance_automation"
+      question: "How is advanced compliance automated?"
+      type: "single_choice"
+      options: ["Continuous compliance monitoring", "Automated policy enforcement", "Regular compliance scans", "Manual compliance", "No automation"]
+      help_text: "Advanced compliance automation ensures ongoing adherence to regulations."
+      related_branch: "Compliance"
+    - id: "database_privacy_preserving_analytics"
+      question: "Are privacy-preserving analytics implemented?"
+      type: "multiple_choice"
+      options: ["Secure multi-party computation", "Homomorphic encryption analytics", "Differential privacy analytics", "K-anonymity", "None"]
+      help_text: "Privacy-preserving analytics enable insights while protecting sensitive data."
+      related_branch: "DataClassification"
+    - id: "database_advanced_incident_response"
+      question: "What advanced incident response capabilities exist?"
+      type: "single_choice"
+      options: ["Automated database incident response", "Database forensics capabilities", "Basic incident procedures", "No incident response", "Unknown"]
+      help_text: "Advanced incident response addresses database-specific security events."
+      related_branch: "IncidentResponse"
+    - id: "database_secure_multitenancy"
+      question: "How is secure multitenancy implemented?"
+      type: "single_choice"
+      options: ["Database-level isolation", "Schema-level isolation", "Application-level isolation", "No multitenancy", "Unknown"]
+      help_text: "Secure multitenancy ensures proper isolation between different tenants or applications."
+      related_branch: "AccessControl"
+    - id: "database_advanced_performance_security"
+      question: "How is performance security optimized?"
+      type: "single_choice"
+      options: ["Security-optimized performance", "Balanced approach", "Performance-first", "No optimization", "Unknown"]
+      help_text: "Performance security balances security controls with database performance requirements."
+      related_branch: "DatabaseSecurity"
+    - id: "database_blockchain_integrity"
+      question: "Is blockchain technology used for data integrity?"
+      type: "single_choice"
+      options: ["Blockchain audit trails", "Hash-based integrity", "Basic checksums", "No integrity verification", "Unknown"]
+      help_text: "Blockchain technology provides immutable audit trails and data integrity verification."
+      related_branch: "AuditLogging"
+    - id: "database_ai_security_integration"
+      question: "How is AI integrated into database security?"
+      type: "multiple_choice"
+      options: ["AI-powered threat detection", "Automated security policies", "Predictive analytics", "Anomaly detection", "None"]
+      help_text: "AI integration enhances database security through intelligent automation."
+      related_branch: "ThreatIntelligence"
+    - id: "database_advanced_data_governance"
+      question: "What advanced data governance is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive data governance", "Policy-based governance", "Basic data management", "No governance", "Unknown"]
+      help_text: "Advanced data governance ensures consistent data security and compliance."
+      related_branch: "DataClassification"
+    - id: "database_secure_development_lifecycle"
+      question: "How is secure development lifecycle applied to database changes?"
+      type: "single_choice"
+      options: ["Full SDLC integration", "Security reviews", "Basic development practices", "No secure development", "Unknown"]
+      help_text: "Secure development lifecycle ensures security is built into database modifications."
+      related_branch: "ConfigurationManagement"
+    - id: "database_advanced_monitoring_correlation"
+      question: "What advanced monitoring correlation is implemented?"
+      type: "single_choice"
+      options: ["Cross-system correlation", "Multi-dimensional analysis", "Basic monitoring", "No correlation", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive database security visibility."
+      related_branch: "Monitoring"
+    - id: "database_quantum_key_distribution"
+      question: "Is quantum key distribution implemented for ultra-secure communications?"
+      type: "single_choice"
+      options: ["Quantum key distribution", "Quantum-resistant protocols", "Classical key exchange", "No quantum security", "Unknown"]
+      help_text: "Quantum key distribution provides theoretical perfect security for key exchange."
+      related_branch: "Encryption"
+    - id: "database_advanced_threat_modeling"
+      question: "What database-specific threat modeling is performed?"
+      type: "single_choice"
+      options: ["Database threat modeling methodology", "STRIDE for databases", "Basic threat analysis", "No threat modeling", "Unknown"]
+      help_text: "Database threat modeling identifies database-specific attack vectors and mitigations."
+      related_branch: "ThreatModeling"
+    - id: "database_secure_query_optimization"
+      question: "How is secure query optimization implemented?"
+      type: "single_choice"
+      options: ["Security-aware query optimization", "Performance-focused optimization", "Basic optimization", "No optimization", "Unknown"]
+      help_text: "Secure query optimization balances performance with security considerations."
+      related_branch: "DatabaseSecurity"
+    - id: "database_advanced_testing_automation"
+      question: "What advanced database security testing is performed?"
+      type: "multiple_choice"
+      options: ["Database fuzzing", "SQL injection testing", "Performance security testing", "Chaos security testing", "None"]
+      help_text: "Advanced testing validates database security under various conditions."
+      related_branch: "VulnerabilityScanning"
+    - id: "database_security_culture_integration"
+      question: "How is database security culture promoted?"
+      type: "single_choice"
+      options: ["Database security training", "Security champions", "Basic awareness", "No security culture", "Unknown"]
+      help_text: "Security culture ensures team members understand database security best practices."
+      related_branch: "SecurityCulture"
+
+dependencies:
+  database_backup_enabled: "Backup"
+  database_monitoring_integration: "Monitoring"
+  database_external_access: "VPN"
+
+threat_intelligence:
+  cve_count: 95
+  recent_threats: ["SQL Injection", "Privilege Escalation", "Data Exfiltration", "Ransomware", "Insider Threats"]
+  attack_vectors: ["Database Injection", "Credential Attacks", "Configuration Exploitation", "Network Attacks"]
+  mitre_techniques: ["T1190", "T1078", "T1213", "T1552", "T1562"]
+  threat_actors: ["Cybercriminals", "APT Groups", "Insider Threats", "Nation State"]
+
+risk_factors:
+  weak_authentication: 4.0
+  no_encryption: 4.5
+  excessive_privileges: 3.8
+  no_backup: 3.5
+  missing_patches: 4.2
+  no_monitoring: 2.5
+  public_exposure: 4.8
