@@ -3406,16 +3406,19 @@ async def enhanced_rule_evaluation(request: dict):
         include_recommendations = request.get("include_recommendations", True)
         include_mitre = request.get("include_mitre", True)
         
+        # Support standalone rule evaluation without existing diagram
         if not diagram_id:
-            raise HTTPException(status_code=400, detail="diagram_id is required")
-        
-        # Get diagram data
-        diagram = await db.diagrams.find_one({"id": diagram_id})
-        if not diagram:
-            raise HTTPException(status_code=404, detail="Diagram not found")
-        
-        nodes = diagram.get("nodes", [])
-        edges = diagram.get("edges", [])
+            diagram_id = str(uuid.uuid4())
+            nodes = request.get("nodes", [])
+            edges = request.get("edges", [])
+        else:
+            # Get diagram data
+            diagram = await db.diagrams.find_one({"id": diagram_id})
+            if not diagram:
+                raise HTTPException(status_code=404, detail="Diagram not found")
+            
+            nodes = diagram.get("nodes", [])
+            edges = diagram.get("edges", [])
         
         # Filter nodes if specified
         if node_filter:
