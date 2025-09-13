@@ -1512,6 +1512,21 @@ async def get_supported_intelligent_types():
 # EXPANDED INTELLIGENT NODES ENDPOINTS - PHASE 1 ENHANCEMENT
 # ============================================================================
 
+@api_router.get("/expanded-nodes/debug")
+async def debug_expanded_types():
+    """Debug endpoint to see what expanded engine returns"""
+    try:
+        supported_types = expanded_node_engine.get_supported_node_types()
+        return {
+            "source": "expanded_node_engine",
+            "count": len(supported_types),
+            "types": supported_types,
+            "first_5": supported_types[:5] if supported_types else [],
+            "new_types": [t for t in supported_types if t in ['ElasticLoadBalancer', 'ConfigurationManagement', 'ServiceMesh', 'DataLakeStorage', 'EdgeComputing', 'QuantumSafeEncryption']]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
 @api_router.get("/expanded-nodes/supported-types")
 async def get_expanded_supported_types():
     """Get all supported node types with enhanced metadata and questionnaire information"""
