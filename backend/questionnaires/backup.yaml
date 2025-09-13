@@ -1,0 +1,282 @@
+node_type: "Control"
+node_subtype: "Backup"
+category: "Data Storage"
+description: "AWS Backup and Data Protection Services"
+required_branches:
+  - "Backup"
+  - "DataIntegrity"
+  - "Encryption"
+  - "AccessControl"
+  - "Compliance"
+
+questionnaires:
+  basic:
+    - id: "backup_strategy"
+      question: "What backup strategy is implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Multi-Tier Backup", "Regular Scheduled Backups", "Ad-hoc Backups", "No Backup Strategy", "Unknown"]
+      help_text: "A comprehensive backup strategy ensures data protection across all critical systems."
+      related_branch: "Backup"
+    - id: "backup_frequency"
+      question: "What is the backup frequency for critical data?"
+      type: "single_choice"
+      options: ["Continuous/Real-time", "Daily", "Weekly", "Monthly", "Irregular", "Unknown"]
+      help_text: "Backup frequency determines the maximum acceptable data loss in case of failure."
+      related_branch: "Backup"
+    - id: "backup_encryption"
+      question: "How are backups encrypted?"
+      type: "single_choice"
+      options: ["Customer Managed KMS Keys", "AWS Managed Keys", "Default Encryption", "No Encryption", "Unknown"]
+      help_text: "Encryption protects backup data from unauthorized access during storage and transit."
+      related_branch: "Encryption"
+    - id: "backup_retention"
+      question: "What is the backup retention policy?"
+      type: "single_choice"
+      options: ["Long-term (>1 year)", "Medium-term (3-12 months)", "Short-term (<3 months)", "No Retention Policy", "Unknown"]
+      help_text: "Retention policies balance storage costs with recovery requirements and compliance needs."
+      related_branch: "Backup"
+    - id: "backup_testing"
+      question: "How frequently are backup restores tested?"
+      type: "single_choice"
+      options: ["Monthly", "Quarterly", "Annually", "Never Tested", "Unknown"]
+      help_text: "Regular restore testing ensures backups are viable when needed for recovery."
+      related_branch: "DataIntegrity"
+
+  advanced:
+    - id: "backup_cross_region"
+      question: "Are backups stored in multiple regions?"
+      type: "single_choice"
+      options: ["Multi-Region with Compliance", "Cross-Region Replication", "Single Region Only", "Unknown"]
+      help_text: "Cross-region backup storage protects against regional disasters and outages."
+      related_branch: "Backup"
+    - id: "backup_automation"
+      question: "What level of backup automation is implemented?"
+      type: "single_choice"
+      options: ["Fully Automated Lifecycle", "Scheduled Automation", "Semi-Automated", "Manual Backups", "Unknown"]
+      help_text: "Automation reduces human error and ensures consistent backup execution."
+      related_branch: "Backup"
+    - id: "backup_monitoring_alerting"
+      question: "What backup monitoring and alerting is configured?"
+      type: "single_choice"
+      options: ["Comprehensive Monitoring + Alerts", "Basic Success/Failure Alerts", "Manual Monitoring", "No Monitoring", "Unknown"]
+      help_text: "Monitoring ensures backup jobs complete successfully and alerts when issues occur."
+      related_branch: "Backup"
+    - id: "backup_access_control"
+      question: "How is access to backups controlled?"
+      type: "single_choice"
+      options: ["Strict RBAC + MFA", "Role-Based Access", "Basic Access Control", "No Access Control", "Unknown"]
+      help_text: "Access control prevents unauthorized access to backup data and restore operations."
+      related_branch: "AccessControl"
+    - id: "backup_data_classification"
+      question: "How is data classification applied to backups?"
+      type: "single_choice"
+      options: ["Classification-Based Backup Policies", "Basic Data Categorization", "No Classification", "Unknown"]
+      help_text: "Data classification ensures appropriate backup protection based on data sensitivity."
+      related_branch: "DataIntegrity"
+    - id: "backup_compression_deduplication"
+      question: "What compression and deduplication is implemented?"
+      type: "single_choice"
+      options: ["Advanced Deduplication + Compression", "Basic Compression", "No Optimization", "Unknown"]
+      help_text: "Compression and deduplication reduce backup storage costs and transfer times."
+      related_branch: "Backup"
+    - id: "backup_lifecycle_management"
+      question: "How is backup lifecycle management implemented?"
+      type: "single_choice"
+      options: ["Automated Lifecycle Policies", "Manual Lifecycle Management", "No Lifecycle Management", "Unknown"]
+      help_text: "Lifecycle management automatically transitions backups through storage tiers to optimize costs."
+      related_branch: "Backup"
+    - id: "backup_point_in_time_recovery"
+      question: "Is point-in-time recovery capability available?"
+      type: "single_choice"
+      options: ["Granular Point-in-Time Recovery", "Daily Point-in-Time", "No Point-in-Time Recovery", "Unknown"]
+      help_text: "Point-in-time recovery enables restoration to specific moments before data corruption or loss."
+      related_branch: "DataIntegrity"
+    - id: "backup_application_consistency"
+      question: "How is application consistency ensured in backups?"
+      type: "single_choice"
+      options: ["Application-Aware Backups", "File System Consistency", "Crash-Consistent Backups", "No Consistency Measures", "Unknown"]
+      help_text: "Application consistency ensures backups can be properly restored without data corruption."
+      related_branch: "DataIntegrity"
+    - id: "backup_disaster_recovery_integration"
+      question: "How is backup integrated with disaster recovery plans?"
+      type: "single_choice"
+      options: ["Integrated DR Strategy", "Basic DR Integration", "Separate DR Plan", "No DR Integration", "Unknown"]
+      help_text: "Integration ensures backups support overall disaster recovery objectives and procedures."
+      related_branch: "Backup"
+    - id: "backup_compliance_requirements"
+      question: "What compliance requirements are addressed by backup policies?"
+      type: "multiple_choice"
+      options: ["GDPR", "HIPAA", "SOX", "PCI DSS", "Industry-Specific", "None"]
+      help_text: "Compliance requirements may dictate specific backup retention and protection measures."
+      related_branch: "Compliance"
+    - id: "backup_cost_optimization"
+      question: "What cost optimization strategies are implemented?"
+      type: "single_choice"
+      options: ["Intelligent Tiering", "Storage Class Optimization", "Basic Cost Controls", "No Cost Optimization", "Unknown"]
+      help_text: "Cost optimization balances data protection requirements with storage expenses."
+      related_branch: "Backup"
+    - id: "backup_network_optimization"
+      question: "How is backup network traffic optimized?"
+      type: "single_choice"
+      options: ["Bandwidth Throttling + Scheduling", "Basic Network Management", "No Network Optimization", "Unknown"]
+      help_text: "Network optimization prevents backup operations from impacting production performance."
+      related_branch: "Backup"
+    - id: "backup_incremental_differential"
+      question: "What incremental and differential backup strategies are used?"
+      type: "single_choice"
+      options: ["Optimized Incremental Strategy", "Basic Incremental Backups", "Full Backups Only", "Unknown"]
+      help_text: "Incremental strategies reduce backup time and storage requirements while maintaining protection."
+      related_branch: "Backup"
+    - id: "backup_metadata_management"
+      question: "How is backup metadata managed and protected?"
+      type: "single_choice"
+      options: ["Comprehensive Metadata Protection", "Basic Metadata Tracking", "No Metadata Management", "Unknown"]
+      help_text: "Metadata management ensures backup catalogs and indexes are protected and recoverable."
+      related_branch: "DataIntegrity"
+    - id: "backup_performance_monitoring"
+      question: "How is backup performance monitored and optimized?"
+      type: "single_choice"
+      options: ["Advanced Performance Analytics", "Basic Performance Monitoring", "No Performance Monitoring", "Unknown"]
+      help_text: "Performance monitoring identifies bottlenecks and optimization opportunities in backup operations."
+      related_branch: "Backup"
+    - id: "backup_legal_hold"
+      question: "Are legal hold capabilities implemented for backups?"
+      type: "single_choice"
+      options: ["Comprehensive Legal Hold", "Basic Retention Extension", "No Legal Hold", "Unknown"]
+      help_text: "Legal hold prevents deletion of backups that may be required for legal proceedings."
+      related_branch: "Compliance"
+
+  expert:
+    - id: "backup_zero_trust_implementation"
+      question: "How is zero trust implemented for backup systems?"
+      type: "single_choice"
+      options: ["Full Zero Trust Backup Architecture", "Partial Zero Trust", "Traditional Backup Security", "Unknown"]
+      help_text: "Zero trust ensures all backup access and operations are verified and authorized."
+      related_branch: "AccessControl"
+    - id: "backup_ai_powered_optimization"
+      question: "Is AI-powered optimization used for backup operations?"
+      type: "single_choice"
+      options: ["AI-Based Backup Optimization", "Machine Learning Analysis", "Basic AI Features", "No AI Optimization", "Unknown"]
+      help_text: "AI-powered optimization can improve backup efficiency and predict potential issues."
+      related_branch: "Backup"
+    - id: "backup_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for backup systems?"
+      type: "single_choice"
+      options: ["Comprehensive Backup Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies backup-specific attack vectors and defenses."
+      related_branch: "Backup"
+    - id: "backup_quantum_safe_encryption"
+      question: "Are quantum-safe encryption methods used for backup protection?"
+      type: "single_choice"
+      options: ["Post-Quantum Backup Cryptography", "Quantum-Resistant Algorithms", "Classical Cryptography", "Unknown"]
+      help_text: "Quantum-safe encryption prepares backup systems for future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "backup_behavioral_analysis"
+      question: "Is behavioral analysis used for backup operations monitoring?"
+      type: "single_choice"
+      options: ["Advanced Backup Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual patterns that may indicate backup system compromise."
+      related_branch: "Backup"
+    - id: "backup_immutable_storage"
+      question: "Is immutable backup storage implemented?"
+      type: "single_choice"
+      options: ["Comprehensive Immutable Backup Strategy", "Basic Immutable Storage", "No Immutable Storage", "Unknown"]
+      help_text: "Immutable storage protects backups from ransomware and unauthorized deletion."
+      related_branch: "DataIntegrity"
+    - id: "backup_advanced_recovery_scenarios"
+      question: "What advanced recovery scenarios are planned and tested?"
+      type: "multiple_choice"
+      options: ["Ransomware Recovery", "Insider Threat Recovery", "Supply Chain Attack Recovery", "Nation-State Attack Recovery", "None"]
+      help_text: "Advanced recovery scenarios ensure preparedness for sophisticated attack types."
+      related_branch: "Backup"
+    - id: "backup_supply_chain_security"
+      question: "How is supply chain security ensured for backup solutions?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "Vendor Security Assessment", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures backup solutions haven't been compromised."
+      related_branch: "Backup"
+    - id: "backup_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for backup systems?"
+      type: "multiple_choice"
+      options: ["Automated Backup Isolation", "Incident-Triggered Backups", "Backup Forensics", "Emergency Recovery", "None"]
+      help_text: "Advanced incident response enables rapid backup system protection during security incidents."
+      related_branch: "Backup"
+    - id: "backup_privacy_protection"
+      question: "How is privacy protection implemented in backup operations?"
+      type: "single_choice"
+      options: ["Privacy-Preserving Backup Architecture", "Data Minimization", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures backup operations don't compromise user data privacy."
+      related_branch: "Compliance"
+    - id: "backup_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to backup and data protection standards."
+      related_branch: "Compliance"
+    - id: "backup_multi_cloud_strategy"
+      question: "How are backups managed across multi-cloud environments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud Backup Strategy", "Cloud-Specific Backup", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud backup provides protection against cloud provider-specific outages and issues."
+      related_branch: "Backup"
+    - id: "backup_advanced_analytics"
+      question: "What advanced analytics are applied to backup data and operations?"
+      type: "single_choice"
+      options: ["Predictive Backup Analytics", "Backup Pattern Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into backup patterns, risks, and optimization opportunities."
+      related_branch: "Backup"
+    - id: "backup_edge_computing_strategy"
+      question: "How are edge computing environments included in backup strategy?"
+      type: "single_choice"
+      options: ["Edge-Specific Backup Strategy", "Centralized Edge Backup", "No Edge Backup", "Unknown"]
+      help_text: "Edge backup ensures data protection for distributed and remote computing environments."
+      related_branch: "Backup"
+    - id: "backup_advanced_deduplication"
+      question: "What advanced deduplication techniques are implemented?"
+      type: "multiple_choice"
+      options: ["Cross-System Deduplication", "Intelligent Block-Level Deduplication", "Application-Aware Deduplication", "Global Deduplication", "None"]
+      help_text: "Advanced deduplication significantly reduces backup storage requirements and costs."
+      related_branch: "Backup"
+    - id: "backup_governance_framework"
+      question: "What backup governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive Backup Governance", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "Backup governance ensures consistent data protection practices across all systems."
+      related_branch: "Compliance"
+    - id: "backup_advanced_encryption_strategies"
+      question: "What advanced encryption strategies are used for backups?"
+      type: "multiple_choice"
+      options: ["End-to-End Encryption", "Client-Side Encryption", "Envelope Encryption", "Field-Level Encryption", "None"]
+      help_text: "Advanced encryption provides enhanced protection for backup data throughout its lifecycle."
+      related_branch: "Encryption"
+    - id: "backup_crisis_management"
+      question: "What crisis management capabilities exist for backup systems?"
+      type: "multiple_choice"
+      options: ["Emergency Backup Activation", "Crisis Recovery Procedures", "Priority Data Recovery", "Emergency Communication", "None"]
+      help_text: "Crisis management ensures backup systems can respond effectively during major incidents."
+      related_branch: "Backup"
+    - id: "backup_future_technology_integration"
+      question: "How prepared are backup systems for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures backup systems can evolve with new storage and protection technologies."
+      related_branch: "Backup"
+
+dependencies:
+  backup_s3_integration: "S3"
+  backup_kms_integration: "KMS"
+  backup_ec2_integration: "EC2"
+
+threat_intelligence:
+  cve_count: 25
+  recent_threats: ["Ransomware", "Data Corruption", "Insider Threats"]
+  attack_vectors: ["Backup Deletion", "Encryption Key Compromise", "Access Control Bypass"]
+  mitre_techniques: ["T1490", "T1486", "T1552"]
+  threat_actors: ["Ransomware Groups", "Insider Threats", "APT Groups"]
+
+risk_factors:
+  no_backup_testing: 4.5
+  single_region_backup: 3.5
+  weak_access_control: 4.0
+  no_encryption: 4.5
+  no_monitoring: 3.0

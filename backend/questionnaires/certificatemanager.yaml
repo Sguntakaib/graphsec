@@ -1,0 +1,282 @@
+node_type: "Control"
+node_subtype: "CertificateManager"
+category: "Security Services"
+description: "AWS Certificate Manager for SSL/TLS certificate management"
+required_branches:
+  - "SSL/TLS"
+  - "CertificateManagement"
+  - "PKI"
+  - "Monitoring"
+  - "Compliance"
+
+questionnaires:
+  basic:
+    - id: "cert_provisioning_method"
+      question: "How are SSL/TLS certificates provisioned?"
+      type: "single_choice"
+      options: ["AWS Certificate Manager", "Let's Encrypt", "Commercial CA", "Self-Signed", "Unknown"]
+      help_text: "Proper certificate provisioning ensures trusted and valid SSL/TLS certificates."
+      related_branch: "CertificateManagement"
+    - id: "cert_automatic_renewal"
+      question: "Is automatic certificate renewal configured?"
+      type: "single_choice"
+      options: ["Fully Automated Renewal", "Semi-Automated Renewal", "Manual Renewal", "No Renewal Process", "Unknown"]
+      help_text: "Automatic renewal prevents certificate expiration and service outages."
+      related_branch: "CertificateManagement"
+    - id: "cert_domain_validation"
+      question: "What domain validation method is used?"
+      type: "single_choice"
+      options: ["DNS Validation", "Email Validation", "HTTP Validation", "Mixed Methods", "Unknown"]
+      help_text: "Domain validation proves ownership of the domain for certificate issuance."
+      related_branch: "SSL/TLS"
+    - id: "cert_key_strength"
+      question: "What key strength is used for certificates?"
+      type: "single_choice"
+      options: ["RSA 4096-bit", "RSA 2048-bit", "ECC P-384", "ECC P-256", "Unknown"]
+      help_text: "Strong key lengths provide better security against cryptographic attacks."
+      related_branch: "PKI"
+    - id: "cert_monitoring_expiration"
+      question: "How is certificate expiration monitored?"
+      type: "single_choice"
+      options: ["Automated Monitoring + Alerts", "Manual Tracking", "Basic Monitoring", "No Monitoring", "Unknown"]
+      help_text: "Expiration monitoring prevents unexpected certificate-related outages."
+      related_branch: "Monitoring"
+
+  advanced:
+    - id: "cert_wildcard_usage"
+      question: "How are wildcard certificates managed?"
+      type: "single_choice"
+      options: ["Limited Wildcard Usage", "Strategic Wildcard Usage", "Extensive Wildcard Usage", "No Wildcard Certificates", "Unknown"]
+      help_text: "Wildcard certificate usage should be carefully managed to balance convenience with security."
+      related_branch: "CertificateManagement"
+    - id: "cert_multi_domain_san"
+      question: "Are multi-domain (SAN) certificates used appropriately?"
+      type: "single_choice"
+      options: ["Strategic SAN Usage", "Extensive SAN Usage", "Single Domain Only", "Unknown"]
+      help_text: "SAN certificates can simplify management but require careful domain grouping."
+      related_branch: "CertificateManagement"
+    - id: "cert_private_key_security"
+      question: "How are private keys secured?"
+      type: "single_choice"
+      options: ["HSM Storage", "Encrypted Storage", "Secure Key Management", "Basic Storage", "Unknown"]
+      help_text: "Private key security is critical to prevent certificate compromise."
+      related_branch: "PKI"
+    - id: "cert_certificate_transparency"
+      question: "Is Certificate Transparency monitoring implemented?"
+      type: "single_choice"
+      options: ["Active CT Monitoring", "Basic CT Awareness", "No CT Monitoring", "Unknown"]
+      help_text: "Certificate Transparency monitoring helps detect unauthorized certificate issuance."
+      related_branch: "Monitoring"
+    - id: "cert_revocation_strategy"
+      question: "What certificate revocation strategy is implemented?"
+      type: "single_choice"
+      options: ["OCSP Stapling", "CRL Distribution", "Both OCSP and CRL", "No Revocation Strategy", "Unknown"]
+      help_text: "Proper revocation strategy ensures compromised certificates can be quickly invalidated."
+      related_branch: "PKI"
+    - id: "cert_deployment_automation"
+      question: "How is certificate deployment automated?"
+      type: "single_choice"
+      options: ["Fully Automated Deployment", "Semi-Automated Deployment", "Manual Deployment", "No Automation", "Unknown"]
+      help_text: "Automated deployment reduces errors and ensures consistent certificate installation."
+      related_branch: "CertificateManagement"
+    - id: "cert_backup_recovery"
+      question: "What backup and recovery strategy exists for certificates?"
+      type: "single_choice"
+      options: ["Comprehensive Backup Strategy", "Basic Certificate Backup", "No Certificate Backup", "Unknown"]
+      help_text: "Certificate backup ensures recovery capability during disasters or system failures."
+      related_branch: "CertificateManagement"
+    - id: "cert_compliance_requirements"
+      question: "What compliance requirements are addressed by certificate management?"
+      type: "multiple_choice"
+      options: ["PCI DSS", "HIPAA", "SOX", "FIPS 140-2", "Common Criteria", "None"]
+      help_text: "Compliance requirements may dictate specific certificate management practices."
+      related_branch: "Compliance"
+    - id: "cert_load_balancer_integration"
+      question: "How are certificates integrated with load balancers?"
+      type: "single_choice"
+      options: ["Automated Load Balancer Integration", "Manual Certificate Deployment", "No Load Balancer Integration", "Unknown"]
+      help_text: "Proper integration ensures certificates are correctly deployed to load balancers."
+      related_branch: "CertificateManagement"
+    - id: "cert_application_integration"
+      question: "How do applications access and use certificates?"
+      type: "single_choice"
+      options: ["Secure Certificate Store Integration", "File-Based Certificate Access", "Environment Variable Access", "Hardcoded Certificates", "Unknown"]
+      help_text: "Secure application integration prevents unauthorized certificate access."
+      related_branch: "CertificateManagement"
+    - id: "cert_testing_validation"
+      question: "What testing is performed on certificate deployments?"
+      type: "single_choice"
+      options: ["Comprehensive Certificate Testing", "Basic SSL Testing", "Manual Testing", "No Certificate Testing", "Unknown"]
+      help_text: "Certificate testing ensures proper installation and functionality."
+      related_branch: "SSL/TLS"
+    - id: "cert_cross_region_management"
+      question: "How are certificates managed across multiple regions?"
+      type: "single_choice"
+      options: ["Cross-Region Certificate Strategy", "Region-Specific Certificates", "Single Region Only", "Unknown"]
+      help_text: "Cross-region management ensures certificate availability for global applications."
+      related_branch: "CertificateManagement"
+    - id: "cert_cost_optimization"
+      question: "What cost optimization strategies are implemented?"
+      type: "single_choice"
+      options: ["Certificate Consolidation", "Lifecycle Management", "No Cost Optimization", "Unknown"]
+      help_text: "Cost optimization balances certificate management expenses with security requirements."
+      related_branch: "CertificateManagement"
+    - id: "cert_security_scanning"
+      question: "Is security scanning performed on certificate configurations?"
+      type: "single_choice"
+      options: ["Automated Security Scanning", "Manual Security Reviews", "No Security Scanning", "Unknown"]
+      help_text: "Security scanning identifies vulnerabilities in certificate configurations."
+      related_branch: "SSL/TLS"
+    - id: "cert_incident_response"
+      question: "What incident response procedures exist for certificate compromise?"
+      type: "single_choice"
+      options: ["Defined Certificate Incident Response", "Basic Response Procedures", "No Certificate IR", "Unknown"]
+      help_text: "Incident response procedures enable rapid response to certificate-related security incidents."
+      related_branch: "CertificateManagement"
+    - id: "cert_change_management"
+      question: "What change management process exists for certificate operations?"
+      type: "single_choice"
+      options: ["Formal Certificate Change Control", "Basic Change Tracking", "No Change Management", "Unknown"]
+      help_text: "Change management ensures certificate modifications are controlled and documented."
+      related_branch: "CertificateManagement"
+    - id: "cert_vendor_management"
+      question: "How are certificate authority relationships managed?"
+      type: "single_choice"
+      options: ["Strategic CA Relationship Management", "Basic Vendor Management", "No CA Management", "Unknown"]
+      help_text: "CA relationship management ensures reliable certificate services and support."
+      related_branch: "PKI"
+
+  expert:
+    - id: "cert_zero_trust_pki"
+      question: "How is zero trust implemented for PKI and certificate management?"
+      type: "single_choice"
+      options: ["Full Zero Trust PKI Architecture", "Partial Zero Trust", "Traditional PKI Model", "Unknown"]
+      help_text: "Zero trust PKI ensures all certificate operations are verified and authorized."
+      related_branch: "PKI"
+    - id: "cert_ai_powered_management"
+      question: "Is AI-powered management used for certificate operations?"
+      type: "single_choice"
+      options: ["AI-Based Certificate Analytics", "Machine Learning Optimization", "Basic AI Features", "No AI Management", "Unknown"]
+      help_text: "AI-powered management can optimize certificate lifecycle and detect anomalies."
+      related_branch: "CertificateManagement"
+    - id: "cert_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for certificate infrastructure?"
+      type: "single_choice"
+      options: ["Comprehensive PKI Threat Model", "Basic Threat Analysis", "No Threat Modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies certificate-specific attack vectors and defenses."
+      related_branch: "PKI"
+    - id: "cert_quantum_safe_certificates"
+      question: "Are quantum-safe certificate algorithms implemented?"
+      type: "single_choice"
+      options: ["Post-Quantum Certificate Algorithms", "Hybrid Classical-Quantum", "Classical Algorithms Only", "Unknown"]
+      help_text: "Quantum-safe certificates prepare for future quantum computing threats to cryptography."
+      related_branch: "PKI"
+    - id: "cert_behavioral_analysis"
+      question: "Is behavioral analysis used for certificate usage monitoring?"
+      type: "single_choice"
+      options: ["Advanced Certificate Behavioral Analysis", "Pattern Recognition", "Basic Analysis", "No Behavioral Analysis", "Unknown"]
+      help_text: "Behavioral analysis identifies unusual certificate usage patterns that may indicate compromise."
+      related_branch: "Monitoring"
+    - id: "cert_advanced_pki_architecture"
+      question: "What advanced PKI architecture is implemented?"
+      type: "single_choice"
+      options: ["Hierarchical CA Architecture", "Cross-Certification Model", "Bridge CA Architecture", "Basic PKI", "Unknown"]
+      help_text: "Advanced PKI architecture provides scalable and secure certificate management."
+      related_branch: "PKI"
+    - id: "cert_certificate_pinning"
+      question: "Is certificate pinning implemented for critical applications?"
+      type: "single_choice"
+      options: ["Dynamic Certificate Pinning", "Static Certificate Pinning", "No Certificate Pinning", "Unknown"]
+      help_text: "Certificate pinning provides protection against certificate-based attacks."
+      related_branch: "SSL/TLS"
+    - id: "cert_supply_chain_security"
+      question: "How is supply chain security ensured for certificate services?"
+      type: "single_choice"
+      options: ["Comprehensive Supply Chain Validation", "CA Trust Validation", "Basic Supply Chain Checks", "No Supply Chain Security", "Unknown"]
+      help_text: "Supply chain security ensures certificate authorities and services haven't been compromised."
+      related_branch: "PKI"
+    - id: "cert_advanced_incident_response"
+      question: "What advanced incident response capabilities exist for certificate incidents?"
+      type: "multiple_choice"
+      options: ["Automated Certificate Revocation", "Emergency Certificate Issuance", "Certificate Forensics", "Incident Correlation", "None"]
+      help_text: "Advanced incident response enables rapid mitigation of certificate-related security incidents."
+      related_branch: "CertificateManagement"
+    - id: "cert_privacy_protection"
+      question: "How is privacy protection implemented in certificate operations?"
+      type: "single_choice"
+      options: ["Privacy-Preserving Certificate Management", "DNS Privacy Protection", "Basic Privacy Measures", "No Privacy Protection", "Unknown"]
+      help_text: "Privacy protection ensures certificate operations don't compromise user or organizational privacy."
+      related_branch: "Compliance"
+    - id: "cert_advanced_compliance_automation"
+      question: "What advanced compliance automation is implemented?"
+      type: "single_choice"
+      options: ["Continuous Compliance Monitoring", "Automated Policy Enforcement", "Real-time Compliance Alerts", "Basic Compliance Checks", "No Automation"]
+      help_text: "Advanced compliance automation ensures continuous adherence to certificate management standards."
+      related_branch: "Compliance"
+    - id: "cert_multi_cloud_pki"
+      question: "How is PKI managed across multi-cloud environments?"
+      type: "single_choice"
+      options: ["Unified Multi-Cloud PKI", "Cloud-Specific Certificate Management", "Basic Multi-Cloud", "Single Cloud Only", "Unknown"]
+      help_text: "Multi-cloud PKI provides consistent certificate management across cloud environments."
+      related_branch: "PKI"
+    - id: "cert_advanced_analytics"
+      question: "What advanced analytics are applied to certificate data?"
+      type: "single_choice"
+      options: ["Predictive Certificate Analytics", "Usage Pattern Analysis", "Basic Analytics", "No Advanced Analytics", "Unknown"]
+      help_text: "Advanced analytics provide insights into certificate usage, security, and optimization opportunities."
+      related_branch: "Monitoring"
+    - id: "cert_iot_device_certificates"
+      question: "How are IoT device certificates managed?"
+      type: "single_choice"
+      options: ["IoT-Specific Certificate Management", "Standard Certificate Management", "No IoT Certificates", "Unknown"]
+      help_text: "IoT certificate management addresses unique requirements for device authentication and security."
+      related_branch: "CertificateManagement"
+    - id: "cert_advanced_key_management"
+      question: "What advanced key management techniques are implemented?"
+      type: "multiple_choice"
+      options: ["Key Escrow", "Key Splitting", "Threshold Cryptography", "Key Ceremony Procedures", "None"]
+      help_text: "Advanced key management provides enhanced security for critical cryptographic operations."
+      related_branch: "PKI"
+    - id: "cert_governance_framework"
+      question: "What certificate governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive Certificate Governance", "Policy-Based Governance", "Basic Guidelines", "No Governance", "Unknown"]
+      help_text: "Certificate governance ensures consistent security practices across all certificate operations."
+      related_branch: "Compliance"
+    - id: "cert_advanced_validation"
+      question: "What advanced certificate validation mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["Extended Validation", "Organization Validation", "Domain Validation Plus", "Certificate Authority Authorization", "None"]
+      help_text: "Advanced validation provides stronger assurance of certificate legitimacy and ownership."
+      related_branch: "PKI"
+    - id: "cert_crisis_management"
+      question: "What crisis management capabilities exist for certificate systems?"
+      type: "multiple_choice"
+      options: ["Emergency Certificate Services", "Crisis Communication", "Priority Certificate Processing", "Emergency Revocation", "None"]
+      help_text: "Crisis management ensures certificate services remain available during major incidents."
+      related_branch: "CertificateManagement"
+    - id: "cert_future_technology_integration"
+      question: "How prepared is certificate management for future technologies?"
+      type: "single_choice"
+      options: ["Comprehensive Future Planning", "Technology Evolution Monitoring", "Basic Future Consideration", "No Future Planning", "Unknown"]
+      help_text: "Future technology integration ensures certificate management can evolve with new cryptographic standards."
+      related_branch: "PKI"
+
+dependencies:
+  cert_cdn_integration: "CDN"
+  cert_loadbalancer_integration: "LoadBalancer"
+  cert_apigateway_integration: "APIGateway"
+
+threat_intelligence:
+  cve_count: 35
+  recent_threats: ["Certificate Spoofing", "CA Compromise", "Weak Cryptography"]
+  attack_vectors: ["Certificate Pinning Bypass", "Man-in-the-Middle", "Certificate Substitution"]
+  mitre_techniques: ["T1553", "T1557", "T1211"]
+  threat_actors: ["APT Groups", "Certificate Authorities", "Nation States"]
+
+risk_factors:
+  weak_key_strength: 4.0
+  no_certificate_monitoring: 3.5
+  manual_certificate_management: 3.0
+  no_revocation_strategy: 4.5
+  expired_certificates: 5.0
