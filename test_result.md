@@ -550,6 +550,54 @@ test_plan:
         agent: "testing"
         comment: "✅ Built-in Security Rule Library working correctly - verified 28 rules across 6 categories with MITRE technique mapping, rule scenarios tested (SQL injection, cloud security, API security), all rules have proper structure with conditions, outcomes, and recommendations"
 
+  - task: "Phase 1 Core Loop Critical Endpoints - POST /api/questionnaires/{node_subtype}/complete"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ENDPOINT FAILURE: POST /api/questionnaires/WebApp/complete returns HTTP 500 'Questionnaire completion processing failed: Node not found in diagram' when testing with exact data structure from review request (responses: authentication_method=oauth2, encryption_enabled=true, input_validation=comprehensive; business_context: criticality=high, data_classification=confidential). The endpoint is not working in standalone mode and requires diagram_id/node_id dependencies instead of the expected standalone questionnaire completion flow."
+
+  - task: "Phase 1 Core Loop Critical Endpoints - GET /api/questionnaires/{node_subtype}"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ENDPOINT FAILURE: GET /api/questionnaires/WebApp returns HTTP 500 'IntelligentNodeEngine.create_security_branches() takes 2 positional arguments but 3 were given' - implementation bug in method signature. The endpoint has a fundamental implementation error preventing it from returning questionnaire prompts and security_branches field as expected."
+
+  - task: "Phase 1 Core Loop Critical Endpoints - POST /api/simulate"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ ENDPOINT WORKING: POST /api/simulate returns HTTP 200 with all required fields (simulation_id, attack_paths, risk_analysis, mitre_techniques, recommendations) when testing standalone simulation with nodes/edges data. The endpoint successfully processes standalone simulation requests without requiring diagram_id dependencies."
+
+  - task: "Phase 1 Core Loop Critical Endpoints - POST /api/rules/evaluate"
+    implemented: true
+    working: false
+    file: "backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ENDPOINT FAILURE: POST /api/rules/evaluate returns HTTP 500 'RuleEvaluationResult object has no attribute dict' - implementation error in RuleEvaluationResult class. The endpoint has a fundamental attribute error preventing standalone rule evaluation from working as expected."
+
 frontend:
 
   - task: "Questionnaire Management - Get Responses API"
