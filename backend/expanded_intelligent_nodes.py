@@ -441,11 +441,11 @@ class ExpandedIntelligentNodeEngine:
         aggregated_metrics = self._calculate_aggregated_metrics(individual_assessments, amplification_analysis)
         
         return {
-            "assessment_results": individual_assessments,
+            "individual_assessments": individual_assessments,  # Changed from assessment_results
             "aggregated_metrics": aggregated_metrics,
             "cross_node_correlations": cross_correlations,
             "risk_amplification": amplification_analysis,
-            "assessment_summary": {
+            "overall_risk_summary": {  # Changed from assessment_summary
                 "total_nodes": len(individual_assessments),
                 "average_risk_score": sum(overall_risk_scores) / len(overall_risk_scores) if overall_risk_scores else 0,
                 "highest_risk_score": max(overall_risk_scores) if overall_risk_scores else 0,
