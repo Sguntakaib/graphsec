@@ -3291,10 +3291,17 @@ async def complete_questionnaire(
             node_id=node_id,
             node_subtype=node_subtype,
             questionnaire_responses=responses,
-            user_id=user_id
+            user_id=user_id,
+            business_context=business_context
         )
         
         return {
+            "completion_id": str(uuid.uuid4()),
+            "node_subtype": node_subtype,
+            "security_analysis": results.get("security_analysis", {}),
+            "findings_generated": results.get("findings", []),
+            "framework_mappings": results.get("framework_mappings", {}),
+            "risk_assessment": results.get("risk_assessment", {}),
             "success": True,
             "message": f"Questionnaire completed successfully for {node_subtype} node",
             "processing_results": results
