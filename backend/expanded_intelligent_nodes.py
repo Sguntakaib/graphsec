@@ -212,7 +212,11 @@ class RiskMetrics:
         
         # Update probabilistic fields
         self.probabilistic_score = mean_risk
-        self.confidence_interval = (percentile_5, percentile_95)
+        self.confidence_interval = {
+            "lower_bound": percentile_5,
+            "upper_bound": percentile_95,
+            "confidence_level": 90
+        }
         self.threat_likelihood = self.threat_probability
         
         return {
