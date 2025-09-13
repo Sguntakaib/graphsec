@@ -159,7 +159,7 @@ class QuestionnaireCompletionProcessor:
             # Convert questionnaire responses to node security attributes
             security_attributes = self._extract_security_attributes(node_subtype, responses)
             
-            # Update the node in the diagram
+            # Try to update the node in an existing diagram first
             update_result = await self.db.diagrams.update_one(
                 {"id": diagram_id, "nodes.id": node_id},
                 {
@@ -172,15 +172,17 @@ class QuestionnaireCompletionProcessor:
                 }
             )
             
-            if update_result.matched_count == 0:
-                raise Exception(f"Node {node_id} not found in diagram {diagram_id}")
-            
-            # Return the updated node data
-            diagram = await self.db.diagrams.find_one({"id": diagram_id})
-            updated_node = next((node for node in diagram["nodes"] if node["id"] == node_id), None)
-            
-            logger.info(f"Updated node {node_id} with security attributes from questionnaire")
-            return updated_node
+            if update_result.matched_count > 0:
+                # Node was found and updated - return the updated node
+                diagram = await self.db.diagrams.find_one({"id": diagram_id})
+                updated_node = next((node for node in diagram["nodes"] if node["id"] == node_id), None)
+                logger.info(f"Updated existing node {node_id} with security attributes from questionnaire")
+                return updated_node
+            else:
+                # Node not found - create synthetic node for standalone mode
+                logger.info(f"Node {node_id} not found in diagram {diagram_id}, creating synthetic node for standalone mode")
+                updated_node = self._create_synthetic_node(node_id, node_subtype, security_attributes, responses)
+                return updated_node
             
         except Exception as e:
             logger.error(f"Error updating node attributes: {e}")
