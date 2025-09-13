@@ -1,0 +1,309 @@
+node_type: "Asset"
+node_subtype: "Lambda"
+category: "Compute Services"
+description: "AWS Lambda Serverless Function"
+required_branches:
+  - "ServerlessSecurity"
+  - "IAM"
+  - "SecretsManagement"
+  - "CodeSecurity"
+  - "Monitoring"
+
+questionnaires:
+  basic:
+    - id: "lambda_runtime"
+      question: "What runtime is used for this Lambda function?"
+      type: "single_choice"
+      options: ["Python 3.11", "Node.js 18", "Java 17", "C# .NET 6", ".NET Core", "Go", "Ruby", "Custom Runtime"]
+      help_text: "Different runtimes have varying security characteristics and update cycles."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_execution_role"
+      question: "How is the Lambda execution role configured?"
+      type: "single_choice"
+      options: ["Least Privilege (Minimal Permissions)", "Standard Permissions", "Broad Permissions", "Administrative Access", "Unknown"]
+      help_text: "Execution roles determine what AWS services the function can access."
+      related_branch: "IAM"
+    - id: "lambda_environment_variables"
+      question: "How are sensitive values handled in environment variables?"
+      type: "single_choice"
+      options: ["AWS Secrets Manager", "Parameter Store", "KMS Encrypted", "Plain Text", "No Sensitive Data"]
+      help_text: "Proper secrets management prevents credential exposure in serverless functions."
+      related_branch: "SecretsManagement"
+    - id: "lambda_vpc_config"
+      question: "Is the Lambda function deployed in a VPC?"
+      type: "single_choice"
+      options: ["Yes - Private Subnets", "Yes - Public Subnets", "No VPC", "Unknown"]
+      help_text: "VPC deployment provides network isolation but affects cold start performance."
+      related_branch: "NetworkSecurity"
+    - id: "lambda_logging"
+      question: "What logging level is configured?"
+      type: "single_choice"
+      options: ["Comprehensive (Debug)", "Standard (Info)", "Minimal (Error)", "No Logging", "Unknown"]
+      help_text: "Proper logging is essential for security monitoring and incident response."
+      related_branch: "Logging"
+
+  advanced:
+    - id: "lambda_code_signing"
+      question: "Is code signing enabled for this Lambda function?"
+      type: "single_choice"
+      options: ["Yes - AWS Signer", "Yes - Third-party", "No Code Signing", "Unknown"]
+      help_text: "Code signing ensures function code integrity and authenticity."
+      related_branch: "CodeSecurity"
+    - id: "lambda_dead_letter_queue"
+      question: "Is a Dead Letter Queue (DLQ) configured?"
+      type: "single_choice"
+      options: ["Yes - SQS DLQ", "Yes - SNS DLQ", "No DLQ", "Unknown"]
+      help_text: "DLQs help handle failed executions and prevent data loss."
+      related_branch: "Monitoring"
+    - id: "lambda_reserved_concurrency"
+      question: "Is reserved concurrency configured?"
+      type: "single_choice"
+      options: ["Yes - Conservative Limit", "Yes - High Limit", "No Limit Set", "Unknown"]
+      help_text: "Reserved concurrency prevents resource exhaustion attacks."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_layers_security"
+      question: "How are Lambda layers managed for security?"
+      type: "single_choice"
+      options: ["Verified Internal Layers", "AWS Managed Layers", "Third-party Layers", "No Layers Used", "Unknown"]
+      help_text: "Lambda layers can introduce security risks through dependencies."
+      related_branch: "SupplyChain"
+    - id: "lambda_x_ray_tracing"
+      question: "Is AWS X-Ray tracing enabled?"
+      type: "single_choice"
+      options: ["Active Tracing", "Passive Tracing", "No Tracing", "Unknown"]
+      help_text: "X-Ray tracing provides visibility into function execution and dependencies."
+      related_branch: "Monitoring"
+    - id: "lambda_function_url_security"
+      question: "If using Function URLs, what authentication is configured?"
+      type: "single_choice"
+      options: ["AWS IAM Auth", "No Authentication", "Not Using Function URLs", "Unknown"]
+      help_text: "Function URLs without proper authentication can expose functions publicly."
+      related_branch: "Authentication"
+    - id: "lambda_dependency_scanning"
+      question: "Are function dependencies scanned for vulnerabilities?"
+      type: "single_choice"
+      options: ["Automated Scanning", "Manual Review", "Third-party Tools", "No Scanning", "Unknown"]
+      help_text: "Dependency scanning helps identify vulnerable packages in function code."
+      related_branch: "VulnerabilityScanning"
+    - id: "lambda_timeout_configuration"
+      question: "How is the function timeout configured?"
+      type: "single_choice"
+      options: ["Conservative (< 30s)", "Moderate (30s-5min)", "High (> 5min)", "Default (3s)", "Unknown"]
+      help_text: "Proper timeout configuration prevents resource exhaustion and hanging executions."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_memory_allocation"
+      question: "How is memory allocation configured for security?"
+      type: "single_choice"
+      options: ["Right-sized for workload", "Over-provisioned", "Under-provisioned", "Default settings", "Unknown"]
+      help_text: "Proper memory allocation prevents resource exhaustion and performance issues."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_event_source_security"
+      question: "How are event sources secured?"
+      type: "multiple_choice"
+      options: ["Resource-based policies", "Event filtering", "Encryption in transit", "Access logging", "None"]
+      help_text: "Event source security prevents unauthorized function invocations."
+      related_branch: "AccessControl"
+    - id: "lambda_error_handling"
+      question: "How is error handling implemented for security?"
+      type: "single_choice"
+      options: ["Comprehensive error handling", "Basic try-catch", "Minimal handling", "No error handling", "Unknown"]
+      help_text: "Proper error handling prevents information disclosure through error messages."
+      related_branch: "CodeSecurity"
+    - id: "lambda_provisioned_concurrency"
+      question: "Is provisioned concurrency used for consistent performance?"
+      type: "single_choice"
+      options: ["Yes - Security-critical functions", "Yes - All functions", "No provisioned concurrency", "Unknown"]
+      help_text: "Provisioned concurrency reduces cold start latency and improves security response times."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_extension_security"
+      question: "If using Lambda extensions, how are they secured?"
+      type: "single_choice"
+      options: ["AWS managed extensions", "Verified third-party", "Custom extensions", "No extensions", "Unknown"]
+      help_text: "Lambda extensions can introduce security risks and should be carefully managed."
+      related_branch: "SupplyChain"
+    - id: "lambda_vpc_endpoints"
+      question: "Are VPC endpoints used for AWS service access?"
+      type: "single_choice"
+      options: ["Yes - Interface endpoints", "Yes - Gateway endpoints", "No VPC endpoints", "Not applicable", "Unknown"]
+      help_text: "VPC endpoints provide secure access to AWS services without internet routing."
+      related_branch: "NetworkSecurity"
+    - id: "lambda_secrets_rotation"
+      question: "Are secrets automatically rotated for this function?"
+      type: "single_choice"
+      options: ["Automatic rotation", "Manual rotation", "No rotation", "No secrets used", "Unknown"]
+      help_text: "Regular secret rotation reduces the impact of credential compromise."
+      related_branch: "SecretsManagement"
+    - id: "lambda_cloudwatch_insights"
+      question: "Is CloudWatch Logs Insights used for security analysis?"
+      type: "single_choice"
+      options: ["Yes - Active monitoring", "Yes - Occasional use", "No Insights", "Unknown"]
+      help_text: "CloudWatch Logs Insights enables advanced log analysis for security events."
+      related_branch: "Monitoring"
+    - id: "lambda_performance_monitoring"
+      question: "What performance monitoring is in place for security?"
+      type: "multiple_choice"
+      options: ["CloudWatch metrics", "Custom metrics", "Third-party APM", "Performance alarms", "None"]
+      help_text: "Performance monitoring can detect security-related resource exhaustion attacks."
+      related_branch: "Monitoring"
+
+  expert:
+    - id: "lambda_serverless_security_architecture"
+      question: "How is serverless security architecture designed for this function?"
+      type: "single_choice"
+      options: ["Defense in depth", "Zero trust serverless", "Basic isolation", "No specific architecture", "Unknown"]
+      help_text: "Serverless security architecture ensures comprehensive protection across all layers."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_advanced_threat_modeling"
+      question: "Has advanced threat modeling been performed for this function?"
+      type: "single_choice"
+      options: ["Comprehensive STRIDE analysis", "Basic threat analysis", "Informal review", "No threat modeling", "Unknown"]
+      help_text: "Advanced threat modeling identifies specific serverless attack vectors."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_runtime_security_hardening"
+      question: "What runtime security hardening measures are implemented?"
+      type: "multiple_choice"
+      options: ["Custom runtime patches", "Security-focused dependencies", "Runtime sandboxing", "Resource constraints", "None"]
+      help_text: "Runtime hardening protects against execution environment vulnerabilities."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_supply_chain_attestation"
+      question: "How is software supply chain attestation implemented?"
+      type: "single_choice"
+      options: ["Full SLSA compliance", "Partial attestation", "Basic verification", "No attestation", "Unknown"]
+      help_text: "Supply chain attestation ensures integrity of function dependencies."
+      related_branch: "SupplyChain"
+    - id: "lambda_zero_day_protection"
+      question: "What zero-day protection mechanisms are in place?"
+      type: "multiple_choice"
+      options: ["Behavioral monitoring", "Runtime protection", "Anomaly detection", "Sandboxing", "None"]
+      help_text: "Zero-day protection defends against unknown vulnerabilities."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_advanced_logging_analysis"
+      question: "What advanced logging analysis is performed?"
+      type: "single_choice"
+      options: ["AI-powered analysis", "Machine learning detection", "Pattern recognition", "Basic log review", "No analysis"]
+      help_text: "Advanced logging analysis identifies sophisticated attack patterns."
+      related_branch: "Monitoring"
+    - id: "lambda_incident_forensics_capability"
+      question: "What incident forensics capabilities are available?"
+      type: "multiple_choice"
+      options: ["Execution tracing", "Memory analysis", "Code path reconstruction", "Timeline analysis", "None"]
+      help_text: "Forensics capabilities enable detailed incident investigation in serverless environments."
+      related_branch: "IncidentResponse"
+    - id: "lambda_compliance_automation"
+      question: "How is compliance automated for this function?"
+      type: "single_choice"
+      options: ["Continuous compliance monitoring", "Automated policy enforcement", "Regular compliance scans", "Manual compliance checks", "No automation"]
+      help_text: "Compliance automation ensures consistent adherence to regulatory requirements."
+      related_branch: "Compliance"
+    - id: "lambda_advanced_encryption_patterns"
+      question: "What advanced encryption patterns are implemented?"
+      type: "multiple_choice"
+      options: ["Envelope encryption", "Client-side encryption", "Field-level encryption", "Homomorphic encryption", "None"]
+      help_text: "Advanced encryption patterns provide enhanced data protection in serverless environments."
+      related_branch: "Encryption"
+    - id: "lambda_serverless_attack_detection"
+      question: "How are serverless-specific attacks detected?"
+      type: "single_choice"
+      options: ["Specialized serverless SIEM", "Custom detection rules", "Generic monitoring", "No specific detection", "Unknown"]
+      help_text: "Serverless attack detection addresses unique serverless threat vectors."
+      related_branch: "Monitoring"
+    - id: "lambda_quantum_safe_cryptography"
+      question: "Is quantum-safe cryptography implemented?"
+      type: "single_choice"
+      options: ["Post-quantum algorithms", "Quantum-resistant protocols", "Hybrid approach", "Classical cryptography only", "Unknown"]
+      help_text: "Quantum-safe cryptography protects against future quantum computing threats."
+      related_branch: "Encryption"
+    - id: "lambda_advanced_dependency_management"
+      question: "How is advanced dependency management implemented?"
+      type: "multiple_choice"
+      options: ["Software bill of materials", "Dependency pinning", "Vulnerability scanning", "License compliance", "None"]
+      help_text: "Advanced dependency management reduces third-party security risks."
+      related_branch: "SupplyChain"
+    - id: "lambda_business_logic_security"
+      question: "How is business logic security validated?"
+      type: "single_choice"
+      options: ["Formal verification", "Comprehensive testing", "Code review", "Basic validation", "No validation"]
+      help_text: "Business logic security prevents exploitation of application-specific vulnerabilities."
+      related_branch: "CodeSecurity"
+    - id: "lambda_advanced_rate_limiting"
+      question: "What advanced rate limiting mechanisms are implemented?"
+      type: "multiple_choice"
+      options: ["Adaptive rate limiting", "Distributed rate limiting", "User-based limits", "Resource-based limits", "None"]
+      help_text: "Advanced rate limiting protects against sophisticated abuse patterns."
+      related_branch: "RateLimiting"
+    - id: "lambda_serverless_security_metrics"
+      question: "What serverless-specific security metrics are tracked?"
+      type: "multiple_choice"
+      options: ["Cold start security time", "Function invocation patterns", "Resource utilization anomalies", "Execution path analysis", "None"]
+      help_text: "Serverless security metrics provide visibility into function-specific security events."
+      related_branch: "Monitoring"
+    - id: "lambda_advanced_secret_management"
+      question: "How is advanced secret management implemented?"
+      type: "single_choice"
+      options: ["Runtime secret injection", "Dynamic secret generation", "Secret versioning", "Basic secret storage", "No secret management"]
+      help_text: "Advanced secret management minimizes secret exposure in serverless environments."
+      related_branch: "SecretsManagement"
+    - id: "lambda_serverless_governance"
+      question: "What serverless governance framework is in place?"
+      type: "single_choice"
+      options: ["Comprehensive governance", "Policy-based controls", "Basic guidelines", "No governance", "Unknown"]
+      help_text: "Serverless governance ensures consistent security practices across functions."
+      related_branch: "Compliance"
+    - id: "lambda_advanced_monitoring_correlation"
+      question: "How is advanced monitoring correlation implemented?"
+      type: "single_choice"
+      options: ["Cross-service correlation", "Multi-dimensional analysis", "Basic correlation", "No correlation", "Unknown"]
+      help_text: "Advanced correlation provides comprehensive visibility across serverless architectures."
+      related_branch: "Monitoring"
+    - id: "lambda_serverless_disaster_recovery"
+      question: "What serverless disaster recovery capabilities are implemented?"
+      type: "multiple_choice"
+      options: ["Multi-region deployment", "Function versioning", "State backup", "Automated failover", "None"]
+      help_text: "Serverless disaster recovery ensures function availability during incidents."
+      related_branch: "Backup"
+    - id: "lambda_advanced_performance_security"
+      question: "How is performance security optimized?"
+      type: "single_choice"
+      options: ["Security-optimized performance", "Balanced approach", "Performance-first", "No optimization", "Unknown"]
+      help_text: "Performance security balances security controls with serverless performance requirements."
+      related_branch: "ServerlessSecurity"
+    - id: "lambda_serverless_threat_intelligence"
+      question: "How is serverless threat intelligence integrated?"
+      type: "single_choice"
+      options: ["Serverless-specific feeds", "Generic threat intel", "Basic indicators", "No threat intelligence", "Unknown"]
+      help_text: "Serverless threat intelligence provides relevant threat information for function-based architectures."
+      related_branch: "Monitoring"
+    - id: "lambda_advanced_testing_security"
+      question: "What advanced security testing is performed?"
+      type: "multiple_choice"
+      options: ["Serverless penetration testing", "Chaos engineering", "Security fuzzing", "Load testing", "None"]
+      help_text: "Advanced security testing validates serverless security under various conditions."
+      related_branch: "VulnerabilityScanning"
+    - id: "lambda_serverless_security_culture"
+      question: "How is serverless security culture promoted?"
+      type: "single_choice"
+      options: ["Serverless security training", "Security-first development", "Basic awareness", "No specific culture", "Unknown"]
+      help_text: "Serverless security culture ensures developers understand unique serverless security challenges."
+      related_branch: "Compliance"
+    - id: "lambda_future_security_roadmap"
+      question: "Is there a future security roadmap for serverless?"
+      type: "single_choice"
+      options: ["Comprehensive roadmap", "Technology evolution planning", "Basic future planning", "No roadmap", "Unknown"]
+      help_text: "Future security roadmap ensures preparedness for evolving serverless security challenges."
+      related_branch: "Compliance"
+
+dependencies: {}
+
+threat_intelligence:
+  cve_count: 45
+  recent_threats: ["Code Injection", "Dependency Vulnerabilities", "Over-privileged Functions"]
+  attack_vectors: ["Function Injection", "Event Manipulation", "Resource Exhaustion"]
+  mitre_techniques: ["T1055", "T1078", "T1133"]
+  threat_actors: ["Script Kiddies", "APT Groups"]
+
+risk_factors:
+  public_function_url: 2.5
+  over_privileged_role: 3.0
+  plain_text_secrets: 4.0
+  no_code_signing: 2.0
+  no_monitoring: 1.5
