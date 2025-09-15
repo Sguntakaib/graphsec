@@ -134,6 +134,14 @@ class IntelligentNodeEngine:
                     options=["Cloud WAF", "On-Premise WAF", "Basic Protection", "None", "Unknown"],
                     help_text="WAF provides protection against common web attacks",
                     related_branch=SecurityBranchType.WAF
+                ),
+                SecurityPrompt(
+                    id="webapp_deployment_type",
+                    question="Where is this web application deployed?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Cloud", "On-Premises", "Hybrid", "Unknown"],
+                    help_text="Deployment type affects security controls and architecture requirements",
+                    related_branch=SecurityBranchType.DEPLOYMENT
                 )
             ],
             risk_factors={
