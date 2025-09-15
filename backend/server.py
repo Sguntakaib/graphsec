@@ -3805,6 +3805,327 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Error creating database indexes: {e}")
 
+# =============================================================================
+# VULNERABILITY ANALYSIS API ENDPOINTS
+# =============================================================================
+
+class VulnerabilityAnalysisRequest(BaseModel):
+    node_id: str
+    node_type: str  # WebApp, API, Database
+    questionnaire_responses: Dict[str, Any]
+    node_position: Optional[Dict[str, float]] = None
+
+class BulkVulnerabilityAnalysisRequest(BaseModel):
+    nodes: List[Dict[str, Any]]
+
+class VulnerabilityRemediationRequest(BaseModel):
+    vulnerability_id: str
+
+@api_router.post("/vulnerabilities/analyze/{node_id}")
+async def analyze_node_vulnerabilities(node_id: str, request: VulnerabilityAnalysisRequest):
+    """Analyze security vulnerabilities for a specific node based on questionnaire responses"""
+    try:
+        logger.info(f"Analyzing vulnerabilities for node {node_id} of type {request.node_type}")
+        
+        # Analyze vulnerabilities using questionnaire analyzer
+        result = questionnaire_analyzer.analyze_questionnaire_responses(
+            node_id=request.node_id,
+            node_type=request.node_type,
+            questionnaire_responses=request.questionnaire_responses,
+            node_position=request.node_position
+        )
+        
+        # Convert to dict for JSON response
+        return {
+            "node_id": result.node_id,
+            "node_type": result.node_type,
+            "total_vulnerabilities": result.total_vulnerabilities,
+            "vulnerabilities_by_severity": {k.value: v for k, v in result.vulnerabilities_by_severity.items()},
+            "vulnerability_nodes": [
+                {
+                    "id": vuln.id,
+                    "name": vuln.name,
+                    "description": vuln.description,
+                    "severity": vuln.severity.value,
+                    "category": vuln.category.value,
+                    "owasp_category": vuln.owasp_category,
+                    "mitre_techniques": vuln.mitre_techniques,
+                    "cve_references": vuln.cve_references,
+                    "parent_node_id": vuln.parent_node_id,
+                    "remediation_steps": vuln.remediation_steps,
+                    "risk_score": vuln.risk_score,
+                    "position": vuln.position,
+                    "color": vuln.color,
+                    "icon": vuln.icon,
+                    "connection_style": vuln.connection_style,
+                    "created_at": vuln.created_at.isoformat()
+                }
+                for vuln in result.vulnerability_nodes
+            ],
+            "overall_risk_score": result.overall_risk_score,
+            "recommendations": result.recommendations,
+            "analysis_timestamp": result.analysis_timestamp.isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error analyzing vulnerabilities for node {node_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Vulnerability analysis failed: {str(e)}")
+
+@api_router.get("/vulnerabilities/{node_id}")
+async def get_node_vulnerabilities(node_id: str):
+    """Get existing vulnerability analysis for a node"""
+    try:
+        # Check if analysis exists in cache
+        if node_id in vulnerability_engine.vulnerability_cache:
+            result = vulnerability_engine.vulnerability_cache[node_id]
+            return {
+                "node_id": result.node_id,
+                "node_type": result.node_type,
+                "total_vulnerabilities": result.total_vulnerabilities,
+                "vulnerabilities_by_severity": {k.value: v for k, v in result.vulnerabilities_by_severity.items()},
+                "vulnerability_nodes": [
+                    {
+                        "id": vuln.id,
+                        "name": vuln.name,
+                        "description": vuln.description,
+                        "severity": vuln.severity.value,
+                        "category": vuln.category.value,
+                        "owasp_category": vuln.owasp_category,
+                        "mitre_techniques": vuln.mitre_techniques,
+                        "parent_node_id": vuln.parent_node_id,
+                        "remediation_steps": vuln.remediation_steps,
+                        "risk_score": vuln.risk_score,
+                        "position": vuln.position,
+                        "color": vuln.color,
+                        "icon": vuln.icon
+                    }
+                    for vuln in result.vulnerability_nodes
+                ],
+                "overall_risk_score": result.overall_risk_score,
+                "recommendations": result.recommendations,
+                "analysis_timestamp": result.analysis_timestamp.isoformat()
+            }
+        else:
+            return {
+                "node_id": node_id,
+                "total_vulnerabilities": 0,
+                "vulnerability_nodes": [],
+                "message": "No vulnerability analysis found for this node"
+            }
+            
+    except Exception as e:
+        logger.error(f"Error retrieving vulnerabilities for node {node_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve vulnerabilities: {str(e)}")
+
+@api_router.post("/vulnerabilities/remediate/{vulnerability_id}")
+async def get_vulnerability_remediation(vulnerability_id: str):
+    """Get detailed remediation guidance for a specific vulnerability"""
+    try:
+        vulnerability = vulnerability_engine.get_vulnerability_by_id(vulnerability_id)
+        
+        if not vulnerability:
+            raise HTTPException(status_code=404, detail="Vulnerability not found")
+        
+        # Generate enhanced remediation guidance
+        remediation_guidance = {
+            "vulnerability_id": vulnerability_id,
+            "vulnerability_name": vulnerability.name,
+            "severity": vulnerability.severity.value,
+            "category": vulnerability.category.value,
+            "owasp_category": vulnerability.owasp_category,
+            "immediate_steps": vulnerability.remediation_steps,
+            "implementation_priority": "High" if vulnerability.severity in [VulnerabilitySeverity.CRITICAL, VulnerabilitySeverity.HIGH] else "Medium",
+            "estimated_effort": _estimate_remediation_effort(vulnerability),
+            "tools_and_resources": _get_remediation_resources(vulnerability),
+            "validation_steps": _get_validation_steps(vulnerability),
+            "prevention_measures": _get_prevention_measures(vulnerability)
+        }
+        
+        return remediation_guidance
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting remediation for vulnerability {vulnerability_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get remediation guidance: {str(e)}")
+
+@api_router.delete("/vulnerabilities/{vulnerability_id}")
+async def mark_vulnerability_fixed(vulnerability_id: str):
+    """Mark a vulnerability as fixed/remediated"""
+    try:
+        success = vulnerability_engine.remove_vulnerability(vulnerability_id)
+        
+        if success:
+            return {"message": "Vulnerability marked as fixed", "vulnerability_id": vulnerability_id}
+        else:
+            raise HTTPException(status_code=404, detail="Vulnerability not found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error marking vulnerability {vulnerability_id} as fixed: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to mark vulnerability as fixed: {str(e)}")
+
+@api_router.get("/vulnerabilities/rules")
+async def get_vulnerability_rules():
+    """Get all available vulnerability rules"""
+    try:
+        from vulnerability_rules import get_vulnerability_rules
+        rules = get_vulnerability_rules()
+        
+        return {
+            "total_rules": len(rules),
+            "rules_by_node_type": {
+                "WebApp": len([r for r in rules if "WebApp" in r.node_types]),
+                "API": len([r for r in rules if "API" in r.node_types]),
+                "Database": len([r for r in rules if "Database" in r.node_types])
+            },
+            "rules": [
+                {
+                    "id": rule.id,
+                    "name": rule.name,
+                    "description": rule.description,
+                    "node_types": rule.node_types,
+                    "vulnerability_category": rule.vulnerability_template.get("category", "Unknown"),
+                    "severity": rule.vulnerability_template.get("severity", "Medium"),
+                    "owasp_category": rule.vulnerability_template.get("owasp_category", "")
+                }
+                for rule in rules
+            ]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error retrieving vulnerability rules: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve vulnerability rules: {str(e)}")
+
+@api_router.post("/vulnerabilities/bulk-analyze")
+async def bulk_analyze_vulnerabilities(request: BulkVulnerabilityAnalysisRequest):
+    """Analyze vulnerabilities for multiple nodes in bulk"""
+    try:
+        logger.info(f"Bulk analyzing vulnerabilities for {len(request.nodes)} nodes")
+        
+        results = {}
+        for node_data in request.nodes:
+            try:
+                result = questionnaire_analyzer.analyze_questionnaire_responses(
+                    node_id=node_data["node_id"],
+                    node_type=node_data["node_type"],
+                    questionnaire_responses=node_data.get("questionnaire_responses", {}),
+                    node_position=node_data.get("position")
+                )
+                
+                results[node_data["node_id"]] = {
+                    "node_id": result.node_id,
+                    "node_type": result.node_type,
+                    "total_vulnerabilities": result.total_vulnerabilities,
+                    "vulnerabilities_by_severity": {k.value: v for k, v in result.vulnerabilities_by_severity.items()},
+                    "overall_risk_score": result.overall_risk_score,
+                    "vulnerability_count": len(result.vulnerability_nodes)
+                }
+                
+            except Exception as node_error:
+                logger.error(f"Error analyzing node {node_data.get('node_id', 'unknown')}: {node_error}")
+                results[node_data.get("node_id", "unknown")] = {
+                    "error": str(node_error),
+                    "total_vulnerabilities": 0,
+                    "overall_risk_score": 0.0
+                }
+        
+        # Calculate summary statistics
+        total_vulnerabilities = sum(r.get("total_vulnerabilities", 0) for r in results.values())
+        avg_risk_score = sum(r.get("overall_risk_score", 0) for r in results.values()) / len(results) if results else 0
+        
+        return {
+            "analyzed_nodes": len(request.nodes),
+            "successful_analyses": len([r for r in results.values() if "error" not in r]),
+            "total_vulnerabilities": total_vulnerabilities,
+            "average_risk_score": round(avg_risk_score, 2),
+            "results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in bulk vulnerability analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Bulk analysis failed: {str(e)}")
+
+@api_router.get("/questionnaire/responses/{node_id}")
+async def get_node_questionnaire_summary(node_id: str):
+    """Get questionnaire response summary for a node"""
+    try:
+        summary = questionnaire_analyzer.get_response_summary(node_id)
+        
+        if not summary:
+            return {
+                "node_id": node_id,
+                "message": "No questionnaire responses found for this node"
+            }
+        
+        return summary
+        
+    except Exception as e:
+        logger.error(f"Error retrieving questionnaire summary for node {node_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve questionnaire summary: {str(e)}")
+
+def _estimate_remediation_effort(vulnerability: VulnerabilityNode) -> str:
+    """Estimate effort required to remediate a vulnerability"""
+    effort_map = {
+        VulnerabilitySeverity.CRITICAL: "High (1-2 weeks)",
+        VulnerabilitySeverity.HIGH: "Medium (3-5 days)",
+        VulnerabilitySeverity.MEDIUM: "Low (1-2 days)",
+        VulnerabilitySeverity.LOW: "Minimal (< 1 day)"
+    }
+    return effort_map.get(vulnerability.severity, "Medium")
+
+def _get_remediation_resources(vulnerability: VulnerabilityNode) -> List[str]:
+    """Get tools and resources for vulnerability remediation"""
+    resources = []
+    
+    if "injection" in vulnerability.category.value.lower():
+        resources.extend([
+            "OWASP Input Validation Cheat Sheet",
+            "Parameterized query frameworks (SqlAlchemy, Hibernate)",
+            "Static Analysis Security Testing (SAST) tools"
+        ])
+    
+    if "access control" in vulnerability.category.value.lower():
+        resources.extend([
+            "OAuth2 and OpenID Connect implementations",
+            "Role-Based Access Control (RBAC) frameworks",
+            "Session management libraries"
+        ])
+    
+    if "cryptographic" in vulnerability.category.value.lower():
+        resources.extend([
+            "TLS/SSL configuration guides",
+            "Encryption key management solutions",
+            "Cryptographic libraries (libsodium, Bouncy Castle)"
+        ])
+    
+    return resources[:5]  # Limit to top 5
+
+def _get_validation_steps(vulnerability: VulnerabilityNode) -> List[str]:
+    """Get steps to validate vulnerability remediation"""
+    steps = [
+        "Re-run security questionnaire to verify controls are in place",
+        "Perform targeted security testing for the specific vulnerability",
+        "Validate remediation through automated security scans"
+    ]
+    
+    if vulnerability.severity in [VulnerabilitySeverity.CRITICAL, VulnerabilitySeverity.HIGH]:
+        steps.append("Conduct penetration testing to verify fix effectiveness")
+    
+    return steps
+
+def _get_prevention_measures(vulnerability: VulnerabilityNode) -> List[str]:
+    """Get measures to prevent similar vulnerabilities"""
+    measures = [
+        "Implement security-focused code review processes",
+        "Add automated security testing to CI/CD pipelines",
+        "Provide security training for development team",
+        "Establish security design review procedures"
+    ]
+    
+    return measures
+
 # Include the router in the main app
 app.include_router(api_router)
 
