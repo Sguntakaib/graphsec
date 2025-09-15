@@ -9352,7 +9352,20 @@ class SecurityModelingAPITester:
             self.test_phase2_database_questionnaire_expert,
             self.test_phase2_questionnaire_structure_validation,
             self.test_phase2_questionnaire_loader_system,
-            self.test_phase2_3level_scaling_system
+            self.test_phase2_3level_scaling_system,
+            
+            # ============================================================================
+            # PHASE 1 VULNERABILITY SYSTEM TESTS (REVIEW REQUEST)
+            # ============================================================================
+            self.test_vulnerability_analyze_webapp_node,
+            self.test_vulnerability_analyze_api_node,
+            self.test_vulnerability_analyze_database_node,
+            self.test_get_node_vulnerabilities,
+            self.test_vulnerability_remediation_guidance,
+            self.test_vulnerability_rules_endpoint,
+            self.test_bulk_vulnerability_analysis,
+            self.test_vulnerability_deletion,
+            self.test_owasp_top_10_coverage
         ]
         
         passed = 0
