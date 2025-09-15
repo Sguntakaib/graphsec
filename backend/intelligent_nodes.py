@@ -324,6 +324,258 @@ class IntelligentNodeEngine:
             }
         )
         
+        # Cloud Deployment Node Template
+        templates["CloudDeployment"] = IntelligentNodeTemplate(
+            node_type="Infrastructure",
+            node_subtype="CloudDeployment",
+            required_branches=[
+                SecurityBranchType.CLOUD_SECURITY,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.ENCRYPTION
+            ],
+            dependencies={
+                "cloud_provider_aws": "AWSService",
+                "cloud_provider_gcp": "GCPService"
+            },
+            security_prompts=[
+                SecurityPrompt(
+                    id="cloud_provider",
+                    question="Which cloud provider are you using?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["AWS", "Google Cloud Platform (GCP)", "Microsoft Azure", "Other", "Multi-Cloud"],
+                    help_text="Different cloud providers have varying security services and configurations",
+                    related_branch=SecurityBranchType.CLOUD_SECURITY
+                ),
+                SecurityPrompt(
+                    id="cloud_region",
+                    question="Which region(s) is the application deployed in?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Single Region", "Multiple Regions (Same Country)", "Multiple Regions (Global)", "Edge Locations", "Unknown"],
+                    help_text="Regional deployment affects compliance, latency, and disaster recovery",
+                    related_branch=SecurityBranchType.CLOUD_SECURITY
+                ),
+                SecurityPrompt(
+                    id="cloud_security_posture",
+                    question="What cloud security posture management is in place?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["CSPM Tool (AWS Security Hub/GCP SCC)", "Native Cloud Security", "Third-party CSPM", "Manual Configuration", "None"],
+                    help_text="Cloud security posture management ensures proper configuration",
+                    related_branch=SecurityBranchType.CLOUD_SECURITY
+                ),
+                SecurityPrompt(
+                    id="cloud_access_management",
+                    question="How is cloud access managed?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["IAM with Least Privilege", "Role-Based Access", "Service Accounts Only", "Shared Credentials", "Root Access"],
+                    help_text="Proper cloud access management is critical for security",
+                    related_branch=SecurityBranchType.ACCESS_CONTROL
+                ),
+                SecurityPrompt(
+                    id="cloud_monitoring",
+                    question="What cloud monitoring and logging is configured?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["CloudTrail/Activity Logs", "VPC Flow Logs", "Application Logs", "Security Monitoring", "Cost Monitoring", "None"],
+                    help_text="Comprehensive monitoring provides visibility into cloud activities",
+                    related_branch=SecurityBranchType.MONITORING
+                )
+            ],
+            risk_factors={
+                "root_access": 9.0,
+                "shared_credentials": 7.0,
+                "no_monitoring": 6.0,
+                "no_cspm": 4.0,
+                "global_deployment": 2.0
+            }
+        )
+        
+        # On-Premises Deployment Node Template
+        templates["OnPremisesDeployment"] = IntelligentNodeTemplate(
+            node_type="Infrastructure",
+            node_subtype="OnPremisesDeployment",
+            required_branches=[
+                SecurityBranchType.NETWORK_SECURITY,
+                SecurityBranchType.INFRASTRUCTURE,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.MONITORING
+            ],
+            dependencies={
+                "onprem_network_wan": "WANConnection",
+                "onprem_network_lan": "LANInfrastructure"
+            },
+            security_prompts=[
+                SecurityPrompt(
+                    id="onprem_server_location",
+                    question="Where are the servers physically located?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Corporate Data Center", "Colocation Facility", "On-Site Server Room", "Remote Office", "Unknown"],
+                    help_text="Physical location affects security controls and access management",
+                    related_branch=SecurityBranchType.INFRASTRUCTURE
+                ),
+                SecurityPrompt(
+                    id="onprem_network_segmentation",
+                    question="How is network segmentation implemented?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["VLANs with Firewalls", "Physical Segmentation", "Software-Defined Networking", "Basic Network Separation", "No Segmentation"],
+                    help_text="Network segmentation limits attack spread and improves security",
+                    related_branch=SecurityBranchType.NETWORK_SECURITY
+                ),
+                SecurityPrompt(
+                    id="onprem_wan_connection",
+                    question="How does the application connect to external networks?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["VPN Only", "Direct Internet + Firewall", "MPLS Network", "Dedicated Lines", "Multiple Connections"],
+                    help_text="WAN connectivity affects external attack surface",
+                    related_branch=SecurityBranchType.NETWORK_SECURITY
+                ),
+                SecurityPrompt(
+                    id="onprem_lan_security",
+                    question="What LAN security measures are in place?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["Network Access Control (NAC)", "802.1X Authentication", "DHCP Snooping", "Port Security", "IDS/IPS", "None"],
+                    help_text="LAN security prevents internal network attacks",
+                    related_branch=SecurityBranchType.NETWORK_SECURITY
+                ),
+                SecurityPrompt(
+                    id="onprem_physical_security",
+                    question="What physical security controls are implemented?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["Keycard Access", "Biometric Access", "Security Cameras", "24/7 Security", "Environmental Controls", "None"],
+                    help_text="Physical security protects against unauthorized physical access",
+                    related_branch=SecurityBranchType.INFRASTRUCTURE
+                )
+            ],
+            risk_factors={
+                "no_segmentation": 8.0,
+                "direct_internet": 6.0,
+                "no_physical_security": 7.0,
+                "no_lan_security": 5.0,
+                "remote_office": 4.0
+            }
+        )
+        
+        # AWS Service Node Template
+        templates["AWSService"] = IntelligentNodeTemplate(
+            node_type="Service",
+            node_subtype="AWSService",
+            required_branches=[
+                SecurityBranchType.CLOUD_SECURITY,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.MONITORING
+            ],
+            dependencies={},
+            security_prompts=[
+                SecurityPrompt(
+                    id="aws_services_used",
+                    question="Which AWS services are you using for this application?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["EC2", "ECS/Fargate", "Lambda", "RDS", "S3", "CloudFront", "Route 53", "ALB/ELB", "API Gateway", "Other"],
+                    help_text="Different AWS services have different security configurations",
+                    related_branch=SecurityBranchType.CLOUD_SECURITY
+                ),
+                SecurityPrompt(
+                    id="aws_deployment_method",
+                    question="How is the application deployed on AWS?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Infrastructure as Code (Terraform/CloudFormation)", "CI/CD Pipeline", "Manual Deployment", "Third-party Tools", "Container Orchestration"],
+                    help_text="Deployment method affects consistency and security",
+                    related_branch=SecurityBranchType.CLOUD_SECURITY
+                ),
+                SecurityPrompt(
+                    id="aws_security_services",
+                    question="Which AWS security services are enabled?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["GuardDuty", "Security Hub", "Config", "CloudTrail", "VPC Flow Logs", "WAF", "Shield", "None"],
+                    help_text="AWS security services provide threat detection and compliance",
+                    related_branch=SecurityBranchType.MONITORING
+                ),
+                SecurityPrompt(
+                    id="aws_network_configuration",
+                    question="How is AWS networking configured?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Private Subnets + NAT Gateway", "Public + Private Subnets", "Public Subnets Only", "Default VPC", "Custom VPC Design"],
+                    help_text="Network configuration affects attack surface and access control",
+                    related_branch=SecurityBranchType.NETWORK_SECURITY
+                ),
+                SecurityPrompt(
+                    id="aws_data_encryption",
+                    question="How is data encryption configured in AWS?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["KMS Customer Managed Keys", "KMS AWS Managed Keys", "CloudHSM", "Client-side Encryption", "No Encryption"],
+                    help_text="Data encryption protects sensitive information",
+                    related_branch=SecurityBranchType.ENCRYPTION
+                )
+            ],
+            risk_factors={
+                "default_vpc": 5.0,
+                "public_subnets_only": 7.0,
+                "manual_deployment": 4.0,
+                "no_security_services": 6.0,
+                "no_encryption": 8.0
+            }
+        )
+        
+        # GCP Service Node Template
+        templates["GCPService"] = IntelligentNodeTemplate(
+            node_type="Service",
+            node_subtype="GCPService",
+            required_branches=[
+                SecurityBranchType.CLOUD_SECURITY,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.MONITORING
+            ],
+            dependencies={},
+            security_prompts=[
+                SecurityPrompt(
+                    id="gcp_services_used",
+                    question="Which GCP services are you using for this application?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["Compute Engine", "App Engine", "Cloud Run", "GKE", "Cloud SQL", "Cloud Storage", "Cloud CDN", "Cloud Load Balancing", "Other"],
+                    help_text="Different GCP services have different security configurations",
+                    related_branch=SecurityBranchType.CLOUD_SECURITY
+                ),
+                SecurityPrompt(
+                    id="gcp_deployment_method",
+                    question="How is the application deployed on GCP?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Cloud Deployment Manager", "Terraform", "CI/CD Pipeline", "Manual Deployment", "Container Orchestration"],
+                    help_text="Deployment method affects consistency and security",
+                    related_branch=SecurityBranchType.CLOUD_SECURITY
+                ),
+                SecurityPrompt(
+                    id="gcp_security_services",
+                    question="Which GCP security services are enabled?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["Security Command Center", "Cloud Security Scanner", "Cloud Audit Logs", "VPC Flow Logs", "Cloud Armor", "Cloud DLP", "None"],
+                    help_text="GCP security services provide threat detection and compliance",
+                    related_branch=SecurityBranchType.MONITORING
+                ),
+                SecurityPrompt(
+                    id="gcp_network_configuration",
+                    question="How is GCP networking configured?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Private Google Access", "Custom VPC", "Shared VPC", "Default Network", "Private Service Connect"],
+                    help_text="Network configuration affects attack surface and access control",
+                    related_branch=SecurityBranchType.NETWORK_SECURITY
+                ),
+                SecurityPrompt(
+                    id="gcp_data_encryption",
+                    question="How is data encryption configured in GCP?",
+                    type=PromptType.MULTIPLE_CHOICE,
+                    options=["Cloud KMS Customer Keys", "Google-managed Keys", "Cloud HSM", "Client-side Encryption", "No Encryption"],
+                    help_text="Data encryption protects sensitive information",
+                    related_branch=SecurityBranchType.ENCRYPTION
+                )
+            ],
+            risk_factors={
+                "default_network": 5.0,
+                "manual_deployment": 4.0,
+                "no_security_services": 6.0,
+                "no_encryption": 8.0,
+                "shared_vpc": 2.0
+            }
+        )
+        
         return templates
     
     def _initialize_completion_rules(self) -> Dict[str, List[str]]:
