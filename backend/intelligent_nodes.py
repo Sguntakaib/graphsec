@@ -87,11 +87,14 @@ class IntelligentNodeEngine:
                 SecurityBranchType.API,
                 SecurityBranchType.DATABASE,
                 SecurityBranchType.INPUT_VALIDATION,
-                SecurityBranchType.WAF
+                SecurityBranchType.WAF,
+                SecurityBranchType.DEPLOYMENT  # New deployment branch
             ],
             dependencies={
                 "webapp_api_endpoints": "API",
-                "webapp_database_connection": "Database"
+                "webapp_database_connection": "Database",
+                "webapp_deployment_cloud": "CloudDeployment",
+                "webapp_deployment_onpremises": "OnPremisesDeployment"
             },
             security_prompts=[
                 SecurityPrompt(
