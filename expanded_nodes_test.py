@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://element-alignment.preview.emergentagent.com/api"
+BASE_URL = "https://layout-debugger.preview.emergentagent.com/api"
 
 class ExpandedNodesAPITester:
     def __init__(self):
