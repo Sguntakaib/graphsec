@@ -586,7 +586,8 @@ class IntelligentNodeEngine:
                 "API endpoints status confirmed", 
                 "Database connection status confirmed",
                 "Input validation level specified",
-                "WAF protection status confirmed"
+                "WAF protection status confirmed",
+                "Deployment type specified"
             ],
             "Database": [
                 "Database type specified",
@@ -606,6 +607,34 @@ class IntelligentNodeEngine:
                 "Sophistication level specified",
                 "Motivation identified",
                 "Resource level estimated"
+            ],
+            "CloudDeployment": [
+                "Cloud provider specified",
+                "Cloud region configuration confirmed",
+                "Cloud security posture defined",
+                "Cloud access management configured",
+                "Cloud monitoring configured"
+            ],
+            "OnPremisesDeployment": [
+                "Server location specified",
+                "Network segmentation configured",
+                "WAN connection defined",
+                "LAN security configured",
+                "Physical security measures specified"
+            ],
+            "AWSService": [
+                "AWS services specified",
+                "Deployment method configured",
+                "Security services enabled",
+                "Network configuration defined",
+                "Data encryption configured"
+            ],
+            "GCPService": [
+                "GCP services specified",
+                "Deployment method configured",
+                "Security services enabled",
+                "Network configuration defined",
+                "Data encryption configured"
             ]
         }
     
