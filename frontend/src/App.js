@@ -1439,6 +1439,60 @@ function AppContent() {
   // VULNERABILITY ANALYSIS FUNCTIONS
   // =============================================================================
 
+  // =============================================================================
+  // VULNERABILITY SYSTEM FUNCTIONS
+  // =============================================================================
+
+  // Get all vulnerabilities from analyses
+  const getAllVulnerabilities = () => {
+    const allVulns = [];
+    Object.values(vulnerabilityAnalyses).forEach(analysis => {
+      if (analysis.vulnerability_nodes) {
+        analysis.vulnerability_nodes.forEach(vuln => {
+          allVulns.push({
+            ...vuln,
+            parent_node_type: analysis.node_type || 'Unknown'
+          });
+        });
+      }
+    });
+    return allVulns;
+  };
+
+  const allVulnerabilities = getAllVulnerabilities();
+
+  // Handle vulnerability filter changes
+  const handleVulnerabilityFilterChange = (filtered, filters) => {
+    setFilteredVulnerabilities(filtered);
+    
+    // Update node visibility based on filters
+    setNodes(nds => nds.map(node => {
+      if (node.type === 'vulnerability') {
+        const isVisible = filtered.some(v => v.id === node.id);
+        return {
+          ...node,
+          hidden: !isVisible
+        };
+      }
+      return node;
+    }));
+  };
+
+  // Handle export filtered vulnerabilities
+  const handleExportFilteredVulnerabilities = (filteredVulns) => {
+    setShowVulnerabilityReport(true);
+  };
+
+  // Handle vulnerability severity filter from legend
+  const handleVulnerabilityLegendFilter = (severity) => {
+    setVulnerabilityFilter(prev => ({
+      ...prev,
+      severity: prev.severity.includes(severity)
+        ? prev.severity.filter(s => s !== severity)
+        : [...prev.severity, severity]
+    }));
+  };
+
   const analyzeNodeVulnerabilitiesHandler = async (nodeId, nodeType, questionnaireResponses, nodePosition = null) => {
     try {
       console.log(`🔍 Analyzing vulnerabilities for ${nodeType} node ${nodeId}`);
