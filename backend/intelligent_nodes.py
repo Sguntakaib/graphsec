@@ -590,6 +590,68 @@ class IntelligentNodeEngine:
             }
         )
         
+        # Product Design Security Template
+        templates["ProductDesignSecurity"] = IntelligentNodeTemplate(
+            node_type="Design",
+            node_subtype="ProductDesignSecurity",
+            required_branches=[
+                SecurityBranchType.AUTHENTICATION,
+                SecurityBranchType.AUTHORIZATION,
+                SecurityBranchType.DATA_CLASSIFICATION,
+                SecurityBranchType.MONITORING
+            ],
+            dependencies={},
+            security_prompts=[
+                SecurityPrompt(
+                    id="design_authentication_strategy",
+                    question="What is the overall authentication strategy for this product?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Multi-factor authentication with SSO", "Strong authentication with MFA", "Basic username/password", "No authentication strategy", "Unknown"],
+                    help_text="Strong authentication prevents spoofing attacks and unauthorized access.",
+                    related_branch=SecurityBranchType.AUTHENTICATION
+                ),
+                SecurityPrompt(
+                    id="design_data_integrity",
+                    question="How is data integrity protected throughout the system?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Cryptographic signatures + checksums", "Database constraints + validation", "Basic validation", "No integrity protection", "Unknown"],
+                    help_text="Data integrity protection prevents unauthorized data modification.",
+                    related_branch=SecurityBranchType.DATA_CLASSIFICATION
+                ),
+                SecurityPrompt(
+                    id="design_audit_logging",
+                    question="What audit logging strategy is planned for the product?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Comprehensive audit trail with digital signatures", "Detailed audit logging", "Basic activity logging", "No audit logging", "Unknown"],
+                    help_text="Comprehensive audit logging prevents repudiation of user actions.",
+                    related_branch=SecurityBranchType.MONITORING
+                ),
+                SecurityPrompt(
+                    id="design_access_controls",
+                    question="What access control model is designed for the product?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Zero-trust with attribute-based access", "Role-based access control", "Simple permissions", "No access controls", "Unknown"],
+                    help_text="Strong access controls prevent unauthorized information disclosure.",
+                    related_branch=SecurityBranchType.AUTHORIZATION
+                ),
+                SecurityPrompt(
+                    id="design_privilege_model",
+                    question="What privilege model is designed for the system?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Least privilege with dynamic permissions", "Role-based least privilege", "Basic user roles", "No privilege model", "Unknown"],
+                    help_text="Proper privilege model prevents elevation of privilege attacks.",
+                    related_branch=SecurityBranchType.AUTHORIZATION
+                )
+            ],
+            risk_factors={
+                "no_authentication_strategy": 8.0,
+                "no_integrity_protection": 7.0,
+                "no_audit_logging": 5.0,
+                "no_access_controls": 9.0,
+                "no_privilege_model": 8.5
+            }
+        )
+        
         return templates
     
     def _initialize_completion_rules(self) -> Dict[str, List[str]]:
