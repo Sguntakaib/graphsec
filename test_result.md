@@ -329,7 +329,19 @@ test_plan:
     status_history:
       - working: true
         agent: "testing"
-        comment: "✅ POST /api/diagrams/{id}/auto-layout endpoint working correctly - NetworkX-based auto-layout algorithms functioning properly"
+        comment: "✅ POST /api/diagrams/{id}/auto-layout endpoint working correctly - smart_hierarchical algorithm functioning properly, returns layout_positions, algorithm, and node_count fields"
+
+  - task: "Template System API"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ GET /api/templates endpoint working correctly - returns 4 templates across 4 categories (Web Application, Zero Trust, Cloud Native, API Security) with proper structure including id, name, description, category, nodes, and edges"
 
   - task: "Template Library System"
     implemented: true
