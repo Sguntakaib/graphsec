@@ -2056,6 +2056,29 @@ function AppContent() {
               </button>
 
               <button
+                onClick={() => setAutoVulnerabilityAnalysis(!autoVulnerabilityAnalysis)}
+                className={`px-3 py-1 rounded flex items-center space-x-2 text-sm ${
+                  autoVulnerabilityAnalysis
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-600 text-white hover:bg-gray-500'
+                }`}
+                title="Auto-analyze vulnerabilities after questionnaire completion"
+              >
+                <Shield className="h-4 w-4" />
+                <span>Auto-Vuln {autoVulnerabilityAnalysis ? 'On' : 'Off'}</span>
+              </button>
+
+              <button
+                onClick={clearAllVulnerabilities}
+                disabled={Object.keys(vulnerabilityAnalyses).length === 0}
+                className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                title="Clear all vulnerability nodes from the canvas"
+              >
+                <EyeOff className="h-4 w-4" />
+                <span>Clear Vulns</span>
+              </button>
+
+              <button
                 onClick={() => {
                   setNodes([]);
                   setEdges([]);
