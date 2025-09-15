@@ -792,8 +792,25 @@ class IntelligentNodeEngine:
         
         for question_id, dependent_node_type in dependencies.items():
             answer = questionnaire_answers.get(question_id)
-            # Create dependent node if answer is True/Yes
-            if answer is True or (isinstance(answer, str) and answer.lower() in ['yes', 'true']):
+            
+            # Handle deployment dependencies with specific logic
+            if question_id == "webapp_deployment_type":
+                if isinstance(answer, str):
+                    if answer.lower() == "cloud":
+                        nodes_to_create.append("CloudDeployment")
+                    elif answer.lower() == "on-premises":
+                        nodes_to_create.append("OnPremisesDeployment")
+            
+            # Handle cloud provider dependencies
+            elif question_id == "cloud_provider":
+                if isinstance(answer, str):
+                    if "aws" in answer.lower():
+                        nodes_to_create.append("AWSService")
+                    elif "gcp" in answer.lower() or "google" in answer.lower():
+                        nodes_to_create.append("GCPService")
+            
+            # Handle standard boolean dependencies
+            elif answer is True or (isinstance(answer, str) and answer.lower() in ['yes', 'true']):
                 nodes_to_create.append(dependent_node_type)
         
         return nodes_to_create
