@@ -30,7 +30,7 @@ import { QuestionnaireProvider, useQuestionnaire } from './contexts/Questionnair
 import QuestionnaireManager from './components/QuestionnaireManager';
 import CanvasSynchronizer from './components/CanvasSynchronizer';
 import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram, applyTemplateToCurrentDiagram } from './services/api';
-  import { 
+import { 
   Shield, 
   Play, 
   Save, 
@@ -55,7 +55,8 @@ import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLay
   Trash2,
   Edit,
   MoreVertical,
-  BookOpen
+  BookOpen,
+  Network
 } from 'lucide-react';
 
 const nodeTypes = {
