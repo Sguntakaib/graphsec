@@ -93,8 +93,7 @@ class IntelligentNodeEngine:
             dependencies={
                 "webapp_api_endpoints": "API",
                 "webapp_database_connection": "Database",
-                "webapp_deployment_cloud": "CloudDeployment",
-                "webapp_deployment_onpremises": "OnPremisesDeployment"
+                "webapp_deployment_type": "Deployment"  # This will be handled specially
             },
             security_prompts=[
                 SecurityPrompt(
