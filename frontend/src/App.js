@@ -64,6 +64,7 @@ import {
 
 const nodeTypes = {
   custom: CustomNode,
+  vulnerability: VulnerabilityNode,
 };
 
 const initialNodes = [];
