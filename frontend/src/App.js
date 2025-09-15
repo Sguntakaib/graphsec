@@ -1809,10 +1809,21 @@ function AppContent() {
               </button>
               
               <button
-                onClick={() => fitView({ padding: 0.1 })}
-                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 flex items-center space-x-2 text-sm"
+                onClick={handleFitAllNodes}
+                disabled={nodes.length === 0}
+                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                title="Fit All Nodes to Canvas"
               >
                 <Maximize2 className="h-4 w-4" />
+                <span>Fit All</span>
+              </button>
+              
+              <button
+                onClick={() => fitView({ padding: 0.1, duration: 600 })}
+                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 flex items-center space-x-2 text-sm"
+                title="Fit Current View"
+              >
+                <Eye className="h-4 w-4" />
                 <span>Fit View</span>
               </button>
 
