@@ -2532,6 +2532,36 @@ function AppContent() {
         />
       )}
 
+      {/* Vulnerability Filter Panel */}
+      {showVulnerabilityFilter && (
+        <div className="fixed top-20 left-4 z-40 w-80">
+          <VulnerabilityFilter
+            vulnerabilities={allVulnerabilities}
+            onFilterChange={handleVulnerabilityFilterChange}
+            onExportFiltered={handleExportFilteredVulnerabilities}
+          />
+        </div>
+      )}
+
+      {/* Vulnerability Legend Panel */}
+      {showVulnerabilityLegend && (
+        <div className="fixed top-20 right-4 z-40 w-80">
+          <VulnerabilityLegend
+            vulnerabilities={allVulnerabilities}
+            onSeverityFilter={handleVulnerabilityLegendFilter}
+          />
+        </div>
+      )}
+
+      {/* Vulnerability Report Modal */}
+      {showVulnerabilityReport && (
+        <VulnerabilityReport
+          vulnerabilities={filteredVulnerabilities.length > 0 ? filteredVulnerabilities : allVulnerabilities}
+          onClose={() => setShowVulnerabilityReport(false)}
+          diagramInfo={currentDiagram}
+        />
+      )}
+
       {/* Enhanced Questionnaire System */}
       <QuestionnaireManager
         nodes={nodes}
