@@ -1,0 +1,212 @@
+node_type: "Design"
+node_subtype: "ProductDesignSecurity"
+category: "Security Architecture"
+description: "Product Design Security Assessment - STRIDE-based"
+required_branches:
+  - "ThreatModeling"
+  - "SecurityArchitecture"
+  - "AuthenticationDesign"
+  - "AuthorizationDesign"
+  - "DataProtection"
+  - "SecurityMonitoring"
+
+questionnaires:
+  basic:
+    # STRIDE: Spoofing (Authentication)
+    - id: "design_authentication_strategy"
+      question: "What is the overall authentication strategy for this product?"
+      type: "single_choice"
+      options: ["Multi-factor authentication with SSO", "Strong authentication with MFA", "Basic username/password", "No authentication strategy", "Unknown"]
+      help_text: "Strong authentication prevents spoofing attacks and unauthorized access."
+      related_branch: "AuthenticationDesign"
+      stride_category: "Spoofing"
+    - id: "design_identity_verification"
+      question: "How is user identity verified during registration?"
+      type: "single_choice"
+      options: ["Multi-step verification with documents", "Email/phone verification", "Basic registration", "No verification", "Unknown"]
+      help_text: "Proper identity verification prevents fake accounts and spoofing."
+      related_branch: "AuthenticationDesign"
+      stride_category: "Spoofing"
+    
+    # STRIDE: Tampering (Integrity)
+    - id: "design_data_integrity"
+      question: "How is data integrity protected throughout the system?"
+      type: "single_choice"
+      options: ["Cryptographic signatures + checksums", "Database constraints + validation", "Basic validation", "No integrity protection", "Unknown"]
+      help_text: "Data integrity protection prevents unauthorized data modification."
+      related_branch: "DataProtection"
+      stride_category: "Tampering"
+    - id: "design_secure_communications"
+      question: "How are communications secured between system components?"
+      type: "single_choice"
+      options: ["End-to-end encryption + mTLS", "TLS encryption", "Basic encryption", "No encryption", "Unknown"]
+      help_text: "Secure communications prevent data tampering in transit."
+      related_branch: "DataProtection"
+      stride_category: "Tampering"
+    
+    # STRIDE: Repudiation (Non-repudiation)
+    - id: "design_audit_logging"
+      question: "What audit logging strategy is planned for the product?"
+      type: "single_choice"
+      options: ["Comprehensive audit trail with digital signatures", "Detailed audit logging", "Basic activity logging", "No audit logging", "Unknown"]
+      help_text: "Comprehensive audit logging prevents repudiation of user actions."
+      related_branch: "SecurityMonitoring"
+      stride_category: "Repudiation"
+    - id: "design_transaction_records"
+      question: "How are critical transactions recorded and protected?"
+      type: "single_choice"
+      options: ["Immutable transaction logs", "Protected transaction records", "Basic transaction logging", "No transaction records", "Unknown"]
+      help_text: "Protected transaction records prevent repudiation of important actions."
+      related_branch: "SecurityMonitoring"
+      stride_category: "Repudiation"
+    
+    # STRIDE: Information Disclosure (Confidentiality)
+    - id: "design_data_classification"
+      question: "How is sensitive data classified and protected?"
+      type: "single_choice"
+      options: ["Comprehensive data classification with encryption", "Basic data classification", "Informal data handling", "No data classification", "Unknown"]
+      help_text: "Data classification ensures appropriate protection for sensitive information."
+      related_branch: "DataProtection"
+      stride_category: "Information Disclosure"
+    - id: "design_access_controls"
+      question: "What access control model is designed for the product?"
+      type: "single_choice"
+      options: ["Zero-trust with attribute-based access", "Role-based access control", "Simple permissions", "No access controls", "Unknown"]
+      help_text: "Strong access controls prevent unauthorized information disclosure."
+      related_branch: "AuthorizationDesign"
+      stride_category: "Information Disclosure"
+    
+    # STRIDE: Denial of Service (Availability)
+    - id: "design_availability_strategy"
+      question: "What availability and resilience strategy is planned?"
+      type: "single_choice"
+      options: ["High availability with failover + rate limiting", "Basic redundancy", "Single instance deployment", "No availability strategy", "Unknown"]
+      help_text: "Availability strategy prevents denial of service attacks."
+      related_branch: "SecurityArchitecture"
+      stride_category: "Denial of Service"
+    - id: "design_resource_protection"
+      question: "How are system resources protected from abuse?"
+      type: "single_choice"
+      options: ["Comprehensive resource limits + monitoring", "Basic rate limiting", "No resource protection", "Unknown"]
+      help_text: "Resource protection prevents denial of service through resource exhaustion."
+      related_branch: "SecurityArchitecture"
+      stride_category: "Denial of Service"
+    
+    # STRIDE: Elevation of Privilege (Authorization)
+    - id: "design_privilege_model"
+      question: "What privilege model is designed for the system?"
+      type: "single_choice"
+      options: ["Least privilege with dynamic permissions", "Role-based least privilege", "Basic user roles", "No privilege model", "Unknown"]
+      help_text: "Proper privilege model prevents elevation of privilege attacks."
+      related_branch: "AuthorizationDesign"
+      stride_category: "Elevation of Privilege"
+    - id: "design_admin_controls"
+      question: "How are administrative privileges controlled?"
+      type: "single_choice"
+      options: ["Privileged access management + monitoring", "Basic admin controls", "Shared admin accounts", "No admin controls", "Unknown"]
+      help_text: "Strong admin controls prevent privilege escalation attacks."
+      related_branch: "AuthorizationDesign"
+      stride_category: "Elevation of Privilege"
+
+  advanced:
+    # Architecture Security Design
+    - id: "design_threat_modeling"
+      question: "What threat modeling approach is used for product design?"
+      type: "single_choice"
+      options: ["STRIDE + PASTA methodology", "Basic STRIDE analysis", "Informal threat analysis", "No threat modeling", "Unknown"]
+      help_text: "Systematic threat modeling identifies security risks early in design."
+      related_branch: "ThreatModeling"
+    - id: "design_security_boundaries"
+      question: "How are security boundaries defined in the architecture?"
+      type: "single_choice"
+      options: ["Clear trust boundaries with validation", "Basic component separation", "Monolithic design", "No defined boundaries", "Unknown"]
+      help_text: "Clear security boundaries prevent privilege escalation and data leakage."
+      related_branch: "SecurityArchitecture"
+    - id: "design_input_validation_strategy"
+      question: "What is the input validation strategy across the product?"
+      type: "single_choice"
+      options: ["Defense in depth with multiple validation layers", "Server-side validation", "Client-side validation", "No validation strategy", "Unknown"]
+      help_text: "Comprehensive input validation prevents injection attacks."
+      related_branch: "SecurityArchitecture"
+    - id: "design_error_handling_strategy"
+      question: "How is error handling designed to prevent information disclosure?"
+      type: "single_choice"
+      options: ["Secure error handling with logging", "Generic error messages", "Detailed error responses", "No error handling strategy", "Unknown"]
+      help_text: "Secure error handling prevents information disclosure to attackers."
+      related_branch: "SecurityArchitecture"
+    
+    # Business Logic Security
+    - id: "design_business_logic_validation"
+      question: "How is business logic security validated in the design?"
+      type: "single_choice"
+      options: ["Formal business logic verification", "Comprehensive business rules", "Basic business validation", "No business logic security", "Unknown"]
+      help_text: "Business logic security prevents exploitation of application-specific vulnerabilities."
+      related_branch: "ThreatModeling"
+    - id: "design_workflow_security"
+      question: "How are business workflows secured against abuse?"
+      type: "single_choice"
+      options: ["Workflow validation with abuse prevention", "Basic workflow controls", "No workflow security", "Unknown"]
+      help_text: "Secure workflows prevent business logic abuse and fraud."
+      related_branch: "ThreatModeling"
+    
+    # Supply Chain Security
+    - id: "design_third_party_integration"
+      question: "How are third-party integrations secured in the design?"
+      type: "single_choice"
+      options: ["Comprehensive third-party security assessment", "Basic integration security", "No third-party security", "Unknown"]
+      help_text: "Secure third-party integration prevents supply chain attacks."
+      related_branch: "SecurityArchitecture"
+    - id: "design_dependency_management"
+      question: "What dependency management strategy is planned?"
+      type: "single_choice"
+      options: ["Automated dependency scanning + SBOM", "Basic dependency tracking", "No dependency management", "Unknown"]
+      help_text: "Dependency management prevents vulnerable component exploitation."
+      related_branch: "SecurityArchitecture"
+    
+    # DevSecOps Integration
+    - id: "design_security_testing_strategy"
+      question: "What security testing strategy is planned for development?"
+      type: "single_choice"
+      options: ["Automated security testing in CI/CD", "Manual security testing", "No security testing", "Unknown"]
+      help_text: "Security testing identifies vulnerabilities before deployment."
+      related_branch: "ThreatModeling"
+    - id: "design_security_metrics"
+      question: "What security metrics will be tracked for the product?"
+      type: "multiple_choice"
+      options: ["Vulnerability metrics", "Incident response metrics", "Compliance metrics", "User security metrics", "None"]
+      help_text: "Security metrics enable data-driven security decision making."
+      related_branch: "SecurityMonitoring"
+    
+    # Incident Response Design
+    - id: "design_incident_response_plan"
+      question: "How is incident response integrated into the product design?"
+      type: "single_choice"
+      options: ["Comprehensive incident response with automation", "Basic incident procedures", "No incident response", "Unknown"]
+      help_text: "Incident response design enables rapid containment of security breaches."
+      related_branch: "SecurityMonitoring"
+    - id: "design_forensic_capabilities"
+      question: "What forensic capabilities are built into the design?"
+      type: "single_choice"
+      options: ["Comprehensive forensic logging", "Basic audit trails", "No forensic capabilities", "Unknown"]
+      help_text: "Forensic capabilities enable detailed incident investigation."
+      related_branch: "SecurityMonitoring"
+
+dependencies:
+  design_requires_authentication: "AuthenticationProvider"
+  design_requires_database: "Database"
+  design_requires_api: "API"
+
+threat_intelligence:
+  cve_count: 250
+  recent_threats: ["Supply Chain Attacks", "Business Logic Abuse", "Design Flaws", "Architecture Vulnerabilities"]
+  attack_vectors: ["Design Weaknesses", "Logic Flaws", "Architecture Bypasses", "Integration Vulnerabilities"]
+  mitre_techniques: ["T1190", "T1078", "T1068", "T1213", "T1562"]
+  threat_actors: ["APT Groups", "Cybercriminals", "Insider Threats", "Nation State"]
+
+risk_factors:
+  no_threat_modeling: 4.0
+  weak_authentication_design: 3.8
+  no_input_validation_strategy: 4.2
+  poor_access_control_design: 4.5
+  no_audit_logging: 3.0
+  insecure_architecture: 4.8
