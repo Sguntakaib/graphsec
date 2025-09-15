@@ -2401,6 +2401,18 @@ function AppContent() {
         />
       )}
 
+      {/* Vulnerability Analysis Panel */}
+      {showVulnerabilityPanel && selectedVulnerability && (
+        <VulnerabilityPanel
+          vulnerability={selectedVulnerability}
+          onClose={() => {
+            setShowVulnerabilityPanel(false);
+            setSelectedVulnerability(null);
+          }}
+          onMarkFixed={handleVulnerabilityFixed}
+        />
+      )}
+
       {/* Enhanced Questionnaire System */}
       <QuestionnaireManager
         nodes={nodes}
