@@ -9365,7 +9365,26 @@ class SecurityModelingAPITester:
             self.test_vulnerability_rules_endpoint,
             self.test_bulk_vulnerability_analysis,
             self.test_vulnerability_deletion,
-            self.test_owasp_top_10_coverage
+            self.test_owasp_top_10_coverage,
+            
+            # ============================================================================
+            # ENHANCED VULNERABILITY DETECTION SYSTEM TESTS (REVIEW REQUEST)
+            # ============================================================================
+            self.test_enhanced_vulnerability_rules,
+            self.test_owasp_api_2023_api1,
+            self.test_owasp_api_2023_api6,
+            self.test_owasp_api_2023_api7,
+            self.test_owasp_api_2023_api3,
+            self.test_owasp_api_2023_api4,
+            self.test_owasp_api_2023_api9,
+            self.test_enhanced_db_privilege_escalation,
+            self.test_enhanced_db_config_drift,
+            self.test_enhanced_db_advanced_injection,
+            self.test_enhanced_db_insider_threat,
+            self.test_enhanced_db_backup_security,
+            self.test_product_design_security_node,
+            self.test_stride_questionnaire,
+            self.test_product_design_intelligent_nodes
         ]
         
         passed = 0
