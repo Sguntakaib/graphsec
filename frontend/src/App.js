@@ -970,16 +970,16 @@ function AppContent() {
       // Apply the new positions with enhanced bounds checking
       setNodes((nds) => {
         const updatedNodes = nds.map((node) => {
-          const layoutNode = layoutData.nodes.find((n) => n.id === node.id);
-          if (layoutNode) {
+          const layoutPosition = layoutData.layout_positions[node.id];
+          if (layoutPosition) {
             // Dynamic canvas bounds based on viewport
             const canvasWidth = window.innerWidth - 300; // Account for sidebars
             const canvasHeight = window.innerHeight - 200; // Account for header/footer
             
             // Ensure nodes stay within dynamic canvas bounds with padding
             const padding = 100;
-            const x = Math.max(padding, Math.min(layoutNode.position.x, canvasWidth - padding));
-            const y = Math.max(padding, Math.min(layoutNode.position.y, canvasHeight - padding));
+            const x = Math.max(padding, Math.min(layoutPosition.x, canvasWidth - padding));
+            const y = Math.max(padding, Math.min(layoutPosition.y, canvasHeight - padding));
             
             return {
               ...node,
