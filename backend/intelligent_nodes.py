@@ -234,6 +234,22 @@ class IntelligentNodeEngine:
             },
             security_prompts=[
                 SecurityPrompt(
+                    id="api_type",
+                    question="What type of API is this?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["REST API", "GraphQL API", "SOAP API", "gRPC API", "WebSocket API", "Other"],
+                    help_text="API type affects security considerations and implementation approach",
+                    related_branch=SecurityBranchType.API
+                ),
+                SecurityPrompt(
+                    id="api_protocol",
+                    question="What protocol does this API use?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["HTTPS", "HTTP", "WebSocket Secure (WSS)", "WebSocket (WS)", "TCP", "Other"],
+                    help_text="Protocol choice significantly impacts data security in transit",
+                    related_branch=SecurityBranchType.API
+                ),
+                SecurityPrompt(
                     id="api_auth_method",
                     question="What authentication method does this API use?",
                     type=PromptType.SINGLE_CHOICE,
