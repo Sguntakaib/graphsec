@@ -9974,7 +9974,86 @@ def test_phase1_critical_endpoints_func(self):
             return False
 
 
-if __name__ == "__main__":
-    # Run focused test for the 4 critical endpoints
-    tester = SecurityModelingAPITester()
-    tester.test_phase1_critical_endpoints()
+    def test_templates_endpoint(self):
+        """Test GET /api/templates endpoint"""
+        try:
+            response = self.session.get(f"{self.base_url}/templates")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if not isinstance(data, list):
+                    self.log_test("Templates Endpoint", False, f"Expected list, got {type(data)}")
+                    return False
+                
+                # Check if we have templates
+                if len(data) == 0:
+                    self.log_test("Templates Endpoint", True, "No templates found (empty list)")
+                    return True
+                
+                # Verify template structure
+                first_template = data[0]
+                required_fields = ["id", "name", "description", "category", "nodes", "edges"]
+                missing_fields = [f for f in required_fields if f not in first_template]
+                
+                if missing_fields:
+                    self.log_test("Templates Endpoint", False, f"Missing template fields: {missing_fields}")
+                    return False
+                
+                # Count templates by category
+                categories = {}
+                for template in data:
+                    category = template.get("category", "Unknown")
+                    categories[category] = categories.get(category, 0) + 1
+                
+                self.log_test("Templates Endpoint", True, 
+                            f"Retrieved {len(data)} templates across {len(categories)} categories: {list(categories.keys())}")
+                return True
+            else:
+                self.log_test("Templates Endpoint", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Templates Endpoint", False, f"Error: {str(e)}")
+            return False
+
+    def run_focused_tests(self):
+        """Run focused tests for the 4 core endpoints requested in review"""
+        print("🎯 Starting Focused Backend API Tests...")
+        print(f"Testing against: {self.base_url}")
+        print("Testing core endpoints after recent improvements:")
+        print("=" * 80)
+        
+        # Core API Tests as requested in review
+        tests = [
+            ("Health Check - GET /api/", self.test_health_check),
+            ("Create Diagram - POST /api/diagrams", self.test_create_diagram),
+            ("Get Diagrams - GET /api/diagrams", self.test_get_diagrams),
+            ("Auto Layout API - POST /api/diagrams/{id}/auto-layout", self.test_auto_layout_endpoint),
+            ("Template System - GET /api/templates", self.test_templates_endpoint),
+        ]
+        
+        passed = 0
+        failed = 0
+        
+        for test_name, test_func in tests:
+            try:
+                if test_func():
+                    passed += 1
+                else:
+                    failed += 1
+            except Exception as e:
+                self.log_test(test_name, False, f"Exception: {str(e)}")
+                failed += 1
+            
+            print()  # Add spacing between tests
+        
+        # Print summary
+        print("=" * 80)
+        print(f"🎯 FOCUSED TEST SUMMARY")
+        print(f"✅ Passed: {passed}")
+        print(f"❌ Failed: {failed}")
+        print(f"📊 Success Rate: {(passed/(passed+failed)*100):.1f}%")
+        print("=" * 80)
+        
+        return passed, failed
