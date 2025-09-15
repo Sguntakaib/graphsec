@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Server, AlertTriangle, Lock, Network, Activity } from 'lucide-react';
+import { Shield, Server, AlertTriangle, Lock, Network, Activity, Cloud, HardDrive } from 'lucide-react';
 
 const SecurityNodeLibrary = () => {
   const nodeCategories = [
