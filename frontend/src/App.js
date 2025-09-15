@@ -259,8 +259,32 @@ function AppContent() {
   };
 
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
+    (params) => {
+      // Find source and target nodes
+      const sourceNode = nodes.find(n => n.id === params.source);
+      const targetNode = nodes.find(n => n.id === params.target);
+      
+      // Get connection info with enhanced styling
+      const connectionInfo = getConnectionInfo(sourceNode, targetNode);
+      
+      // Create enhanced edge with connection-specific styling
+      const newEdge = {
+        ...params,
+        id: `edge-${params.source}-${params.target}-${Date.now()}`,
+        type: 'smoothstep',
+        label: connectionInfo.label,
+        style: connectionInfo.style,
+        markerEnd: connectionInfo.markerEnd,
+        labelStyle: connectionInfo.labelStyle,
+        labelBgStyle: connectionInfo.labelBgStyle,
+        labelShowBg: true,
+        labelBgBorderRadius: 4,
+        labelBgPadding: [4, 8],
+      };
+      
+      setEdges((eds) => addEdge(newEdge, eds));
+    },
+    [nodes, setEdges],
   );
 
   const onNodeClick = useCallback((event, node) => {
