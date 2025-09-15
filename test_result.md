@@ -260,10 +260,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 1 Core Loop Critical Endpoints - POST /api/questionnaires/{node_subtype}/complete"
-    - "Phase 1 Core Loop Critical Endpoints - GET /api/questionnaires/{node_subtype}" 
-    - "Phase 1 Core Loop Critical Endpoints - POST /api/simulate"
-    - "Phase 1 Core Loop Critical Endpoints - POST /api/rules/evaluate"
+    - "Phase 1 Vulnerability Engine - Vulnerability Analysis API"
+    - "Phase 1 Vulnerability Engine - Vulnerability Rules Engine"
+    - "Phase 1 Vulnerability Engine - Questionnaire Analysis Integration"
+    - "Phase 1 Vulnerability Engine - OWASP Top 10 Mapping"
+    - "Phase 1 Auto-Linking System - Vulnerability Node Creation"
+    - "Phase 1 Auto-Linking System - Smart Positioning Algorithm"
   stuck_tasks: 
     - "Phase 1 Core Loop Completion - Findings Management System"
     - "Phase 1 Core Loop Completion - Questionnaire Completion Processor"
