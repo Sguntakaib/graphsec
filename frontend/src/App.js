@@ -712,6 +712,75 @@ function AppContent() {
     setHighlightedPaths([]);
   };
 
+  // Function to determine edge label and styling based on connection type
+  const getConnectionInfo = (sourceNode, targetNode, questionnaire_answers = {}) => {
+    const sourceType = sourceNode?.data?.subtype || sourceNode?.type;
+    const targetType = targetNode?.data?.subtype || targetNode?.type;
+    
+    // API connections
+    if (sourceType === 'WebApp' && targetType === 'API') {
+      const apiType = questionnaire_answers?.api_type || 'REST API';
+      const protocol = questionnaire_answers?.api_protocol || 'HTTPS';
+      return {
+        label: `${protocol} ${apiType}`,
+        style: { stroke: '#3B82F6', strokeWidth: 2 },
+        markerEnd: { type: 'arrowclosed', color: '#3B82F6' }
+      };
+    }
+    
+    // Database connections
+    if ((sourceType === 'WebApp' || sourceType === 'API') && targetType === 'Database') {
+      return {
+        label: 'DB Calls',
+        style: { stroke: '#8B5CF6', strokeWidth: 2 },
+        markerEnd: { type: 'arrowclosed', color: '#8B5CF6' }
+      };
+    }
+    
+    // Cloud deployment connections
+    if (sourceType === 'WebApp' && targetType === 'CloudDeployment') {
+      return {
+        label: 'Deployed on',
+        style: { stroke: '#10B981', strokeWidth: 2, strokeDasharray: '5,5' },
+        markerEnd: { type: 'arrowclosed', color: '#10B981' }
+      };
+    }
+    
+    // Cloud service connections
+    if (targetType === 'AWSService' || targetType === 'GCPService') {
+      return {
+        label: 'Uses Services',
+        style: { stroke: '#06B6D4', strokeWidth: 2, strokeDasharray: '3,3' },
+        markerEnd: { type: 'arrowclosed', color: '#06B6D4' }
+      };
+    }
+    
+    // On-premises deployment
+    if (sourceType === 'WebApp' && targetType === 'OnPremisesDeployment') {
+      return {
+        label: 'Hosted on',
+        style: { stroke: '#F59E0B', strokeWidth: 2, strokeDasharray: '5,5' },
+        markerEnd: { type: 'arrowclosed', color: '#F59E0B' }
+      };
+    }
+    
+    // Attack path connections
+    if (sourceType === 'ExternalAttacker' || sourceType === 'MaliciousInsider') {
+      return {
+        label: 'Attacks',
+        style: { stroke: '#EF4444', strokeWidth: 3, strokeDasharray: '7,3' },
+        markerEnd: { type: 'arrowclosed', color: '#EF4444' }
+      };
+    }
+    
+    // Default connection
+    return {
+      label: 'Connected',
+      style: { stroke: '#9CA3AF', strokeWidth: 1 },
+      markerEnd: { type: 'arrowclosed', color: '#9CA3AF' }
+    };
+  };
+
   const handleAutoLayout = async () => {
     if (!currentDiagram) return;
     
