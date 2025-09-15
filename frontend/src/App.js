@@ -14,6 +14,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './App.css';
+import './styles/vulnerability.css';
 import { AdvancedNodeLibrary } from './components/AdvancedNodeLibrary';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { EnhancedSimulationPanel } from './components/EnhancedSimulationPanel';
