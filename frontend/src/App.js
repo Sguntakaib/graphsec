@@ -719,20 +719,55 @@ function AppContent() {
     try {
       const layoutData = await autoLayoutDiagram(currentDiagram.id);
       
-      // Apply the new positions
+      // Apply the new positions with bounds checking
       setNodes((nds) =>
         nds.map((node) => {
-          const newPosition = layoutData.layout_positions[node.id];
-          return newPosition
-            ? { ...node, position: newPosition }
-            : node;
+          const layoutNode = layoutData.nodes.find((n) => n.id === node.id);
+          if (layoutNode) {
+            // Ensure nodes stay within reasonable canvas bounds
+            const x = Math.max(50, Math.min(layoutNode.position.x, 1200));
+            const y = Math.max(50, Math.min(layoutNode.position.y, 800));
+            
+            return {
+              ...node,
+              position: { x, y },
+            };
+          }
+          return node;
         })
       );
       
-      // Fit view to show all nodes
-      setTimeout(() => fitView(), 100);
+      // Fit view to show all nodes with padding
+      setTimeout(() => {
+        fitView({ 
+          padding: 0.1,
+          includeHiddenNodes: false,
+          minZoom: 0.5,
+          maxZoom: 1.2
+        });
+      }, 100);
     } catch (error) {
       console.error('Failed to auto-layout diagram:', error);
+      
+      // Fallback: Simple local auto-layout if API fails
+      if (nodes.length > 0) {
+        const gridSize = Math.ceil(Math.sqrt(nodes.length));
+        const spacing = 200;
+        const startX = 100;
+        const startY = 100;
+        
+        setNodes((nds) =>
+          nds.map((node, index) => ({
+            ...node,
+            position: {
+              x: startX + (index % gridSize) * spacing,
+              y: startY + Math.floor(index / gridSize) * spacing,
+            },
+          }))
+        );
+        
+        setTimeout(() => fitView({ padding: 0.1 }), 100);
+      }
     } finally {
       setIsLoading(false);
     }
