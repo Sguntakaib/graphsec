@@ -3934,7 +3934,12 @@ async def get_node_vulnerabilities(node_id: str):
                         "risk_score": vuln.risk_score,
                         "position": vuln.position,
                         "color": vuln.color,
-                        "icon": vuln.icon
+                        "icon": vuln.icon,
+                        # Educational context fields
+                        "trigger_context": vuln.trigger_context,
+                        "triggered_by_rule": vuln.triggered_by_rule,
+                        "missing_controls": vuln.missing_controls,
+                        "user_selections": vuln.user_selections
                     }
                     for vuln in result.vulnerability_nodes
                 ],
