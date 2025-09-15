@@ -1798,6 +1798,21 @@ function AppContent() {
             stroke: '#10B981',
             strokeDasharray: '3,3'
           },
+          labelStyle: {
+            fill: '#ffffff',
+            fontWeight: 600,
+            fontSize: '12px',
+            backgroundColor: 'rgba(17, 24, 39, 0.9)',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            border: '1px solid #10B981'
+          },
+          labelBgStyle: {
+            fill: 'rgba(17, 24, 39, 0.9)',
+            stroke: '#10B981',
+            strokeWidth: 1,
+            fillOpacity: 0.9
+          },
           markerEnd: {
             type: 'arrowclosed',
             color: '#10B981',
