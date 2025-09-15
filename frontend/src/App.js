@@ -72,6 +72,10 @@ const nodeTypes = {
   vulnerability: VulnerabilityNode,
 };
 
+const edgeTypes = {
+  'vulnerability-edge': VulnerabilityEdge,
+};
+
 const initialNodes = [];
 const initialEdges = [];
 
