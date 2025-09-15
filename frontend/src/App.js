@@ -882,20 +882,29 @@ function AppContent() {
   };
 
   const handleAutoLayout = async () => {
-    if (!currentDiagram) return;
+    if (!currentDiagram) {
+      // If no diagram, perform local layout
+      performLocalAutoLayout();
+      return;
+    }
     
     setIsLoading(true);
     try {
       const layoutData = await autoLayoutDiagram(currentDiagram.id);
       
-      // Apply the new positions with bounds checking
-      setNodes((nds) =>
-        nds.map((node) => {
+      // Apply the new positions with enhanced bounds checking
+      setNodes((nds) => {
+        const updatedNodes = nds.map((node) => {
           const layoutNode = layoutData.nodes.find((n) => n.id === node.id);
           if (layoutNode) {
-            // Ensure nodes stay within reasonable canvas bounds
-            const x = Math.max(50, Math.min(layoutNode.position.x, 1200));
-            const y = Math.max(50, Math.min(layoutNode.position.y, 800));
+            // Dynamic canvas bounds based on viewport
+            const canvasWidth = window.innerWidth - 300; // Account for sidebars
+            const canvasHeight = window.innerHeight - 200; // Account for header/footer
+            
+            // Ensure nodes stay within dynamic canvas bounds with padding
+            const padding = 100;
+            const x = Math.max(padding, Math.min(layoutNode.position.x, canvasWidth - padding));
+            const y = Math.max(padding, Math.min(layoutNode.position.y, canvasHeight - padding));
             
             return {
               ...node,
@@ -903,31 +912,100 @@ function AppContent() {
             };
           }
           return node;
-        })
-      );
+        });
+        
+        return updatedNodes;
+      });
       
       // Fit view to show all nodes with padding
       setTimeout(() => {
         fitView({ 
-          padding: 0.1,
+          padding: 0.15,
           includeHiddenNodes: false,
-          minZoom: 0.5,
-          maxZoom: 1.2
+          minZoom: 0.3,
+          maxZoom: 1.5,
+          duration: 800
         });
       }, 100);
     } catch (error) {
       console.error('Failed to auto-layout diagram:', error);
-      
-      // Fallback: Simple local auto-layout if API fails
-      if (nodes.length > 0) {
-        const gridSize = Math.ceil(Math.sqrt(nodes.length));
-        const spacing = 200;
-        const startX = 100;
-        const startY = 100;
+      performLocalAutoLayout();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Enhanced local auto-layout function
+  const performLocalAutoLayout = () => {
+    if (nodes.length === 0) return;
+    
+    setIsLoading(true);
+    
+    // Get canvas dimensions
+    const canvasWidth = window.innerWidth - 300;
+    const canvasHeight = window.innerHeight - 200;
+    
+    // Intelligent grid-based layout with categorization
+    const nodesByType = nodes.reduce((acc, node) => {
+      const type = node.data?.type || 'default';
+      if (!acc[type]) acc[type] = [];
+      acc[type].push(node);
+      return acc;
+    }, {});
+    
+    const typePositions = {
+      'Actor': { x: 50, y: 50 },      // Top-left for threat actors
+      'Asset': { x: canvasWidth * 0.4, y: canvasHeight * 0.3 }, // Center for assets
+      'Surface': { x: canvasWidth * 0.7, y: canvasHeight * 0.2 }, // Right for attack surfaces
+      'Control': { x: canvasWidth * 0.2, y: canvasHeight * 0.7 }, // Bottom-left for controls
+      'Zone': { x: canvasWidth * 0.8, y: canvasHeight * 0.8 }, // Bottom-right for zones
+      'default': { x: canvasWidth * 0.5, y: canvasHeight * 0.5 }
+    };
+    
+    const spacing = {
+      x: Math.min(250, canvasWidth / 6),
+      y: Math.min(200, canvasHeight / 6)
+    };
+    
+    setNodes((nds) => {
+      const updatedNodes = nds.map((node) => {
+        const nodeType = node.data?.type || 'default';
+        const typeNodes = nodesByType[nodeType];
+        const nodeIndex = typeNodes.findIndex(n => n.id === node.id);
         
-        setNodes((nds) =>
-          nds.map((node, index) => ({
-            ...node,
+        // Calculate position within type group
+        const basePos = typePositions[nodeType] || typePositions.default;
+        const nodesPerRow = Math.ceil(Math.sqrt(typeNodes.length));
+        const row = Math.floor(nodeIndex / nodesPerRow);
+        const col = nodeIndex % nodesPerRow;
+        
+        const x = basePos.x + (col * spacing.x);
+        const y = basePos.y + (row * spacing.y);
+        
+        // Ensure nodes stay within bounds
+        const boundedX = Math.max(50, Math.min(x, canvasWidth - 50));
+        const boundedY = Math.max(50, Math.min(y, canvasHeight - 50));
+        
+        return {
+          ...node,
+          position: { x: boundedX, y: boundedY },
+        };
+      });
+      
+      return updatedNodes;
+    });
+    
+    // Auto-fit view after layout
+    setTimeout(() => {
+      fitView({ 
+        padding: 0.1,
+        includeHiddenNodes: false,
+        minZoom: 0.3,
+        maxZoom: 1.5,
+        duration: 800
+      });
+      setIsLoading(false);
+    }, 100);
             position: {
               x: startX + (index % gridSize) * spacing,
               y: startY + Math.floor(index / gridSize) * spacing,
