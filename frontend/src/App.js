@@ -1877,6 +1877,16 @@ function AppContent() {
               <span>Core Loop</span>
             </button>
             
+            <button
+              onClick={analyzeAllNodeVulnerabilities}
+              disabled={isLoading || nodes.filter(n => n.data?.questionnaireResponses).length === 0}
+              className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              title="Analyze Vulnerabilities - Auto-generate vulnerability nodes based on OWASP Top 10"
+            >
+              <AlertTriangle className="h-4 w-4" />
+              <span>Vulnerabilities</span>
+            </button>
+            
             <div className="relative">
               <input
                 type="file"
