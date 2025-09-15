@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://unlinked-vuln-nodes.preview.emergentagent.com/api"
+BASE_URL = "https://sec-context-modal.preview.emergentagent.com/api"
 
 def test_endpoint_1_questionnaire_complete():
     """
