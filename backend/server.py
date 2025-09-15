@@ -3858,7 +3858,12 @@ async def analyze_node_vulnerabilities(node_id: str, request: VulnerabilityAnaly
                     "color": vuln.color,
                     "icon": vuln.icon,
                     "connection_style": vuln.connection_style,
-                    "created_at": vuln.created_at.isoformat()
+                    "created_at": vuln.created_at.isoformat(),
+                    # Educational context fields
+                    "trigger_context": vuln.trigger_context,
+                    "triggered_by_rule": vuln.triggered_by_rule,
+                    "missing_controls": vuln.missing_controls,
+                    "user_selections": vuln.user_selections
                 }
                 for vuln in result.vulnerability_nodes
             ],
