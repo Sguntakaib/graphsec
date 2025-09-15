@@ -342,6 +342,58 @@ const AdvancedNodeLibrary = () => {
           alert_volume: 'Low'
         }
       ]
+    },
+    {
+      id: 'infrastructure',
+      title: 'Infrastructure',
+      icon: Server,
+      color: 'text-blue-400',
+      nodes: [
+        {
+          type: 'Infrastructure',
+          subtype: 'CloudDeployment',
+          label: 'Cloud Deployment',
+          description: 'Cloud-based deployment infrastructure with automatic scaling',
+          mitre_ids: [],
+          deployment_model: 'IaaS/PaaS',
+          security_level: 'Shared Responsibility'
+        },
+        {
+          type: 'Infrastructure',
+          subtype: 'OnPremisesDeployment',
+          label: 'On-Premises Deployment',
+          description: 'On-premises deployment infrastructure with full control',
+          mitre_ids: [],
+          deployment_model: 'Self-Managed',
+          security_level: 'Full Responsibility'
+        }
+      ]
+    },
+    {
+      id: 'cloud-services',
+      title: 'Cloud Services',
+      icon: Network,
+      color: 'text-cyan-400',
+      nodes: [
+        {
+          type: 'Service',
+          subtype: 'AWSService',
+          label: 'AWS Service',
+          description: 'Amazon Web Services cloud platform components',
+          mitre_ids: [],
+          provider: 'Amazon',
+          service_model: 'Multi-Service'
+        },
+        {
+          type: 'Service',
+          subtype: 'GCPService',
+          label: 'GCP Service',
+          description: 'Google Cloud Platform components and services',
+          mitre_ids: [],
+          provider: 'Google',
+          service_model: 'Multi-Service'
+        }
+      ]
     }
   ];
 
