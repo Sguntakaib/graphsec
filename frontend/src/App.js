@@ -712,72 +712,172 @@ function AppContent() {
     setHighlightedPaths([]);
   };
 
-  // Function to determine edge label and styling based on connection type
+  // Enhanced function to determine edge label and styling based on connection type
   const getConnectionInfo = (sourceNode, targetNode, questionnaire_answers = {}) => {
     const sourceType = sourceNode?.data?.subtype || sourceNode?.type;
     const targetType = targetNode?.data?.subtype || targetNode?.type;
     
-    // API connections
-    if (sourceType === 'WebApp' && targetType === 'API') {
-      const apiType = questionnaire_answers?.api_type || 'REST API';
+    // API connections (WebApp to API, API to API)
+    if ((sourceType === 'WebApp' && targetType === 'API') || 
+        (sourceType === 'API' && targetType === 'API')) {
+      const apiType = questionnaire_answers?.api_type || 'REST';
       const protocol = questionnaire_answers?.api_protocol || 'HTTPS';
       return {
         label: `${protocol} ${apiType}`,
         style: { stroke: '#3B82F6', strokeWidth: 2 },
-        markerEnd: { type: 'arrowclosed', color: '#3B82F6' }
+        markerEnd: { type: 'arrowclosed', color: '#3B82F6' },
+        labelStyle: { fill: '#3B82F6', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#1E3A8A', fillOpacity: 0.8 }
       };
     }
     
     // Database connections
     if ((sourceType === 'WebApp' || sourceType === 'API') && targetType === 'Database') {
+      const dbType = questionnaire_answers?.database_type || 'SQL';
       return {
-        label: 'DB Calls',
+        label: `${dbType} DB`,
         style: { stroke: '#8B5CF6', strokeWidth: 2 },
-        markerEnd: { type: 'arrowclosed', color: '#8B5CF6' }
+        markerEnd: { type: 'arrowclosed', color: '#8B5CF6' },
+        labelStyle: { fill: '#8B5CF6', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#581C87', fillOpacity: 0.8 }
       };
     }
     
-    // Cloud deployment connections
-    if (sourceType === 'WebApp' && targetType === 'CloudDeployment') {
+    // Storage connections (to S3Bucket, file systems, etc.)
+    if ((sourceType === 'WebApp' || sourceType === 'API') && 
+        (targetType === 'S3Bucket' || targetType === 'FileSystem')) {
       return {
-        label: 'Deployed on',
-        style: { stroke: '#10B981', strokeWidth: 2, strokeDasharray: '5,5' },
-        markerEnd: { type: 'arrowclosed', color: '#10B981' }
+        label: 'File I/O',
+        style: { stroke: '#10B981', strokeWidth: 2, strokeDasharray: '4,2' },
+        markerEnd: { type: 'arrowclosed', color: '#10B981' },
+        labelStyle: { fill: '#10B981', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#047857', fillOpacity: 0.8 }
+      };
+    }
+    
+    // Message Queue connections
+    if ((sourceType === 'WebApp' || sourceType === 'API') && 
+        (targetType === 'MessageQueue' || targetType === 'ServiceBus')) {
+      return {
+        label: 'Message',
+        style: { stroke: '#F59E0B', strokeWidth: 2, strokeDasharray: '6,3' },
+        markerEnd: { type: 'arrowclosed', color: '#F59E0B' },
+        labelStyle: { fill: '#F59E0B', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#92400E', fillOpacity: 0.8 }
+      };
+    }
+    
+    // Network zone transitions (crossing trust boundaries)
+    if (sourceType === 'Internet' || targetType === 'Internet') {
+      return {
+        label: 'Public Network',
+        style: { stroke: '#EF4444', strokeWidth: 3, strokeDasharray: '8,4' },
+        markerEnd: { type: 'arrowclosed', color: '#EF4444' },
+        labelStyle: { fill: '#EF4444', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#7F1D1D', fillOpacity: 0.8 }
+      };
+    }
+    
+    if ((sourceType === 'DMZ' && targetType === 'Internal') || 
+        (sourceType === 'Internal' && targetType === 'DMZ')) {
+      return {
+        label: 'Network Transit',
+        style: { stroke: '#F97316', strokeWidth: 2, strokeDasharray: '5,3' },
+        markerEnd: { type: 'arrowclosed', color: '#F97316' },
+        labelStyle: { fill: '#F97316', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#9A3412', fillOpacity: 0.8 }
       };
     }
     
     // Cloud service connections
-    if (targetType === 'AWSService' || targetType === 'GCPService') {
+    if (targetType === 'AWSService' || targetType === 'GCPService' || targetType === 'AzureService') {
       return {
-        label: 'Uses Services',
+        label: 'Cloud API',
         style: { stroke: '#06B6D4', strokeWidth: 2, strokeDasharray: '3,3' },
-        markerEnd: { type: 'arrowclosed', color: '#06B6D4' }
+        markerEnd: { type: 'arrowclosed', color: '#06B6D4' },
+        labelStyle: { fill: '#06B6D4', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#0E7490', fillOpacity: 0.8 }
       };
     }
     
-    // On-premises deployment
-    if (sourceType === 'WebApp' && targetType === 'OnPremisesDeployment') {
+    // Authentication flows
+    if ((sourceType === 'WebApp' || sourceType === 'API') && 
+        (targetType === 'ActiveDirectory' || targetType === 'OAuth' || targetType === 'SAML')) {
       return {
-        label: 'Hosted on',
-        style: { stroke: '#F59E0B', strokeWidth: 2, strokeDasharray: '5,5' },
-        markerEnd: { type: 'arrowclosed', color: '#F59E0B' }
+        label: 'Auth Flow',
+        style: { stroke: '#8B5CF6', strokeWidth: 2, strokeDasharray: '4,4' },
+        markerEnd: { type: 'arrowclosed', color: '#8B5CF6' },
+        labelStyle: { fill: '#8B5CF6', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#581C87', fillOpacity: 0.8 }
       };
     }
     
-    // Attack path connections
-    if (sourceType === 'ExternalAttacker' || sourceType === 'MaliciousInsider') {
+    // Load balancer connections
+    if (sourceType === 'LoadBalancer' || targetType === 'LoadBalancer') {
       return {
-        label: 'Attacks',
+        label: 'Load Balance',
+        style: { stroke: '#14B8A6', strokeWidth: 2 },
+        markerEnd: { type: 'arrowclosed', color: '#14B8A6' },
+        labelStyle: { fill: '#14B8A6', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#0F766E', fillOpacity: 0.8 }
+      };
+    }
+    
+    // Attack surface connections (vulnerabilities)
+    if (targetType === 'SSRF' || targetType === 'SQLi' || targetType === 'RCE' || 
+        targetType === 'IDOR' || targetType === 'WeakIAM' || targetType === 'Deserialization') {
+      return {
+        label: 'Exploits',
+        style: { stroke: '#DC2626', strokeWidth: 3, strokeDasharray: '7,3' },
+        markerEnd: { type: 'arrowclosed', color: '#DC2626' },
+        labelStyle: { fill: '#DC2626', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#7F1D1D', fillOpacity: 0.8 }
+      };
+    }
+    
+    // Security control connections (protective)
+    if (sourceType === 'WAF' || sourceType === 'EDR' || sourceType === 'SIEM' || 
+        sourceType === 'EgressProxy' || sourceType === 'IAMPolicy' || sourceType === 'NetworkACL') {
+      return {
+        label: 'Protects',
+        style: { stroke: '#059669', strokeWidth: 2, strokeDasharray: '6,2' },
+        markerEnd: { type: 'arrowclosed', color: '#059669' },
+        labelStyle: { fill: '#059669', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#064E3B', fillOpacity: 0.8 }
+      };
+    }
+    
+    // Actor attack paths
+    if (sourceType === 'ExternalAttacker' || sourceType === 'Insider' || 
+        sourceType === 'ServiceAccount' || sourceType === 'NationState') {
+      return {
+        label: 'Attack Vector',
         style: { stroke: '#EF4444', strokeWidth: 3, strokeDasharray: '7,3' },
-        markerEnd: { type: 'arrowclosed', color: '#EF4444' }
+        markerEnd: { type: 'arrowclosed', color: '#EF4444' },
+        labelStyle: { fill: '#EF4444', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#7F1D1D', fillOpacity: 0.8 }
       };
     }
     
-    // Default connection
+    // VM/Container connections
+    if ((sourceType === 'VM' || sourceType === 'Container') && 
+        (targetType === 'WebApp' || targetType === 'API' || targetType === 'Database')) {
+      return {
+        label: 'Hosts',
+        style: { stroke: '#7C3AED', strokeWidth: 2, strokeDasharray: '5,2' },
+        markerEnd: { type: 'arrowclosed', color: '#7C3AED' },
+        labelStyle: { fill: '#7C3AED', fontWeight: 'bold', fontSize: '12px' },
+        labelBgStyle: { fill: '#4C1D95', fillOpacity: 0.8 }
+      };
+    }
+    
+    // Default connection with improved styling
     return {
-      label: 'Connected',
-      style: { stroke: '#9CA3AF', strokeWidth: 1 },
-      markerEnd: { type: 'arrowclosed', color: '#9CA3AF' }
+      label: 'Data Flow',
+      style: { stroke: '#9CA3AF', strokeWidth: 2 },
+      markerEnd: { type: 'arrowclosed', color: '#9CA3AF' },
+      labelStyle: { fill: '#9CA3AF', fontWeight: 'bold', fontSize: '12px' },
+      labelBgStyle: { fill: '#374151', fillOpacity: 0.8 }
     };
   };
 
