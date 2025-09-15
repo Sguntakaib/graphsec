@@ -30,6 +30,10 @@ from probabilistic_simulation import probabilistic_engine, ProbabilisticAttackPa
 from findings_management import FindingsManager, Finding, FindingSeverity, FindingStatus, FindingSource, FindingsFilter, FindingsSummary
 from questionnaire_completion_processor import QuestionnaireCompletionProcessor
 
+# Import vulnerability analysis modules
+from vulnerability_engine import vulnerability_engine, VulnerabilityAnalysisResult, VulnerabilityNode, VulnerabilitySeverity
+from questionnaire_analyzer import questionnaire_analyzer
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
