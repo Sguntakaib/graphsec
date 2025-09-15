@@ -1397,6 +1397,124 @@ function AppContent() {
     }
   };
 
+  // =============================================================================
+  // VULNERABILITY ANALYSIS FUNCTIONS
+  // =============================================================================
+
+  const analyzeNodeVulnerabilitiesHandler = async (nodeId, nodeType, questionnaireResponses, nodePosition = null) => {
+    try {
+      console.log(`🔍 Analyzing vulnerabilities for ${nodeType} node ${nodeId}`);
+      
+      const analysisResult = await analyzeNodeVulnerabilities(
+        nodeId,
+        nodeType,
+        questionnaireResponses,
+        nodePosition
+      );
+      
+      // Store the analysis result
+      setVulnerabilityAnalyses(prev => ({
+        ...prev,
+        [nodeId]: analysisResult
+      }));
+      
+      // Create vulnerability nodes for visualization
+      const vulnerabilityNodes = createVulnerabilityNodes(analysisResult);
+      const vulnerabilityEdges = createVulnerabilityEdges(analysisResult, nodeId);
+      
+      // Add vulnerability nodes and edges to the graph
+      if (vulnerabilityNodes.length > 0) {
+        setNodes(nds => [...nds, ...vulnerabilityNodes]);
+        setEdges(eds => [...eds, ...vulnerabilityEdges]);
+        
+        console.log(`✅ Created ${vulnerabilityNodes.length} vulnerability nodes for node ${nodeId}`);
+      }
+      
+      return analysisResult;
+      
+    } catch (error) {
+      console.error('Error analyzing vulnerabilities:', error);
+      return null;
+    }
+  };
+
+  const handleVulnerabilityNodeClick = (vulnerabilityNode) => {
+    setSelectedVulnerability(vulnerabilityNode);
+    setShowVulnerabilityPanel(true);
+  };
+
+  const handleVulnerabilityFixed = async (vulnerabilityId) => {
+    try {
+      // Remove vulnerability node from graph
+      setNodes(nds => nds.filter(node => node.id !== vulnerabilityId));
+      setEdges(eds => eds.filter(edge => edge.target !== vulnerabilityId));
+      
+      // Update vulnerability analyses
+      setVulnerabilityAnalyses(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(nodeId => {
+          if (updated[nodeId].vulnerability_nodes) {
+            updated[nodeId].vulnerability_nodes = updated[nodeId].vulnerability_nodes.filter(
+              vuln => vuln.id !== vulnerabilityId
+            );
+            updated[nodeId].total_vulnerabilities = updated[nodeId].vulnerability_nodes.length;
+          }
+        });
+        return updated;
+      });
+      
+      console.log(`✅ Vulnerability ${vulnerabilityId} marked as fixed and removed from graph`);
+      
+    } catch (error) {
+      console.error('Error handling vulnerability fix:', error);
+    }
+  };
+
+  const analyzeAllNodeVulnerabilities = async () => {
+    const securityNodes = nodes.filter(node => 
+      node.data?.subtype && 
+      ['WebApp', 'API', 'Database'].includes(node.data.subtype) &&
+      node.data?.questionnaireResponses
+    );
+    
+    if (securityNodes.length === 0) {
+      alert('No nodes with questionnaire responses found for vulnerability analysis.');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      for (const node of securityNodes) {
+        await analyzeNodeVulnerabilitiesHandler(
+          node.id,
+          node.data.subtype,
+          node.data.questionnaireResponses,
+          node.position
+        );
+      }
+      
+      alert(`Vulnerability analysis completed for ${securityNodes.length} nodes.`);
+      
+    } catch (error) {
+      console.error('Error in bulk vulnerability analysis:', error);
+      alert('Error occurred during bulk vulnerability analysis.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearAllVulnerabilities = () => {
+    // Remove all vulnerability nodes and edges
+    setNodes(nds => nds.filter(node => node.type !== 'vulnerability'));
+    setEdges(eds => eds.filter(edge => !edge.data?.vulnerability));
+    
+    // Clear vulnerability analyses
+    setVulnerabilityAnalyses({});
+    
+    console.log('✅ All vulnerabilities cleared from graph');
+  };
+
   const saveQuestionnaireResponses = async (nodeId, responses) => {
     if (!currentDiagram) return;
     
