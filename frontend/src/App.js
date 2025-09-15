@@ -355,6 +355,12 @@ function AppContent() {
   );
 
   const onNodeClick = useCallback((event, node) => {
+    // Handle vulnerability node clicks
+    if (node.type === 'vulnerability') {
+      handleVulnerabilityNodeClick(node.data);
+      return;
+    }
+    
     setSelectedNode(node);
     setContextMenu(null); // Close context menu when clicking node
   }, []);
