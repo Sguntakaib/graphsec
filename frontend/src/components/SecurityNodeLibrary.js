@@ -32,6 +32,48 @@ const SecurityNodeLibrary = () => {
       ]
     },
     {
+      title: 'Infrastructure',
+      icon: Cloud,
+      color: 'text-blue-400',
+      nodes: [
+        {
+          type: 'Infrastructure',
+          subtype: 'CloudDeployment',
+          label: 'Cloud Deployment',
+          description: 'Cloud-based deployment infrastructure',
+          mitre_ids: []
+        },
+        {
+          type: 'Infrastructure',
+          subtype: 'OnPremisesDeployment',
+          label: 'On-Premises Deployment',
+          description: 'On-premises deployment infrastructure',
+          mitre_ids: []
+        }
+      ]
+    },
+    {
+      title: 'Cloud Services',
+      icon: HardDrive,
+      color: 'text-cyan-400',
+      nodes: [
+        {
+          type: 'Service',
+          subtype: 'AWSService',
+          label: 'AWS Service',
+          description: 'Amazon Web Services components',
+          mitre_ids: []
+        },
+        {
+          type: 'Service',
+          subtype: 'GCPService',
+          label: 'GCP Service',
+          description: 'Google Cloud Platform components',
+          mitre_ids: []
+        }
+      ]
+    },
+    {
       title: 'Assets',
       icon: Server,
       color: 'text-green-400',
