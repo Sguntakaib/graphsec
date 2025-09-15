@@ -2384,7 +2384,11 @@ function AppContent() {
             className="bg-gray-900"
             fitView
             snapToGrid
-            snapGrid={[20, 20]}
+            snapGrid={[15, 15]}
+            nodesDraggable={true}
+            nodesConnectable={true}
+            elementsSelectable={true}
+            selectNodesOnDrag={false}
           >
             <Controls 
               className="bg-gray-800 border-gray-700"
