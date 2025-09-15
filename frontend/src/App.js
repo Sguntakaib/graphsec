@@ -29,7 +29,10 @@ import CoreLoopDashboard from './components/CoreLoopDashboard';
 import { QuestionnaireProvider, useQuestionnaire } from './contexts/QuestionnaireContext';
 import QuestionnaireManager from './components/QuestionnaireManager';
 import CanvasSynchronizer from './components/CanvasSynchronizer';
+import VulnerabilityNode from './components/VulnerabilityNode';
+import VulnerabilityPanel from './components/VulnerabilityPanel';
 import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram, applyTemplateToCurrentDiagram } from './services/api';
+import { analyzeNodeVulnerabilities, getNodeVulnerabilities, createVulnerabilityNodes, createVulnerabilityEdges } from './services/vulnerabilityApi';
 import { 
   Shield, 
   Play, 
