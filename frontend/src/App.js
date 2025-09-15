@@ -2430,15 +2430,15 @@ function AppContent() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-0.5 bg-emerald-600" style={{borderStyle: 'dashed', borderWidth: '1px 0'}}></div>
-                  <span className="text-emerald-300">Protects</span>
+                  <span className="text-emerald-200 font-medium">Protects</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-0.5 bg-cyan-500"></div>
-                  <span className="text-cyan-300">Cloud API</span>
+                  <span className="text-cyan-200 font-medium">Cloud API</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-0.5 bg-gray-500"></div>
-                  <span className="text-gray-300">Data Flow</span>
+                  <span className="text-gray-200 font-medium">Data Flow</span>
                 </div>
               </div>
             </Panel>
