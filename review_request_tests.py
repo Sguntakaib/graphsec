@@ -8,7 +8,7 @@ import requests
 import json
 
 # Use the production URL from review request
-BASE_URL = "https://sec-context-modal.preview.emergentagent.com/api"
+BASE_URL = "https://vulnscan-enhance-1.preview.emergentagent.com/api"
 
 class ReviewRequestTester:
     def __init__(self):
