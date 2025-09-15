@@ -985,6 +985,49 @@ class SecurityModelingAPITester:
             self.log_test("Auto Layout", False, f"Error: {str(e)}")
             return False
 
+    def test_templates_endpoint(self):
+        """Test GET /api/templates endpoint"""
+        try:
+            response = self.session.get(f"{self.base_url}/templates")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if not isinstance(data, list):
+                    self.log_test("Templates Endpoint", False, f"Expected list, got {type(data)}")
+                    return False
+                
+                # Check if we have templates
+                if len(data) == 0:
+                    self.log_test("Templates Endpoint", True, "No templates found (empty list)")
+                    return True
+                
+                # Verify template structure
+                first_template = data[0]
+                required_fields = ["id", "name", "description", "category", "nodes", "edges"]
+                missing_fields = [f for f in required_fields if f not in first_template]
+                
+                if missing_fields:
+                    self.log_test("Templates Endpoint", False, f"Missing template fields: {missing_fields}")
+                    return False
+                
+                # Count templates by category
+                categories = {}
+                for template in data:
+                    category = template.get("category", "Unknown")
+                    categories[category] = categories.get(category, 0) + 1
+                
+                self.log_test("Templates Endpoint", True, 
+                            f"Retrieved {len(data)} templates across {len(categories)} categories: {list(categories.keys())}")
+                return True
+            else:
+                self.log_test("Templates Endpoint", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Templates Endpoint", False, f"Error: {str(e)}")
+            return False
+
     # Phase 1 Intelligent Node System Tests
     def test_intelligent_nodes_supported_types(self):
         """Test GET /api/intelligent-nodes/supported-types"""
