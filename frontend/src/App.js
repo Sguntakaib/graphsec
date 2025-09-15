@@ -1961,6 +1961,55 @@ function AppContent() {
               <AlertTriangle className="h-4 w-4" />
               <span>Vulnerabilities</span>
             </button>
+
+            {/* Vulnerability System Controls */}
+            {allVulnerabilities.length > 0 && (
+              <>
+                <button
+                  onClick={() => setShowVulnerabilityFilter(!showVulnerabilityFilter)}
+                  className={`px-3 py-2 rounded flex items-center space-x-2 text-sm transition-colors ${
+                    showVulnerabilityFilter
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-600 text-white hover:bg-gray-700'
+                  }`}
+                  title="Filter Vulnerabilities"
+                >
+                  <Filter className="h-4 w-4" />
+                  <span>Filter</span>
+                </button>
+
+                <button
+                  onClick={() => setShowVulnerabilityLegend(!showVulnerabilityLegend)}
+                  className={`px-3 py-2 rounded flex items-center space-x-2 text-sm transition-colors ${
+                    showVulnerabilityLegend
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-600 text-white hover:bg-gray-700'
+                  }`}
+                  title="Security Dashboard"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </button>
+
+                <button
+                  onClick={() => setShowVulnerabilityReport(true)}
+                  className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center space-x-2 text-sm"
+                  title="Generate Vulnerability Report"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Report</span>
+                </button>
+
+                <button
+                  onClick={clearAllVulnerabilities}
+                  className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center space-x-2 text-sm"
+                  title="Clear All Vulnerabilities"
+                >
+                  <X className="h-4 w-4" />
+                  <span>Clear</span>
+                </button>
+              </>
+            )}
             
             <div className="relative">
               <input
