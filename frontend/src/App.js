@@ -2271,6 +2271,7 @@ function AppContent() {
             onDrop={onDrop}
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             defaultEdgeOptions={defaultEdgeOptions}
             className="bg-gray-900"
             fitView
