@@ -1316,6 +1316,23 @@ function AppContent() {
           }
         }
 
+        // Trigger vulnerability analysis if enabled
+        if (autoVulnerabilityAnalysis && ['WebApp', 'API', 'Database'].includes(currentQuestionnaireNode.subtype)) {
+          console.log('🔍 Auto-triggering vulnerability analysis for questionnaire completion');
+          
+          const nodePosition = nodes.find(n => n.id === currentQuestionnaireNode.id)?.position;
+          const analysisResult = await analyzeNodeVulnerabilitiesHandler(
+            currentQuestionnaireNode.id,
+            currentQuestionnaireNode.subtype,
+            result.answers,
+            nodePosition
+          );
+          
+          if (analysisResult && analysisResult.total_vulnerabilities > 0) {
+            statusMessage += `\n\n🚨 Security Analysis:\n• ${analysisResult.total_vulnerabilities} vulnerabilities identified\n• Overall risk score: ${analysisResult.overall_risk_score.toFixed(1)}/10`;
+          }
+        }
+
         // Show completion status with smart node creation info
         let statusMessage = `Security configuration completed!\n\nCompletion: ${result.validation?.completion_percentage || 0}%\nRecommendations: ${result.recommendations?.length || 0}`;
         
