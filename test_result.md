@@ -650,15 +650,18 @@ test_plan:
 
   - task: "Phase 1 Vulnerability Engine - Vulnerability Rules Engine"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/vulnerability_rules.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "✅ Phase 1 Vulnerability Rules Engine implemented - Comprehensive rule definitions for WebApp, API, and Database nodes based on OWASP Top 10 2023. Includes 50+ specific vulnerability rules with MITRE ATT&CK mappings, severity scoring, and remediation guidance. Ready for testing rule evaluation and vulnerability generation."
+      - working: true
+        agent: "testing"
+        comment: "✅ VULNERABILITY RULES ENGINE WORKING: Route ordering issue fixed. Rules by node type: WebApp (multiple rules), API (multiple rules), Database (multiple rules). All vulnerability rules have proper structure with OWASP category mapping, severity levels, and MITRE technique assignments. GET /api/vulnerabilities/rules endpoint functional."
 
   - task: "Phase 1 Vulnerability Engine - Questionnaire Analysis Integration"
     implemented: true
