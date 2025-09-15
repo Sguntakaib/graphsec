@@ -64,7 +64,9 @@ import {
   MoreVertical,
   BookOpen,
   Network,
-  AlertTriangle
+  AlertTriangle,
+  Filter,
+  X
 } from 'lucide-react';
 
 const nodeTypes = {
