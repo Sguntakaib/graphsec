@@ -101,6 +101,17 @@ function AppContent() {
   const [currentQueueIndex, setCurrentQueueIndex] = useState(0);
   const [parentQuestionnaireState, setParentQuestionnaireState] = useState(null); // For resuming parent questionnaires
   const [dependencyStates, setDependencyStates] = useState({}); // Track dependency states per parent node: {parentNodeId: {API: 'COMPLETED', Database: 'CREATED'}}
+  
+  // Vulnerability system state
+  const [vulnerabilityAnalyses, setVulnerabilityAnalyses] = useState({}); // Store vulnerability analyses by node ID
+  const [selectedVulnerability, setSelectedVulnerability] = useState(null);
+  const [showVulnerabilityPanel, setShowVulnerabilityPanel] = useState(false);
+  const [vulnerabilityFilter, setVulnerabilityFilter] = useState({
+    severity: [],
+    category: [],
+    showFixed: false
+  });
+  const [autoVulnerabilityAnalysis, setAutoVulnerabilityAnalysis] = useState(true); // Auto-analyze on questionnaire completion
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
