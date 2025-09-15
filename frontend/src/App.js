@@ -115,11 +115,17 @@ function AppContent() {
   const [vulnerabilityAnalyses, setVulnerabilityAnalyses] = useState({}); // Store vulnerability analyses by node ID
   const [selectedVulnerability, setSelectedVulnerability] = useState(null);
   const [showVulnerabilityPanel, setShowVulnerabilityPanel] = useState(false);
+  const [showVulnerabilityFilter, setShowVulnerabilityFilter] = useState(false);
+  const [showVulnerabilityLegend, setShowVulnerabilityLegend] = useState(false);
+  const [showVulnerabilityReport, setShowVulnerabilityReport] = useState(false);
   const [vulnerabilityFilter, setVulnerabilityFilter] = useState({
     severity: [],
     category: [],
+    nodeTypes: [],
+    searchText: '',
     showFixed: false
   });
+  const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]);
   const [autoVulnerabilityAnalysis, setAutoVulnerabilityAnalysis] = useState(true); // Auto-analyze on questionnaire completion
 
   // Track zoom level changes
