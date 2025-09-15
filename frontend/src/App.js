@@ -1006,18 +1006,6 @@ function AppContent() {
       });
       setIsLoading(false);
     }, 100);
-            position: {
-              x: startX + (index % gridSize) * spacing,
-              y: startY + Math.floor(index / gridSize) * spacing,
-            },
-          }))
-        );
-        
-        setTimeout(() => fitView({ padding: 0.1 }), 100);
-      }
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleExportDiagram = () => {
