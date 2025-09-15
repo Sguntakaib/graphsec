@@ -334,8 +334,7 @@ class IntelligentNodeEngine:
                 SecurityBranchType.ENCRYPTION
             ],
             dependencies={
-                "cloud_provider_aws": "AWSService",
-                "cloud_provider_gcp": "GCPService"
+                "cloud_provider": "CloudProvider"  # This will be handled specially
             },
             security_prompts=[
                 SecurityPrompt(
