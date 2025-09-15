@@ -31,6 +31,13 @@ class SecurityBranchType(str, Enum):
     CLOUD_SECURITY = "CloudSecurity"
     NETWORK_SECURITY = "NetworkSecurity"
     INFRASTRUCTURE = "Infrastructure"
+    # STRIDE-based security branches
+    THREAT_MODELING = "ThreatModeling"
+    SECURITY_ARCHITECTURE = "SecurityArchitecture"
+    AUTHENTICATION_DESIGN = "AuthenticationDesign"
+    AUTHORIZATION_DESIGN = "AuthorizationDesign"
+    DATA_PROTECTION = "DataProtection"
+    SECURITY_MONITORING = "SecurityMonitoring"
 
 class PromptType(str, Enum):
     SINGLE_CHOICE = "single_choice"
