@@ -26,6 +26,11 @@ class SecurityBranchType(str, Enum):
     BACKUP = "Backup"
     MONITORING = "Monitoring"
     LOGGING = "Logging"
+    # Deployment-related branches
+    DEPLOYMENT = "Deployment"
+    CLOUD_SECURITY = "CloudSecurity"
+    NETWORK_SECURITY = "NetworkSecurity"
+    INFRASTRUCTURE = "Infrastructure"
 
 class PromptType(str, Enum):
     SINGLE_CHOICE = "single_choice"
