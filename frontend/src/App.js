@@ -137,6 +137,56 @@ function AppContent() {
   
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
+  // Function to automatically fit all nodes within canvas when they go out of bounds
+  const handleFitAllNodes = useCallback(() => {
+    if (nodes.length === 0) return;
+    
+    // Get the bounds of all nodes
+    const bounds = nodes.reduce((acc, node) => {
+      const x = node.position.x;
+      const y = node.position.y;
+      const width = node.width || 200;
+      const height = node.height || 100;
+      
+      return {
+        minX: Math.min(acc.minX, x),
+        minY: Math.min(acc.minY, y),
+        maxX: Math.max(acc.maxX, x + width),
+        maxY: Math.max(acc.maxY, y + height)
+      };
+    }, { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+    
+    // Check if any nodes are out of visible bounds
+    const canvasWidth = window.innerWidth - 300;
+    const canvasHeight = window.innerHeight - 200;
+    const padding = 50;
+    
+    const nodesOutOfBounds = bounds.minX < padding || 
+                           bounds.minY < padding || 
+                           bounds.maxX > canvasWidth - padding || 
+                           bounds.maxY > canvasHeight - padding;
+    
+    if (nodesOutOfBounds) {
+      // Fit view with animation
+      fitView({ 
+        padding: 0.1,
+        includeHiddenNodes: false,
+        minZoom: 0.2,
+        maxZoom: 1.5,
+        duration: 600
+      });
+    }
+  }, [nodes, fitView]);
+
+  // Auto-check for out-of-bounds nodes when nodes change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleFitAllNodes();
+    }, 500); // Small delay to avoid constant checking
+    
+    return () => clearTimeout(timeoutId);
+  }, [nodes, handleFitAllNodes]);
+
   // Save state for undo/redo
   const saveStateToUndoStack = useCallback(() => {
     const currentState = {
