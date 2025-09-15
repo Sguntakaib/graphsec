@@ -1316,6 +1316,17 @@ function AppContent() {
           }
         }
 
+        // Show completion status with smart node creation info
+        let statusMessage = `Security configuration completed!\n\nCompletion: ${result.validation?.completion_percentage || 0}%\nRecommendations: ${result.recommendations?.length || 0}`;
+        
+        if (result.smartNodeResult) {
+          statusMessage += `\n\nSmart Links Created:\n• ${result.smartNodeResult.nodesCreated} new nodes\n• ${result.smartNodeResult.edgesCreated} connections`;
+        }
+
+        if (result.dependentNodes?.length > 0) {
+          statusMessage += `\n\nDependent Nodes:\n• ${result.dependentNodes.length} nodes will be configured`;
+        }
+
         // Trigger vulnerability analysis if enabled
         if (autoVulnerabilityAnalysis && ['WebApp', 'API', 'Database'].includes(currentQuestionnaireNode.subtype)) {
           console.log('🔍 Auto-triggering vulnerability analysis for questionnaire completion');
@@ -1331,17 +1342,6 @@ function AppContent() {
           if (analysisResult && analysisResult.total_vulnerabilities > 0) {
             statusMessage += `\n\n🚨 Security Analysis:\n• ${analysisResult.total_vulnerabilities} vulnerabilities identified\n• Overall risk score: ${analysisResult.overall_risk_score.toFixed(1)}/10`;
           }
-        }
-
-        // Show completion status with smart node creation info
-        let statusMessage = `Security configuration completed!\n\nCompletion: ${result.validation?.completion_percentage || 0}%\nRecommendations: ${result.recommendations?.length || 0}`;
-        
-        if (result.smartNodeResult) {
-          statusMessage += `\n\nSmart Links Created:\n• ${result.smartNodeResult.nodesCreated} new nodes\n• ${result.smartNodeResult.edgesCreated} connections`;
-        }
-
-        if (result.dependentNodes?.length > 0) {
-          statusMessage += `\n\nDependent Nodes:\n• ${result.dependentNodes.length} nodes will be configured`;
         }
         
         alert(statusMessage);
