@@ -2384,7 +2384,10 @@ function AppContent() {
                     ? 'bg-red-600 text-white'
                     : 'bg-gray-600 text-white hover:bg-gray-500'
                 }`}
-                title="Auto-analyze vulnerabilities after questionnaire completion"
+                title={autoVulnerabilityAnalysis 
+                  ? "Auto-vulnerability analysis enabled - will analyze after COMPLETE questionnaires only"
+                  : "Auto-vulnerability analysis disabled - use 'Vulnerabilities' button after completing all security questions"
+                }
               >
                 <Shield className="h-4 w-4" />
                 <span>Auto-Vuln {autoVulnerabilityAnalysis ? 'On' : 'Off'}</span>
