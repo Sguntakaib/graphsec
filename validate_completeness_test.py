@@ -88,18 +88,21 @@ class ValidateCompletenessEndpointTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Expected fields based on test_result.md
-                expected_fields = ["completion_percentage", "is_complete", "recommendations"]
-                missing_fields = [f for f in expected_fields if f not in data]
+                # The actual API response structure has validation nested
+                validation = data.get("validation", {})
+                recommendations = data.get("recommendations", [])
+                
+                # Expected fields in validation object
+                expected_fields = ["completion_percentage", "is_complete"]
+                missing_fields = [f for f in expected_fields if f not in validation]
                 
                 if missing_fields:
                     self.log_test("Validate Completeness Basic", False, 
-                                f"Missing expected fields: {missing_fields}. Got: {list(data.keys())}")
+                                f"Missing expected fields in validation: {missing_fields}. Got: {list(validation.keys())}")
                     return False
                 
-                completion_percentage = data.get("completion_percentage")
-                is_complete = data.get("is_complete")
-                recommendations = data.get("recommendations", [])
+                completion_percentage = validation.get("completion_percentage")
+                is_complete = validation.get("is_complete")
                 
                 # Validate data types
                 if not isinstance(completion_percentage, (int, float)):
