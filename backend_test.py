@@ -63,7 +63,7 @@ class ConditionalQuestionnaireVulnerabilityTester:
                 data = response.json()
                 
                 # Verify response structure
-                expected_fields = ["questionnaire_type", "questions", "conditional_logic"]
+                expected_fields = ["success", "questions", "conditional_info"]
                 missing_fields = [f for f in expected_fields if f not in data]
                 
                 if missing_fields:
