@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Conditional Questionnaire and Enhanced Vulnerability Detection System Tests
-Tests the enhanced conditional questionnaire system and vulnerability detection with specific scenarios
-as requested in the review request.
+Backend API Testing - Focus on validate-completeness endpoint
+Tests the failing POST /api/intelligent-nodes/WebApp/validate-completeness endpoint
+as reported by the user throwing 500 error.
 """
 
 import requests
