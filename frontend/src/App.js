@@ -2790,8 +2790,8 @@ function AppContent() {
         />
       )}
 
-      {/* Enhanced Questionnaire System - DISABLED: Using legacy system to prevent conflicts */}
-      {/* <QuestionnaireManager
+      {/* Enhanced Questionnaire System - ENABLED: For dependent questionnaire support */}
+      <QuestionnaireManager
         nodes={nodes}
         setNodes={setNodes}
         onNodeCreate={(newNode) => {
@@ -2808,7 +2808,7 @@ function AppContent() {
         setDependencyState={setDependencyState}
         getDependencyState={getDependencyState}
         getIncompleteDependencies={getIncompleteDependencies}
-      /> */}
+      />
 
       {/* Canvas Synchronizer - Temporarily disabled to fix infinite loop */}
       {/* <CanvasSynchronizer
