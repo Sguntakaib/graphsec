@@ -63,14 +63,35 @@ const SecurityQuestionnaire = ({
   const fetchSecurityPrompts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
+      
+      // Use comprehensive questionnaire for WebApp, fallback to intelligent-nodes for others
+      let response;
+      if (nodeSubtype === 'WebApp') {
+        console.log('🎯 Using comprehensive WebApp questionnaire system');
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`);
+      } else {
+        console.log('🎯 Falling back to intelligent-nodes system for', nodeSubtype);
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
+      }
       
       if (!response.ok) {
         throw new Error(`Failed to fetch prompts: ${response.statusText}`);
       }
       
       const data = await response.json();
-      setPrompts(data.prompts || []);
+      
+      if (nodeSubtype === 'WebApp') {
+        // Comprehensive questionnaire response format
+        setPrompts(data.prompts || []);
+        console.log(`🎯 Loaded ${data.total_questions} comprehensive WebApp questions (${data.level} level)`);
+        if (data.completion_required) {
+          console.log('⚠️ All questions must be answered before vulnerability analysis');
+        }
+      } else {
+        // Legacy intelligent-nodes response format
+        setPrompts(data.prompts || []);
+      }
+      
       setError(null);
     } catch (err) {
       console.error('Error fetching security prompts:', err);
