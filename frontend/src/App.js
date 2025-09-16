@@ -1351,21 +1351,31 @@ function AppContent() {
           statusMessage += `\n\nDependent Nodes:\n• ${result.dependentNodes.length} nodes will be configured`;
         }
 
-        // Trigger vulnerability analysis if enabled
+        // Check if questionnaire is complete before triggering vulnerability analysis
+        const isQuestionnaireComplete = await checkQuestionnaireCompleteness(currentQuestionnaireNode.id, currentQuestionnaireNode.subtype);
+        
+        // Only trigger vulnerability analysis if enabled AND questionnaire is complete
         if (autoVulnerabilityAnalysis && ['WebApp', 'API', 'Database'].includes(currentQuestionnaireNode.subtype)) {
-          console.log('🔍 Auto-triggering vulnerability analysis for questionnaire completion');
-          
-          const nodePosition = nodes.find(n => n.id === currentQuestionnaireNode.id)?.position;
-          const analysisResult = await analyzeNodeVulnerabilitiesHandler(
-            currentQuestionnaireNode.id,
-            currentQuestionnaireNode.subtype,
-            result.answers,
-            nodePosition
-          );
-          
-          if (analysisResult && analysisResult.total_vulnerabilities > 0) {
-            statusMessage += `\n\n🚨 Security Analysis:\n• ${analysisResult.total_vulnerabilities} vulnerabilities identified\n• Overall risk score: ${analysisResult.overall_risk_score.toFixed(1)}/10`;
+          if (isQuestionnaireComplete) {
+            console.log('🔍 Auto-triggering vulnerability analysis for COMPLETE questionnaire');
+            
+            const nodePosition = nodes.find(n => n.id === currentQuestionnaireNode.id)?.position;
+            const analysisResult = await analyzeNodeVulnerabilitiesHandler(
+              currentQuestionnaireNode.id,
+              currentQuestionnaireNode.subtype,
+              result.answers,
+              nodePosition
+            );
+            
+            if (analysisResult && analysisResult.total_vulnerabilities > 0) {
+              statusMessage += `\n\n🚨 Security Analysis:\n• ${analysisResult.total_vulnerabilities} vulnerabilities identified\n• Overall risk score: ${analysisResult.overall_risk_score.toFixed(1)}/10`;
+            }
+          } else {
+            console.log('⚠️ Questionnaire incomplete - skipping auto-vulnerability analysis');
+            statusMessage += `\n\n⚠️ Security Analysis:\n• Questionnaire incomplete - please answer all questions before vulnerability analysis\n• Use "Vulnerabilities" button after completing all security questions`;
           }
+        } else if (!autoVulnerabilityAnalysis) {
+          statusMessage += `\n\n💡 Tip: Use "Vulnerabilities" button to analyze security risks after completing all questions`;
         }
         
         alert(statusMessage);
