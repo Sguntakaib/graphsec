@@ -104,8 +104,8 @@ class ConditionalQuestionnaireVulnerabilityTester:
             self.log_test("Conditional API Questionnaire", False, f"Error: {str(e)}")
             return False
 
-    def test_owasp_api3_2023_broken_object_property_level_authorization(self):
-        """Test POST /api/vulnerabilities/analyze/api3-2023 - Broken Object Property Level Authorization"""
+    def test_conditional_trigger_rest_api(self):
+        """Test POST /api/questionnaires/API/conditional-trigger with REST API response"""
         try:
             request_data = {
                 "node_type": "API",
