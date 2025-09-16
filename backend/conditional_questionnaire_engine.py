@@ -1,0 +1,416 @@
+"""
+Conditional Questionnaire Engine
+Handles conditional question flow based on user responses
+Supports API type and Database type conditional questioning
+"""
+
+from typing import Dict, List, Optional, Any, Tuple
+from enum import Enum
+import logging
+from questionnaire_loader import QuestionnaireLoader, QuestionnaireLevel
+
+logger = logging.getLogger(__name__)
+
+class ConditionalQuestionnaireEngine:
+    """Engine for handling conditional questionnaire logic"""
+    
+    def __init__(self, questionnaire_loader: QuestionnaireLoader):
+        self.questionnaire_loader = questionnaire_loader
+        
+        # Define conditional question mappings
+        self.api_type_questions = {
+            "REST API": [
+                {
+                    "id": "rest_api_versioning",
+                    "question": "How is REST API versioning implemented?",
+                    "type": "single_choice",
+                    "options": ["URI versioning (/v1/)", "Header versioning", "Query parameter versioning", "Content negotiation", "No versioning"],
+                    "help_text": "REST API versioning strategy affects security and backward compatibility.",
+                    "related_branch": "ApiSecurity"
+                },
+                {
+                    "id": "rest_http_methods",
+                    "question": "Which HTTP methods are supported and how are they secured?",
+                    "type": "multiple_choice",
+                    "options": ["GET (read-only)", "POST (create)", "PUT (update)", "DELETE (remove)", "PATCH (partial update)", "OPTIONS (preflight)", "HEAD (metadata)"],
+                    "help_text": "HTTP method security prevents unauthorized operations.",
+                    "related_branch": "ApiSecurity"
+                },
+                {
+                    "id": "rest_content_type_validation",
+                    "question": "How is Content-Type validation implemented?",
+                    "type": "single_choice",
+                    "options": ["Strict Content-Type validation", "Flexible validation", "No validation", "Unknown"],
+                    "help_text": "Content-Type validation prevents content confusion attacks.",
+                    "related_branch": "InputValidation"
+                }
+            ],
+            "GraphQL API": [
+                {
+                    "id": "graphql_query_depth_limiting",
+                    "question": "Is GraphQL query depth limiting implemented?",
+                    "type": "single_choice",
+                    "options": ["Configurable depth limits", "Fixed depth limits", "No depth limiting", "Unknown"],
+                    "help_text": "Query depth limiting prevents denial of service attacks on GraphQL APIs.",
+                    "related_branch": "ApiSecurity"
+                },
+                {
+                    "id": "graphql_query_complexity",
+                    "question": "How is GraphQL query complexity analysis implemented?",
+                    "type": "single_choice", 
+                    "options": ["Advanced complexity analysis", "Basic complexity scoring", "Query timeout only", "No complexity analysis", "Unknown"],
+                    "help_text": "Query complexity analysis prevents resource exhaustion attacks.",
+                    "related_branch": "ApiSecurity"
+                },
+                {
+                    "id": "graphql_introspection",
+                    "question": "Is GraphQL introspection disabled in production?",
+                    "type": "single_choice",
+                    "options": ["Disabled in production", "Authenticated introspection only", "Enabled for all users", "Unknown"],
+                    "help_text": "GraphQL introspection can expose sensitive schema information.",
+                    "related_branch": "InformationDisclosure"
+                },
+                {
+                    "id": "graphql_query_allowlisting",
+                    "question": "Is GraphQL query allowlisting (persisted queries) implemented?",
+                    "type": "single_choice",
+                    "options": ["Persisted queries only", "Hybrid approach", "Dynamic queries allowed", "Unknown"],
+                    "help_text": "Query allowlisting provides strong protection against malicious queries.",
+                    "related_branch": "ApiSecurity"
+                }
+            ],
+            "SOAP API": [
+                {
+                    "id": "soap_wsdl_security",
+                    "question": "How is WSDL access controlled?",
+                    "type": "single_choice",
+                    "options": ["Authenticated WSDL access", "Public WSDL", "No WSDL provided", "Unknown"],
+                    "help_text": "WSDL can expose service structure and should be properly secured.",
+                    "related_branch": "InformationDisclosure"
+                },
+                {
+                    "id": "soap_xml_security",
+                    "question": "What XML security measures are implemented?",
+                    "type": "multiple_choice",
+                    "options": ["XML signature", "XML encryption", "XML schema validation", "XXE prevention", "None"],
+                    "help_text": "XML security prevents various XML-based attacks on SOAP services.",
+                    "related_branch": "InputValidation"
+                },
+                {
+                    "id": "soap_ws_security",
+                    "question": "Is WS-Security implemented for message-level security?",
+                    "type": "single_choice",
+                    "options": ["Full WS-Security implementation", "Basic token authentication", "Transport security only", "No message security", "Unknown"],
+                    "help_text": "WS-Security provides message-level authentication and encryption for SOAP.",
+                    "related_branch": "Encryption"
+                }
+            ],
+            "gRPC API": [
+                {
+                    "id": "grpc_tls_config",
+                    "question": "How is gRPC TLS configured?",
+                    "type": "single_choice",
+                    "options": ["mTLS (mutual TLS)", "Server-side TLS only", "Insecure connections", "Unknown"],
+                    "help_text": "gRPC TLS configuration secures communication channels.",
+                    "related_branch": "Encryption"
+                },
+                {
+                    "id": "grpc_auth_method",
+                    "question": "What gRPC authentication method is used?",
+                    "type": "single_choice",
+                    "options": ["OAuth2 tokens", "JWT tokens", "API keys in metadata", "Certificate-based", "No authentication"],
+                    "help_text": "gRPC authentication secures service access.",
+                    "related_branch": "Authentication"
+                },
+                {
+                    "id": "grpc_interceptors",
+                    "question": "Are gRPC interceptors used for security?",
+                    "type": "multiple_choice",
+                    "options": ["Authentication interceptor", "Authorization interceptor", "Logging interceptor", "Rate limiting interceptor", "None"],
+                    "help_text": "gRPC interceptors provide cross-cutting security concerns.",
+                    "related_branch": "ApiSecurity"
+                }
+            ],
+            "WebSocket API": [
+                {
+                    "id": "websocket_origin_validation",
+                    "question": "How is WebSocket origin validation implemented?",
+                    "type": "single_choice",
+                    "options": ["Strict origin validation", "Flexible origin checking", "No origin validation", "Unknown"],
+                    "help_text": "Origin validation prevents unauthorized WebSocket connections.",
+                    "related_branch": "ApiSecurity"
+                },
+                {
+                    "id": "websocket_auth_method",
+                    "question": "How is WebSocket authentication handled?",
+                    "type": "single_choice",
+                    "options": ["Token-based authentication", "Session-based authentication", "Certificate authentication", "No authentication", "Unknown"],
+                    "help_text": "WebSocket authentication secures real-time connections.",
+                    "related_branch": "Authentication"
+                },
+                {
+                    "id": "websocket_message_validation",
+                    "question": "How are WebSocket messages validated?",
+                    "type": "single_choice",
+                    "options": ["JSON schema validation", "Custom message validation", "Basic format checking", "No message validation", "Unknown"],
+                    "help_text": "Message validation prevents malicious WebSocket payloads.",
+                    "related_branch": "InputValidation"
+                }
+            ]
+        }
+        
+        self.database_type_questions = {
+            "MySQL": [
+                {
+                    "id": "mysql_ssl_mode",
+                    "question": "What MySQL SSL mode is configured?",
+                    "type": "single_choice",
+                    "options": ["REQUIRED", "VERIFY_CA", "VERIFY_IDENTITY", "PREFERRED", "DISABLED"],
+                    "help_text": "MySQL SSL mode determines the level of connection encryption and validation.",
+                    "related_branch": "Encryption"
+                },
+                {
+                    "id": "mysql_auth_plugin",
+                    "question": "Which MySQL authentication plugin is used?",
+                    "type": "single_choice",
+                    "options": ["caching_sha2_password", "mysql_native_password", "sha256_password", "auth_socket", "Unknown"],
+                    "help_text": "MySQL authentication plugin affects password security and compatibility.",
+                    "related_branch": "Authentication"
+                },
+                {
+                    "id": "mysql_general_log",
+                    "question": "Is MySQL general query logging enabled?",
+                    "type": "single_choice",
+                    "options": ["Enabled with log rotation", "Enabled without rotation", "Disabled", "Unknown"],
+                    "help_text": "MySQL general log captures all database activity for security monitoring.",
+                    "related_branch": "AuditLogging"
+                }
+            ],
+            "PostgreSQL": [
+                {
+                    "id": "postgresql_ssl_config",
+                    "question": "How is PostgreSQL SSL configured?",
+                    "type": "single_choice",
+                    "options": ["SSL required with certificate validation", "SSL required", "SSL preferred", "SSL disabled", "Unknown"],
+                    "help_text": "PostgreSQL SSL configuration secures database connections.",
+                    "related_branch": "Encryption"
+                },
+                {
+                    "id": "postgresql_row_level_security",
+                    "question": "Is PostgreSQL Row Level Security (RLS) enabled?",
+                    "type": "single_choice",
+                    "options": ["RLS enabled with policies", "RLS enabled without policies", "RLS disabled", "Unknown"],
+                    "help_text": "Row Level Security provides fine-grained access control to table rows.",
+                    "related_branch": "AccessControl"
+                },
+                {
+                    "id": "postgresql_audit_extension",
+                    "question": "Which PostgreSQL audit extension is used?",
+                    "type": "single_choice",
+                    "options": ["pgAudit", "Custom audit triggers", "Built-in logging only", "No audit extension", "Unknown"],
+                    "help_text": "PostgreSQL audit extensions provide comprehensive database activity monitoring.",
+                    "related_branch": "AuditLogging"
+                }
+            ],
+            "MongoDB": [
+                {
+                    "id": "mongodb_auth_mechanism",
+                    "question": "What MongoDB authentication mechanism is used?",
+                    "type": "single_choice",
+                    "options": ["SCRAM-SHA-256", "SCRAM-SHA-1", "X.509 certificates", "LDAP", "No authentication"],
+                    "help_text": "MongoDB authentication mechanism affects security strength.",
+                    "related_branch": "Authentication"
+                },
+                {
+                    "id": "mongodb_authorization",
+                    "question": "How is MongoDB role-based access control configured?",
+                    "type": "single_choice",
+                    "options": ["Custom roles with least privilege", "Built-in roles only", "Single admin user", "No authorization", "Unknown"],
+                    "help_text": "MongoDB RBAC provides granular access control to databases and collections.",
+                    "related_branch": "AccessControl"
+                },
+                {
+                    "id": "mongodb_audit_log",
+                    "question": "Is MongoDB audit logging enabled?",
+                    "type": "single_choice",
+                    "options": ["Comprehensive audit logging", "Basic audit logging", "No audit logging", "Unknown"],
+                    "help_text": "MongoDB audit logging tracks database access and operations.",
+                    "related_branch": "AuditLogging"
+                }
+            ],
+            "Redis": [
+                {
+                    "id": "redis_auth_config",
+                    "question": "How is Redis authentication configured?",
+                    "type": "single_choice",
+                    "options": ["ACL with multiple users", "Single password (requirepass)", "No authentication", "Unknown"],
+                    "help_text": "Redis authentication prevents unauthorized access to data.",
+                    "related_branch": "Authentication"
+                },
+                {
+                    "id": "redis_tls_config",
+                    "question": "Is Redis TLS encryption enabled?",
+                    "type": "single_choice",
+                    "options": ["TLS enabled for all connections", "TLS enabled for client connections only", "No TLS encryption", "Unknown"],
+                    "help_text": "Redis TLS encryption protects data in transit.",
+                    "related_branch": "Encryption"
+                },
+                {
+                    "id": "redis_command_restrictions",
+                    "question": "Are dangerous Redis commands disabled?",
+                    "type": "multiple_choice",
+                    "options": ["FLUSHALL disabled", "CONFIG disabled", "DEBUG disabled", "EVAL disabled", "None disabled"],
+                    "help_text": "Disabling dangerous Redis commands reduces attack surface.",
+                    "related_branch": "AccessControl"
+                }
+            ],
+            "Elasticsearch": [
+                {
+                    "id": "elasticsearch_security_enabled",
+                    "question": "Is Elasticsearch Security (X-Pack) enabled?",
+                    "type": "single_choice",
+                    "options": ["X-Pack Security enabled", "Open Distro Security", "Basic authentication only", "No security", "Unknown"],
+                    "help_text": "Elasticsearch security features provide authentication and authorization.",
+                    "related_branch": "AccessControl"
+                },
+                {
+                    "id": "elasticsearch_tls_config",
+                    "question": "How is Elasticsearch TLS configured?",
+                    "type": "single_choice",
+                    "options": ["TLS for all communications", "TLS for client connections only", "TLS for inter-node only", "No TLS", "Unknown"],
+                    "help_text": "Elasticsearch TLS secures all communication channels.",
+                    "related_branch": "Encryption"
+                },
+                {
+                    "id": "elasticsearch_audit_logging",
+                    "question": "Is Elasticsearch audit logging configured?",
+                    "type": "single_choice",
+                    "options": ["Comprehensive audit logging", "Basic access logging", "No audit logging", "Unknown"],
+                    "help_text": "Elasticsearch audit logging tracks access and operations for security monitoring.",
+                    "related_branch": "AuditLogging"
+                }
+            ]
+        }
+    
+    def get_conditional_questionnaire(self, node_subtype: str, level: QuestionnaireLevel, 
+                                    previous_responses: Dict[str, Any] = None) -> Tuple[List[Dict], bool]:
+        """
+        Get questionnaire with conditional questions based on previous responses
+        
+        Returns:
+            Tuple of (questions_list, has_conditional_questions)
+        """
+        logger.info(f"Getting conditional questionnaire for {node_subtype} at {level.value} level")
+        
+        # Get base questionnaire
+        base_questions = self.questionnaire_loader.get_questionnaire(node_subtype, level)
+        if not base_questions:
+            return [], False
+        
+        # Check if this is a node type that supports conditional questions
+        if node_subtype.upper() not in ["API", "DATABASE"]:
+            return base_questions, False
+            
+        # Add type selection question if not already present
+        base_questions = self._ensure_type_selection_question(base_questions, node_subtype)
+        
+        # If we have previous responses, add conditional questions
+        conditional_questions = []
+        has_conditional = False
+        
+        if previous_responses:
+            conditional_questions = self._get_conditional_questions(node_subtype, previous_responses)
+            has_conditional = len(conditional_questions) > 0
+        
+        # Combine base and conditional questions
+        all_questions = base_questions + conditional_questions
+        
+        return all_questions, has_conditional
+    
+    def _ensure_type_selection_question(self, questions: List[Dict], node_subtype: str) -> List[Dict]:
+        """Ensure type selection question is present and at the beginning"""
+        
+        type_question_id = f"{node_subtype.lower()}_type"
+        
+        # Check if type question already exists
+        existing_question = None
+        for i, question in enumerate(questions):
+            if question.get('id') == type_question_id:
+                existing_question = questions.pop(i)
+                break
+        
+        # Create or update type selection question
+        if node_subtype.upper() == "API":
+            type_question = existing_question or {
+                "id": "api_type",
+                "question": "What type of API is this?",
+                "type": "single_choice",
+                "options": ["REST API", "GraphQL API", "SOAP API", "gRPC API", "WebSocket API", "Other"],
+                "help_text": "API type determines specific security considerations and implementation approaches.",
+                "related_branch": "ApiSecurity",
+                "is_conditional_trigger": True
+            }
+        elif node_subtype.upper() == "DATABASE":
+            type_question = existing_question or {
+                "id": "database_type",
+                "question": "What type of database is this?",
+                "type": "single_choice",
+                "options": ["MySQL", "PostgreSQL", "MongoDB", "Redis", "Elasticsearch", "SQL Server", "Oracle", "Other"],
+                "help_text": "Database type determines specific security configurations and best practices.",
+                "related_branch": "DatabaseSecurity",
+                "is_conditional_trigger": True
+            }
+        else:
+            return questions  # No type question needed
+        
+        # Insert type question at the beginning
+        return [type_question] + questions
+    
+    def _get_conditional_questions(self, node_subtype: str, responses: Dict[str, Any]) -> List[Dict]:
+        """Get conditional questions based on previous responses"""
+        
+        conditional_questions = []
+        
+        if node_subtype.upper() == "API":
+            api_type = responses.get("api_type")
+            if api_type and api_type in self.api_type_questions:
+                conditional_questions = self.api_type_questions[api_type].copy()
+                logger.info(f"Added {len(conditional_questions)} conditional questions for {api_type}")
+        
+        elif node_subtype.upper() == "DATABASE":
+            db_type = responses.get("database_type") 
+            if db_type and db_type in self.database_type_questions:
+                conditional_questions = self.database_type_questions[db_type].copy()
+                logger.info(f"Added {len(conditional_questions)} conditional questions for {db_type}")
+        
+        # Mark conditional questions
+        for question in conditional_questions:
+            question["is_conditional"] = True
+            question["conditional_trigger"] = responses.get(f"{node_subtype.lower()}_type")
+        
+        return conditional_questions
+    
+    def is_conditional_trigger_question(self, question: Dict) -> bool:
+        """Check if question triggers conditional questions"""
+        return question.get("is_conditional_trigger", False)
+    
+    def get_next_conditional_questions(self, node_subtype: str, question_id: str, response: str) -> List[Dict]:
+        """Get conditional questions triggered by a specific response"""
+        
+        if question_id == "api_type" and node_subtype.upper() == "API":
+            return self.api_type_questions.get(response, [])
+        elif question_id == "database_type" and node_subtype.upper() == "DATABASE":
+            return self.database_type_questions.get(response, [])
+        
+        return []
+
+# Global instance
+conditional_questionnaire_engine = None
+
+def get_conditional_questionnaire_engine() -> ConditionalQuestionnaireEngine:
+    """Get the global conditional questionnaire engine instance"""
+    global conditional_questionnaire_engine
+    if conditional_questionnaire_engine is None:
+        from questionnaire_loader import get_questionnaire_loader
+        conditional_questionnaire_engine = ConditionalQuestionnaireEngine(get_questionnaire_loader())
+    return conditional_questionnaire_engine
