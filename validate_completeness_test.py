@@ -155,8 +155,9 @@ class ValidateCompletenessEndpointTester:
             
             if response.status_code == 200:
                 data = response.json()
-                completion_percentage = data.get("completion_percentage", 0)
-                is_complete = data.get("is_complete", False)
+                validation = data.get("validation", {})
+                completion_percentage = validation.get("completion_percentage", 0)
+                is_complete = validation.get("is_complete", False)
                 
                 # Empty list should result in 0% completion and not complete
                 if completion_percentage == 0 and is_complete == False:
