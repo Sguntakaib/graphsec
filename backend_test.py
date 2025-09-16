@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - Focus on validate-completeness endpoint
-Tests the failing POST /api/intelligent-nodes/WebApp/validate-completeness endpoint
-as reported by the user throwing 500 error.
+Backend API Testing - WebApp Questionnaire Dependency Questions Verification
+Tests the WebApp questionnaire endpoint to verify dependency questions are now included.
+Focus: Verify that WebApp questionnaire now includes "Do you use API?" and "Do you use Database?" dependency questions.
 """
 
 import requests
