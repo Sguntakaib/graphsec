@@ -178,14 +178,14 @@ class ConditionalQuestionnaireVulnerabilityTester:
                 data = response.json()
                 
                 # Verify response structure
-                expected_fields = ["triggered_questions", "question_id", "response_value"]
+                expected_fields = ["success", "conditional_questions", "trigger_question"]
                 missing_fields = [f for f in expected_fields if f not in data]
                 
                 if missing_fields:
                     self.log_test("Conditional Trigger GraphQL API", False, f"Missing response fields: {missing_fields}")
                     return False
                 
-                triggered_questions = data.get("triggered_questions", [])
+                triggered_questions = data.get("conditional_questions", [])
                 
                 # Should return GraphQL-specific questions
                 if len(triggered_questions) == 0:
