@@ -234,7 +234,12 @@ const SecurityQuestionnaire = ({
       console.log(`🎯 Dependency trigger detected for ${currentPrompt.id} → ${dependencyTriggers[currentPrompt.id]}`);
       
       try {
-        // Check dependencies for this specific answer
+        // Check dependencies for all answers so far (including current)
+        const allAnswersWithCurrent = {
+          ...answers,
+          [currentPrompt.id]: currentAnswer
+        };
+        
         const dependencyResponse = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/check-dependencies`,
           {
@@ -242,7 +247,7 @@ const SecurityQuestionnaire = ({
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ answers: { [currentPrompt.id]: currentAnswer } })
+            body: JSON.stringify({ answers: allAnswersWithCurrent })
           }
         );
         
