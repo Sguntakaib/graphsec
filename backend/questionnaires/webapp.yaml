@@ -31,7 +31,7 @@ questionnaires:
       type: "single_choice"
       options: ["HTTPS only (HSTS enabled)", "HTTPS preferred", "Mixed HTTP/HTTPS", "HTTP only", "Unknown"]
       help_text: "HTTPS encryption protects data in transit and prevents man-in-the-middle attacks."
-      related_branch: "HTTPS"
+      related_branch: "Encryption"
     - id: "webapp_session_management"
       question: "How are user sessions managed?"
       type: "single_choice"
