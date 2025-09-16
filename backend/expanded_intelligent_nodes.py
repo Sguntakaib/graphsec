@@ -3236,6 +3236,180 @@ class ExpandedIntelligentNodeEngine:
             )
         }
         
+        # Product Design Security Node (STRIDE-based threat modeling)
+        templates["ProductDesignSecurity"] = {
+            "node_type": "Control",
+            "node_subtype": "ProductDesignSecurity",
+            "category": NodeCategory.SECURITY_CONTROL,
+            "description": "Product Design Security with STRIDE-based threat modeling",
+            "required_branches": [
+                SecurityBranchType.THREAT_MODELING,
+                SecurityBranchType.SECURE_DESIGN,
+                SecurityBranchType.PRIVACY_BY_DESIGN,
+                SecurityBranchType.SECURITY_TESTING,
+                SecurityBranchType.COMPLIANCE
+            ],
+            "questionnaires": {
+                QuestionnaireLevel.BASIC: [
+                    {
+                        "id": "stride_spoofing_assessment",
+                        "question": "How is identity spoofing prevented in your product design?",
+                        "type": "single_choice",
+                        "options": ["Strong Authentication (MFA)", "Basic Authentication", "Token-based Auth", "No Authentication", "Unknown"],
+                        "help_text": "Spoofing threats involve impersonating users or systems to gain unauthorized access.",
+                        "related_branch": SecurityBranchType.AUTHENTICATION
+                    },
+                    {
+                        "id": "stride_tampering_assessment",
+                        "question": "What measures prevent data tampering in your product?",
+                        "type": "single_choice",
+                        "options": ["Cryptographic Integrity Checks", "Input Validation", "Basic Checksums", "No Tampering Protection", "Unknown"],
+                        "help_text": "Tampering threats involve unauthorized modification of data or code.",
+                        "related_branch": SecurityBranchType.DATA_INTEGRITY
+                    },
+                    {
+                        "id": "stride_repudiation_assessment",
+                        "question": "How does your product ensure non-repudiation?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive Audit Logging", "Basic Logging", "Digital Signatures", "No Audit Trail", "Unknown"],
+                        "help_text": "Repudiation threats involve denying actions or transactions that actually occurred.",
+                        "related_branch": SecurityBranchType.AUDIT_LOGGING
+                    },
+                    {
+                        "id": "stride_information_disclosure_assessment",
+                        "question": "What protections prevent information disclosure?",
+                        "type": "single_choice",
+                        "options": ["End-to-End Encryption", "Transport Encryption", "Basic Access Controls", "No Disclosure Protection", "Unknown"],
+                        "help_text": "Information disclosure threats involve exposing sensitive data to unauthorized parties.",
+                        "related_branch": SecurityBranchType.ENCRYPTION
+                    },
+                    {
+                        "id": "stride_denial_of_service_assessment",
+                        "question": "How is denial of service prevented in your product?",
+                        "type": "single_choice",
+                        "options": ["Rate Limiting + Load Balancing", "Basic Rate Limiting", "Resource Monitoring", "No DoS Protection", "Unknown"],
+                        "help_text": "Denial of Service threats involve making systems or resources unavailable to legitimate users.",
+                        "related_branch": SecurityBranchType.AVAILABILITY
+                    },
+                    {
+                        "id": "stride_elevation_of_privilege_assessment",
+                        "question": "What prevents elevation of privilege attacks?",
+                        "type": "single_choice",
+                        "options": ["Principle of Least Privilege", "Role-Based Access Control", "Basic Permissions", "No Privilege Controls", "Unknown"],
+                        "help_text": "Elevation of privilege threats involve gaining higher access levels than intended.",
+                        "related_branch": SecurityBranchType.ACCESS_CONTROL
+                    }
+                ],
+                QuestionnaireLevel.ADVANCED: [
+                    {
+                        "id": "threat_model_methodology",
+                        "question": "What threat modeling methodology is used?",
+                        "type": "single_choice",
+                        "options": ["STRIDE + DREAD", "PASTA", "OCTAVE", "TRIKE", "Custom Methodology", "No Formal Methodology"],
+                        "help_text": "Systematic threat modeling methodologies provide structured approaches to security analysis.",
+                        "related_branch": SecurityBranchType.THREAT_MODELING
+                    },
+                    {
+                        "id": "data_flow_diagram_coverage",
+                        "question": "How comprehensive are your data flow diagrams?",
+                        "type": "single_choice",
+                        "options": ["Complete System Coverage", "Core Components Only", "Basic Diagrams", "No Data Flow Diagrams", "Unknown"],
+                        "help_text": "Data flow diagrams are essential for identifying attack surfaces and trust boundaries.",
+                        "related_branch": SecurityBranchType.SECURE_DESIGN
+                    },
+                    {
+                        "id": "trust_boundary_analysis",
+                        "question": "How are trust boundaries identified and analyzed?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive Analysis", "Basic Identification", "Informal Assessment", "No Trust Boundary Analysis", "Unknown"],
+                        "help_text": "Trust boundaries represent points where security controls must be enforced.",
+                        "related_branch": SecurityBranchType.SECURE_DESIGN
+                    },
+                    {
+                        "id": "security_by_design_principles",
+                        "question": "Which security-by-design principles are implemented?",
+                        "type": "multiple_choice",
+                        "options": ["Defense in Depth", "Fail Secure", "Least Privilege", "Separation of Duties", "Zero Trust", "Privacy by Design", "None"],
+                        "help_text": "Security-by-design principles should be embedded throughout the product architecture.",
+                        "related_branch": SecurityBranchType.SECURE_DESIGN
+                    },
+                    {
+                        "id": "privacy_impact_assessment",
+                        "question": "Has a Privacy Impact Assessment been conducted?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive PIA", "Basic Privacy Review", "Informal Assessment", "No Privacy Assessment", "Unknown"],
+                        "help_text": "Privacy Impact Assessments identify and mitigate privacy risks in product design.",
+                        "related_branch": SecurityBranchType.PRIVACY_BY_DESIGN
+                    },
+                    {
+                        "id": "security_testing_integration",
+                        "question": "How is security testing integrated into development?",
+                        "type": "single_choice",
+                        "options": ["Continuous Security Testing", "Automated SAST/DAST", "Manual Security Testing", "Basic Testing", "No Security Testing"],
+                        "help_text": "Integrated security testing validates that security controls work as designed.",
+                        "related_branch": SecurityBranchType.SECURITY_TESTING
+                    }
+                ],
+                QuestionnaireLevel.EXPERT: [
+                    {
+                        "id": "attack_tree_analysis",
+                        "question": "Are attack trees used for threat analysis?",
+                        "type": "single_choice",
+                        "options": ["Comprehensive Attack Trees", "Basic Attack Scenarios", "Informal Threat Analysis", "No Attack Tree Analysis", "Unknown"],
+                        "help_text": "Attack trees provide structured analysis of how threats could be realized.",
+                        "related_branch": SecurityBranchType.THREAT_MODELING
+                    },
+                    {
+                        "id": "quantitative_risk_assessment",
+                        "question": "Is quantitative risk assessment performed?",
+                        "type": "single_choice",
+                        "options": ["Full Quantitative Analysis", "Risk Scoring", "Qualitative Assessment", "No Risk Assessment", "Unknown"],
+                        "help_text": "Quantitative risk assessment provides measurable security risk metrics.",
+                        "related_branch": SecurityBranchType.RISK_ASSESSMENT
+                    },
+                    {
+                        "id": "secure_coding_standards",
+                        "question": "What secure coding standards are enforced?",
+                        "type": "multiple_choice",
+                        "options": ["OWASP Secure Coding", "SANS Top 25", "CWE Prevention", "Custom Standards", "Industry Standards", "No Standards"],
+                        "help_text": "Secure coding standards prevent common vulnerabilities during development.",
+                        "related_branch": SecurityBranchType.SECURE_DEVELOPMENT
+                    },
+                    {
+                        "id": "red_team_engagement",
+                        "question": "Is red team testing performed on the product design?",
+                        "type": "single_choice",
+                        "options": ["Regular Red Team Exercises", "Annual Red Team", "Purple Team Collaboration", "No Red Team Testing", "Unknown"],
+                        "help_text": "Red team testing provides adversarial validation of security controls.",
+                        "related_branch": SecurityBranchType.SECURITY_TESTING
+                    },
+                    {
+                        "id": "regulatory_compliance_assessment",
+                        "question": "Which regulatory requirements must the product meet?",
+                        "type": "multiple_choice",
+                        "options": ["GDPR", "CCPA", "HIPAA", "SOX", "PCI DSS", "ISO 27001", "NIST Framework", "None"],
+                        "help_text": "Regulatory compliance requirements may dictate specific security controls.",
+                        "related_branch": SecurityBranchType.COMPLIANCE
+                    },
+                    {
+                        "id": "threat_intelligence_integration",
+                        "question": "How is threat intelligence integrated into product design?",
+                        "type": "single_choice",
+                        "options": ["Real-time Threat Intelligence", "Periodic Intelligence Updates", "Basic Threat Awareness", "No Threat Intelligence", "Unknown"],
+                        "help_text": "Threat intelligence helps inform security design decisions based on current threat landscape.",
+                        "related_branch": SecurityBranchType.THREAT_INTELLIGENCE
+                    }
+                ]
+            },
+            "threat_intelligence": ThreatIntelligence(
+                cve_count=25,
+                recent_threats=["Design Flaws", "Architecture Vulnerabilities", "Privacy Violations", "Compliance Gaps"],
+                risk_score=6.5,
+                mitre_techniques=["T1190", "T1078", "T1055", "T1562"],
+                threat_actors=["External Attackers", "Insider Threats", "Nation-State Actors"]
+            )
+        }
+        
         return templates
     
     def _initialize_threat_intelligence(self) -> Dict[str, ThreatIntelligence]:
