@@ -329,6 +329,7 @@ class ConditionalQuestionnaireVulnerabilityTester:
         """Test POST /api/vulnerabilities/analyze/test_node/enhanced with input validation vulnerability"""
         try:
             request_data = {
+                "node_id": "test_node_api",
                 "node_type": "API",
                 "questionnaire_responses": {
                     "api_input_validation": "No validation",
