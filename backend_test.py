@@ -14,7 +14,7 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://auto-test-fix.preview.emergentagent.com/api"
 
-class WebAppDependencyQuestionsTester:
+class WebAppValidateCompletenessEndpointTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
@@ -51,306 +51,409 @@ class WebAppDependencyQuestionsTester:
             return False
 
     # ============================================================================
-    # CRITICAL TESTING TASK: VERIFY DEPENDENCY QUESTIONS IN WEBAPP QUESTIONNAIRE
+    # CRITICAL TESTING TASK: REPRODUCE 500 ERROR IN VALIDATE-COMPLETENESS ENDPOINT
     # ============================================================================
     
-    def test_webapp_questionnaire_content(self):
-        """Test GET /api/questionnaires/WebApp?level=basic - should return MORE than 8 questions with dependency questions"""
+    def test_validate_completeness_with_realistic_webapp_data(self):
+        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with realistic WebApp questionnaire data"""
         try:
-            response = self.session.get(f"{self.base_url}/questionnaires/WebApp?level=basic")
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Verify response structure
-                expected_fields = ["prompts", "total_questions"]
-                missing_fields = [f for f in expected_fields if f not in data]
-                
-                if missing_fields:
-                    self.log_test("WebApp Questionnaire Content", False, f"Missing response fields: {missing_fields}")
-                    return False
-                
-                prompts = data.get("prompts", [])
-                total_questions = data.get("total_questions", 0)
-                
-                # Should have MORE than 8 questions (now should have 10 questions including 2 new dependency questions)
-                if total_questions <= 8:
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                f"Expected MORE than 8 questions, got {total_questions}. Previous version had 8, new should have 10.")
-                    return False
-                
-                if len(prompts) <= 8:
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                f"Expected MORE than 8 prompts, got {len(prompts)}. Previous version had 8, new should have 10.")
-                    return False
-                
-                # Look for the two new dependency questions
-                api_dependency_question = None
-                database_dependency_question = None
-                
-                for prompt in prompts:
-                    prompt_id = prompt.get("id", "")
-                    question_text = prompt.get("question", "")
-                    
-                    # Check for API dependency question
-                    if prompt_id == "webapp_api_endpoints" or "API endpoints" in question_text:
-                        api_dependency_question = prompt
-                    
-                    # Check for Database dependency question  
-                    if prompt_id == "webapp_database_connection" or "database" in question_text.lower():
-                        database_dependency_question = prompt
-                
-                # Verify API dependency question
-                if not api_dependency_question:
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                "Missing API dependency question (webapp_api_endpoints)")
-                    return False
-                
-                # Verify Database dependency question
-                if not database_dependency_question:
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                "Missing Database dependency question (webapp_database_connection)")
-                    return False
-                
-                # Verify both dependency questions have type: "boolean"
-                if api_dependency_question.get("type") != "boolean":
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                f"API dependency question should have type 'boolean', got '{api_dependency_question.get('type')}'")
-                    return False
-                
-                if database_dependency_question.get("type") != "boolean":
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                f"Database dependency question should have type 'boolean', got '{database_dependency_question.get('type')}'")
-                    return False
-                
-                # Check for dependencies field with conditional mappings
-                dependencies = data.get("dependencies", {})
-                if not dependencies:
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                "Missing dependencies field with conditional mappings")
-                    return False
-                
-                # Verify dependency mappings - check for API and Database mappings
-                has_api_mapping = False
-                has_database_mapping = False
-                
-                for dep_id, target in dependencies.items():
-                    if target == "API":
-                        has_api_mapping = True
-                    elif target == "Database":
-                        has_database_mapping = True
-                
-                if not has_api_mapping:
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                f"Missing API dependency mapping. Found dependencies: {dependencies}")
-                    return False
-                
-                if not has_database_mapping:
-                    self.log_test("WebApp Questionnaire Content", False, 
-                                f"Missing Database dependency mapping. Found dependencies: {dependencies}")
-                    return False
-                
-                self.log_test("WebApp Questionnaire Content", True, 
-                            f"WebApp questionnaire now has {total_questions} questions (up from 8), includes both dependency questions with proper structure and mappings")
-                return True
-            else:
-                self.log_test("WebApp Questionnaire Content", False, f"HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("WebApp Questionnaire Content", False, f"Error: {str(e)}")
-            return False
-
-    def test_dependency_questions_validation(self):
-        """Test that both new dependency questions have correct structure"""
-        try:
-            response = self.session.get(f"{self.base_url}/questionnaires/WebApp?level=basic")
-            
-            if response.status_code == 200:
-                data = response.json()
-                prompts = data.get("prompts", [])
-                
-                # Find the dependency questions
-                api_question = None
-                database_question = None
-                
-                for prompt in prompts:
-                    prompt_id = prompt.get("id", "")
-                    if prompt_id == "webapp_api_endpoints":
-                        api_question = prompt
-                    elif prompt_id == "webapp_database_connection":
-                        database_question = prompt
-                
-                if not api_question:
-                    self.log_test("Dependency Questions Validation", False, "API dependency question not found")
-                    return False
-                
-                if not database_question:
-                    self.log_test("Dependency Questions Validation", False, "Database dependency question not found")
-                    return False
-                
-                # Validate API question structure
-                expected_api_question = "Does this web application expose API endpoints?"
-                if expected_api_question not in api_question.get("question", ""):
-                    self.log_test("Dependency Questions Validation", False, 
-                                f"API question text incorrect. Expected: '{expected_api_question}', got: '{api_question.get('question')}'")
-                    return False
-                
-                # Validate Database question structure
-                expected_db_question = "Does this application connect to a database?"
-                if expected_db_question not in database_question.get("question", ""):
-                    self.log_test("Dependency Questions Validation", False, 
-                                f"Database question text incorrect. Expected: '{expected_db_question}', got: '{database_question.get('question')}'")
-                    return False
-                
-                # Verify both have required fields
-                required_fields = ["id", "question", "type", "help_text", "required"]
-                
-                for question, name in [(api_question, "API"), (database_question, "Database")]:
-                    missing_fields = [f for f in required_fields if f not in question]
-                    if missing_fields:
-                        self.log_test("Dependency Questions Validation", False, 
-                                    f"{name} dependency question missing fields: {missing_fields}")
-                        return False
-                    
-                    if question.get("type") != "boolean":
-                        self.log_test("Dependency Questions Validation", False, 
-                                    f"{name} dependency question should have type 'boolean', got '{question.get('type')}'")
-                        return False
-                    
-                    if not question.get("required"):
-                        self.log_test("Dependency Questions Validation", False, 
-                                    f"{name} dependency question should be required")
-                        return False
-                
-                self.log_test("Dependency Questions Validation", True, 
-                            "Both dependency questions have correct structure, text, type (boolean), and required fields")
-                return True
-            else:
-                self.log_test("Dependency Questions Validation", False, f"HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Dependency Questions Validation", False, f"Error: {str(e)}")
-            return False
-
-    def test_compare_to_previous_version(self):
-        """Test that new version has more questions than previous version (8 -> 10)"""
-        try:
-            response = self.session.get(f"{self.base_url}/questionnaires/WebApp?level=basic")
-            
-            if response.status_code == 200:
-                data = response.json()
-                total_questions = data.get("total_questions", 0)
-                prompts = data.get("prompts", [])
-                
-                # Previous version had 8 questions, new should have 10
-                expected_new_count = 10
-                previous_count = 8
-                
-                if total_questions != expected_new_count:
-                    self.log_test("Compare to Previous Version", False, 
-                                f"Expected exactly {expected_new_count} questions, got {total_questions}. Previous version had {previous_count}.")
-                    return False
-                
-                if len(prompts) != expected_new_count:
-                    self.log_test("Compare to Previous Version", False, 
-                                f"Expected exactly {expected_new_count} prompts, got {len(prompts)}. Previous version had {previous_count}.")
-                    return False
-                
-                # Verify the 2 new questions are the dependency questions
-                dependency_question_ids = ["webapp_api_endpoints", "webapp_database_connection"]
-                found_dependency_questions = []
-                
-                for prompt in prompts:
-                    if prompt.get("id") in dependency_question_ids:
-                        found_dependency_questions.append(prompt.get("id"))
-                
-                if len(found_dependency_questions) != 2:
-                    self.log_test("Compare to Previous Version", False, 
-                                f"Expected 2 dependency questions, found {len(found_dependency_questions)}: {found_dependency_questions}")
-                    return False
-                
-                missing_deps = [dep_id for dep_id in dependency_question_ids if dep_id not in found_dependency_questions]
-                if missing_deps:
-                    self.log_test("Compare to Previous Version", False, 
-                                f"Missing dependency questions: {missing_deps}")
-                    return False
-                
-                self.log_test("Compare to Previous Version", True, 
-                            f"Successfully upgraded from {previous_count} to {expected_new_count} questions, with 2 new dependency questions added")
-                return True
-            else:
-                self.log_test("Compare to Previous Version", False, f"HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Compare to Previous Version", False, f"Error: {str(e)}")
-            return False
-
-    def test_conditional_questionnaire_system_enabled(self):
-        """Test that the conditional questionnaire system is properly enabled with dependency mappings"""
-        try:
-            response = self.session.get(f"{self.base_url}/questionnaires/WebApp?level=basic")
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Check for dependencies field
-                dependencies = data.get("dependencies", {})
-                if not dependencies:
-                    self.log_test("Conditional Questionnaire System", False, 
-                                "Missing dependencies field - conditional questionnaire system not enabled")
-                    return False
-                
-                # Verify the conditional mappings enable the system
-                # Note: The actual implementation uses webapp_api_enabled instead of webapp_api_endpoints
-                expected_mappings = {
-                    "webapp_api_enabled": "API",
-                    "webapp_database_connection": "Database"
+            # Realistic WebApp questionnaire data that would come from frontend interface
+            realistic_webapp_branches = [
+                {
+                    "id": "login-branch-1",
+                    "name": "Authentication System",
+                    "type": "Login",
+                    "required": True,
+                    "completed": True,
+                    "value": "oauth2",
+                    "description": "OAuth2 authentication implementation"
+                },
+                {
+                    "id": "database-branch-1", 
+                    "name": "Database Security",
+                    "type": "Database",
+                    "required": True,
+                    "completed": True,
+                    "value": "encrypted",
+                    "description": "Database encryption enabled"
+                },
+                {
+                    "id": "api-branch-1",
+                    "name": "API Security",
+                    "type": "API",
+                    "required": True,
+                    "completed": False,
+                    "value": None,
+                    "description": "API security configuration"
+                },
+                {
+                    "id": "input-validation-branch-1",
+                    "name": "Input Validation",
+                    "type": "InputValidation",
+                    "required": True,
+                    "completed": True,
+                    "value": "comprehensive",
+                    "description": "Comprehensive input validation"
+                },
+                {
+                    "id": "waf-branch-1",
+                    "name": "Web Application Firewall",
+                    "type": "WAF",
+                    "required": False,
+                    "completed": False,
+                    "value": None,
+                    "description": "WAF protection"
+                },
+                {
+                    "id": "deployment-branch-1",
+                    "name": "Deployment Security",
+                    "type": "Deployment",
+                    "required": True,
+                    "completed": True,
+                    "value": "secure",
+                    "description": "Secure deployment configuration"
                 }
-                
-                for dep_id, expected_target in expected_mappings.items():
-                    if dep_id not in dependencies:
-                        self.log_test("Conditional Questionnaire System", False, 
-                                    f"Missing conditional mapping for {dep_id}")
-                        return False
-                    
-                    if dependencies[dep_id] != expected_target:
-                        self.log_test("Conditional Questionnaire System", False, 
-                                    f"Incorrect conditional mapping for {dep_id}: expected '{expected_target}', got '{dependencies[dep_id]}'")
-                        return False
-                
-                # Verify the dependency questions exist and can trigger child questionnaires
-                prompts = data.get("prompts", [])
-                dependency_question_ids = ["webapp_api_endpoints", "webapp_database_connection"]
-                dependency_questions = []
-                
-                for prompt in prompts:
-                    if prompt.get("id") in dependency_question_ids:
-                        dependency_questions.append(prompt)
-                
-                if len(dependency_questions) != 2:
-                    self.log_test("Conditional Questionnaire System", False, 
-                                f"Expected 2 dependency questions for conditional triggering, found {len(dependency_questions)}")
+            ]
+            
+            print(f"🔍 Testing with realistic WebApp data: {len(realistic_webapp_branches)} branches")
+            print(f"📋 Branch types: {[b['type'] for b in realistic_webapp_branches]}")
+            
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
+                json=realistic_webapp_branches,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            print(f"📡 Response Status: {response.status_code}")
+            print(f"📄 Response Headers: {dict(response.headers)}")
+            
+            if response.status_code == 500:
+                # This is the expected 500 error we're trying to reproduce
+                try:
+                    error_data = response.json()
+                    self.log_test("Validate Completeness - Realistic Data", False, 
+                                f"REPRODUCED 500 ERROR! Error details: {error_data}")
+                    print(f"🚨 EXACT 500 ERROR MESSAGE: {error_data}")
                     return False
-                
-                # Verify both dependency questions are boolean type (required for conditional logic)
-                for dep_q in dependency_questions:
-                    if dep_q.get("type") != "boolean":
-                        self.log_test("Conditional Questionnaire System", False, 
-                                    f"Dependency question {dep_q.get('id')} must be boolean type for conditional logic, got '{dep_q.get('type')}'")
-                        return False
-                
-                self.log_test("Conditional Questionnaire System", True, 
-                            "Conditional questionnaire system properly enabled with correct dependency mappings and boolean trigger questions")
+                except:
+                    error_text = response.text
+                    self.log_test("Validate Completeness - Realistic Data", False, 
+                                f"REPRODUCED 500 ERROR! Error text: {error_text}")
+                    print(f"🚨 EXACT 500 ERROR TEXT: {error_text}")
+                    return False
+            elif response.status_code == 200:
+                data = response.json()
+                self.log_test("Validate Completeness - Realistic Data", True, 
+                            f"Endpoint working correctly: {data}")
                 return True
+            elif response.status_code == 422:
+                # Validation error - might indicate enum value issues
+                error_data = response.json()
+                self.log_test("Validate Completeness - Realistic Data", False, 
+                            f"VALIDATION ERROR (422): {error_data} - This might indicate SecurityBranch enum value issues")
+                print(f"🔍 VALIDATION ERROR DETAILS: {error_data}")
+                return False
             else:
-                self.log_test("Conditional Questionnaire System", False, f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Validate Completeness - Realistic Data", False, 
+                            f"Unexpected HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("Conditional Questionnaire System", False, f"Error: {str(e)}")
+            self.log_test("Validate Completeness - Realistic Data", False, f"Request error: {str(e)}")
+            return False
+
+    def test_validate_completeness_with_different_enum_values(self):
+        """Test with different SecurityBranch enum value formats to identify the correct ones"""
+        try:
+            # Test different enum value formats based on common patterns
+            enum_test_cases = [
+                {
+                    "name": "Lowercase enum values",
+                    "branches": [
+                        {
+                            "id": "test-1",
+                            "name": "Test Branch",
+                            "type": "login",  # lowercase
+                            "required": True,
+                            "completed": True,
+                            "value": "oauth2",
+                            "description": "Test"
+                        }
+                    ]
+                },
+                {
+                    "name": "Uppercase enum values", 
+                    "branches": [
+                        {
+                            "id": "test-2",
+                            "name": "Test Branch",
+                            "type": "LOGIN",  # uppercase
+                            "required": True,
+                            "completed": True,
+                            "value": "oauth2",
+                            "description": "Test"
+                        }
+                    ]
+                },
+                {
+                    "name": "PascalCase enum values",
+                    "branches": [
+                        {
+                            "id": "test-3",
+                            "name": "Test Branch", 
+                            "type": "Login",  # PascalCase
+                            "required": True,
+                            "completed": True,
+                            "value": "oauth2",
+                            "description": "Test"
+                        }
+                    ]
+                }
+            ]
+            
+            working_enum_format = None
+            
+            for test_case in enum_test_cases:
+                print(f"🧪 Testing {test_case['name']}")
+                
+                response = self.session.post(
+                    f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
+                    json=test_case['branches'],
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                print(f"   Status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    working_enum_format = test_case['name']
+                    self.log_test("Enum Value Format Test", True, 
+                                f"FOUND WORKING ENUM FORMAT: {test_case['name']} - type: '{test_case['branches'][0]['type']}'")
+                    break
+                elif response.status_code == 422:
+                    try:
+                        error_data = response.json()
+                        print(f"   422 Error: {error_data}")
+                    except:
+                        print(f"   422 Error: {response.text}")
+                elif response.status_code == 500:
+                    try:
+                        error_data = response.json()
+                        print(f"   500 Error: {error_data}")
+                    except:
+                        print(f"   500 Error: {response.text}")
+            
+            if working_enum_format:
+                return True
+            else:
+                self.log_test("Enum Value Format Test", False, 
+                            "None of the tested enum formats worked - all returned errors")
+                return False
+                
+        except Exception as e:
+            self.log_test("Enum Value Format Test", False, f"Request error: {str(e)}")
+            return False
+
+    def test_validate_completeness_api_contract_validation(self):
+        """Test the API contract - what format does the endpoint actually expect?"""
+        try:
+            # Test 1: Empty request
+            print("🧪 Testing empty request")
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
+                json=[],
+                headers={"Content-Type": "application/json"}
+            )
+            print(f"   Empty request status: {response.status_code}")
+            
+            # Test 2: Minimal valid branch
+            print("🧪 Testing minimal valid branch")
+            minimal_branch = [
+                {
+                    "id": "test-minimal",
+                    "name": "Minimal Test",
+                    "type": "Login",
+                    "required": True,
+                    "completed": False,
+                    "value": None,
+                    "description": "Minimal test branch"
+                }
+            ]
+            
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
+                json=minimal_branch,
+                headers={"Content-Type": "application/json"}
+            )
+            print(f"   Minimal branch status: {response.status_code}")
+            
+            if response.status_code == 422:
+                try:
+                    error_data = response.json()
+                    print(f"   Validation error details: {error_data}")
+                    self.log_test("API Contract Validation", False, 
+                                f"API contract validation failed: {error_data}")
+                    return False
+                except:
+                    print(f"   Validation error text: {response.text}")
+                    self.log_test("API Contract Validation", False, 
+                                f"API contract validation failed: {response.text}")
+                    return False
+            elif response.status_code == 200:
+                data = response.json()
+                self.log_test("API Contract Validation", True, 
+                            f"API contract working with minimal data: {data}")
+                return True
+            elif response.status_code == 500:
+                try:
+                    error_data = response.json()
+                    self.log_test("API Contract Validation", False, 
+                                f"500 error with minimal data: {error_data}")
+                    return False
+                except:
+                    self.log_test("API Contract Validation", False, 
+                                f"500 error with minimal data: {response.text}")
+                    return False
+            else:
+                self.log_test("API Contract Validation", False, 
+                            f"Unexpected status {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("API Contract Validation", False, f"Request error: {str(e)}")
+            return False
+
+    def test_validate_completeness_with_frontend_format(self):
+        """Test with the exact format that the frontend would send from questionnaire interface"""
+        try:
+            # This simulates the exact data structure that would come from the frontend
+            # questionnaire interface when a user completes a WebApp questionnaire
+            frontend_format_data = [
+                {
+                    "id": "webapp-auth-001",
+                    "name": "Authentication Method",
+                    "type": "Login",
+                    "required": True,
+                    "completed": True,
+                    "value": "oauth2",
+                    "description": "OAuth2 authentication with JWT tokens"
+                },
+                {
+                    "id": "webapp-encryption-001", 
+                    "name": "Data Encryption",
+                    "type": "Database",
+                    "required": True,
+                    "completed": True,
+                    "value": "enabled",
+                    "description": "Database encryption at rest and in transit"
+                },
+                {
+                    "id": "webapp-input-validation-001",
+                    "name": "Input Validation",
+                    "type": "InputValidation", 
+                    "required": True,
+                    "completed": True,
+                    "value": "comprehensive",
+                    "description": "Comprehensive input validation and sanitization"
+                }
+            ]
+            
+            print(f"🌐 Testing with frontend questionnaire format")
+            print(f"📊 Data structure: {json.dumps(frontend_format_data, indent=2)}")
+            
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
+                json=frontend_format_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            print(f"📡 Frontend format response status: {response.status_code}")
+            
+            if response.status_code == 500:
+                try:
+                    error_data = response.json()
+                    self.log_test("Frontend Format Test", False, 
+                                f"500 ERROR WITH FRONTEND FORMAT: {error_data}")
+                    print(f"🚨 FRONTEND FORMAT 500 ERROR: {error_data}")
+                    
+                    # Check if it's an enum validation error
+                    error_str = str(error_data)
+                    if "enum" in error_str.lower() or "validation" in error_str.lower():
+                        print("🔍 This appears to be an enum validation error!")
+                        print("💡 The SecurityBranch enum values might not match what the frontend is sending")
+                    
+                    return False
+                except:
+                    error_text = response.text
+                    self.log_test("Frontend Format Test", False, 
+                                f"500 ERROR WITH FRONTEND FORMAT: {error_text}")
+                    print(f"🚨 FRONTEND FORMAT 500 ERROR: {error_text}")
+                    return False
+            elif response.status_code == 200:
+                data = response.json()
+                self.log_test("Frontend Format Test", True, 
+                            f"Frontend format working correctly: {data}")
+                return True
+            elif response.status_code == 422:
+                error_data = response.json()
+                self.log_test("Frontend Format Test", False, 
+                            f"VALIDATION ERROR (422) WITH FRONTEND FORMAT: {error_data}")
+                print(f"🔍 FRONTEND FORMAT VALIDATION ERROR: {error_data}")
+                return False
+            else:
+                self.log_test("Frontend Format Test", False, 
+                            f"Unexpected status {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Frontend Format Test", False, f"Request error: {str(e)}")
+            return False
+
+    def test_get_supported_types_for_reference(self):
+        """Get supported intelligent node types for reference"""
+        try:
+            response = self.session.get(f"{self.base_url}/intelligent-nodes/supported-types")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("Get Supported Types", True, 
+                            f"Supported types: {data}")
+                print(f"📋 SUPPORTED INTELLIGENT NODE TYPES: {data}")
+                return True
+            else:
+                self.log_test("Get Supported Types", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Get Supported Types", False, f"Request error: {str(e)}")
+            return False
+
+    def test_get_webapp_template_for_reference(self):
+        """Get WebApp template to understand the expected branch structure"""
+        try:
+            response = self.session.get(f"{self.base_url}/intelligent-nodes/WebApp/template")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("Get WebApp Template", True, 
+                            f"WebApp template structure: {data}")
+                print(f"🏗️ WEBAPP TEMPLATE STRUCTURE:")
+                print(f"   Node Type: {data.get('node_type')}")
+                print(f"   Node Subtype: {data.get('node_subtype')}")
+                print(f"   Required Branches: {data.get('required_branches')}")
+                
+                # This will help us understand the correct enum values
+                if 'required_branches' in data:
+                    print(f"✅ CORRECT SECURITY BRANCH ENUM VALUES: {data['required_branches']}")
+                
+                return True
+            else:
+                self.log_test("Get WebApp Template", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Get WebApp Template", False, f"Request error: {str(e)}")
             return False
 
     # ============================================================================
@@ -358,22 +461,26 @@ class WebAppDependencyQuestionsTester:
     # ============================================================================
     
     def run_all_tests(self):
-        """Run all WebApp dependency questions verification tests"""
-        print("🚀 Starting WebApp Questionnaire Dependency Questions Verification Tests")
-        print("=" * 80)
-        print("CRITICAL TESTING TASK: VERIFY DEPENDENCY QUESTIONS IN WEBAPP QUESTIONNAIRE")
-        print("Testing that WebApp questionnaire now includes 'Do you use API?' and 'Do you use Database?' dependency questions")
-        print("=" * 80)
+        """Run all validate-completeness endpoint tests"""
+        print("🚀 Starting POST /api/intelligent-nodes/WebApp/validate-completeness Endpoint Testing")
+        print("=" * 90)
+        print("CRITICAL TESTING TASK: REPRODUCE AND DIAGNOSE 500 INTERNAL SERVER ERROR")
+        print("Testing the WebApp validate-completeness endpoint to reproduce the user-reported 500 error")
+        print("=" * 90)
         
         tests = [
             # Basic connectivity
             self.test_health_check,
             
-            # CRITICAL: WebApp Dependency Questions Verification
-            self.test_webapp_questionnaire_content,
-            self.test_dependency_questions_validation,
-            self.test_compare_to_previous_version,
-            self.test_conditional_questionnaire_system_enabled,
+            # Reference data to understand expected format
+            self.test_get_supported_types_for_reference,
+            self.test_get_webapp_template_for_reference,
+            
+            # CRITICAL: Reproduce the 500 error
+            self.test_validate_completeness_with_realistic_webapp_data,
+            self.test_validate_completeness_with_frontend_format,
+            self.test_validate_completeness_with_different_enum_values,
+            self.test_validate_completeness_api_contract_validation,
         ]
         
         passed = 0
@@ -392,27 +499,38 @@ class WebAppDependencyQuestionsTester:
             print()  # Add spacing between tests
         
         # Print summary
-        print("=" * 80)
-        print("🎯 WEBAPP DEPENDENCY QUESTIONS VERIFICATION TEST SUMMARY")
-        print("=" * 80)
+        print("=" * 90)
+        print("🎯 VALIDATE-COMPLETENESS ENDPOINT TEST SUMMARY")
+        print("=" * 90)
         print(f"✅ PASSED: {passed}")
         print(f"❌ FAILED: {failed}")
         print(f"📊 SUCCESS RATE: {(passed / (passed + failed) * 100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 ALL TESTS PASSED! WebApp questionnaire dependency questions have been successfully added and are working correctly.")
-            print("✅ WebApp questionnaire now includes both 'Do you use API?' and 'Do you use Database?' dependency questions")
-            print("✅ Conditional questionnaire system is properly enabled")
-            print("✅ Question count increased from 8 to 10 as expected")
+            print("\n🎉 ALL TESTS PASSED! The validate-completeness endpoint is working correctly.")
+            print("✅ No 500 internal server error reproduced")
+            print("✅ API contract validation successful")
+            print("✅ SecurityBranch enum values are correct")
         else:
-            print(f"\n⚠️  {failed} tests failed. Please review the failed tests above.")
-            print("The WebApp questionnaire dependency questions may not be properly implemented.")
+            print(f"\n⚠️  {failed} tests failed. Analysis of the 500 error:")
+            
+            # Analyze the test results to provide diagnostic information
+            error_tests = [result for result in self.test_results if not result['success']]
+            
+            for error_test in error_tests:
+                if "500" in error_test['message']:
+                    print(f"🚨 500 ERROR REPRODUCED in {error_test['test']}")
+                    print(f"   Details: {error_test['message']}")
+                elif "422" in error_test['message']:
+                    print(f"🔍 VALIDATION ERROR in {error_test['test']}")
+                    print(f"   Details: {error_test['message']}")
+                    print("   💡 This suggests SecurityBranch enum value mismatch")
         
         return passed, failed
 
 def main():
     """Main test execution"""
-    tester = WebAppDependencyQuestionsTester()
+    tester = WebAppValidateCompletenessEndpointTester()
     passed, failed = tester.run_all_tests()
     
     # Exit with appropriate code
