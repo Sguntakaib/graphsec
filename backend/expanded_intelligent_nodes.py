@@ -129,6 +129,7 @@ class ThreatIntelligence:
     attack_vectors: List[str] = None
     mitre_techniques: List[str] = None
     threat_actors: List[str] = None
+    risk_score: float = 0.0
     
     def __post_init__(self):
         if self.recent_threats is None:
