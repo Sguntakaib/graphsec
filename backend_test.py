@@ -11,8 +11,8 @@ import uuid
 from datetime import datetime, timezone
 import sys
 
-# Use the backend URL as specified in review request
-BASE_URL = "http://localhost:8001/api"
+# Use the backend URL from frontend/.env with /api suffix
+BASE_URL = "https://apiscan-fix.preview.emergentagent.com/api"
 
 class EnhancedVulnerabilityTester:
     def __init__(self):
