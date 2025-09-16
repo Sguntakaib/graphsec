@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://smart-forms-14.preview.emergentagent.com/api"
+BASE_URL = "https://auto-test-fix.preview.emergentagent.com/api"
 
 class CriticalEndpointsTester:
     def __init__(self):
