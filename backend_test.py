@@ -55,65 +55,53 @@ class ConditionalQuestionnaireVulnerabilityTester:
     # ============================================================================
     
     def test_conditional_questionnaire_api_endpoint(self):
-        """Test POST /api/vulnerabilities/analyze/api1-2023 - Broken Object Level Authorization"""
+        """Test GET /api/questionnaires/API/conditional - should return API questionnaire with api_type question first"""
         try:
-            request_data = {
-                "node_type": "API",
-                "security_config": {
-                    "object_level_authorization": "none",
-                    "user_context_validation": False,
-                    "data_sanitization": "no sanitization",
-                    "rate_limiting": "none",
-                    "business_flow_protection": False
-                },
-                "endpoints": [
-                    {"path": "/api/users/{id}", "method": "GET", "authorization": "none"},
-                    {"path": "/api/orders/{id}", "method": "PUT", "authorization": "basic"}
-                ],
-                "business_flows": [
-                    {"name": "user_data_access", "rate_limit": None, "protection": "none"}
-                ]
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/api1-2023",
-                json=request_data,
-                headers={"Content-Type": "application/json"}
-            )
+            response = self.session.get(f"{self.base_url}/questionnaires/API/conditional")
             
             if response.status_code == 200:
                 data = response.json()
                 
-                # Verify response structure - updated to match actual API response
-                expected_fields = ["vulnerabilities", "analysis_type", "total_count", "risk_assessment"]
+                # Verify response structure
+                expected_fields = ["questionnaire_type", "questions", "conditional_logic"]
                 missing_fields = [f for f in expected_fields if f not in data]
                 
                 if missing_fields:
-                    self.log_test("OWASP API1-2023", False, f"Missing response fields: {missing_fields}")
+                    self.log_test("Conditional API Questionnaire", False, f"Missing response fields: {missing_fields}")
                     return False
                 
-                vulnerabilities = data.get("vulnerabilities", [])
-                analysis_type = data.get("analysis_type", "")
+                questions = data.get("questions", [])
                 
-                # Should generate vulnerabilities for insecure configuration
-                if len(vulnerabilities) == 0:
-                    self.log_test("OWASP API1-2023", False, "No vulnerabilities generated for insecure API configuration")
+                # Should have questions and first question should be api_type
+                if len(questions) == 0:
+                    self.log_test("Conditional API Questionnaire", False, "No questions returned")
                     return False
                 
-                # Verify OWASP categorization in analysis_type
-                if "API1:2023" not in analysis_type:
-                    self.log_test("OWASP API1-2023", False, f"Incorrect analysis type: {analysis_type}")
+                first_question = questions[0]
+                if first_question.get("question_id") != "api_type":
+                    self.log_test("Conditional API Questionnaire", False, 
+                                f"First question should be 'api_type', got '{first_question.get('question_id')}'")
                     return False
                 
-                self.log_test("OWASP API1-2023", True, 
-                            f"Generated {len(vulnerabilities)} vulnerabilities for Broken Object Level Authorization")
+                # Verify api_type question has REST API and GraphQL options
+                options = first_question.get("options", [])
+                has_rest = any("REST API" in str(option) for option in options)
+                has_graphql = any("GraphQL" in str(option) for option in options)
+                
+                if not (has_rest and has_graphql):
+                    self.log_test("Conditional API Questionnaire", False, 
+                                f"api_type question missing REST API or GraphQL options: {options}")
+                    return False
+                
+                self.log_test("Conditional API Questionnaire", True, 
+                            f"API conditional questionnaire with {len(questions)} questions, api_type question first")
                 return True
             else:
-                self.log_test("OWASP API1-2023", False, f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Conditional API Questionnaire", False, f"HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("OWASP API1-2023", False, f"Error: {str(e)}")
+            self.log_test("Conditional API Questionnaire", False, f"Error: {str(e)}")
             return False
 
     def test_owasp_api3_2023_broken_object_property_level_authorization(self):
