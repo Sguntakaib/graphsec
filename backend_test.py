@@ -108,47 +108,56 @@ class ConditionalQuestionnaireVulnerabilityTester:
         """Test POST /api/questionnaires/API/conditional-trigger with REST API response"""
         try:
             request_data = {
-                "node_type": "API",
-                "security_config": {
-                    "property_level_authorization": "none",
-                    "field_level_access_control": False,
-                    "sensitive_data_exposure": "high",
-                    "data_filtering": "none"
-                },
-                "endpoints": [
-                    {"path": "/api/users/profile", "method": "GET", "sensitive_fields": ["ssn", "salary", "medical_records"]},
-                    {"path": "/api/admin/users", "method": "GET", "sensitive_fields": ["password_hash", "api_keys"]}
-                ]
+                "question_id": "api_type",
+                "response": "REST API"
             }
             
             response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/api3-2023",
+                f"{self.base_url}/questionnaires/API/conditional-trigger",
                 json=request_data,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                vulnerabilities = data.get("vulnerabilities", [])
-                analysis_type = data.get("analysis_type", "")
                 
-                if len(vulnerabilities) == 0:
-                    self.log_test("OWASP API3-2023", False, "No vulnerabilities generated for property-level authorization issues")
+                # Verify response structure
+                expected_fields = ["triggered_questions", "question_id", "response_value"]
+                missing_fields = [f for f in expected_fields if f not in data]
+                
+                if missing_fields:
+                    self.log_test("Conditional Trigger REST API", False, f"Missing response fields: {missing_fields}")
                     return False
                 
-                if "API3:2023" not in analysis_type:
-                    self.log_test("OWASP API3-2023", False, f"Incorrect analysis type: {analysis_type}")
+                triggered_questions = data.get("triggered_questions", [])
+                
+                # Should return REST-specific questions
+                if len(triggered_questions) == 0:
+                    self.log_test("Conditional Trigger REST API", False, "No REST-specific questions triggered")
                     return False
                 
-                self.log_test("OWASP API3-2023", True, 
-                            f"Generated {len(vulnerabilities)} vulnerabilities for Broken Object Property Level Authorization")
+                # Check for REST-specific question content
+                rest_keywords = ["endpoint", "http", "rest", "resource", "method"]
+                rest_questions = []
+                for question in triggered_questions:
+                    question_text = question.get("question", "").lower()
+                    if any(keyword in question_text for keyword in rest_keywords):
+                        rest_questions.append(question)
+                
+                if len(rest_questions) == 0:
+                    self.log_test("Conditional Trigger REST API", False, 
+                                f"No REST-specific questions found in triggered questions")
+                    return False
+                
+                self.log_test("Conditional Trigger REST API", True, 
+                            f"Triggered {len(triggered_questions)} questions, {len(rest_questions)} REST-specific")
                 return True
             else:
-                self.log_test("OWASP API3-2023", False, f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Conditional Trigger REST API", False, f"HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("OWASP API3-2023", False, f"Error: {str(e)}")
+            self.log_test("Conditional Trigger REST API", False, f"Error: {str(e)}")
             return False
 
     def test_owasp_api4_2023_unrestricted_resource_consumption(self):
