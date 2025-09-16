@@ -83,6 +83,19 @@ const initialNodes = [];
 const initialEdges = [];
 
 function AppContent() {
+  // Add ResizeObserver error handler to prevent console spam
+  useEffect(() => {
+    const resizeObserverErrHandler = (e) => {
+      if (e.message === 'ResizeObserver loop completed with undelivered notifications.' || 
+          e.message === 'ResizeObserver loop limit exceeded') {
+        e.stopImmediatePropagation();
+        return false;
+      }
+    };
+    window.addEventListener('error', resizeObserverErrHandler, true);
+    return () => window.removeEventListener('error', resizeObserverErrHandler, true);
+  }, []);
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { state: questionnaireState, actions: questionnaireActions } = useQuestionnaire();
