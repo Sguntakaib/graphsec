@@ -375,13 +375,12 @@ class ConditionalQuestionnaireVulnerabilityTester:
                     return False
                 
                 # Verify educational context is included
-                trigger_context = data.get("trigger_context", {})
-                missing_controls = data.get("missing_controls", [])
-                user_selections = data.get("user_selections", {})
+                conditional_analysis = data.get("conditional_analysis", {})
+                analysis_type = data.get("analysis_type", "")
                 
-                if not trigger_context or not missing_controls:
+                if not conditional_analysis or analysis_type != "enhanced_conditional":
                     self.log_test("Input Validation Vulnerability", False, 
-                                "Missing educational context (trigger_context or missing_controls)")
+                                "Missing educational context (conditional_analysis) or wrong analysis_type")
                     return False
                 
                 self.log_test("Input Validation Vulnerability", True, 
