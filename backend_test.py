@@ -503,6 +503,7 @@ class ConditionalQuestionnaireVulnerabilityTester:
         """Test WAF-related DDoS vulnerability detection"""
         try:
             request_data = {
+                "node_id": "test_node_webapp",
                 "node_type": "WebApp",
                 "questionnaire_responses": {
                     "waf_deployment": "No WAF",
