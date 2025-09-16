@@ -160,8 +160,8 @@ class ConditionalQuestionnaireVulnerabilityTester:
             self.log_test("Conditional Trigger REST API", False, f"Error: {str(e)}")
             return False
 
-    def test_owasp_api4_2023_unrestricted_resource_consumption(self):
-        """Test POST /api/vulnerabilities/analyze/api4-2023 - Unrestricted Resource Consumption"""
+    def test_conditional_trigger_graphql_api(self):
+        """Test POST /api/questionnaires/API/conditional-trigger with GraphQL API response"""
         try:
             request_data = {
                 "node_type": "API",
