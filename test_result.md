@@ -444,6 +444,9 @@ test_plan:
       - working: true
         agent: "testing"
         comment: "✅ POST /api/intelligent-nodes/{node_subtype}/validate-completeness endpoints working correctly - CRITICAL API contract issue resolved: endpoint now correctly accepts direct list format. Validation logic working with proper is_complete field, completion percentage, and security recommendations"
+      - working: true
+        agent: "testing"
+        comment: "✅ ENDPOINT ISSUE RESOLVED: POST /api/intelligent-nodes/WebApp/validate-completeness endpoint now working correctly after fixing enum validation error. Root cause was incorrect SecurityBranch type values - API expects 'Login', 'Database', 'API', 'InputValidation', 'WAF', 'Deployment' (not 'LOGIN', 'DATABASE', etc.). Endpoint returns proper response structure: {validation: {is_complete: bool, completion_percentage: float, missing_branches: [], completed_count: int, required_count: int}, recommendations: []}. All test scenarios pass: basic validation (16.7% completion), empty list (0% completion), incomplete branches (33.3% completion), malformed data rejection (HTTP 422). The 500 error reported by user was due to incorrect enum values in request data."
 
   - task: "Intelligent Node Calculate Risk API"
     implemented: true
