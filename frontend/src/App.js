@@ -28,7 +28,7 @@ import NodeBranchVisualizer from './components/NodeBranchVisualizer';
 import ThreatModelingWizard from './components/ThreatModelingWizard';
 import CoreLoopDashboard from './components/CoreLoopDashboard';
 import { QuestionnaireProvider, useQuestionnaire } from './contexts/QuestionnaireContext';
-// import QuestionnaireManager from './components/QuestionnaireManager'; // DISABLED: Using legacy system
+import QuestionnaireManager from './components/QuestionnaireManager'; // ENABLED: For dependent questionnaire support
 import CanvasSynchronizer from './components/CanvasSynchronizer';
 import VulnerabilityNode from './components/VulnerabilityNode';
 import VulnerabilityPanel from './components/VulnerabilityPanel';
