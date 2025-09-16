@@ -83,6 +83,18 @@ class SecurityBranchType(str, Enum):
     DDoS_PROTECTION = "DDoSProtection"
     MESSAGE_SECURITY = "MessageSecurity"
     APPLICATION_SERVICES = "ApplicationServices"
+    
+    # Product Design Security Branches (for STRIDE-based threat modeling)
+    THREAT_MODELING = "ThreatModeling"
+    SECURE_DESIGN = "SecureDesign"
+    PRIVACY_BY_DESIGN = "PrivacyByDesign"
+    SECURITY_TESTING = "SecurityTesting"
+    DATA_INTEGRITY = "DataIntegrity"
+    AUDIT_LOGGING = "AuditLogging"
+    AVAILABILITY = "Availability"
+    RISK_ASSESSMENT = "RiskAssessment"
+    SECURE_DEVELOPMENT = "SecureDevelopment"
+    THREAT_INTELLIGENCE = "ThreatIntelligence"
 
 class QuestionnaireLevel(str, Enum):
     BASIC = "basic"           # 5-8 questions
