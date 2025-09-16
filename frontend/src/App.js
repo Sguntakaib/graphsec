@@ -533,8 +533,8 @@ function AppContent() {
               console.log('🚀 Starting questionnaire flow...');
               questionnaireActions.startQuestionnaireFlow(node, 1);
               
-              // Check if QuestionnaireManager is available - DISABLED: Using legacy system only
-              if (false && window.questionnaireManager) {
+              // Check if QuestionnaireManager is available - ENABLED for dependent questionnaire support
+              if (window.questionnaireManager) {
                 console.log('📋 QuestionnaireManager available, starting questionnaire...');
                 const result = await window.questionnaireManager.startQuestionnaireForNode(
                   nodeId, 
