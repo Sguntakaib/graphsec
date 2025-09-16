@@ -338,7 +338,7 @@ class ConditionalQuestionnaireVulnerabilityTester:
             }
             
             response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/test_node/enhanced",
+                f"{self.base_url}/vulnerabilities/analyze/test_node_api/enhanced",
                 json=request_data,
                 headers={"Content-Type": "application/json"}
             )
@@ -459,14 +459,14 @@ class ConditionalQuestionnaireVulnerabilityTester:
             }
             
             response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/test_node/enhanced",
+                f"{self.base_url}/vulnerabilities/analyze/test_node_database/enhanced",
                 json=request_data,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                vulnerabilities = data.get("vulnerabilities", [])
+                vulnerabilities = data.get("vulnerability_nodes", [])
                 
                 # Should detect Critical Data Exposure with Critical severity
                 if len(vulnerabilities) == 0:
@@ -511,14 +511,14 @@ class ConditionalQuestionnaireVulnerabilityTester:
             }
             
             response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/test_node/enhanced",
+                f"{self.base_url}/vulnerabilities/analyze/test_node_webapp/enhanced",
                 json=request_data,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                vulnerabilities = data.get("vulnerabilities", [])
+                vulnerabilities = data.get("vulnerability_nodes", [])
                 
                 # Should detect DDoS vulnerability with Medium severity
                 if len(vulnerabilities) == 0:
@@ -568,14 +568,14 @@ class ConditionalQuestionnaireVulnerabilityTester:
             }
             
             response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/test_node/enhanced",
+                f"{self.base_url}/vulnerabilities/analyze/test_node_mongodb/enhanced",
                 json=request_data,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                vulnerabilities = data.get("vulnerabilities", [])
+                vulnerabilities = data.get("vulnerability_nodes", [])
                 
                 # Should detect NoSQL Injection vulnerability with High severity
                 if len(vulnerabilities) == 0:
