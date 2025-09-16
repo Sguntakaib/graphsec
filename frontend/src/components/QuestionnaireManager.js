@@ -397,6 +397,7 @@ const QuestionnaireManager = ({
   useEffect(() => {
     // This could be exposed via a ref or context if needed
     window.questionnaireManager = publicMethods;
+    console.log('🎯 QuestionnaireManager initialized and available globally');
     
     // Initialize pending requests set
     if (!window.pendingPromptRequests) {
