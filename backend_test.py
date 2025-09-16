@@ -336,14 +336,14 @@ class EnhancedVulnerabilityTester:
             if response.status_code == 200:
                 data = response.json()
                 vulnerabilities = data.get("vulnerabilities", [])
-                owasp_category = data.get("owasp_category", "")
+                analysis_type = data.get("analysis_type", "")
                 
                 if len(vulnerabilities) == 0:
                     self.log_test("OWASP API9-2023", False, "No vulnerabilities generated for inventory management issues")
                     return False
                 
-                if "API9:2023" not in owasp_category:
-                    self.log_test("OWASP API9-2023", False, f"Incorrect OWASP category: {owasp_category}")
+                if "API9:2023" not in analysis_type:
+                    self.log_test("OWASP API9-2023", False, f"Incorrect analysis type: {analysis_type}")
                     return False
                 
                 self.log_test("OWASP API9-2023", True, 
