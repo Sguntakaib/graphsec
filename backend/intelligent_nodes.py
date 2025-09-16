@@ -41,6 +41,7 @@ class SecurityBranchType(str, Enum):
     
     # Additional missing enum values from questionnaire YAML files
     ERROR_HANDLING = "ErrorHandling"
+    ERRORHANDLING = "Errorhandling"  # Frontend sends this case
     API_SECURITY = "ApiSecurity"
     COMPLIANCE = "Compliance"
     INCIDENT_RESPONSE = "IncidentResponse"
@@ -70,6 +71,7 @@ class SecurityBranchType(str, Enum):
     CONTAINER_ORCHESTRATION = "ContainerOrchestration"
     CONFIGURATION_MANAGEMENT = "ConfigurationManagement"
     SESSION_MANAGEMENT = "SessionManagement"
+    SESSIONMANAGEMENT = "Sessionmanagement"  # Frontend sends this case
     RESILIENCE = "Resilience"
     CODE_SECURITY = "CodeSecurity"
     CACHING = "Caching"
@@ -77,7 +79,8 @@ class SecurityBranchType(str, Enum):
     RUNTIME_PROTECTION = "RuntimeProtection"
     OS_HARDENING = "OSHardening"
     DATA_LOSS_PREVENTION = "DataLossPrevention"
-    CSP = "CSP"
+    CSP_HEADER = "CSP"
+    CSP_LOWER = "Csp"  # Frontend sends this case
     CDN = "CDN"
     BUSINESS_LOGIC = "BusinessLogic"
     VPN = "VPN"
