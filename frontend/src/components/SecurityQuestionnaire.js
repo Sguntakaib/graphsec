@@ -261,7 +261,7 @@ const SecurityQuestionnaire = ({
             // Trigger dependent node creation immediately
             if (onComplete) {
               onComplete({
-                answers,
+                answers: allAnswersWithCurrent, // Include current answer with all previous answers
                 dependentNodes,
                 triggerDependentQuestionnaires: true,
                 partialCompletion: true, // Flag to indicate this is not final completion
