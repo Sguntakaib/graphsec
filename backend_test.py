@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://vulnscan-enhance-1.preview.emergentagent.com/api"
+BASE_URL = "https://apiscan-fix.preview.emergentagent.com/api"
 
 class EnhancedVulnerabilityTester:
     def __init__(self):
