@@ -3821,6 +3821,13 @@ class BulkVulnerabilityAnalysisRequest(BaseModel):
 class VulnerabilityRemediationRequest(BaseModel):
     vulnerability_id: str
 
+class EnhancedVulnerabilityRequest(BaseModel):
+    """Enhanced vulnerability analysis request for specialized endpoints"""
+    node_type: str
+    security_config: Dict[str, Any]
+    endpoints: Optional[List[Dict[str, Any]]] = []
+    business_flows: Optional[List[Dict[str, Any]]] = []
+
 @api_router.post("/vulnerabilities/analyze/{node_id}")
 async def analyze_node_vulnerabilities(node_id: str, request: VulnerabilityAnalysisRequest):
     """Analyze security vulnerabilities for a specific node based on questionnaire responses"""
