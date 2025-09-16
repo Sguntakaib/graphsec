@@ -51,10 +51,10 @@ class ConditionalQuestionnaireVulnerabilityTester:
             return False
 
     # ============================================================================
-    # OWASP API Security Top 10 2023 Endpoints Testing
+    # PRIORITY 1: Conditional Questionnaire System Testing
     # ============================================================================
     
-    def test_owasp_api1_2023_broken_object_level_authorization(self):
+    def test_conditional_questionnaire_api_endpoint(self):
         """Test POST /api/vulnerabilities/analyze/api1-2023 - Broken Object Level Authorization"""
         try:
             request_data = {
