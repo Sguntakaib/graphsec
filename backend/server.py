@@ -3828,6 +3828,751 @@ class EnhancedVulnerabilityRequest(BaseModel):
     endpoints: Optional[List[Dict[str, Any]]] = []
     business_flows: Optional[List[Dict[str, Any]]] = []
 
+# =============================================================================
+# OWASP API Security Top 10 2023 Endpoints - MUST BE BEFORE GENERIC ROUTE
+# =============================================================================
+
+@api_router.post("/vulnerabilities/analyze/api1-2023")
+async def analyze_api1_2023_broken_object_authorization(request: EnhancedVulnerabilityRequest):
+    """API1:2023 - Broken Object Level Authorization detection"""
+    try:
+        vulnerabilities = []
+        
+        # Check for missing object-level authorization
+        security_config = request.security_config
+        object_auth = security_config.get("object_level_authorization", "").lower()
+        user_context_validation = security_config.get("user_context_validation", False)
+        
+        if object_auth in ["none", "weak", ""] or not user_context_validation:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Broken Object Level Authorization",
+                "description": "API lacks proper object-level authorization checks, allowing users to access unauthorized objects",
+                "severity": "Critical",
+                "category": "Broken Access Control",
+                "owasp_category": "API1:2023 – Broken Object Level Authorization",
+                "mitre_techniques": ["T1078", "T1083"],
+                "risk_score": 9.0,
+                "remediation_steps": [
+                    "Implement object-level authorization checks for every API endpoint",
+                    "Validate user permissions for each object access request",
+                    "Use user policies and context instead of relying on object IDs",
+                    "Add comprehensive authorization testing to your security suite"
+                ],
+                "trigger_context": {
+                    "object_level_authorization": object_auth,
+                    "user_context_validation": user_context_validation
+                }
+            })
+        
+        # Check endpoint-specific authorization
+        for endpoint in request.endpoints:
+            if endpoint.get("authorization", "").lower() in ["none", "bearer_only", ""]:
+                vulnerabilities.append({
+                    "id": str(uuid.uuid4()),
+                    "name": f"Weak Authorization - {endpoint.get('path', 'Unknown')}",
+                    "description": f"Endpoint {endpoint.get('path')} lacks proper authorization controls",
+                    "severity": "High",
+                    "category": "Broken Access Control", 
+                    "owasp_category": "API1:2023 – Broken Object Level Authorization",
+                    "mitre_techniques": ["T1078"],
+                    "risk_score": 7.5,
+                    "remediation_steps": [
+                        f"Add object-level authorization to {endpoint.get('path')}",
+                        "Validate user can access specific object IDs",
+                        "Implement context-aware authorization logic"
+                    ]
+                })
+        
+        return {
+            "analysis_type": "API1:2023 - Broken Object Level Authorization",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "Critical" if any(v["severity"] == "Critical" for v in vulnerabilities) else "High",
+                "impact": "Unauthorized access to sensitive objects and data"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in API1:2023 analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"API1:2023 analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/api3-2023")
+async def analyze_api3_2023_broken_property_authorization(request: EnhancedVulnerabilityRequest):
+    """API3:2023 - Broken Object Property Level Authorization detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check for excessive data exposure
+        data_sanitization = security_config.get("data_sanitization", "").lower()
+        field_level_controls = security_config.get("field_level_authorization", False)
+        
+        if data_sanitization in ["no sanitization", "basic sanitization", ""] or not field_level_controls:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Excessive Data Exposure",
+                "description": "API responses contain more data than necessary, potentially exposing sensitive information",
+                "severity": "Medium",
+                "category": "Information Disclosure",
+                "owasp_category": "API3:2023 – Broken Object Property Level Authorization",
+                "mitre_techniques": ["T1213", "T1005"],
+                "risk_score": 6.5,
+                "remediation_steps": [
+                    "Implement response filtering to only return necessary fields",
+                    "Use Data Transfer Objects (DTOs) for API responses",
+                    "Apply data minimization principles",
+                    "Add field-level access controls"
+                ],
+                "trigger_context": {
+                    "data_sanitization": data_sanitization,
+                    "field_level_authorization": field_level_controls
+                }
+            })
+        
+        # Check for mass assignment vulnerabilities
+        input_validation = security_config.get("input_validation", "").lower()
+        if "mass assignment" in input_validation or input_validation in ["no validation", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Mass Assignment Vulnerability",
+                "description": "API allows modification of object properties that should be restricted",
+                "severity": "High",
+                "category": "Broken Access Control",
+                "owasp_category": "API3:2023 – Broken Object Property Level Authorization",
+                "mitre_techniques": ["T1078", "T1055"],
+                "risk_score": 7.0,
+                "remediation_steps": [
+                    "Implement allowlists for updatable fields",
+                    "Validate input against expected schema",
+                    "Use separate DTOs for input and output",
+                    "Add property-level authorization checks"
+                ]
+            })
+        
+        return {
+            "analysis_type": "API3:2023 - Broken Object Property Level Authorization",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "High" if any(v["severity"] == "High" for v in vulnerabilities) else "Medium",
+                "impact": "Unauthorized access to sensitive object properties"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in API3:2023 analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"API3:2023 analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/api4-2023")
+async def analyze_api4_2023_resource_consumption(request: EnhancedVulnerabilityRequest):
+    """API4:2023 - Unrestricted Resource Consumption detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check for rate limiting
+        rate_limiting = security_config.get("rate_limiting", "").lower()
+        if rate_limiting in ["none", "no rate limiting", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "No Rate Limiting",
+                "description": "API lacks rate limiting controls, vulnerable to resource exhaustion attacks",
+                "severity": "Medium",
+                "category": "Denial of Service",
+                "owasp_category": "API4:2023 – Unrestricted Resource Consumption",
+                "mitre_techniques": ["T1499", "T1498"],
+                "risk_score": 6.0,
+                "remediation_steps": [
+                    "Implement comprehensive rate limiting per user/IP",
+                    "Add request size and payload limits",
+                    "Configure timeout controls for long operations",
+                    "Monitor resource consumption patterns"
+                ]
+            })
+        
+        # Check for pagination limits
+        pagination = security_config.get("pagination_security", "").lower()
+        if pagination in ["no pagination", "no pagination limits", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Unlimited Data Retrieval",
+                "description": "API allows unlimited data retrieval without pagination controls",
+                "severity": "Medium", 
+                "category": "Denial of Service",
+                "owasp_category": "API4:2023 – Unrestricted Resource Consumption",
+                "mitre_techniques": ["T1499"],
+                "risk_score": 5.5,
+                "remediation_steps": [
+                    "Implement mandatory pagination with reasonable limits",
+                    "Add maximum result set size controls",
+                    "Use cursor-based pagination for large datasets",
+                    "Monitor and alert on excessive data requests"
+                ]
+            })
+        
+        return {
+            "analysis_type": "API4:2023 - Unrestricted Resource Consumption",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "Medium",
+                "impact": "Resource exhaustion and denial of service"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in API4:2023 analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"API4:2023 analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/api6-2023")
+async def analyze_api6_2023_sensitive_business_flows(request: EnhancedVulnerabilityRequest):
+    """API6:2023 - Unrestricted Access to Sensitive Business Flows detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check business flow protection
+        business_flow_protection = security_config.get("business_flow_protection", False)
+        automated_threat_detection = security_config.get("automated_threat_detection", False)
+        
+        if not business_flow_protection or not automated_threat_detection:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Unprotected Sensitive Business Flows",
+                "description": "Sensitive business operations lack protection against automation and abuse",
+                "severity": "High",
+                "category": "Business Logic Vulnerabilities",
+                "owasp_category": "API6:2023 – Unrestricted Access to Sensitive Business Flows",
+                "mitre_techniques": ["T1499", "T1078"],
+                "risk_score": 7.5,
+                "remediation_steps": [
+                    "Implement business logic rate limiting",
+                    "Add CAPTCHA or challenge-response for sensitive operations",
+                    "Monitor for automation patterns and bot behavior",
+                    "Implement user behavior analytics"
+                ]
+            })
+        
+        # Check specific business flows
+        for flow in request.business_flows:
+            flow_name = flow.get("name", "Unknown")
+            protection = flow.get("protection", "").lower()
+            rate_limit = flow.get("rate_limit")
+            
+            if protection in ["none", ""] or rate_limit is None:
+                severity = "High" if flow_name in ["password_reset", "account_creation", "payment_processing"] else "Medium"
+                vulnerabilities.append({
+                    "id": str(uuid.uuid4()),
+                    "name": f"Unprotected Business Flow - {flow_name}",
+                    "description": f"Business flow '{flow_name}' lacks adequate protection controls",
+                    "severity": severity,
+                    "category": "Business Logic Vulnerabilities",
+                    "owasp_category": "API6:2023 – Unrestricted Access to Sensitive Business Flows",
+                    "mitre_techniques": ["T1499", "T1078"],
+                    "risk_score": 7.0 if severity == "High" else 5.5,
+                    "remediation_steps": [
+                        f"Add rate limiting to {flow_name} workflow",
+                        "Implement anti-automation controls",
+                        "Add behavioral monitoring",
+                        "Configure abuse detection alerts"
+                    ]
+                })
+        
+        return {
+            "analysis_type": "API6:2023 - Unrestricted Access to Sensitive Business Flows",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "High" if any(v["severity"] == "High" for v in vulnerabilities) else "Medium",
+                "impact": "Business process abuse and financial/reputational damage"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in API6:2023 analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"API6:2023 analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/api7-2023")
+async def analyze_api7_2023_server_side_request_forgery(request: EnhancedVulnerabilityRequest):
+    """API7:2023 - Server-Side Request Forgery detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check for SSRF protections
+        url_validation = security_config.get("url_validation", "").lower()
+        allowlist_implementation = security_config.get("external_request_allowlist", False)
+        network_segmentation = security_config.get("network_segmentation", False)
+        
+        if url_validation in ["no validation", "basic validation", ""] or not allowlist_implementation:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Server-Side Request Forgery",
+                "description": "API can be manipulated to make unauthorized requests to internal or external systems",
+                "severity": "High",
+                "category": "Server-Side Request Forgery",
+                "owasp_category": "API7:2023 – Server-Side Request Forgery",
+                "mitre_techniques": ["T1190", "T1071"],
+                "risk_score": 8.0,
+                "remediation_steps": [
+                    "Validate and sanitize all user-supplied URLs",
+                    "Implement strict allowlist for external requests",
+                    "Use network segmentation to limit internal access",
+                    "Disable unused URL schemas (file://, ftp://, etc.)"
+                ],
+                "trigger_context": {
+                    "url_validation": url_validation,
+                    "allowlist_implementation": allowlist_implementation,
+                    "network_segmentation": network_segmentation
+                }
+            })
+        
+        # Check input validation for URLs
+        input_validation = security_config.get("input_validation", "").lower()
+        if input_validation in ["no validation", "client-side only", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Insufficient Input Validation for URLs",
+                "description": "Inadequate validation of URL inputs enables SSRF attacks",
+                "severity": "Medium",
+                "category": "Injection",
+                "owasp_category": "API7:2023 – Server-Side Request Forgery",
+                "mitre_techniques": ["T1190"],
+                "risk_score": 6.5,
+                "remediation_steps": [
+                    "Implement comprehensive URL validation",
+                    "Use regular expressions to validate URL patterns",
+                    "Check URL schemes and domains against allowlist",
+                    "Sanitize URL parameters"
+                ]
+            })
+        
+        return {
+            "analysis_type": "API7:2023 - Server-Side Request Forgery",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "High" if any(v["severity"] == "High" for v in vulnerabilities) else "Medium",
+                "impact": "Unauthorized access to internal systems and data exfiltration"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in API7:2023 analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"API7:2023 analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/api9-2023")
+async def analyze_api9_2023_improper_inventory_management(request: EnhancedVulnerabilityRequest):
+    """API9:2023 - Improper Inventory Management detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check API documentation and inventory
+        documentation = security_config.get("documentation_security", "").lower()
+        version_management = security_config.get("version_management", "").lower()
+        api_discovery = security_config.get("api_discovery_controls", False)
+        
+        if documentation in ["no documentation", "public detailed docs", ""]:
+            severity = "Medium" if documentation == "public detailed docs" else "Low"
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Poor API Documentation Security",
+                "description": "API documentation practices create security risks through information disclosure",
+                "severity": severity,
+                "category": "Information Disclosure",
+                "owasp_category": "API9:2023 – Improper Inventory Management",
+                "mitre_techniques": ["T1190", "T1213"],
+                "risk_score": 5.0 if severity == "Medium" else 3.0,
+                "remediation_steps": [
+                    "Review and sanitize public API documentation",
+                    "Remove sensitive internal details from public docs",
+                    "Implement separate documentation for internal/external use",
+                    "Regular documentation security reviews"
+                ]
+            })
+        
+        if version_management in ["no version management", "poor versioning", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Poor API Version Management",
+                "description": "Inadequate API version management creates security blind spots",
+                "severity": "Low",
+                "category": "Security Misconfiguration",
+                "owasp_category": "API9:2023 – Improper Inventory Management",
+                "mitre_techniques": ["T1190"],
+                "risk_score": 4.0,
+                "remediation_steps": [
+                    "Implement comprehensive API versioning strategy",
+                    "Maintain inventory of all API versions",
+                    "Plan deprecation timeline for old versions",
+                    "Monitor usage of deprecated endpoints"
+                ]
+            })
+        
+        if not api_discovery:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Lack of API Discovery Controls",
+                "description": "Missing API discovery and inventory management capabilities",
+                "severity": "Low",
+                "category": "Security Misconfiguration",
+                "owasp_category": "API9:2023 – Improper Inventory Management",
+                "mitre_techniques": ["T1190"],
+                "risk_score": 4.5,
+                "remediation_steps": [
+                    "Implement automated API discovery tools",
+                    "Maintain real-time API inventory",
+                    "Monitor for shadow or undocumented APIs",
+                    "Regular API security assessments"
+                ]
+            })
+        
+        return {
+            "analysis_type": "API9:2023 - Improper Inventory Management",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "Medium" if any(v["severity"] == "Medium" for v in vulnerabilities) else "Low",
+                "impact": "Security blind spots and increased attack surface"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in API9:2023 analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"API9:2023 analysis failed: {str(e)}")
+
+# =============================================================================
+# ENHANCED DATABASE SECURITY ENDPOINTS - MUST BE BEFORE GENERIC ROUTE
+# =============================================================================
+
+@api_router.post("/vulnerabilities/analyze/privilege-escalation")
+async def analyze_privilege_escalation(request: EnhancedVulnerabilityRequest):
+    """Enhanced Database Security - Privilege Escalation detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check privilege management
+        privilege_mgmt = security_config.get("privilege_management", "").lower()
+        if privilege_mgmt in ["static user privileges", "excessive privileges", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Database Privilege Escalation Risk",
+                "description": "Database configuration allows potential privilege escalation beyond intended access levels",
+                "severity": "High",
+                "category": "Broken Access Control",
+                "owasp_category": "A01:2023 – Broken Access Control",
+                "mitre_techniques": ["T1068", "T1078"],
+                "risk_score": 7.5,
+                "remediation_steps": [
+                    "Implement dynamic privilege management system",
+                    "Apply principle of least privilege strictly",
+                    "Conduct regular privilege audits and reviews",
+                    "Monitor and alert on privilege changes"
+                ]
+            })
+        
+        # Check for shared accounts
+        access_control = security_config.get("access_control", "").lower()
+        if "shared accounts" in access_control:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Shared Database Accounts",
+                "description": "Use of shared database accounts increases privilege escalation risk",
+                "severity": "Medium",
+                "category": "Identification and Authentication Failures",
+                "owasp_category": "A07:2023 – Identification and Authentication Failures",
+                "mitre_techniques": ["T1078"],
+                "risk_score": 6.0,
+                "remediation_steps": [
+                    "Replace shared accounts with individual user accounts",
+                    "Implement proper user authentication and authorization",
+                    "Add account activity monitoring",
+                    "Establish account lifecycle management"
+                ]
+            })
+        
+        return {
+            "analysis_type": "Enhanced Database Security - Privilege Escalation",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "High" if any(v["severity"] == "High" for v in vulnerabilities) else "Medium",
+                "impact": "Unauthorized database access and data manipulation"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in privilege escalation analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Privilege escalation analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/config-drift")
+async def analyze_config_drift(request: EnhancedVulnerabilityRequest):
+    """Enhanced Database Security - Configuration Drift detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check change management
+        change_mgmt = security_config.get("change_management", "").lower()
+        if change_mgmt in ["no change management", "manual change tracking", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Database Configuration Drift",
+                "description": "Database security configuration may have drifted from established security baseline",
+                "severity": "Medium",
+                "category": "Security Misconfiguration",
+                "owasp_category": "A05:2023 – Security Misconfiguration",
+                "mitre_techniques": ["T1190", "T1212"],
+                "risk_score": 6.0,
+                "remediation_steps": [
+                    "Implement automated configuration management",
+                    "Establish regular configuration baseline audits",
+                    "Deploy automated compliance checking tools",
+                    "Set up configuration drift detection and alerts"
+                ]
+            })
+        
+        # Check configuration monitoring
+        config_monitoring = security_config.get("configuration_monitoring", False)
+        if not config_monitoring:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "No Configuration Monitoring",
+                "description": "Lack of configuration monitoring prevents detection of security drift",
+                "severity": "Medium",
+                "category": "Security Logging and Monitoring Failures",
+                "owasp_category": "A09:2023 – Security Logging and Monitoring Failures",
+                "mitre_techniques": ["T1562", "T1070"],
+                "risk_score": 5.5,
+                "remediation_steps": [
+                    "Implement continuous configuration monitoring",
+                    "Set up automated alerts for configuration changes",
+                    "Establish configuration change approval workflows",
+                    "Regular configuration security assessments"
+                ]
+            })
+        
+        return {
+            "analysis_type": "Enhanced Database Security - Configuration Drift",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "Medium",
+                "impact": "Security control degradation and compliance violations"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in config drift analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Configuration drift analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/advanced-injection")
+async def analyze_advanced_injection(request: EnhancedVulnerabilityRequest):
+    """Enhanced Database Security - Advanced Injection detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check stored procedure security
+        stored_proc_security = security_config.get("stored_procedure_security", "").lower()
+        if stored_proc_security in ["no security measures", "basic implementation", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Advanced Database Injection Vulnerability",
+                "description": "Database vulnerable to NoSQL injection, LDAP injection, or command injection through stored procedures",
+                "severity": "Critical",
+                "category": "Injection",
+                "owasp_category": "A03:2023 – Injection",
+                "mitre_techniques": ["T1190", "T1059"],
+                "risk_score": 8.5,
+                "remediation_steps": [
+                    "Implement comprehensive input validation for all database types",
+                    "Use parameterized queries for SQL, NoSQL, and LDAP operations",
+                    "Apply principle of least privilege for database access",
+                    "Conduct regular security code reviews of database procedures"
+                ]
+            })
+        
+        # Check query parameterization
+        query_parameterization = security_config.get("query_parameterization", "").lower()
+        if query_parameterization in ["dynamic queries", "string concatenation", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Dynamic Query Construction",
+                "description": "Use of dynamic query construction enables advanced injection attacks",
+                "severity": "High",
+                "category": "Injection",
+                "owasp_category": "A03:2023 – Injection",
+                "mitre_techniques": ["T1190"],
+                "risk_score": 7.0,
+                "remediation_steps": [
+                    "Replace dynamic queries with parameterized queries",
+                    "Implement input validation and sanitization",
+                    "Use ORM frameworks with built-in protection",
+                    "Regular security testing of database interactions"
+                ]
+            })
+        
+        return {
+            "analysis_type": "Enhanced Database Security - Advanced Injection",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "Critical" if any(v["severity"] == "Critical" for v in vulnerabilities) else "High",
+                "impact": "Database compromise and data exfiltration"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in advanced injection analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Advanced injection analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/insider-threat")
+async def analyze_insider_threat(request: EnhancedVulnerabilityRequest):
+    """Enhanced Database Security - Insider Threat detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check user activity monitoring
+        activity_monitoring = security_config.get("user_activity_monitoring", "").lower()
+        if activity_monitoring in ["no activity monitoring", "basic user tracking", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Database Insider Threat Risk",
+                "description": "Database lacks sufficient monitoring to detect malicious insider activities",
+                "severity": "Medium",
+                "category": "Security Logging and Monitoring Failures",
+                "owasp_category": "A09:2023 – Security Logging and Monitoring Failures",
+                "mitre_techniques": ["T1078", "T1213"],
+                "risk_score": 6.5,
+                "remediation_steps": [
+                    "Implement user behavior analytics for database access",
+                    "Add comprehensive privileged access monitoring",
+                    "Establish regular access reviews and recertification",
+                    "Deploy data loss prevention (DLP) solutions"
+                ]
+            })
+        
+        # Check privileged access controls
+        privileged_access = security_config.get("privileged_access_management", False)
+        if not privileged_access:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Insufficient Privileged Access Controls",
+                "description": "Lack of privileged access management increases insider threat risk",
+                "severity": "Medium",
+                "category": "Broken Access Control",
+                "owasp_category": "A01:2023 – Broken Access Control",
+                "mitre_techniques": ["T1078"],
+                "risk_score": 6.0,
+                "remediation_steps": [
+                    "Implement privileged access management (PAM) solution",
+                    "Add session recording for privileged database access",
+                    "Establish approval workflows for sensitive operations",
+                    "Monitor and alert on unusual privileged activities"
+                ]
+            })
+        
+        return {
+            "analysis_type": "Enhanced Database Security - Insider Threat",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "Medium",
+                "impact": "Data theft and unauthorized database modifications by insiders"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in insider threat analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Insider threat analysis failed: {str(e)}")
+
+@api_router.post("/vulnerabilities/analyze/backup-security")
+async def analyze_backup_security(request: EnhancedVulnerabilityRequest):
+    """Enhanced Database Security - Backup Security detection"""
+    try:
+        vulnerabilities = []
+        security_config = request.security_config
+        
+        # Check backup encryption
+        backup_encryption = security_config.get("backup_encryption", "").lower()
+        if backup_encryption in ["unencrypted backups", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Unencrypted Database Backups",
+                "description": "Database backups are not properly encrypted and could be compromised",
+                "severity": "High",
+                "category": "Cryptographic Failures",
+                "owasp_category": "A02:2023 – Cryptographic Failures",
+                "mitre_techniques": ["T1005", "T1213"],
+                "risk_score": 7.0,
+                "remediation_steps": [
+                    "Enable encryption for all database backups",
+                    "Implement secure backup storage with access controls",
+                    "Regular backup integrity testing and validation",
+                    "Establish secure key management for backup encryption"
+                ]
+            })
+        
+        # Check backup access controls
+        backup_access = security_config.get("backup_access_controls", False)
+        if not backup_access:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Insufficient Backup Access Controls",
+                "description": "Database backup files lack adequate access controls",
+                "severity": "Medium",
+                "category": "Broken Access Control",
+                "owasp_category": "A01:2023 – Broken Access Control",
+                "mitre_techniques": ["T1005"],
+                "risk_score": 6.0,
+                "remediation_steps": [
+                    "Implement strict access controls for backup files",
+                    "Use separate credentials for backup access",
+                    "Monitor and log backup file access",
+                    "Regular access review for backup systems"
+                ]
+            })
+        
+        # Check backup testing
+        backup_testing = security_config.get("backup_restoration_testing", "").lower()
+        if backup_testing in ["no testing", "irregular testing", ""]:
+            vulnerabilities.append({
+                "id": str(uuid.uuid4()),
+                "name": "Untested Backup Recovery",
+                "description": "Database backup recovery procedures are not regularly tested",
+                "severity": "Medium",
+                "category": "Software and Data Integrity Failures",
+                "owasp_category": "A08:2023 – Software and Data Integrity Failures",
+                "mitre_techniques": ["T1485"],
+                "risk_score": 5.5,
+                "remediation_steps": [
+                    "Establish regular backup restoration testing schedule",
+                    "Validate backup integrity and completeness",
+                    "Document and test disaster recovery procedures",
+                    "Monitor backup success rates and alert on failures"
+                ]
+            })
+        
+        return {
+            "analysis_type": "Enhanced Database Security - Backup Security",
+            "vulnerabilities": vulnerabilities,
+            "total_count": len(vulnerabilities),
+            "risk_assessment": {
+                "overall_risk": "High" if any(v["severity"] == "High" for v in vulnerabilities) else "Medium",
+                "impact": "Data loss and unauthorized access to backup data"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in backup security analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Backup security analysis failed: {str(e)}")
+
 @api_router.post("/vulnerabilities/analyze/{node_id}")
 async def analyze_node_vulnerabilities(node_id: str, request: VulnerabilityAnalysisRequest):
     """Analyze security vulnerabilities for a specific node based on questionnaire responses"""
