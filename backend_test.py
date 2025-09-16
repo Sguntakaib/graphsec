@@ -695,19 +695,19 @@ class EnhancedVulnerabilityTester:
             request_data = {
                 "nodes": [
                     {
-                        "id": str(uuid.uuid4()),
+                        "node_id": str(uuid.uuid4()),
                         "node_type": "API",
-                        "security_config": {
-                            "authentication": "none",
-                            "authorization": "weak",
+                        "questionnaire_responses": {
+                            "authentication_method": "none",
+                            "authorization_level": "weak",
                             "input_validation": "minimal"
                         }
                     },
                     {
-                        "id": str(uuid.uuid4()),
+                        "node_id": str(uuid.uuid4()),
                         "node_type": "Database",
-                        "security_config": {
-                            "encryption": "none",
+                        "questionnaire_responses": {
+                            "encryption_enabled": False,
                             "access_control": "basic",
                             "backup_security": "poor"
                         }
