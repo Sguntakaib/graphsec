@@ -57,29 +57,25 @@ class ConditionalDependencyTester:
     # ============================================================================
     
     def test_webapp_questionnaire_contains_dependency_questions(self):
-        """Test GET /api/questionnaires/WebApp - Check if it contains conditional questions about API/Database usage"""
+        """Test GET /api/intelligent-nodes/WebApp/prompts - Check if it contains conditional questions about API/Database usage"""
         try:
-            response = self.session.get(f"{self.base_url}/questionnaires/WebApp")
+            response = self.session.get(f"{self.base_url}/intelligent-nodes/WebApp/prompts")
             
             if response.status_code == 200:
                 data = response.json()
                 
-                # Check for prompts or questions in response
+                # Check for prompts in response
                 prompts = data.get("prompts", [])
-                questions = data.get("questions", [])
-                security_branches = data.get("security_branches", [])
                 
-                all_questions = prompts + questions
-                
-                if len(all_questions) == 0:
-                    self.log_test("WebApp Dependency Questions", False, "No questions/prompts found in WebApp questionnaire")
+                if len(prompts) == 0:
+                    self.log_test("WebApp Dependency Questions", False, "No prompts found in WebApp intelligent-nodes questionnaire")
                     return False
                 
-                # Look for API usage questions
+                # Look for specific dependency questions
                 api_questions = []
                 database_questions = []
                 
-                for question in all_questions:
+                for question in prompts:
                     question_text = question.get("question", "").lower()
                     question_id = question.get("id", "").lower()
                     
@@ -93,16 +89,16 @@ class ConditionalDependencyTester:
                 
                 if len(api_questions) == 0:
                     self.log_test("WebApp Dependency Questions", False, 
-                                f"No API-related questions found in WebApp questionnaire. Questions: {[q.get('question', q.get('id', 'Unknown')) for q in all_questions[:5]]}")
+                                f"No API dependency question found in WebApp intelligent-nodes questionnaire. Questions: {[q.get('question', q.get('id', 'Unknown')) for q in prompts[:5]]}")
                     return False
                 
                 if len(database_questions) == 0:
                     self.log_test("WebApp Dependency Questions", False, 
-                                f"No Database-related questions found in WebApp questionnaire. Questions: {[q.get('question', q.get('id', 'Unknown')) for q in all_questions[:5]]}")
+                                f"No Database dependency question found in WebApp intelligent-nodes questionnaire. Questions: {[q.get('question', q.get('id', 'Unknown')) for q in prompts[:5]]}")
                     return False
                 
                 self.log_test("WebApp Dependency Questions", True, 
-                            f"WebApp questionnaire contains {len(api_questions)} API questions and {len(database_questions)} Database questions")
+                            f"WebApp intelligent-nodes questionnaire contains API and Database dependency questions")
                 return True
             else:
                 self.log_test("WebApp Dependency Questions", False, f"HTTP {response.status_code}: {response.text}")
