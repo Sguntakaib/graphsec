@@ -90,7 +90,7 @@ class RoutingFixTester:
             return False
 
     def test_bulk_vulnerability_analysis_with_product_design_security(self):
-        """Test POST /api/vulnerabilities/analyze/bulk with ProductDesignSecurity node type"""
+        """Test POST /api/vulnerabilities/bulk-analyze with ProductDesignSecurity node type"""
         try:
             request_data = {
                 "nodes": [
@@ -109,7 +109,7 @@ class RoutingFixTester:
             }
             
             response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/bulk",
+                f"{self.base_url}/vulnerabilities/bulk-analyze",
                 json=request_data,
                 headers={"Content-Type": "application/json"}
             )
