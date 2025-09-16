@@ -2731,6 +2731,16 @@ function AppContent() {
             setSelectedVulnerability(null);
           }}
           onMarkFixed={handleVulnerabilityFixed}
+          userAnswers={(() => {
+            // Get user answers from the parent node
+            const parentNode = nodes.find(n => n.id === selectedVulnerability.parent_node_id);
+            return parentNode?.data?.questionnaireResponses || {};
+          })()}
+          nodeSubtype={(() => {
+            // Get node subtype from the parent node
+            const parentNode = nodes.find(n => n.id === selectedVulnerability.parent_node_id);
+            return parentNode?.data?.subtype || '';
+          })()}
         />
       )}
 
