@@ -48,6 +48,12 @@ const EnhancedSecurityQuestionnaire = ({
       'firewall': 'WAF',
       'web_firewall': 'WAF',
       
+      // HTTPS/Encryption
+      'https': 'Encryption',
+      'encryption': 'Encryption',
+      'ssl': 'Encryption',
+      'tls': 'Encryption',
+      
       // Deployment
       'deployment': 'Deployment',
       'deploy': 'Deployment',
