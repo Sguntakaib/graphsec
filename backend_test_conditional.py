@@ -83,12 +83,12 @@ class ConditionalDependencyTester:
                     question_text = question.get("question", "").lower()
                     question_id = question.get("id", "").lower()
                     
-                    # Check for API-related questions
-                    if any(keyword in question_text or keyword in question_id for keyword in ["api", "endpoint", "rest", "service"]):
+                    # Check for specific API dependency question
+                    if "webapp_api_endpoints" in question_id or "api endpoints" in question_text:
                         api_questions.append(question)
                     
-                    # Check for Database-related questions  
-                    if any(keyword in question_text or keyword in question_id for keyword in ["database", "db", "data", "storage"]):
+                    # Check for specific Database dependency question  
+                    if "webapp_database_connection" in question_id or ("database" in question_text and "connect" in question_text):
                         database_questions.append(question)
                 
                 if len(api_questions) == 0:
