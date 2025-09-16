@@ -739,6 +739,18 @@ test_plan:
         agent: "testing"
         comment: "✅ PRODUCTDESIGNSECURITY ROUTING FIX VERIFIED: All 3 critical routing tests passed (100% success rate). STRIDE Questionnaire Endpoint (GET /api/questionnaires/ProductDesignSecurity) correctly returns STRIDE-based questionnaire with questionnaire_type='STRIDE-based Threat Modeling', stride_categories array, and 12 prompts from product_design_security.yaml. Bulk Vulnerability Analysis (POST /api/vulnerabilities/bulk-analyze) successfully processes ProductDesignSecurity nodes with proper response format. Route Ordering Fix confirmed - specific ProductDesignSecurity route prioritized over generic route. Backend dependencies resolved (attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed). The routing fix is fully operational and production-ready."
 
+  - task: "WebApp Questionnaire Dependency Questions Verification"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ WEBAPP DEPENDENCY QUESTIONS VERIFICATION COMPLETE: All tests passed with 100% success rate (5/5)! CRITICAL VERIFICATION CONFIRMED: ✅ WebApp questionnaire now has 10 questions (up from 8) including both dependency questions ✅ API dependency question: 'Does this web application expose API endpoints?' (ID: webapp_api_endpoints, type: boolean) ✅ Database dependency question: 'Does this application connect to a database?' (ID: webapp_database_connection, type: boolean) ✅ Both questions have proper structure with required fields (id, question, type, help_text, required) ✅ Conditional questionnaire system properly enabled with dependency mappings (webapp_api_enabled→API, webapp_database_connection→Database) ✅ Question count successfully increased from 8 to 10 as expected ✅ Both dependency questions are boolean type for conditional logic triggering. The WebApp questionnaire dependency questions have been successfully added and the conditional questionnaire system is fully operational. Backend dependencies resolved (attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed)."
+
 frontend:
   - task: "Phase 2 VulnerabilityNode Component"
     implemented: true
