@@ -186,27 +186,27 @@ class ValidateCompletenessEndpointTester:
                     "name": "Login Security", 
                     "type": "Login",
                     "required": True,
-                    "completed": False,  # Not completed
-                    "value": None,
+                    "completed": True,  # Completed
+                    "value": "oauth2",
                     "description": "Authentication method configuration"
                 },
                 {
-                    "id": "encryption-branch",
-                    "name": "Data Encryption",
-                    "type": "Encryption", 
-                    "required": True,
-                    "completed": True,
-                    "value": "enabled",
-                    "description": "Data encryption configuration"
-                },
-                {
-                    "id": "validation-branch",
-                    "name": "Input Validation",
-                    "type": "InputValidation",
+                    "id": "api-branch",
+                    "name": "API Security",
+                    "type": "API", 
                     "required": True,
                     "completed": False,  # Not completed
                     "value": None,
-                    "description": "Input validation configuration"
+                    "description": "API security configuration"
+                },
+                {
+                    "id": "database-branch",
+                    "name": "Database Security",
+                    "type": "Database",
+                    "required": True,
+                    "completed": True,  # Completed
+                    "value": "encrypted",
+                    "description": "Database security configuration"
                 }
             ]
             
