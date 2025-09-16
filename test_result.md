@@ -758,6 +758,18 @@ test_plan:
         comment: "✅ WEBAPP DEPENDENCY QUESTIONS VERIFICATION COMPLETE: All tests passed with 100% success rate (5/5)! CRITICAL VERIFICATION CONFIRMED: ✅ WebApp questionnaire now has 10 questions (up from 8) including both dependency questions ✅ API dependency question: 'Does this web application expose API endpoints?' (ID: webapp_api_endpoints, type: boolean) ✅ Database dependency question: 'Does this application connect to a database?' (ID: webapp_database_connection, type: boolean) ✅ Both questions have proper structure with required fields (id, question, type, help_text, required) ✅ Conditional questionnaire system properly enabled with dependency mappings (webapp_api_enabled→API, webapp_database_connection→Database) ✅ Question count successfully increased from 8 to 10 as expected ✅ Both dependency questions are boolean type for conditional logic triggering. The WebApp questionnaire dependency questions have been successfully added and the conditional questionnaire system is fully operational. Backend dependencies resolved (attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed)."
 
 frontend:
+  - task: "WebApp Questionnaire Dependency Flow Issue"
+    implemented: true
+    working: false
+    file: "frontend/src/App.js, frontend/src/components/SecurityQuestionnaire.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ DEPENDENCY FLOW ISSUE IDENTIFIED: When selecting 'yes' for database dependency in WebApp questionnaire, only Database questionnaire appears but API questionnaire does NOT appear. Expected behavior: Both API and Database questionnaire modals should appear in sequence. Current behavior: Only Database questionnaire modal appears. Console logs show dependency system working correctly for Database ('Creating new Database node', 'Database questionnaire modal found') but no API dependency processing. The conditional dependency logic may not be triggering both dependencies simultaneously when database connection is selected."
+
   - task: "Phase 2 VulnerabilityNode Component"
     implemented: true
     working: "NA"
