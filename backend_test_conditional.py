@@ -261,15 +261,15 @@ class ConditionalDependencyTester:
                 data = response.json()
                 
                 # Should return empty dependencies
-                dependencies = data.get("dependencies", [])
+                dependent_nodes = data.get("dependent_nodes", [])
                 
-                if len(dependencies) > 0:
+                if len(dependent_nodes) > 0:
                     self.log_test("Check Dependencies Both=no", False, 
-                                f"Expected no dependencies but got: {dependencies}")
+                                f"Expected no dependent_nodes but got: {dependent_nodes}")
                     return False
                 
                 self.log_test("Check Dependencies Both=no", True, 
-                            f"Correctly identified no dependencies: {dependencies}")
+                            f"Correctly identified no dependencies: {dependent_nodes}")
                 return True
             else:
                 self.log_test("Check Dependencies Both=no", False, f"HTTP {response.status_code}: {response.text}")
