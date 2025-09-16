@@ -159,11 +159,9 @@ class ConditionalDependencyTester:
         """Test POST /api/intelligent-nodes/WebApp/check-dependencies - API=no, Database=yes"""
         try:
             request_data = {
-                "responses": {
-                    "uses_api": "no",
-                    "uses_database": "yes",
-                    "api_endpoints": "false",
-                    "database_connection": "true"
+                "answers": {
+                    "webapp_api_endpoints": "no",
+                    "webapp_database_connection": "yes"
                 }
             }
             
