@@ -4021,7 +4021,11 @@ async def bulk_analyze_vulnerabilities(request: BulkVulnerabilityAnalysisRequest
     try:
         logger.info(f"Bulk analyzing vulnerabilities for {len(request.nodes)} nodes")
         
-        results = {}
+        results_list = []  # Change to list instead of dict
+        total_vulnerabilities = 0
+        total_risk_score = 0.0
+        successful_analyses = 0
+        
         for node_data in request.nodes:
             try:
                 result = questionnaire_analyzer.analyze_questionnaire_responses(
@@ -4031,34 +4035,49 @@ async def bulk_analyze_vulnerabilities(request: BulkVulnerabilityAnalysisRequest
                     node_position=node_data.get("position")
                 )
                 
-                results[node_data["node_id"]] = {
+                node_result = {
                     "node_id": result.node_id,
                     "node_type": result.node_type,
                     "total_vulnerabilities": result.total_vulnerabilities,
                     "vulnerabilities_by_severity": {k.value: v for k, v in result.vulnerabilities_by_severity.items()},
                     "overall_risk_score": result.overall_risk_score,
-                    "vulnerability_count": len(result.vulnerability_nodes)
+                    "vulnerability_count": len(result.vulnerability_nodes),
+                    "vulnerability_nodes": [
+                        {
+                            "id": vuln.id,
+                            "name": vuln.name,
+                            "severity": vuln.severity.value,
+                            "category": vuln.category.value,
+                            "owasp_category": vuln.owasp_category
+                        }
+                        for vuln in result.vulnerability_nodes[:5]  # Limit to first 5 for performance
+                    ]
                 }
+                
+                results_list.append(node_result)
+                total_vulnerabilities += result.total_vulnerabilities
+                total_risk_score += result.overall_risk_score
+                successful_analyses += 1
                 
             except Exception as node_error:
                 logger.error(f"Error analyzing node {node_data.get('node_id', 'unknown')}: {node_error}")
-                results[node_data.get("node_id", "unknown")] = {
+                results_list.append({
+                    "node_id": node_data.get("node_id", "unknown"),
+                    "node_type": node_data.get("node_type", "Unknown"),
                     "error": str(node_error),
                     "total_vulnerabilities": 0,
                     "overall_risk_score": 0.0
-                }
+                })
         
         # Calculate summary statistics
-        total_vulnerabilities = sum(r.get("total_vulnerabilities", 0) for r in results.values())
-        avg_risk_score = sum(r.get("overall_risk_score", 0) for r in results.values()) / len(results) if results else 0
+        avg_risk_score = total_risk_score / successful_analyses if successful_analyses > 0 else 0
         
-        return {
-            "analyzed_nodes": len(request.nodes),
-            "successful_analyses": len([r for r in results.values() if "error" not in r]),
-            "total_vulnerabilities": total_vulnerabilities,
-            "average_risk_score": round(avg_risk_score, 2),
-            "results": results
-        }
+        # Return as list format as expected by testing agent
+        return results_list
+        
+    except Exception as e:
+        logger.error(f"Error in bulk vulnerability analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"Bulk analysis failed: {str(e)}")
         
     except Exception as e:
         logger.error(f"Error in bulk vulnerability analysis: {e}")
