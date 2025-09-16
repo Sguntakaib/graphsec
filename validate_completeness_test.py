@@ -254,7 +254,7 @@ class ValidateCompletenessEndpointTester:
                     {
                         "id": "login-branch",
                         "name": "Login Security",
-                        "type": "LOGIN",
+                        "type": "Login",
                         "required": True,
                         "completed": True,
                         "value": "oauth2"
