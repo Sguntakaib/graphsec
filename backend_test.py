@@ -559,6 +559,7 @@ class ConditionalQuestionnaireVulnerabilityTester:
         """Test MongoDB NoSQL injection vulnerability detection"""
         try:
             request_data = {
+                "node_id": "test_node_mongodb",
                 "node_type": "Database",
                 "questionnaire_responses": {
                     "database_type": "MongoDB",
