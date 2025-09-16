@@ -58,7 +58,7 @@ class ValidateCompletenessEndpointTester:
                 {
                     "id": "login-branch",
                     "name": "Login Security",
-                    "type": "LOGIN",
+                    "type": "Login",
                     "required": True,
                     "completed": True,
                     "value": "oauth2",
@@ -67,7 +67,7 @@ class ValidateCompletenessEndpointTester:
                 {
                     "id": "encryption-branch", 
                     "name": "Data Encryption",
-                    "type": "ENCRYPTION",
+                    "type": "Encryption",
                     "required": True,
                     "completed": True,
                     "value": "enabled",
