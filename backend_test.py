@@ -399,6 +399,7 @@ class ConditionalQuestionnaireVulnerabilityTester:
         """Test CORS misconfiguration vulnerability detection"""
         try:
             request_data = {
+                "node_id": "test_node_cors",
                 "node_type": "API",
                 "questionnaire_responses": {
                     "api_cors_configuration": "Permissive CORS"
