@@ -175,20 +175,20 @@ class ConditionalDependencyTester:
                 data = response.json()
                 
                 # Should return Database dependency but not API
-                dependencies = data.get("dependencies", [])
+                dependent_nodes = data.get("dependent_nodes", [])
                 
-                if "Database" not in dependencies:
+                if "Database" not in dependent_nodes:
                     self.log_test("Check Dependencies API=no DB=yes", False, 
-                                f"Expected 'Database' in dependencies but got: {dependencies}")
+                                f"Expected 'Database' in dependent_nodes but got: {dependent_nodes}")
                     return False
                 
-                if "API" in dependencies:
+                if "API" in dependent_nodes:
                     self.log_test("Check Dependencies API=no DB=yes", False, 
-                                f"Did not expect 'API' in dependencies but got: {dependencies}")
+                                f"Did not expect 'API' in dependent_nodes but got: {dependent_nodes}")
                     return False
                 
                 self.log_test("Check Dependencies API=no DB=yes", True, 
-                            f"Correctly identified Database dependency only: {dependencies}")
+                            f"Correctly identified Database dependency only: {dependent_nodes}")
                 return True
             else:
                 self.log_test("Check Dependencies API=no DB=yes", False, f"HTTP {response.status_code}: {response.text}")
