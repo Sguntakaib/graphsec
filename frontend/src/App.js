@@ -129,7 +129,7 @@ function AppContent() {
     showFixed: false
   });
   const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]);
-  const [autoVulnerabilityAnalysis, setAutoVulnerabilityAnalysis] = useState(true); // Auto-analyze on questionnaire completion
+  const [autoVulnerabilityAnalysis, setAutoVulnerabilityAnalysis] = useState(false); // Disabled by default - require manual trigger after complete questionnaire
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
