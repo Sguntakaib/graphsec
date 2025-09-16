@@ -3708,9 +3708,71 @@ async def get_product_design_security_questionnaire():
         logger.error(f"Error loading ProductDesignSecurity questionnaire: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to load questionnaire: {str(e)}")
 
+# CONDITIONAL QUESTIONNAIRE ENDPOINT - Enhanced with API/DB type conditioning
+@api_router.get("/questionnaires/{node_subtype}/conditional")
+async def get_conditional_questionnaire(node_subtype: str, level: str = "basic", responses: str = None):
+    """Get conditional questionnaire based on previous responses"""
+    try:
+        from conditional_questionnaire_engine import get_conditional_questionnaire_engine
+        from questionnaire_loader import QuestionnaireLevel as LoaderQuestionnaireLevel
+        import json
+        
+        # Validate level parameter
+        try:
+            questionnaire_level = LoaderQuestionnaireLevel(level.lower())
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid questionnaire level. Must be one of: {[l.value for l in LoaderQuestionnaireLevel]}")
+        
+        # Parse previous responses if provided
+        previous_responses = {}
+        if responses:
+            try:
+                previous_responses = json.loads(responses)
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=400, detail="Invalid JSON format for responses parameter")
+        
+        # Get conditional questionnaire engine
+        conditional_engine = get_conditional_questionnaire_engine()
+        
+        # Get conditional questionnaire
+        questions, has_conditional = conditional_engine.get_conditional_questionnaire(
+            node_subtype, questionnaire_level, previous_responses
+        )
+        
+        # Get metadata
+        metadata = questionnaire_loader.get_metadata(node_subtype)
+        
+        response = {
+            "success": True,
+            "node_subtype": node_subtype,
+            "level": level,
+            "questions": questions,
+            "question_count": len(questions),
+            "has_conditional_questions": has_conditional,
+            "estimated_time": f"{len(questions) * 30} seconds",
+            "metadata": {
+                "category": metadata.category if metadata else "Unknown",
+                "description": metadata.description if metadata else f"{node_subtype} security questionnaire",
+                "required_branches": metadata.required_branches if metadata else [],
+                "threat_intelligence": metadata.threat_intelligence if metadata else {},
+                "risk_factors": metadata.risk_factors if metadata else {}
+            },
+            "conditional_info": {
+                "supports_conditional": node_subtype.upper() in ["API", "DATABASE"],
+                "conditional_triggers": [f"{node_subtype.lower()}_type"] if node_subtype.upper() in ["API", "DATABASE"] else [],
+                "previous_responses_applied": len(previous_responses) > 0
+            }
+        }
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error getting conditional questionnaire: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/questionnaires/{node_subtype}")
 async def get_phase2_questionnaire(node_subtype: str, level: str = "basic"):
-    """Get Phase 2 file-based questionnaire for specific node type and level"""
+    """Get Phase 2 file-based questionnaire for specific node type and level (Legacy endpoint)"""
     try:
         # Validate level parameter
         try:
