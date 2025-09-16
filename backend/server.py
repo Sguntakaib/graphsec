@@ -934,9 +934,19 @@ async def get_risk_analysis(diagram_id: str):
     return risk_analysis
 
 def _smart_hierarchical_layout(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Dict[str, float]]:
-    """Smart hierarchical layout based on security model semantics"""
+    """Smart hierarchical layout optimized for vulnerability-dense scenarios"""
     
-    # Define security layer hierarchy
+    # Separate vulnerability nodes from main security nodes
+    vulnerability_nodes = [n for n in nodes if n.get("type") == "vulnerability"]
+    main_nodes = [n for n in nodes if n.get("type") != "vulnerability"]
+    
+    layout_positions = {}
+    
+    # If we have many vulnerabilities (15+), use hybrid approach
+    if len(vulnerability_nodes) >= 15:
+        return _hybrid_vulnerability_layout(G, main_nodes, vulnerability_nodes)
+    
+    # Define security layer hierarchy for main nodes
     layer_order = {
         "Zone": 0,      # Network zones at the top
         "Actor": 1,     # Threat actors 
@@ -946,9 +956,9 @@ def _smart_hierarchical_layout(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Di
         "Signal": 5     # Detection signals
     }
     
-    # Group nodes by type and layer
+    # Group main nodes by type and layer
     layers = {}
-    for node in nodes:
+    for node in main_nodes:
         node_type = node.get("type", "Unknown")
         layer = layer_order.get(node_type, 3)  # Default to asset layer
         
@@ -956,15 +966,15 @@ def _smart_hierarchical_layout(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Di
             layers[layer] = []
         layers[layer].append(node)
     
-    layout_positions = {}
     layer_height = 200
     base_y = 100
     
-    for layer_idx, layer_nodes in layers.items():
+    # Position main nodes in hierarchical layers
+    for layer_idx, layer_nodes in sorted(layers.items()):
         y_pos = base_y + (layer_idx * layer_height)
         
         # Calculate spacing for nodes in this layer
-        total_width = max(1200, len(layer_nodes) * 250)
+        total_width = max(1200, len(layer_nodes) * 300)
         node_spacing = total_width / max(len(layer_nodes), 1)
         start_x = -(total_width / 2) + (node_spacing / 2)
         
@@ -980,12 +990,139 @@ def _smart_hierarchical_layout(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Di
         for subtype, subtype_nodes in subtype_groups.items():
             for i, node in enumerate(subtype_nodes):
                 layout_positions[node["id"]] = {
-                    "x": x_offset + (i * 150),
+                    "x": x_offset + (i * 200),
                     "y": y_pos
                 }
-            x_offset += len(subtype_nodes) * 150 + 100  # Gap between subtypes
+            x_offset += len(subtype_nodes) * 200 + 150  # Gap between subtypes
+    
+    # Position vulnerability nodes in orbital patterns around their parents
+    _position_vulnerability_nodes_orbital(layout_positions, vulnerability_nodes, main_nodes)
     
     return layout_positions
+
+def _hybrid_vulnerability_layout(G: nx.DiGraph, main_nodes: List[Dict], vulnerability_nodes: List[Dict]) -> Dict[str, Dict[str, float]]:
+    """Hybrid layout optimized for high-density vulnerability scenarios (15+ vulnerabilities)"""
+    
+    layout_positions = {}
+    
+    # Position main nodes in a wide horizontal layout to leave space for vulnerabilities
+    main_node_count = len(main_nodes)
+    if main_node_count > 0:
+        total_width = max(2000, main_node_count * 400)  # Wider spacing
+        node_spacing = total_width / main_node_count
+        start_x = -(total_width / 2) + (node_spacing / 2)
+        
+        # Group main nodes by type for better organization
+        type_groups = {}
+        for node in main_nodes:
+            node_type = node.get("type", "Unknown")
+            if node_type not in type_groups:
+                type_groups[node_type] = []
+            type_groups[node_type].append(node)
+        
+        x_offset = start_x
+        base_y = 0  # Center main nodes vertically
+        
+        # Position each type group
+        for node_type, nodes_in_type in type_groups.items():
+            for i, node in enumerate(nodes_in_type):
+                layout_positions[node["id"]] = {
+                    "x": x_offset,
+                    "y": base_y + (i * 100 if len(nodes_in_type) > 1 else 0)  # Slight vertical offset for multiple nodes of same type
+                }
+                x_offset += 400  # Wide spacing between main nodes
+    
+    # Use compact orbital positioning for vulnerability nodes
+    _position_vulnerability_nodes_compact_orbital(layout_positions, vulnerability_nodes, main_nodes)
+    
+    return layout_positions
+
+def _position_vulnerability_nodes_orbital(layout_positions: Dict, vulnerability_nodes: List[Dict], main_nodes: List[Dict]):
+    """Position vulnerability nodes in orbital patterns around their parent nodes"""
+    
+    # Group vulnerabilities by parent node
+    vuln_by_parent = {}
+    for vuln in vulnerability_nodes:
+        parent_id = vuln.get("parent_node_id")
+        if parent_id not in vuln_by_parent:
+            vuln_by_parent[parent_id] = []
+        vuln_by_parent[parent_id].append(vuln)
+    
+    # Position vulnerabilities around each parent
+    for parent_id, vulns in vuln_by_parent.items():
+        parent_pos = layout_positions.get(parent_id)
+        if not parent_pos:
+            continue
+            
+        vuln_count = len(vulns)
+        radius = 150  # Base orbital radius
+        
+        # Adjust radius based on number of vulnerabilities
+        if vuln_count > 8:
+            radius = 200
+        elif vuln_count > 12:
+            radius = 250
+            
+        import math
+        for i, vuln in enumerate(vulns):
+            angle = (2 * math.pi * i) / vuln_count
+            x = parent_pos["x"] + radius * math.cos(angle)
+            y = parent_pos["y"] + radius * math.sin(angle)
+            
+            layout_positions[vuln["id"]] = {"x": x, "y": y}
+
+def _position_vulnerability_nodes_compact_orbital(layout_positions: Dict, vulnerability_nodes: List[Dict], main_nodes: List[Dict]):
+    """Compact orbital positioning for high-density vulnerability scenarios"""
+    
+    # Group vulnerabilities by parent node
+    vuln_by_parent = {}
+    for vuln in vulnerability_nodes:
+        parent_id = vuln.get("parent_node_id")
+        if parent_id not in vuln_by_parent:
+            vuln_by_parent[parent_id] = []
+        vuln_by_parent[parent_id].append(vuln)
+    
+    import math
+    
+    # Position vulnerabilities around each parent with compact multi-ring approach
+    for parent_id, vulns in vuln_by_parent.items():
+        parent_pos = layout_positions.get(parent_id)
+        if not parent_pos:
+            continue
+            
+        vuln_count = len(vulns)
+        
+        # Use multi-ring approach for many vulnerabilities
+        if vuln_count <= 8:
+            # Single ring
+            radius = 120
+            for i, vuln in enumerate(vulns):
+                angle = (2 * math.pi * i) / vuln_count
+                x = parent_pos["x"] + radius * math.cos(angle)
+                y = parent_pos["y"] + radius * math.sin(angle)
+                layout_positions[vuln["id"]] = {"x": x, "y": y}
+        else:
+            # Multi-ring approach
+            inner_count = min(8, vuln_count)
+            inner_radius = 120
+            outer_radius = 200
+            
+            # Inner ring
+            for i in range(inner_count):
+                angle = (2 * math.pi * i) / inner_count
+                x = parent_pos["x"] + inner_radius * math.cos(angle)
+                y = parent_pos["y"] + inner_radius * math.sin(angle)
+                layout_positions[vulns[i]["id"]] = {"x": x, "y": y}
+            
+            # Outer ring(s)
+            remaining_vulns = vulns[inner_count:]
+            if remaining_vulns:
+                outer_count = len(remaining_vulns)
+                for i, vuln in enumerate(remaining_vulns):
+                    angle = (2 * math.pi * i) / outer_count
+                    x = parent_pos["x"] + outer_radius * math.cos(angle)
+                    y = parent_pos["y"] + outer_radius * math.sin(angle)
+                    layout_positions[vuln["id"]] = {"x": x, "y": y}
 
 def _circular_layout_by_type(G: nx.DiGraph, nodes: List[Dict]) -> Dict[str, Dict[str, float]]:
     """Circular layout with nodes grouped by type"""
