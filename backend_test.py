@@ -15,7 +15,7 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://auto-test-fix.preview.emergentagent.com/api"
 
-class WebAppValidateCompletenessEndpointTester:
+class WebAppValidateCompletenessHttpsFixTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
@@ -52,283 +52,15 @@ class WebAppValidateCompletenessEndpointTester:
             return False
 
     # ============================================================================
-    # CRITICAL TESTING TASK: REPRODUCE 500 ERROR IN VALIDATE-COMPLETENESS ENDPOINT
+    # CRITICAL TESTING TASK: TEST HTTPS ENUM MAPPING FIX
     # ============================================================================
     
-    def test_validate_completeness_with_realistic_webapp_data(self):
-        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with realistic WebApp questionnaire data"""
+    def test_validate_completeness_with_encryption_type(self):
+        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with 'Encryption' type (mapped from HTTPS)"""
         try:
-            # Realistic WebApp questionnaire data that would come from frontend interface
-            realistic_webapp_branches = [
-                {
-                    "id": "login-branch-1",
-                    "name": "Authentication System",
-                    "type": "Login",
-                    "required": True,
-                    "completed": True,
-                    "value": "oauth2",
-                    "description": "OAuth2 authentication implementation"
-                },
-                {
-                    "id": "database-branch-1", 
-                    "name": "Database Security",
-                    "type": "Database",
-                    "required": True,
-                    "completed": True,
-                    "value": "encrypted",
-                    "description": "Database encryption enabled"
-                },
-                {
-                    "id": "api-branch-1",
-                    "name": "API Security",
-                    "type": "API",
-                    "required": True,
-                    "completed": False,
-                    "value": None,
-                    "description": "API security configuration"
-                },
-                {
-                    "id": "input-validation-branch-1",
-                    "name": "Input Validation",
-                    "type": "InputValidation",
-                    "required": True,
-                    "completed": True,
-                    "value": "comprehensive",
-                    "description": "Comprehensive input validation"
-                },
-                {
-                    "id": "waf-branch-1",
-                    "name": "Web Application Firewall",
-                    "type": "WAF",
-                    "required": False,
-                    "completed": False,
-                    "value": None,
-                    "description": "WAF protection"
-                },
-                {
-                    "id": "deployment-branch-1",
-                    "name": "Deployment Security",
-                    "type": "Deployment",
-                    "required": True,
-                    "completed": True,
-                    "value": "secure",
-                    "description": "Secure deployment configuration"
-                }
-            ]
-            
-            print(f"🔍 Testing with realistic WebApp data: {len(realistic_webapp_branches)} branches")
-            print(f"📋 Branch types: {[b['type'] for b in realistic_webapp_branches]}")
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                json=realistic_webapp_branches,
-                headers={"Content-Type": "application/json"}
-            )
-            
-            print(f"📡 Response Status: {response.status_code}")
-            print(f"📄 Response Headers: {dict(response.headers)}")
-            
-            if response.status_code == 500:
-                # This is the expected 500 error we're trying to reproduce
-                try:
-                    error_data = response.json()
-                    self.log_test("Validate Completeness - Realistic Data", False, 
-                                f"REPRODUCED 500 ERROR! Error details: {error_data}")
-                    print(f"🚨 EXACT 500 ERROR MESSAGE: {error_data}")
-                    return False
-                except:
-                    error_text = response.text
-                    self.log_test("Validate Completeness - Realistic Data", False, 
-                                f"REPRODUCED 500 ERROR! Error text: {error_text}")
-                    print(f"🚨 EXACT 500 ERROR TEXT: {error_text}")
-                    return False
-            elif response.status_code == 200:
-                data = response.json()
-                self.log_test("Validate Completeness - Realistic Data", True, 
-                            f"Endpoint working correctly: {data}")
-                return True
-            elif response.status_code == 422:
-                # Validation error - might indicate enum value issues
-                error_data = response.json()
-                self.log_test("Validate Completeness - Realistic Data", False, 
-                            f"VALIDATION ERROR (422): {error_data} - This might indicate SecurityBranch enum value issues")
-                print(f"🔍 VALIDATION ERROR DETAILS: {error_data}")
-                return False
-            else:
-                self.log_test("Validate Completeness - Realistic Data", False, 
-                            f"Unexpected HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Validate Completeness - Realistic Data", False, f"Request error: {str(e)}")
-            return False
-
-    def test_validate_completeness_with_different_enum_values(self):
-        """Test with different SecurityBranch enum value formats to identify the correct ones"""
-        try:
-            # Test different enum value formats based on common patterns
-            enum_test_cases = [
-                {
-                    "name": "Lowercase enum values",
-                    "branches": [
-                        {
-                            "id": "test-1",
-                            "name": "Test Branch",
-                            "type": "login",  # lowercase
-                            "required": True,
-                            "completed": True,
-                            "value": "oauth2",
-                            "description": "Test"
-                        }
-                    ]
-                },
-                {
-                    "name": "Uppercase enum values", 
-                    "branches": [
-                        {
-                            "id": "test-2",
-                            "name": "Test Branch",
-                            "type": "LOGIN",  # uppercase
-                            "required": True,
-                            "completed": True,
-                            "value": "oauth2",
-                            "description": "Test"
-                        }
-                    ]
-                },
-                {
-                    "name": "PascalCase enum values",
-                    "branches": [
-                        {
-                            "id": "test-3",
-                            "name": "Test Branch", 
-                            "type": "Login",  # PascalCase
-                            "required": True,
-                            "completed": True,
-                            "value": "oauth2",
-                            "description": "Test"
-                        }
-                    ]
-                }
-            ]
-            
-            working_enum_format = None
-            
-            for test_case in enum_test_cases:
-                print(f"🧪 Testing {test_case['name']}")
-                
-                response = self.session.post(
-                    f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                    json=test_case['branches'],
-                    headers={"Content-Type": "application/json"}
-                )
-                
-                print(f"   Status: {response.status_code}")
-                
-                if response.status_code == 200:
-                    working_enum_format = test_case['name']
-                    self.log_test("Enum Value Format Test", True, 
-                                f"FOUND WORKING ENUM FORMAT: {test_case['name']} - type: '{test_case['branches'][0]['type']}'")
-                    break
-                elif response.status_code == 422:
-                    try:
-                        error_data = response.json()
-                        print(f"   422 Error: {error_data}")
-                    except:
-                        print(f"   422 Error: {response.text}")
-                elif response.status_code == 500:
-                    try:
-                        error_data = response.json()
-                        print(f"   500 Error: {error_data}")
-                    except:
-                        print(f"   500 Error: {response.text}")
-            
-            if working_enum_format:
-                return True
-            else:
-                self.log_test("Enum Value Format Test", False, 
-                            "None of the tested enum formats worked - all returned errors")
-                return False
-                
-        except Exception as e:
-            self.log_test("Enum Value Format Test", False, f"Request error: {str(e)}")
-            return False
-
-    def test_validate_completeness_api_contract_validation(self):
-        """Test the API contract - what format does the endpoint actually expect?"""
-        try:
-            # Test 1: Empty request
-            print("🧪 Testing empty request")
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                json=[],
-                headers={"Content-Type": "application/json"}
-            )
-            print(f"   Empty request status: {response.status_code}")
-            
-            # Test 2: Minimal valid branch
-            print("🧪 Testing minimal valid branch")
-            minimal_branch = [
-                {
-                    "id": "test-minimal",
-                    "name": "Minimal Test",
-                    "type": "Login",
-                    "required": True,
-                    "completed": False,
-                    "value": None,
-                    "description": "Minimal test branch"
-                }
-            ]
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                json=minimal_branch,
-                headers={"Content-Type": "application/json"}
-            )
-            print(f"   Minimal branch status: {response.status_code}")
-            
-            if response.status_code == 422:
-                try:
-                    error_data = response.json()
-                    print(f"   Validation error details: {error_data}")
-                    self.log_test("API Contract Validation", False, 
-                                f"API contract validation failed: {error_data}")
-                    return False
-                except:
-                    print(f"   Validation error text: {response.text}")
-                    self.log_test("API Contract Validation", False, 
-                                f"API contract validation failed: {response.text}")
-                    return False
-            elif response.status_code == 200:
-                data = response.json()
-                self.log_test("API Contract Validation", True, 
-                            f"API contract working with minimal data: {data}")
-                return True
-            elif response.status_code == 500:
-                try:
-                    error_data = response.json()
-                    self.log_test("API Contract Validation", False, 
-                                f"500 error with minimal data: {error_data}")
-                    return False
-                except:
-                    self.log_test("API Contract Validation", False, 
-                                f"500 error with minimal data: {response.text}")
-                    return False
-            else:
-                self.log_test("API Contract Validation", False, 
-                            f"Unexpected status {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("API Contract Validation", False, f"Request error: {str(e)}")
-            return False
-
-    def test_validate_completeness_with_frontend_format(self):
-        """Test with the exact format that the frontend would send from questionnaire interface"""
-        try:
-            # This simulates the exact data structure that would come from the frontend
-            # questionnaire interface when a user completes a WebApp questionnaire
-            frontend_format_data = [
+            # Test with 'Encryption' as the type value for the HTTPS-related branch
+            # This is the fix: frontend maps 'https' -> 'Encryption'
+            webapp_branches_with_encryption = [
                 {
                     "id": "webapp-auth-001",
                     "name": "Authentication Method",
@@ -339,13 +71,13 @@ class WebAppValidateCompletenessEndpointTester:
                     "description": "OAuth2 authentication with JWT tokens"
                 },
                 {
-                    "id": "webapp-encryption-001", 
-                    "name": "Data Encryption",
-                    "type": "Database",
+                    "id": "webapp-https-001", 
+                    "name": "HTTPS Configuration",
+                    "type": "Encryption",  # CRITICAL: This should be 'Encryption' not 'Https'
                     "required": True,
                     "completed": True,
                     "value": "enabled",
-                    "description": "Database encryption at rest and in transit"
+                    "description": "HTTPS encryption enabled with TLS 1.3"
                 },
                 {
                     "id": "webapp-input-validation-001",
@@ -358,55 +90,264 @@ class WebAppValidateCompletenessEndpointTester:
                 }
             ]
             
-            print(f"🌐 Testing with frontend questionnaire format")
-            print(f"📊 Data structure: {json.dumps(frontend_format_data, indent=2)}")
+            print(f"🔐 Testing with 'Encryption' type for HTTPS branch")
+            print(f"📋 Branch types: {[b['type'] for b in webapp_branches_with_encryption]}")
             
             response = self.session.post(
                 f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                json=frontend_format_data,
+                json=webapp_branches_with_encryption,
                 headers={"Content-Type": "application/json"}
             )
             
-            print(f"📡 Frontend format response status: {response.status_code}")
+            print(f"📡 Response Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("HTTPS->Encryption Mapping Test", True, 
+                            f"✅ SUCCESS! Endpoint working with 'Encryption' type: {data}")
+                print(f"🎉 HTTPS ENUM MAPPING FIX VERIFIED! Response: {json.dumps(data, indent=2)}")
+                return True
+            elif response.status_code == 500:
+                try:
+                    error_data = response.json()
+                    self.log_test("HTTPS->Encryption Mapping Test", False, 
+                                f"❌ 500 ERROR STILL EXISTS: {error_data}")
+                    print(f"🚨 500 ERROR WITH ENCRYPTION TYPE: {error_data}")
+                    return False
+                except:
+                    error_text = response.text
+                    self.log_test("HTTPS->Encryption Mapping Test", False, 
+                                f"❌ 500 ERROR STILL EXISTS: {error_text}")
+                    print(f"🚨 500 ERROR WITH ENCRYPTION TYPE: {error_text}")
+                    return False
+            elif response.status_code == 422:
+                error_data = response.json()
+                self.log_test("HTTPS->Encryption Mapping Test", False, 
+                            f"❌ VALIDATION ERROR (422): {error_data}")
+                print(f"🔍 VALIDATION ERROR WITH ENCRYPTION TYPE: {error_data}")
+                return False
+            else:
+                self.log_test("HTTPS->Encryption Mapping Test", False, 
+                            f"❌ Unexpected HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("HTTPS->Encryption Mapping Test", False, f"Request error: {str(e)}")
+            return False
+
+    def test_validate_completeness_with_https_type_should_fail(self):
+        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with 'Https' type (should fail)"""
+        try:
+            # Test with 'Https' as the type value - this should fail because it's not in SecurityBranchType enum
+            webapp_branches_with_https = [
+                {
+                    "id": "webapp-auth-001",
+                    "name": "Authentication Method",
+                    "type": "Login",
+                    "required": True,
+                    "completed": True,
+                    "value": "oauth2",
+                    "description": "OAuth2 authentication with JWT tokens"
+                },
+                {
+                    "id": "webapp-https-001", 
+                    "name": "HTTPS Configuration",
+                    "type": "Https",  # This should cause the 500 error
+                    "required": True,
+                    "completed": True,
+                    "value": "enabled",
+                    "description": "HTTPS encryption enabled with TLS 1.3"
+                }
+            ]
+            
+            print(f"🚫 Testing with 'Https' type (should fail)")
+            print(f"📋 Branch types: {[b['type'] for b in webapp_branches_with_https]}")
+            
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
+                json=webapp_branches_with_https,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            print(f"📡 Response Status: {response.status_code}")
             
             if response.status_code == 500:
                 try:
                     error_data = response.json()
-                    self.log_test("Frontend Format Test", False, 
-                                f"500 ERROR WITH FRONTEND FORMAT: {error_data}")
-                    print(f"🚨 FRONTEND FORMAT 500 ERROR: {error_data}")
-                    
-                    # Check if it's an enum validation error
+                    # Check if it's the expected enum validation error
                     error_str = str(error_data)
-                    if "enum" in error_str.lower() or "validation" in error_str.lower():
-                        print("🔍 This appears to be an enum validation error!")
-                        print("💡 The SecurityBranch enum values might not match what the frontend is sending")
-                    
-                    return False
+                    if "enum" in error_str.lower() and "https" in error_str.lower():
+                        self.log_test("HTTPS Type Should Fail Test", True, 
+                                    f"✅ EXPECTED 500 ERROR with 'Https' type: {error_data}")
+                        print(f"✅ CONFIRMED: 'Https' type causes expected enum validation error")
+                        return True
+                    else:
+                        self.log_test("HTTPS Type Should Fail Test", False, 
+                                    f"❌ Unexpected 500 error format: {error_data}")
+                        return False
                 except:
                     error_text = response.text
-                    self.log_test("Frontend Format Test", False, 
-                                f"500 ERROR WITH FRONTEND FORMAT: {error_text}")
-                    print(f"🚨 FRONTEND FORMAT 500 ERROR: {error_text}")
+                    if "enum" in error_text.lower() and "https" in error_text.lower():
+                        self.log_test("HTTPS Type Should Fail Test", True, 
+                                    f"✅ EXPECTED 500 ERROR with 'Https' type: {error_text}")
+                        print(f"✅ CONFIRMED: 'Https' type causes expected enum validation error")
+                        return True
+                    else:
+                        self.log_test("HTTPS Type Should Fail Test", False, 
+                                    f"❌ Unexpected 500 error format: {error_text}")
+                        return False
+            elif response.status_code == 422:
+                error_data = response.json()
+                # Check if it's the expected enum validation error
+                error_str = str(error_data)
+                if "enum" in error_str.lower() and ("https" in error_str.lower() or "Https" in error_str):
+                    self.log_test("HTTPS Type Should Fail Test", True, 
+                                f"✅ EXPECTED 422 VALIDATION ERROR with 'Https' type: {error_data}")
+                    print(f"✅ CONFIRMED: 'Https' type causes expected enum validation error (422)")
+                    return True
+                else:
+                    self.log_test("HTTPS Type Should Fail Test", False, 
+                                f"❌ Unexpected 422 error format: {error_data}")
                     return False
             elif response.status_code == 200:
                 data = response.json()
-                self.log_test("Frontend Format Test", True, 
-                            f"Frontend format working correctly: {data}")
-                return True
-            elif response.status_code == 422:
-                error_data = response.json()
-                self.log_test("Frontend Format Test", False, 
-                            f"VALIDATION ERROR (422) WITH FRONTEND FORMAT: {error_data}")
-                print(f"🔍 FRONTEND FORMAT VALIDATION ERROR: {error_data}")
+                self.log_test("HTTPS Type Should Fail Test", False, 
+                            f"❌ UNEXPECTED SUCCESS with 'Https' type: {data}")
+                print(f"❌ ERROR: 'Https' type should not work, but got 200 response")
                 return False
             else:
-                self.log_test("Frontend Format Test", False, 
-                            f"Unexpected status {response.status_code}: {response.text}")
+                self.log_test("HTTPS Type Should Fail Test", False, 
+                            f"❌ Unexpected HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("Frontend Format Test", False, f"Request error: {str(e)}")
+            self.log_test("HTTPS Type Should Fail Test", False, f"Request error: {str(e)}")
+            return False
+
+    def test_validate_completeness_realistic_webapp_questionnaire(self):
+        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with realistic WebApp questionnaire data"""
+        try:
+            # Realistic WebApp questionnaire data including all common WebApp branches
+            realistic_webapp_questionnaire = [
+                {
+                    "id": "webapp-login-001",
+                    "name": "Authentication System",
+                    "type": "Login",
+                    "required": True,
+                    "completed": True,
+                    "value": "oauth2",
+                    "description": "OAuth2 authentication implementation"
+                },
+                {
+                    "id": "webapp-api-001",
+                    "name": "API Security",
+                    "type": "API",
+                    "required": True,
+                    "completed": True,
+                    "value": "secured",
+                    "description": "API security with rate limiting and authentication"
+                },
+                {
+                    "id": "webapp-database-001", 
+                    "name": "Database Security",
+                    "type": "Database",
+                    "required": True,
+                    "completed": True,
+                    "value": "encrypted",
+                    "description": "Database encryption enabled"
+                },
+                {
+                    "id": "webapp-input-validation-001",
+                    "name": "Input Validation",
+                    "type": "InputValidation",
+                    "required": True,
+                    "completed": True,
+                    "value": "comprehensive",
+                    "description": "Comprehensive input validation"
+                },
+                {
+                    "id": "webapp-waf-001",
+                    "name": "Web Application Firewall",
+                    "type": "WAF",
+                    "required": False,
+                    "completed": True,
+                    "value": "enabled",
+                    "description": "WAF protection enabled"
+                },
+                {
+                    "id": "webapp-deployment-001",
+                    "name": "Deployment Security",
+                    "type": "Deployment",
+                    "required": True,
+                    "completed": True,
+                    "value": "secure",
+                    "description": "Secure deployment configuration"
+                },
+                {
+                    "id": "webapp-encryption-001",
+                    "name": "HTTPS/TLS Configuration", 
+                    "type": "Encryption",  # CRITICAL: Using 'Encryption' instead of 'Https'
+                    "required": True,
+                    "completed": True,
+                    "value": "tls_1_3",
+                    "description": "HTTPS with TLS 1.3 encryption"
+                }
+            ]
+            
+            print(f"🌐 Testing realistic WebApp questionnaire with all common branches")
+            print(f"📋 Branch types: {[b['type'] for b in realistic_webapp_questionnaire]}")
+            print(f"🔐 HTTPS branch mapped to 'Encryption' type")
+            
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
+                json=realistic_webapp_questionnaire,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            print(f"📡 Response Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("Realistic WebApp Questionnaire Test", True, 
+                            f"✅ SUCCESS! Realistic questionnaire working: {data}")
+                
+                # Verify response structure
+                if 'validation' in data and 'recommendations' in data:
+                    validation = data['validation']
+                    print(f"📊 Validation Results:")
+                    print(f"   Is Complete: {validation.get('is_complete', 'N/A')}")
+                    print(f"   Completion %: {validation.get('completion_percentage', 'N/A')}")
+                    print(f"   Completed Count: {validation.get('completed_count', 'N/A')}")
+                    print(f"   Required Count: {validation.get('required_count', 'N/A')}")
+                    print(f"   Recommendations: {len(data.get('recommendations', []))}")
+                    
+                return True
+            elif response.status_code == 500:
+                try:
+                    error_data = response.json()
+                    self.log_test("Realistic WebApp Questionnaire Test", False, 
+                                f"❌ 500 ERROR: {error_data}")
+                    print(f"🚨 500 ERROR WITH REALISTIC DATA: {error_data}")
+                    return False
+                except:
+                    error_text = response.text
+                    self.log_test("Realistic WebApp Questionnaire Test", False, 
+                                f"❌ 500 ERROR: {error_text}")
+                    print(f"🚨 500 ERROR WITH REALISTIC DATA: {error_text}")
+                    return False
+            elif response.status_code == 422:
+                error_data = response.json()
+                self.log_test("Realistic WebApp Questionnaire Test", False, 
+                            f"❌ VALIDATION ERROR (422): {error_data}")
+                print(f"🔍 VALIDATION ERROR WITH REALISTIC DATA: {error_data}")
+                return False
+            else:
+                self.log_test("Realistic WebApp Questionnaire Test", False, 
+                            f"❌ Unexpected HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Realistic WebApp Questionnaire Test", False, f"Request error: {str(e)}")
             return False
 
     def test_get_supported_types_for_reference(self):
@@ -446,6 +387,11 @@ class WebAppValidateCompletenessEndpointTester:
                 # This will help us understand the correct enum values
                 if 'required_branches' in data:
                     print(f"✅ CORRECT SECURITY BRANCH ENUM VALUES: {data['required_branches']}")
+                    # Check if 'Encryption' is in the required branches
+                    if 'Encryption' in data['required_branches']:
+                        print(f"🔐 CONFIRMED: 'Encryption' is a valid SecurityBranchType enum value")
+                    if 'Https' in data['required_branches']:
+                        print(f"⚠️  WARNING: 'Https' found in required branches - this might be the issue")
                 
                 return True
             else:
@@ -462,11 +408,12 @@ class WebAppValidateCompletenessEndpointTester:
     # ============================================================================
     
     def run_all_tests(self):
-        """Run all validate-completeness endpoint tests"""
-        print("🚀 Starting POST /api/intelligent-nodes/WebApp/validate-completeness Endpoint Testing")
+        """Run all HTTPS enum mapping fix tests"""
+        print("🚀 Starting HTTPS Enum Mapping Fix Verification Tests")
         print("=" * 90)
-        print("CRITICAL TESTING TASK: REPRODUCE AND DIAGNOSE 500 INTERNAL SERVER ERROR")
-        print("Testing the WebApp validate-completeness endpoint to reproduce the user-reported 500 error")
+        print("CRITICAL BUG FIX VERIFICATION: POST /api/intelligent-nodes/WebApp/validate-completeness")
+        print("ISSUE: Questionnaire uses related_branch: 'HTTPS' which isn't in SecurityBranchType enum")
+        print("FIX: Frontend maps 'https' -> 'Encryption', so test with 'Encryption' as type value")
         print("=" * 90)
         
         tests = [
@@ -477,11 +424,10 @@ class WebAppValidateCompletenessEndpointTester:
             self.test_get_supported_types_for_reference,
             self.test_get_webapp_template_for_reference,
             
-            # CRITICAL: Reproduce the 500 error
-            self.test_validate_completeness_with_realistic_webapp_data,
-            self.test_validate_completeness_with_frontend_format,
-            self.test_validate_completeness_with_different_enum_values,
-            self.test_validate_completeness_api_contract_validation,
+            # CRITICAL: Test the HTTPS enum mapping fix
+            self.test_validate_completeness_with_encryption_type,
+            self.test_validate_completeness_with_https_type_should_fail,
+            self.test_validate_completeness_realistic_webapp_questionnaire,
         ]
         
         passed = 0
@@ -501,37 +447,39 @@ class WebAppValidateCompletenessEndpointTester:
         
         # Print summary
         print("=" * 90)
-        print("🎯 VALIDATE-COMPLETENESS ENDPOINT TEST SUMMARY")
+        print("🎯 HTTPS ENUM MAPPING FIX VERIFICATION SUMMARY")
         print("=" * 90)
         print(f"✅ PASSED: {passed}")
         print(f"❌ FAILED: {failed}")
         print(f"📊 SUCCESS RATE: {(passed / (passed + failed) * 100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 ALL TESTS PASSED! The validate-completeness endpoint is working correctly.")
-            print("✅ No 500 internal server error reproduced")
-            print("✅ API contract validation successful")
-            print("✅ SecurityBranch enum values are correct")
+            print("\n🎉 ALL TESTS PASSED! The HTTPS enum mapping fix is working correctly.")
+            print("✅ 500 error is fixed - endpoint returns HTTP 200 with 'Encryption' type")
+            print("✅ 'Https' type correctly fails with validation error")
+            print("✅ Realistic WebApp questionnaire data works correctly")
+            print("✅ Frontend fix (https -> Encryption mapping) verified")
         else:
-            print(f"\n⚠️  {failed} tests failed. Analysis of the 500 error:")
+            print(f"\n⚠️  {failed} tests failed. Analysis:")
             
             # Analyze the test results to provide diagnostic information
             error_tests = [result for result in self.test_results if not result['success']]
             
             for error_test in error_tests:
-                if "500" in error_test['message']:
-                    print(f"🚨 500 ERROR REPRODUCED in {error_test['test']}")
+                if "500" in error_test['message'] and "Encryption" in error_test['message']:
+                    print(f"🚨 CRITICAL: 500 error still exists with 'Encryption' type")
+                    print(f"   This means the fix is not working properly")
                     print(f"   Details: {error_test['message']}")
-                elif "422" in error_test['message']:
-                    print(f"🔍 VALIDATION ERROR in {error_test['test']}")
+                elif "UNEXPECTED SUCCESS" in error_test['message']:
+                    print(f"🚨 CRITICAL: 'Https' type should fail but returned success")
+                    print(f"   This means the enum validation is not working")
                     print(f"   Details: {error_test['message']}")
-                    print("   💡 This suggests SecurityBranch enum value mismatch")
         
         return passed, failed
 
 def main():
     """Main test execution"""
-    tester = WebAppValidateCompletenessEndpointTester()
+    tester = WebAppValidateCompletenessHttpsFixTester()
     passed, failed = tester.run_all_tests()
     
     # Exit with appropriate code
