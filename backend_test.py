@@ -323,10 +323,11 @@ class WebAppDependencyQuestionsTester:
                 
                 # Verify the dependency questions exist and can trigger child questionnaires
                 prompts = data.get("prompts", [])
+                dependency_question_ids = ["webapp_api_endpoints", "webapp_database_connection"]
                 dependency_questions = []
                 
                 for prompt in prompts:
-                    if prompt.get("id") in expected_mappings.keys():
+                    if prompt.get("id") in dependency_question_ids:
                         dependency_questions.append(prompt)
                 
                 if len(dependency_questions) != 2:
