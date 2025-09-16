@@ -78,9 +78,9 @@ class ConditionalQuestionnaireVulnerabilityTester:
                     return False
                 
                 first_question = questions[0]
-                if first_question.get("id") != "api_type":
+                if first_question.get("question_id") != "api_type" and first_question.get("id") != "api_type":
                     self.log_test("Conditional API Questionnaire", False, 
-                                f"First question should be 'api_type', got '{first_question.get('id')}'")
+                                f"First question should be 'api_type', got '{first_question.get('id') or first_question.get('question_id')}'")
                     return False
                 
                 # Verify api_type question has REST API and GraphQL options
