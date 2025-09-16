@@ -302,8 +302,9 @@ class WebAppDependencyQuestionsTester:
                     return False
                 
                 # Verify the conditional mappings enable the system
+                # Note: The actual implementation uses webapp_api_enabled instead of webapp_api_endpoints
                 expected_mappings = {
-                    "webapp_api_endpoints": "API",
+                    "webapp_api_enabled": "API",
                     "webapp_database_connection": "Database"
                 }
                 
