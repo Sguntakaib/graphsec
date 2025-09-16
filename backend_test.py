@@ -406,14 +406,14 @@ class ConditionalQuestionnaireVulnerabilityTester:
             }
             
             response = self.session.post(
-                f"{self.base_url}/vulnerabilities/analyze/test_node/enhanced",
+                f"{self.base_url}/vulnerabilities/analyze/test_node_cors/enhanced",
                 json=request_data,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                vulnerabilities = data.get("vulnerabilities", [])
+                vulnerabilities = data.get("vulnerability_nodes", [])
                 
                 # Should detect CORS Misconfiguration with Medium severity
                 if len(vulnerabilities) == 0:
