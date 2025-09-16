@@ -347,14 +347,14 @@ class ConditionalQuestionnaireVulnerabilityTester:
                 data = response.json()
                 
                 # Verify response structure
-                expected_fields = ["vulnerabilities", "trigger_context", "missing_controls", "user_selections"]
+                expected_fields = ["vulnerability_nodes", "conditional_analysis", "analysis_type"]
                 missing_fields = [f for f in expected_fields if f not in data]
                 
                 if missing_fields:
                     self.log_test("Input Validation Vulnerability", False, f"Missing response fields: {missing_fields}")
                     return False
                 
-                vulnerabilities = data.get("vulnerabilities", [])
+                vulnerabilities = data.get("vulnerability_nodes", [])
                 
                 # Should detect SQL Injection vulnerability with Critical severity
                 if len(vulnerabilities) == 0:
