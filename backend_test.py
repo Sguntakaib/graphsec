@@ -698,18 +698,21 @@ class EnhancedVulnerabilityTester:
                         "node_id": str(uuid.uuid4()),
                         "node_type": "API",
                         "questionnaire_responses": {
-                            "authentication_method": "none",
-                            "authorization_level": "weak",
-                            "input_validation": "minimal"
+                            "api_authentication_method": "No Authentication",
+                            "api_authorization_model": "No authorization",
+                            "api_rate_limiting": "No rate limiting",
+                            "api_input_validation": "No validation",
+                            "api_encryption": "No encryption"
                         }
                     },
                     {
                         "node_id": str(uuid.uuid4()),
                         "node_type": "Database",
                         "questionnaire_responses": {
-                            "encryption_enabled": False,
-                            "access_control": "basic",
-                            "backup_security": "poor"
+                            "db_encryption_at_rest": "No encryption",
+                            "db_access_control": "Basic authentication",
+                            "db_backup_security": "Unencrypted backups",
+                            "db_audit_logging": "No logging"
                         }
                     }
                 ]
