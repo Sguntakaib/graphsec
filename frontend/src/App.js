@@ -1721,10 +1721,43 @@ function AppContent() {
       return;
     }
 
+    // Check completeness for all nodes before analysis
     setIsLoading(true);
+    const incompleteNodes = [];
+    const completeNodes = [];
     
     try {
       for (const node of securityNodes) {
+        const isComplete = await checkQuestionnaireCompleteness(node.id, node.data.subtype);
+        if (isComplete) {
+          completeNodes.push(node);
+        } else {
+          incompleteNodes.push(node);
+        }
+      }
+      
+      let message = '';
+      
+      if (incompleteNodes.length > 0) {
+        const incompleteNames = incompleteNodes.map(n => `${n.data.subtype} (${n.data.label || n.id})`).join(', ');
+        message += `⚠️ ${incompleteNodes.length} nodes have incomplete questionnaires:\n• ${incompleteNames}\n\nPlease complete all security questions before vulnerability analysis.\n\n`;
+      }
+      
+      if (completeNodes.length === 0) {
+        alert(message + 'No nodes are ready for vulnerability analysis. Complete questionnaires first.');
+        return;
+      }
+      
+      // Ask user whether to proceed with only complete nodes
+      if (incompleteNodes.length > 0) {
+        const proceed = confirm(message + `Proceed with vulnerability analysis for ${completeNodes.length} complete nodes only?`);
+        if (!proceed) {
+          return;
+        }
+      }
+      
+      // Analyze only complete nodes
+      for (const node of completeNodes) {
         await analyzeNodeVulnerabilitiesHandler(
           node.id,
           node.data.subtype,
@@ -1733,7 +1766,11 @@ function AppContent() {
         );
       }
       
-      alert(`Vulnerability analysis completed for ${securityNodes.length} nodes.`);
+      let resultMessage = `✅ Vulnerability analysis completed for ${completeNodes.length} nodes.`;
+      if (incompleteNodes.length > 0) {
+        resultMessage += `\n\n⚠️ ${incompleteNodes.length} nodes skipped due to incomplete questionnaires.`;
+      }
+      alert(resultMessage);
       
     } catch (error) {
       console.error('Error in bulk vulnerability analysis:', error);
