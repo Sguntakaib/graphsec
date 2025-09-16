@@ -240,9 +240,9 @@ class ConditionalQuestionnaireVulnerabilityTester:
                     return False
                 
                 first_question = questions[0]
-                if first_question.get("question_id") != "database_type":
+                if first_question.get("id") != "database_type":
                     self.log_test("Conditional Database Questionnaire", False, 
-                                f"First question should be 'database_type', got '{first_question.get('question_id')}'")
+                                f"First question should be 'database_type', got '{first_question.get('id')}'")
                     return False
                 
                 # Verify database_type question has MongoDB option
