@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Enhanced Vulnerability Detection System - Comprehensive Backend API Tests
-Tests all new vulnerability detection features including OWASP API Security Top 10 2023,
-Enhanced Database Security, ProductDesignSecurity node type, and STRIDE questionnaires.
+Conditional Questionnaire and Enhanced Vulnerability Detection System Tests
+Tests the enhanced conditional questionnaire system and vulnerability detection with specific scenarios
+as requested in the review request.
 """
 
 import requests
@@ -14,7 +14,7 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://api-threat-detect.preview.emergentagent.com/api"
 
-class EnhancedVulnerabilityTester:
+class ConditionalQuestionnaireVulnerabilityTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
