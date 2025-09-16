@@ -4718,9 +4718,88 @@ async def analyze_backup_security(request: EnhancedVulnerabilityRequest):
         logger.error(f"Error in backup security analysis: {e}")
         raise HTTPException(status_code=500, detail=f"Backup security analysis failed: {str(e)}")
 
+# ENHANCED VULNERABILITY ANALYSIS WITH CONDITIONAL LOGIC
+@api_router.post("/vulnerabilities/analyze/{node_id}/enhanced")
+async def analyze_node_vulnerabilities_enhanced(node_id: str, request: VulnerabilityAnalysisRequest):
+    """Enhanced vulnerability analysis with conditional API/DB type logic and combined threat detection"""
+    try:
+        logger.info(f"Enhanced analyzing vulnerabilities for node {node_id} of type {request.node_type}")
+        
+        # Use enhanced vulnerability engine with conditional rules
+        from vulnerability_engine import VulnerabilityEngine
+        
+        vulnerability_engine = VulnerabilityEngine()
+        
+        # Analyze with enhanced rules
+        result = vulnerability_engine.analyze_node_vulnerabilities(
+            node_id=request.node_id,
+            node_type=request.node_type,
+            questionnaire_responses=request.questionnaire_responses,
+            node_position=request.node_position
+        )
+        
+        # Add conditional analysis information
+        conditional_info = {
+            "has_api_type_conditions": "api_type" in request.questionnaire_responses,
+            "has_database_type_conditions": "database_type" in request.questionnaire_responses,
+            "detected_api_type": request.questionnaire_responses.get("api_type"),
+            "detected_database_type": request.questionnaire_responses.get("database_type"),
+            "combined_vulnerabilities_detected": len([v for v in result.vulnerability_nodes if v.triggered_by_rule.startswith("critical_")]),
+            "input_validation_vulnerabilities": len([v for v in result.vulnerability_nodes if "injection" in v.name.lower() or "xss" in v.name.lower()]),
+            "cors_vulnerabilities": len([v for v in result.vulnerability_nodes if "cors" in v.name.lower()]),
+            "waf_related_vulnerabilities": len([v for v in result.vulnerability_nodes if "ddos" in v.name.lower() or "dos" in v.name.lower()])
+        }
+        
+        # Convert to enhanced response format
+        return {
+            "node_id": result.node_id,
+            "node_type": result.node_type,
+            "total_vulnerabilities": result.total_vulnerabilities,
+            "vulnerabilities_by_severity": {k.value: v for k, v in result.vulnerabilities_by_severity.items()},
+            "vulnerability_nodes": [
+                {
+                    "id": vuln.id,
+                    "name": vuln.name,
+                    "description": vuln.description,
+                    "severity": vuln.severity.value,
+                    "category": vuln.category.value,
+                    "owasp_category": vuln.owasp_category,
+                    "mitre_techniques": vuln.mitre_techniques,
+                    "cve_references": vuln.cve_references,
+                    "parent_node_id": vuln.parent_node_id,
+                    "remediation_steps": vuln.remediation_steps,
+                    "risk_score": vuln.risk_score,
+                    "position": vuln.position,
+                    "color": vuln.color,
+                    "icon": vuln.icon,
+                    "connection_style": vuln.connection_style,
+                    "created_at": vuln.created_at.isoformat(),
+                    # Educational context fields
+                    "trigger_context": vuln.trigger_context,
+                    "triggered_by_rule": vuln.triggered_by_rule,
+                    "missing_controls": vuln.missing_controls,
+                    "user_selections": vuln.user_selections,
+                    # Enhanced fields
+                    "is_conditional_vulnerability": vuln.triggered_by_rule.startswith(("api_", "database_", "graphql_", "mongodb_")),
+                    "is_combined_vulnerability": vuln.triggered_by_rule.startswith("critical_"),
+                    "priority_level": getattr(vuln, 'priority', 3)
+                }
+                for vuln in result.vulnerability_nodes
+            ],
+            "overall_risk_score": result.overall_risk_score,
+            "recommendations": result.recommendations,
+            "analysis_timestamp": result.analysis_timestamp.isoformat(),
+            "conditional_analysis": conditional_info,
+            "analysis_type": "enhanced_conditional"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in enhanced vulnerability analysis for node {node_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Enhanced vulnerability analysis failed: {str(e)}")
+
 @api_router.post("/vulnerabilities/analyze/{node_id}")
 async def analyze_node_vulnerabilities(node_id: str, request: VulnerabilityAnalysisRequest):
-    """Analyze security vulnerabilities for a specific node based on questionnaire responses"""
+    """Analyze security vulnerabilities for a specific node based on questionnaire responses (Legacy endpoint)"""
     try:
         logger.info(f"Analyzing vulnerabilities for node {node_id} of type {request.node_type}")
         
