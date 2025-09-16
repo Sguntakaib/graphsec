@@ -5703,56 +5703,7 @@ async def analyze_backup_security(request: EnhancedVulnerabilityRequest):
         logger.error(f"Error in backup security analysis: {e}")
         raise HTTPException(status_code=500, detail=f"Backup security analysis failed: {str(e)}")
 
-# =============================================================================
-# PRODUCT DESIGN SECURITY ENDPOINT (STRIDE-based)
-# =============================================================================
-
-@api_router.get("/questionnaires/ProductDesignSecurity")
-async def get_product_design_security_questionnaire():
-    """Get STRIDE-based questionnaire for ProductDesignSecurity nodes"""
-    try:
-        # Load questionnaire from YAML file
-        import yaml
-        questionnaire_path = Path(__file__).parent / "questionnaires" / "product_design_security.yaml"
-        
-        if not questionnaire_path.exists():
-            raise HTTPException(status_code=404, detail="ProductDesignSecurity questionnaire not found")
-        
-        with open(questionnaire_path, 'r', encoding='utf-8') as file:
-            questionnaire_data = yaml.safe_load(file)
-        
-        # Extract basic questionnaire (STRIDE-based)
-        basic_questions = questionnaire_data.get("questionnaires", {}).get("basic", [])
-        
-        # Format questions for API response
-        formatted_questions = []
-        for question in basic_questions:
-            formatted_questions.append({
-                "id": question["id"],
-                "question": question["question"],
-                "type": question["type"],
-                "options": question.get("options", []),
-                "help_text": question.get("help_text", ""),
-                "related_branch": question.get("related_branch", ""),
-                "stride_category": question.get("stride_category", "")
-            })
-        
-        return {
-            "node_subtype": "ProductDesignSecurity",
-            "node_type": questionnaire_data.get("node_type", "Design"),
-            "category": questionnaire_data.get("category", "Security Architecture"),
-            "description": questionnaire_data.get("description", ""),
-            "questionnaire_type": "STRIDE-based Threat Modeling",
-            "security_branches": questionnaire_data.get("required_branches", []),
-            "prompts": formatted_questions,
-            "stride_categories": ["Spoofing", "Tampering", "Repudiation", "Information Disclosure", "Denial of Service", "Elevation of Privilege"],
-            "threat_intelligence": questionnaire_data.get("threat_intelligence", {}),
-            "dependencies": questionnaire_data.get("dependencies", {})
-        }
-        
-    except Exception as e:
-        logger.error(f"Error loading ProductDesignSecurity questionnaire: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to load questionnaire: {str(e)}")
+# Duplicate ProductDesignSecurity route removed - now positioned before generic route
 
 # Include the router in the main app
 app.include_router(api_router)
