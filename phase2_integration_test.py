@@ -12,7 +12,7 @@ import sys
 import math
 
 # Use the production URL from review request
-BASE_URL = "https://apiscan-fix.preview.emergentagent.com/api"
+BASE_URL = "https://dbvuln-scanner.preview.emergentagent.com/api"
 
 class Phase2IntegrationTester:
     def __init__(self):
