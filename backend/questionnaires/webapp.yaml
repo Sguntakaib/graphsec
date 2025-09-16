@@ -62,6 +62,18 @@ questionnaires:
       options: ["Comprehensive security headers", "Basic headers", "Minimal headers", "No security headers", "Unknown"]
       help_text: "Security headers provide protection against common web vulnerabilities."
       related_branch: "CSP"
+    - id: "webapp_api_endpoints"
+      question: "Does this web application expose API endpoints?"
+      type: "boolean"
+      help_text: "APIs can be attack vectors if not properly secured with authentication and input validation."
+      related_branch: "API"
+      conditional_trigger: "API"
+    - id: "webapp_database_connection"
+      question: "Does this application connect to a database?"
+      type: "boolean"
+      help_text: "Database connections require input validation to prevent SQL injection attacks."
+      related_branch: "Database"
+      conditional_trigger: "Database"
 
   advanced:
     - id: "webapp_authorization_model"
