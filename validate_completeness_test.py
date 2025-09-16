@@ -180,7 +180,7 @@ class ValidateCompletenessEndpointTester:
                 {
                     "id": "login-branch",
                     "name": "Login Security", 
-                    "type": "LOGIN",
+                    "type": "Login",
                     "required": True,
                     "completed": False,  # Not completed
                     "value": None,
@@ -189,7 +189,7 @@ class ValidateCompletenessEndpointTester:
                 {
                     "id": "encryption-branch",
                     "name": "Data Encryption",
-                    "type": "ENCRYPTION", 
+                    "type": "Encryption", 
                     "required": True,
                     "completed": True,
                     "value": "enabled",
@@ -198,7 +198,7 @@ class ValidateCompletenessEndpointTester:
                 {
                     "id": "validation-branch",
                     "name": "Input Validation",
-                    "type": "INPUT_VALIDATION",
+                    "type": "InputValidation",
                     "required": True,
                     "completed": False,  # Not completed
                     "value": None,
