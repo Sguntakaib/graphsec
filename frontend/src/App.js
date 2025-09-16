@@ -1255,6 +1255,48 @@ function AppContent() {
     }
   };
 
+  // Questionnaire Completeness Check
+  const checkQuestionnaireCompleteness = async (nodeId, nodeSubtype) => {
+    try {
+      if (nodeSubtype === 'WebApp') {
+        // For comprehensive WebApp questionnaire, check against the full set
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`);
+        if (response.ok) {
+          const data = await response.json();
+          const totalQuestions = data.total_questions;
+          
+          // Get current node answers
+          const node = nodes.find(n => n.id === nodeId);
+          const currentAnswers = node?.data?.questionnaireResponses || {};
+          const answeredCount = Object.keys(currentAnswers).filter(key => currentAnswers[key] !== null && currentAnswers[key] !== undefined).length;
+          
+          console.log(`🎯 WebApp questionnaire completeness: ${answeredCount}/${totalQuestions} questions answered`);
+          return answeredCount >= totalQuestions;
+        }
+      } else {
+        // For other node types, use existing intelligent-nodes system
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
+        if (response.ok) {
+          const data = await response.json();
+          const totalQuestions = data.prompts?.length || 0;
+          
+          // Get current node answers
+          const node = nodes.find(n => n.id === nodeId);
+          const currentAnswers = node?.data?.questionnaireResponses || {};
+          const answeredCount = Object.keys(currentAnswers).filter(key => currentAnswers[key] !== null && currentAnswers[key] !== undefined).length;
+          
+          console.log(`🎯 ${nodeSubtype} questionnaire completeness: ${answeredCount}/${totalQuestions} questions answered`);
+          return answeredCount >= totalQuestions;
+        }
+      }
+      
+      return false; // Default to incomplete if unable to check
+    } catch (error) {
+      console.error('Error checking questionnaire completeness:', error);
+      return false;
+    }
+  };
+
   // Security Questionnaire Handlers
   const handleSecurityQuestionnaireComplete = async (result) => {
     try {
