@@ -449,6 +449,7 @@ class ConditionalQuestionnaireVulnerabilityTester:
         """Test combined critical data exposure vulnerability detection"""
         try:
             request_data = {
+                "node_id": "test_node_database",
                 "node_type": "Database",
                 "questionnaire_responses": {
                     "data_classification": "Confidential",
