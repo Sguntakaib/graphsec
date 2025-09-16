@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - WebApp Questionnaire Dependency Questions Verification
-Tests the WebApp questionnaire endpoint to verify dependency questions are now included.
-Focus: Verify that WebApp questionnaire now includes "Do you use API?" and "Do you use Database?" dependency questions.
+Backend API Testing - CRITICAL: POST /api/intelligent-nodes/WebApp/validate-completeness Endpoint Testing
+Tests the WebApp validate-completeness endpoint to reproduce and diagnose the 500 internal server error.
+Focus: Reproduce the 500 error, check exact error message, validate API contract, and verify SecurityBranch enum values.
 """
 
 import requests
