@@ -101,16 +101,84 @@ const SecurityQuestionnaire = ({
     }
   };
 
+  // Map questionnaire prompt types to correct SecurityBranch enum values
+  const mapPromptTypeToSecurityBranch = (promptId, relatedBranch) => {
+    // Common mappings based on prompt IDs and related branches
+    const mappings = {
+      // Authentication related
+      'authentication_method': 'Login',
+      'auth_method': 'Login',
+      'login': 'Login',
+      'authentication': 'Login',
+      
+      // Database related
+      'database_connection': 'Database',
+      'database': 'Database',
+      'db_connection': 'Database',
+      
+      // API related
+      'api_endpoints': 'API',
+      'api': 'API',
+      'rest_api': 'API',
+      
+      // Input validation
+      'input_validation': 'InputValidation',
+      'validation': 'InputValidation',
+      
+      // WAF
+      'waf': 'WAF',
+      'firewall': 'WAF',
+      'web_firewall': 'WAF',
+      
+      // Deployment
+      'deployment': 'Deployment',
+      'deploy': 'Deployment',
+      'deployment_security': 'Deployment',
+      
+      // Default fallbacks based on related_branch
+      'encryption': 'Encryption',
+      'access_control': 'AccessControl',
+      'monitoring': 'Monitoring',
+      'logging': 'Logging'
+    };
+
+    // First try direct prompt ID mapping
+    if (mappings[promptId]) {
+      return mappings[promptId];
+    }
+
+    // Then try related_branch mapping
+    if (relatedBranch && mappings[relatedBranch.toLowerCase()]) {
+      return mappings[relatedBranch.toLowerCase()];
+    }
+
+    // Try to extract from prompt ID patterns
+    if (promptId.includes('auth') || promptId.includes('login')) return 'Login';
+    if (promptId.includes('database') || promptId.includes('db')) return 'Database';
+    if (promptId.includes('api')) return 'API';
+    if (promptId.includes('validation') || promptId.includes('input')) return 'InputValidation';
+    if (promptId.includes('waf') || promptId.includes('firewall')) return 'WAF';
+    if (promptId.includes('deploy')) return 'Deployment';
+
+    // Default fallback - use related_branch as PascalCase if available
+    if (relatedBranch) {
+      return relatedBranch.charAt(0).toUpperCase() + relatedBranch.slice(1).toLowerCase();
+    }
+
+    // Final fallback
+    return 'Login';
+  };
+
   const validateAnswers = async () => {
     try {
       const branches = prompts.map(prompt => ({
         id: prompt.id,
-        name: prompt.related_branch,
-        type: prompt.related_branch,
+        name: prompt.related_branch || prompt.id,
+        type: mapPromptTypeToSecurityBranch(prompt.id, prompt.related_branch),
         required: true,
         completed: answers[prompt.id] !== undefined && answers[prompt.id] !== null,
         value: answers[prompt.id],
-        description: prompt.help_text
+        description: prompt.help_text || prompt.question
       }));
 
       const response = await fetch(
