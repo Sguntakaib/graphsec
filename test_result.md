@@ -724,6 +724,18 @@ test_plan:
         agent: "testing"
         comment: "✅ SMART POSITIONING ALGORITHM WORKING: Orbital positioning around parent nodes implemented, vulnerability nodes include position data with proper x/y coordinates. Bulk analysis successfully processes multiple nodes (26 total vulnerabilities across 3 nodes) with appropriate positioning calculations."
 
+  - task: "ProductDesignSecurity Routing Fix"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PRODUCTDESIGNSECURITY ROUTING FIX VERIFIED: All 3 critical routing tests passed (100% success rate). STRIDE Questionnaire Endpoint (GET /api/questionnaires/ProductDesignSecurity) correctly returns STRIDE-based questionnaire with questionnaire_type='STRIDE-based Threat Modeling', stride_categories array, and 12 prompts from product_design_security.yaml. Bulk Vulnerability Analysis (POST /api/vulnerabilities/bulk-analyze) successfully processes ProductDesignSecurity nodes with proper response format. Route Ordering Fix confirmed - specific ProductDesignSecurity route prioritized over generic route. Backend dependencies resolved (attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed). The routing fix is fully operational and production-ready."
+
 frontend:
   - task: "Phase 2 VulnerabilityNode Component"
     implemented: true
