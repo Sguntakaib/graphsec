@@ -3770,6 +3770,38 @@ async def get_conditional_questionnaire(node_subtype: str, level: str = "basic",
         logger.error(f"Error getting conditional questionnaire: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/questionnaires/{node_subtype}/conditional-trigger")
+async def get_conditional_questions_for_response(node_subtype: str, request: dict):
+    """Get conditional questions triggered by a specific response"""
+    try:
+        from conditional_questionnaire_engine import get_conditional_questionnaire_engine
+        
+        question_id = request.get("question_id")
+        response_value = request.get("response")
+        
+        if not question_id or not response_value:
+            raise HTTPException(status_code=400, detail="question_id and response are required")
+        
+        conditional_engine = get_conditional_questionnaire_engine()
+        
+        # Get conditional questions for this specific response
+        conditional_questions = conditional_engine.get_next_conditional_questions(
+            node_subtype, question_id, response_value
+        )
+        
+        return {
+            "success": True,
+            "node_subtype": node_subtype,
+            "trigger_question": question_id,
+            "trigger_response": response_value,
+            "conditional_questions": conditional_questions,
+            "question_count": len(conditional_questions)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting conditional questions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/questionnaires/{node_subtype}")
 async def get_phase2_questionnaire(node_subtype: str, level: str = "basic"):
     """Get Phase 2 file-based questionnaire for specific node type and level (Legacy endpoint)"""
