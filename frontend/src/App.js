@@ -2155,7 +2155,7 @@ function AppContent() {
               onClick={analyzeAllNodeVulnerabilities}
               disabled={isLoading || nodes.filter(n => n.data?.questionnaireResponses).length === 0}
               className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-              title="Analyze Vulnerabilities - Auto-generate vulnerability nodes based on OWASP Top 10"
+              title="Analyze Vulnerabilities - Requires COMPLETE questionnaires for all security questions (headers, logging, authentication, etc.)"
             >
               <AlertTriangle className="h-4 w-4" />
               <span>Vulnerabilities</span>
