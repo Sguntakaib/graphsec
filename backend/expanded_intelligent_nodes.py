@@ -111,6 +111,7 @@ class ThreatLevel(str, Enum):
 class NodeCategory(str, Enum):
     CLOUD_INFRASTRUCTURE = "Cloud Infrastructure"
     SECURITY_SERVICES = "Security Services"
+    SECURITY_CONTROL = "Security Control"
     NETWORK_COMPONENTS = "Network Components"
     CONTAINER_DEVOPS = "Container & DevOps"
     DATA_STORAGE = "Data & Storage"
