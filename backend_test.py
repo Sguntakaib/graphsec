@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - CRITICAL: POST /api/intelligent-nodes/WebApp/validate-completeness Endpoint Testing
-Tests the WebApp validate-completeness endpoint to reproduce and diagnose the 500 internal server error.
-Focus: Reproduce the 500 error, check exact error message, validate API contract, and verify SecurityBranch enum values.
+Backend API Testing - CRITICAL BUG FIX VERIFICATION: POST /api/intelligent-nodes/WebApp/validate-completeness Endpoint Testing
+Tests the WebApp validate-completeness endpoint after fixing the 'Https' enum mapping issue.
+ISSUE: The questionnaire uses related_branch: "HTTPS" which isn't in SecurityBranchType enum, needs to be mapped to 'Encryption'.
+Focus: Test with 'HTTPS' mapped to 'Encryption', verify 500 error is fixed, test realistic WebApp questionnaire data.
 """
 
 import requests
