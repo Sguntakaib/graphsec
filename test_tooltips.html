@@ -24,21 +24,40 @@
         const { useState } = React;
         const { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } = RadixTooltip;
 
-        // Mock questionnaire data with option descriptions
-        const mockPrompt = {
-            id: "webapp_session_management",
-            question: "How are user sessions managed?",
-            type: "single_choice",
-            options: ["Secure session management", "Standard sessions", "Basic sessions", "No session management", "Unknown"],
-            option_descriptions: {
-                "Secure session management": "Implements HTTPS-only cookies, secure session IDs, session rotation, timeout controls, and protection against session hijacking and fixation attacks.",
-                "Standard sessions": "Basic session handling with standard security practices like secure cookies and reasonable timeouts, but may lack advanced protections.",
-                "Basic sessions": "Simple session implementation with minimal security features - vulnerable to common session-based attacks.",
-                "No session management": "Application does not maintain user sessions, requiring re-authentication for each request or operating statelessly.",
-                "Unknown": "Session management implementation is unclear or not documented."
-            },
-            help_text: "Secure session management prevents session hijacking and fixation attacks."
-        };
+        // Live questionnaire data from actual API
+        const [questionnaire, setQuestionnaire] = useState(null);
+        
+        // Load real questionnaire data from API
+        useEffect(() => {
+            const loadQuestionnaire = async () => {
+                try {
+                    const response = await fetch('http://localhost:8001/api/questionnaires/WebApp?level=basic');
+                    const data = await response.json();
+                    if (data.prompts && data.prompts.length > 0) {
+                        setQuestionnaire(data.prompts[0]); // Use first question as example
+                    }
+                } catch (error) {
+                    console.error('Failed to load questionnaire:', error);
+                    // Fallback to mock data
+                    setQuestionnaire({
+                        id: "webapp_session_management",
+                        question: "How are user sessions managed?",
+                        type: "single_choice",
+                        options: ["Secure session management", "Standard sessions", "Basic sessions", "No session management", "Unknown"],
+                        option_descriptions: {
+                            "Secure session management": "Implements HTTPS-only cookies, secure session IDs, session rotation, timeout controls, and protection against session hijacking and fixation attacks.",
+                            "Standard sessions": "Basic session handling with standard security practices like secure cookies and reasonable timeouts, but may lack advanced protections.",
+                            "Basic sessions": "Simple session implementation with minimal security features - vulnerable to common session-based attacks.",
+                            "No session management": "Application does not maintain user sessions, requiring re-authentication for each request or operating statelessly.",
+                            "Unknown": "Session management implementation is unclear or not documented."
+                        },
+                        help_text: "Secure session management prevents session hijacking and fixation attacks."
+                    });
+                }
+            };
+            
+            loadQuestionnaire();
+        }, []);
 
         const QuestionnaireDemo = () => {
             const [selectedValue, setSelectedValue] = useState("");
