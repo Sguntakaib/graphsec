@@ -558,44 +558,8 @@ function AppContent() {
             return;
           }
           
-          // Try enhanced system first
-          try {
-            const node = nodes.find(n => n.id === nodeId);
-            if (node) {
-              console.log('🚀 Starting questionnaire flow...');
-              questionnaireActions.startQuestionnaireFlow(node, 1);
-              
-              // Check if QuestionnaireManager is available - ENABLED for dependent questionnaire support
-              if (window.questionnaireManager) {
-                console.log('📋 QuestionnaireManager available, starting questionnaire...');
-                const result = await window.questionnaireManager.startQuestionnaireForNode(
-                  nodeId, 
-                  nodeSubtype, 
-                  parentNodeId, 
-                  {}
-                );
-                console.log('✅ Enhanced questionnaire started:', result);
-                
-                // Only use fallback if the enhanced system actually failed
-                if (result && result.success) {
-                  // Make sure old system doesn't activate
-                  setShowSecurityQuestionnaire(false);
-                  setCurrentQuestionnaireNode(null);
-                  console.log('🎯 Enhanced system succeeded, skipping fallback');
-                  return; // Success - exit early
-                } else {
-                  console.warn('⚠️ Enhanced system returned failure, using fallback');
-                }
-              } else {
-                console.warn('⚠️ QuestionnaireManager not available, using fallback');
-              }
-            }
-          } catch (enhancedError) {
-            console.error('❌ Enhanced questionnaire failed:', enhancedError);
-          }
-          
-          // Fallback to old system
-          console.log('🔄 Falling back to old questionnaire system');
+          // Use legacy questionnaire system only
+          console.log('🎯 Using legacy questionnaire system');
           console.log('🎯 Setting currentQuestionnaireNode to:', { id: nodeId, subtype: nodeSubtype });
           console.log('🎯 Current showSecurityQuestionnaire state:', showSecurityQuestionnaire);
           
