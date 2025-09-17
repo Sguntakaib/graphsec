@@ -31,6 +31,12 @@ questionnaires:
       question: "How is input validation implemented?"
       type: "single_choice"
       options: ["Comprehensive server-side validation", "Basic validation", "Client-side only", "No validation", "Unknown"]
+      option_descriptions:
+        "Comprehensive server-side validation": "Robust validation on the server including type checking, length limits, format validation, sanitization, and protection against injection attacks."
+        "Basic validation": "Simple server-side checks for required fields and basic format validation, but may miss advanced attack vectors."
+        "Client-side only": "Validation performed only in the browser - easily bypassed by attackers and offers no real security protection."
+        "No validation": "No input validation is performed, making the application highly vulnerable to injection attacks and data corruption."
+        "Unknown": "Input validation approach is unclear or not documented."
       help_text: "Proper input validation prevents injection attacks and data corruption."
       related_branch: "InputValidation"
     - id: "webapp_https_enforcement"
