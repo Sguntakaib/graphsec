@@ -113,6 +113,12 @@ questionnaires:
       question: "What database logging is configured?"
       type: "single_choice"
       options: ["Comprehensive audit logging", "Basic query logging", "Connection logging only", "No logging", "Unknown"]
+      option_descriptions:
+        "Comprehensive audit logging": "Complete audit trail including all data access, schema changes, privilege modifications, and failed access attempts for forensics and compliance."
+        "Basic query logging": "Logging of database queries and major operations, but may miss detailed security events or administrative actions."
+        "Connection logging only": "Logs only database connections and disconnections - insufficient for security monitoring or forensic analysis."
+        "No logging": "No database activity logging - impossible to detect unauthorized access or conduct forensic investigations."
+        "Unknown": "Database logging configuration is unclear or not documented."
       help_text: "Database logging enables security monitoring and compliance."
       related_branch: "AuditLogging"
 
