@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - COMPREHENSIVE 500 ERROR FIX VERIFICATION: POST /api/intelligent-nodes/WebApp/validate-completeness Endpoint Testing
-Tests the WebApp validate-completeness endpoint after comprehensive fix for 500 Internal Server Error.
+Backend API Testing - QUESTIONNAIRE FLOW CLEANUP VERIFICATION
+Tests backend API endpoints after questionnaire flow cleanup to ensure they are still working correctly.
 
-CRITICAL FIXES IMPLEMENTED:
-1. Missing backend dependencies (propcache) - FIXED
-2. Invalid enum values in questionnaire YAML files (50+ values not in SecurityBranchType enum) - FIXED  
-3. Specific HTTPS->Encryption mapping issue - FIXED
-4. Added 42 missing enum values to SecurityBranchType including:
-   - ErrorHandling, ApiSecurity, Compliance, IncidentResponse, SecretsManagement, ContainerSecurity, etc.
+TESTING FOCUS:
+1. Core questionnaire endpoints that the simplified legacy system relies on:
+   - GET /api/questionnaires/WebApp - WebApp questionnaire prompts
+   - GET /api/intelligent-nodes/{node_subtype}/prompts - Other node types
+   - POST /api/intelligent-nodes/{node_subtype}/check-dependencies - Dependency checking for conditional questionnaires
 
-TESTING SCOPE:
-- Test validate-completeness endpoint with various enum values that were previously causing 500 errors
-- Verify common questionnaire enum values now work: ErrorHandling, ApiSecurity, Compliance, etc.
-- Test complete WebApp questionnaire flow to ensure no more 500 errors
-- Confirm original user-reported issue is completely resolved
+2. Critical API endpoints that support the simplified flow:
+   - GET /api/diagrams - Diagram management
+   - POST /api/diagrams - Create diagram
+   - Health check endpoint
+
+3. Test priority: Focus on endpoints that the legacy SecurityQuestionnaire system uses,
+   since we disabled the enhanced QuestionnaireManager system
+
+CONTEXT: We just completed a major cleanup of the questionnaire flow system by disabling 
+the enhanced QuestionnaireManager and streamlining to use only the legacy SecurityQuestionnaire system.
 """
 
 import requests
