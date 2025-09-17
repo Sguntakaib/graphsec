@@ -192,13 +192,13 @@ class QuestionnaireFlowCleanupTester:
                     data = response.json()
                     
                     # Verify response structure
-                    if 'dependencies' not in data:
+                    if 'dependent_nodes' not in data:
                         self.log_test(f"{node_type} Dependencies Check", False, 
-                                    f"Missing 'dependencies' field. Response: {data}")
+                                    f"Missing 'dependent_nodes' field. Response: {data}")
                         all_passed = False
                         continue
                     
-                    actual_dependencies = data['dependencies']
+                    actual_dependencies = data['dependent_nodes']
                     
                     # Check if expected dependencies are present
                     missing_deps = [dep for dep in expected if dep not in actual_dependencies]
