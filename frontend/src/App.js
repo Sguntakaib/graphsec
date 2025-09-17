@@ -2075,10 +2075,414 @@ function AppContent() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentDiagram]);
 
+  // Import the new layout
+  const MainLayout = React.lazy(() => import('./components/layout/MainLayout'));
+
   return (
-    <div className="h-screen flex flex-col bg-gray-900">
-      {/* Enhanced Header */}
-      <div className="bg-gray-800 border-b border-gray-700 p-4">
+    <React.Suspense fallback={
+      <div className="h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-white">Loading...</div>
+      </div>
+    }>
+      <MainLayout
+        // Navigation props
+        currentDiagram={currentDiagram}
+        isLoading={isLoading}
+        simulationResult={simulationResult}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        
+        // Action handlers
+        onNewDiagram={handleNewDiagram}
+        onSave={handleSaveDiagram}
+        onSimulate={handleRunSimulation}
+        onShowTemplates={() => setShowTemplateLibrary(true)}
+        onShowWizard={() => setShowThreatModelingWizard(true)}
+        onShowCoreLoop={() => setShowCoreLoopDashboard(true)}
+        onShowSettings={() => setShowAdvancedControls(!showAdvancedControls)}
+        onImport={handleImportDiagram}
+        onExport={handleExportDiagram}
+        onAnalyzeVulnerabilities={analyzeAllNodeVulnerabilities}
+        
+        // Canvas and data
+        nodes={nodes}
+        edges={edges}
+        setNodes={setNodes}
+        setEdges={setEdges}
+        selectedNode={selectedNode}
+        diagrams={diagrams}
+        onLoadDiagram={handleLoadDiagram}
+        
+        // Right panel props
+        fitView={fitView}
+        onRunSimulation={handleRunSimulation}
+        onHighlightPath={highlightAttackPaths}
+        onClearHighlights={clearAttackPathHighlighting}
+        nodeBranches={nodeBranches}
+        onNodeBranchUpdate={handleNodeBranchUpdate}
+        
+        // Vulnerability data
+        allVulnerabilities={allVulnerabilities}
+        
+        // Performance data
+        performance={performance}
+        
+        // Tour/onboarding
+        onStartTour={() => setShowTemplateLibrary(true)}
+      >
+        {/* ReactFlow Canvas */}
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={onNodeClick}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
+          className="bg-gray-900"
+          fitView
+          snapToGrid
+          snapGrid={[15, 15]}
+          nodesDraggable={true}
+          nodesConnectable={true}
+          elementsSelectable={true}
+          selectNodesOnDrag={false}
+        >
+          <Controls 
+            className="bg-gray-800 border-gray-700"
+            showZoom={true}
+            showFitView={true}
+            showInteractive={true}
+          />
+          <MiniMap 
+            className="bg-gray-800 border-gray-700" 
+            nodeColor={(node) => {
+              const colorMap = {
+                'Actor': '#DC2626',
+                'Asset': '#059669', 
+                'Surface': '#D97706',
+                'Control': '#2563EB',
+                'Zone': '#7C3AED',
+                'Signal': '#0891B2'
+              };
+              return colorMap[node.data?.type] || '#6B7280';
+            }}
+            maskColor="rgba(0, 0, 0, 0.6)"
+            pannable
+            zoomable
+          />
+          <Background 
+            variant="dots" 
+            gap={20} 
+            size={1} 
+            color="#374151" 
+          />
+          
+          {/* Floating Action Button for Adding Nodes */}
+          <Panel position="bottom-right" className="m-4">
+            <button
+              onClick={() => setShowNodeCreationModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors flex items-center justify-center"
+              title="Add Security Component"
+            >
+              <Plus className="h-6 w-6" />
+            </button>
+          </Panel>
+          
+          {/* Connection Types Legend */}
+          {showConnectionLegend && (
+            <Panel position="bottom-left" className="bg-gray-800 border border-gray-700 rounded-lg p-3 m-4 max-w-sm">
+              <div className="text-white text-sm font-semibold mb-2 flex items-center">
+                <Network className="h-4 w-4 mr-2" />
+                Connection Types
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-blue-500"></div>
+                  <span className="text-blue-300">HTTPS REST</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-purple-500"></div>
+                  <span className="text-purple-300">SQL DB</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-green-500 border-dashed border-green-500"></div>
+                  <span className="text-green-300">File I/O</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-yellow-500 border-dashed border-yellow-500"></div>
+                  <span className="text-yellow-300">Message</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-red-500 border-dashed border-red-500"></div>
+                  <span className="text-red-300">Public Net</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-cyan-500"></div>
+                  <span className="text-cyan-300">Cloud API</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-red-600 border-dashed border-red-600"></div>
+                  <span className="text-red-400">Exploits</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-0.5 bg-green-600"></div>
+                  <span className="text-green-400">Controls</span>
+                </div>
+              </div>
+            </Panel>
+          )}
+          
+          {/* Risk Analysis Panel */}
+          {simulationResult && (
+            <Panel position="top-right" className="bg-gray-800 border border-gray-700 rounded-lg p-3 m-4 max-w-xs">
+              <div className="text-white text-sm font-semibold mb-2 flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-2 text-orange-400" />
+                Risk Assessment
+              </div>
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Overall Risk:</span>
+                  <span className={`font-medium ${
+                    simulationResult.overall_risk_level === 'Critical' ? 'text-red-400' :
+                    simulationResult.overall_risk_level === 'High' ? 'text-orange-400' :
+                    simulationResult.overall_risk_level === 'Medium' ? 'text-yellow-400' :
+                    'text-green-400'
+                  }`}>{simulationResult.overall_risk_level}</span>
+                </div>
+                <div className="text-gray-400 text-xs">
+                  {simulationResult.attack_paths?.length || 0} attack paths found
+                </div>
+              </div>
+            </Panel>
+          )}
+          
+          {isLoading && (
+            <Panel position="bottom-center" className="bg-gray-800 border border-gray-700 rounded p-3">
+              <div className="text-white text-sm flex items-center space-x-2">
+                <div className="animate-spin h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+                <span>Processing advanced simulation...</span>
+              </div>
+            </Panel>
+          )}
+        </ReactFlow>
+      </MainLayout>
+
+      {/* Node Creation Modal */}
+      <NodeCreationModal
+        isVisible={showNodeCreationModal}
+        onClose={() => setShowNodeCreationModal(false)}
+        onCreateNode={handleCreateNodeFromModal}
+      />
+
+      {/* Vulnerability Components */}
+      {showVulnerabilityFilter && (
+        <VulnerabilityFilter
+          vulnerabilities={allVulnerabilities}
+          onFilterChange={(filtered) => {
+            // Handle vulnerability filtering
+          }}
+          onClose={() => setShowVulnerabilityFilter(false)}
+        />
+      )}
+
+      {showVulnerabilityLegend && (
+        <VulnerabilityLegend
+          vulnerabilities={allVulnerabilities}
+          onClose={() => setShowVulnerabilityLegend(false)}
+        />
+      )}
+
+      {showVulnerabilityReport && (
+        <VulnerabilityReport
+          vulnerabilities={allVulnerabilities}
+          onClose={() => setShowVulnerabilityReport(false)}
+        />
+      )}
+
+      {selectedVulnerability && (
+        <VulnerabilityPanel
+          vulnerability={selectedVulnerability}
+          onClose={() => setSelectedVulnerability(null)}
+          onRemediate={(vulnId, action) => {
+            // Handle vulnerability remediation
+          }}
+        />
+      )}
+
+      {/* Legacy Security Questionnaire - ENABLED: Main questionnaire system */}
+      {showSecurityQuestionnaire && currentQuestionnaireNode && (
+        <SecurityQuestionnaire 
+          nodeSubtype={currentQuestionnaireNode.subtype || currentQuestionnaireNode.data?.subtype} 
+          onComplete={handleSecurityQuestionnaireComplete}
+          onCancel={handleSecurityQuestionnaireCancel}
+          existingValues={{}}
+          isVisible={showSecurityQuestionnaire}
+          sourceNode={currentQuestionnaireNode}
+          currentNodes={nodes}
+          onCreateLinkedNodes={handleCreateLinkedNodes}
+          getIncompleteDependencies={getIncompleteDependencies}
+          resumeFromPromptIndex={
+            parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id 
+              ? parentQuestionnaireState.resumeFromPromptIndex 
+              : null
+          }
+          partialAnswers={
+            parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id 
+              ? parentQuestionnaireState.partialAnswers 
+              : null
+          }
+        />
+      )}
+
+      {/* Template Library Modal */}
+      {showTemplateLibrary && (
+        <TemplateLibrary
+          onApplyTemplate={handleApplyTemplate}
+          onClose={() => setShowTemplateLibrary(false)}
+        />
+      )}
+
+      {/* Threat Modeling Wizard Modal */}
+      {showThreatModelingWizard && (
+        <ThreatModelingWizard
+          isVisible={showThreatModelingWizard}
+          onClose={handleThreatModelingWizardCancel}
+          onComplete={handleThreatModelingWizardComplete}
+          currentDiagram={currentDiagram}
+          existingNodes={nodes}
+          existingEdges={edges}
+        />
+      )}
+
+      {/* Core Loop Dashboard Modal */}
+      {showCoreLoopDashboard && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Phase 1 Core Loop Dashboard</h2>
+              <button
+                onClick={() => setShowCoreLoopDashboard(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+              <CoreLoopDashboard />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Questionnaire Overview Modal */}
+      {showQuestionnaireOverview && overviewNode && (
+        <QuestionnaireOverview
+          node={overviewNode}
+          diagram={currentDiagram}
+          isVisible={showQuestionnaireOverview}
+          onClose={() => {
+            setShowQuestionnaireOverview(false);
+            setOverviewNode(null);
+          }}
+          onEdit={handleQuestionnaireOverviewEdit}
+        />
+      )}
+
+      {/* Vulnerability Analysis Panel */}
+      {showVulnerabilityPanel && selectedVulnerability && (
+        <VulnerabilityPanel
+          vulnerability={selectedVulnerability}
+          onClose={() => {
+            setShowVulnerabilityPanel(false);
+            setSelectedVulnerability(null);
+          }}
+          onMarkFixed={handleVulnerabilityFixed}
+          userAnswers={(() => {
+            // Get user answers from the parent node
+            const parentNode = nodes.find(n => n.id === selectedVulnerability.parent_node_id);
+            return parentNode?.data?.questionnaireResponses || {};
+          })()}
+          nodeSubtype={(() => {
+            // Get node subtype from the parent node
+            const parentNode = nodes.find(n => n.id === selectedVulnerability.parent_node_id);
+            return parentNode?.data?.subtype || '';
+          })()}
+        />
+      )}
+
+      {/* Vulnerability Filter Panel */}
+      {showVulnerabilityFilter && (
+        <div className="fixed top-20 left-4 z-40 w-80">
+          <VulnerabilityFilter
+            vulnerabilities={allVulnerabilities}
+            onFilterChange={handleVulnerabilityFilterChange}
+            onExportFiltered={handleExportFilteredVulnerabilities}
+          />
+        </div>
+      )}
+
+      {/* Vulnerability Legend Panel */}
+      {showVulnerabilityLegend && (
+        <div className="fixed top-20 right-4 z-40 w-80">
+          <VulnerabilityLegend
+            vulnerabilities={allVulnerabilities}
+            onSeverityFilter={handleVulnerabilityLegendFilter}
+          />
+        </div>
+      )}
+
+      {/* Vulnerability Report Modal */}
+      {showVulnerabilityReport && (
+        <VulnerabilityReport
+          vulnerabilities={filteredVulnerabilities.length > 0 ? filteredVulnerabilities : allVulnerabilities}
+          onClose={() => setShowVulnerabilityReport(false)}
+          diagramInfo={currentDiagram}
+        />
+      )}
+
+      {/* Enhanced Questionnaire System - DISABLED: Using legacy system only */}
+      {/*
+      <QuestionnaireManager
+        nodes={nodes}
+        setNodes={setNodes}
+        onNodeCreate={(newNode) => {
+          setNodes(currentNodes => [...currentNodes, newNode]);
+        }}
+        onNodeUpdate={(updatedNode) => {
+          setNodes(currentNodes => 
+            currentNodes.map(node => 
+              node.id === updatedNode.id ? updatedNode : node
+            )
+          );
+        }}
+        currentDiagram={currentDiagram}
+        setDependencyState={setDependencyState}
+        getDependencyState={getDependencyState}
+        getIncompleteDependencies={getIncompleteDependencies}
+      />
+      */}
+
+      {/* Canvas Synchronizer - Temporarily disabled to fix infinite loop */}
+      {/* <CanvasSynchronizer
+        nodes={nodes}
+        setNodes={setNodes}
+        edges={edges}
+        setEdges={setEdges}
+        onNodeUpdate={(updatedNode) => {
+          console.log('Canvas sync: Node updated', updatedNode);
+        }}
+        onEdgeCreate={(newEdge) => {
+          console.log('Canvas sync: Edge created', newEdge);
+        }}
+      /> */}
+    </React.Suspense>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Shield className="h-8 w-8 text-blue-400" />
