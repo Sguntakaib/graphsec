@@ -30,11 +30,12 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://webapp-api-manager.preview.emergentagent.com/api"
 
-class WebAppValidateCompletenessHttpsFixTester:
+class QuestionnaireFlowCleanupTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
         self.test_results = []
+        self.created_diagram_id = None
         
     def log_test(self, test_name, success, message="", response_data=None):
         """Log test results"""
@@ -67,355 +68,344 @@ class WebAppValidateCompletenessHttpsFixTester:
             return False
 
     # ============================================================================
-    # CRITICAL TESTING TASK: TEST HTTPS ENUM MAPPING FIX
+    # CORE QUESTIONNAIRE ENDPOINTS - Legacy System
     # ============================================================================
     
-    def test_validate_completeness_with_encryption_type(self):
-        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with 'Encryption' type (mapped from HTTPS)"""
+    def test_get_webapp_questionnaire(self):
+        """Test GET /api/questionnaires/WebApp - WebApp questionnaire prompts"""
         try:
-            # Test with 'Encryption' as the type value for the HTTPS-related branch
-            # This is the fix: frontend maps 'https' -> 'Encryption'
-            webapp_branches_with_encryption = [
-                {
-                    "id": "webapp-auth-001",
-                    "name": "Authentication Method",
-                    "type": "Login",
-                    "required": True,
-                    "completed": True,
-                    "value": "oauth2",
-                    "description": "OAuth2 authentication with JWT tokens"
-                },
-                {
-                    "id": "webapp-https-001", 
-                    "name": "HTTPS Configuration",
-                    "type": "Encryption",  # CRITICAL: This should be 'Encryption' not 'Https'
-                    "required": True,
-                    "completed": True,
-                    "value": "enabled",
-                    "description": "HTTPS encryption enabled with TLS 1.3"
-                },
-                {
-                    "id": "webapp-input-validation-001",
-                    "name": "Input Validation",
-                    "type": "InputValidation", 
-                    "required": True,
-                    "completed": True,
-                    "value": "comprehensive",
-                    "description": "Comprehensive input validation and sanitization"
-                }
-            ]
-            
-            print(f"🔐 Testing with 'Encryption' type for HTTPS branch")
-            print(f"📋 Branch types: {[b['type'] for b in webapp_branches_with_encryption]}")
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                json=webapp_branches_with_encryption,
-                headers={"Content-Type": "application/json"}
-            )
-            
-            print(f"📡 Response Status: {response.status_code}")
+            response = self.session.get(f"{self.base_url}/questionnaires/WebApp")
             
             if response.status_code == 200:
                 data = response.json()
-                self.log_test("HTTPS->Encryption Mapping Test", True, 
-                            f"✅ SUCCESS! Endpoint working with 'Encryption' type: {data}")
-                print(f"🎉 HTTPS ENUM MAPPING FIX VERIFIED! Response: {json.dumps(data, indent=2)}")
+                
+                # Verify expected structure for legacy system
+                expected_fields = ['prompts', 'security_branches']
+                missing_fields = [field for field in expected_fields if field not in data]
+                
+                if missing_fields:
+                    self.log_test("WebApp Questionnaire", False, 
+                                f"Missing expected fields: {missing_fields}. Response: {data}")
+                    return False
+                
+                prompts_count = len(data.get('prompts', []))
+                branches_count = len(data.get('security_branches', []))
+                
+                self.log_test("WebApp Questionnaire", True, 
+                            f"WebApp questionnaire retrieved successfully - {prompts_count} prompts, {branches_count} branches")
+                
+                print(f"📋 WebApp Questionnaire Details:")
+                print(f"   Prompts: {prompts_count}")
+                print(f"   Security Branches: {branches_count}")
+                
                 return True
-            elif response.status_code == 500:
-                try:
-                    error_data = response.json()
-                    self.log_test("HTTPS->Encryption Mapping Test", False, 
-                                f"❌ 500 ERROR STILL EXISTS: {error_data}")
-                    print(f"🚨 500 ERROR WITH ENCRYPTION TYPE: {error_data}")
-                    return False
-                except:
-                    error_text = response.text
-                    self.log_test("HTTPS->Encryption Mapping Test", False, 
-                                f"❌ 500 ERROR STILL EXISTS: {error_text}")
-                    print(f"🚨 500 ERROR WITH ENCRYPTION TYPE: {error_text}")
-                    return False
-            elif response.status_code == 422:
-                error_data = response.json()
-                self.log_test("HTTPS->Encryption Mapping Test", False, 
-                            f"❌ VALIDATION ERROR (422): {error_data}")
-                print(f"🔍 VALIDATION ERROR WITH ENCRYPTION TYPE: {error_data}")
-                return False
             else:
-                self.log_test("HTTPS->Encryption Mapping Test", False, 
-                            f"❌ Unexpected HTTP {response.status_code}: {response.text}")
+                self.log_test("WebApp Questionnaire", False, 
+                            f"HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("HTTPS->Encryption Mapping Test", False, f"Request error: {str(e)}")
+            self.log_test("WebApp Questionnaire", False, f"Request error: {str(e)}")
             return False
 
-    def test_validate_completeness_with_https_type_should_fail(self):
-        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with 'Https' type (should fail)"""
-        try:
-            # Test with 'Https' as the type value - this should fail because it's not in SecurityBranchType enum
-            webapp_branches_with_https = [
-                {
-                    "id": "webapp-auth-001",
-                    "name": "Authentication Method",
-                    "type": "Login",
-                    "required": True,
-                    "completed": True,
-                    "value": "oauth2",
-                    "description": "OAuth2 authentication with JWT tokens"
-                },
-                {
-                    "id": "webapp-https-001", 
-                    "name": "HTTPS Configuration",
-                    "type": "Https",  # This should cause the 500 error
-                    "required": True,
-                    "completed": True,
-                    "value": "enabled",
-                    "description": "HTTPS encryption enabled with TLS 1.3"
-                }
-            ]
-            
-            print(f"🚫 Testing with 'Https' type (should fail)")
-            print(f"📋 Branch types: {[b['type'] for b in webapp_branches_with_https]}")
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                json=webapp_branches_with_https,
-                headers={"Content-Type": "application/json"}
-            )
-            
-            print(f"📡 Response Status: {response.status_code}")
-            
-            if response.status_code == 500:
-                try:
-                    error_data = response.json()
-                    # Check if it's the expected enum validation error
-                    error_str = str(error_data)
-                    if "enum" in error_str.lower() and "https" in error_str.lower():
-                        self.log_test("HTTPS Type Should Fail Test", True, 
-                                    f"✅ EXPECTED 500 ERROR with 'Https' type: {error_data}")
-                        print(f"✅ CONFIRMED: 'Https' type causes expected enum validation error")
-                        return True
-                    else:
-                        self.log_test("HTTPS Type Should Fail Test", False, 
-                                    f"❌ Unexpected 500 error format: {error_data}")
-                        return False
-                except:
-                    error_text = response.text
-                    if "enum" in error_text.lower() and "https" in error_text.lower():
-                        self.log_test("HTTPS Type Should Fail Test", True, 
-                                    f"✅ EXPECTED 500 ERROR with 'Https' type: {error_text}")
-                        print(f"✅ CONFIRMED: 'Https' type causes expected enum validation error")
-                        return True
-                    else:
-                        self.log_test("HTTPS Type Should Fail Test", False, 
-                                    f"❌ Unexpected 500 error format: {error_text}")
-                        return False
-            elif response.status_code == 422:
-                error_data = response.json()
-                # Check if it's the expected enum validation error
-                error_str = str(error_data)
-                if "enum" in error_str.lower() and ("https" in error_str.lower() or "Https" in error_str):
-                    self.log_test("HTTPS Type Should Fail Test", True, 
-                                f"✅ EXPECTED 422 VALIDATION ERROR with 'Https' type: {error_data}")
-                    print(f"✅ CONFIRMED: 'Https' type causes expected enum validation error (422)")
-                    return True
-                else:
-                    self.log_test("HTTPS Type Should Fail Test", False, 
-                                f"❌ Unexpected 422 error format: {error_data}")
-                    return False
-            elif response.status_code == 200:
-                data = response.json()
-                self.log_test("HTTPS Type Should Fail Test", False, 
-                            f"❌ UNEXPECTED SUCCESS with 'Https' type: {data}")
-                print(f"❌ ERROR: 'Https' type should not work, but got 200 response")
-                return False
-            else:
-                self.log_test("HTTPS Type Should Fail Test", False, 
-                            f"❌ Unexpected HTTP {response.status_code}: {response.text}")
-                return False
+    def test_get_intelligent_node_prompts(self):
+        """Test GET /api/intelligent-nodes/{node_subtype}/prompts - Other node types"""
+        node_types = ['API', 'Database', 'ExternalAttacker']
+        all_passed = True
+        
+        for node_type in node_types:
+            try:
+                response = self.session.get(f"{self.base_url}/intelligent-nodes/{node_type}/prompts")
                 
-        except Exception as e:
-            self.log_test("HTTPS Type Should Fail Test", False, f"Request error: {str(e)}")
-            return False
-
-    def test_validate_completeness_realistic_webapp_questionnaire(self):
-        """Test POST /api/intelligent-nodes/WebApp/validate-completeness with realistic WebApp questionnaire data"""
-        try:
-            # Realistic WebApp questionnaire data including all common WebApp branches
-            realistic_webapp_questionnaire = [
-                {
-                    "id": "webapp-login-001",
-                    "name": "Authentication System",
-                    "type": "Login",
-                    "required": True,
-                    "completed": True,
-                    "value": "oauth2",
-                    "description": "OAuth2 authentication implementation"
-                },
-                {
-                    "id": "webapp-api-001",
-                    "name": "API Security",
-                    "type": "API",
-                    "required": True,
-                    "completed": True,
-                    "value": "secured",
-                    "description": "API security with rate limiting and authentication"
-                },
-                {
-                    "id": "webapp-database-001", 
-                    "name": "Database Security",
-                    "type": "Database",
-                    "required": True,
-                    "completed": True,
-                    "value": "encrypted",
-                    "description": "Database encryption enabled"
-                },
-                {
-                    "id": "webapp-input-validation-001",
-                    "name": "Input Validation",
-                    "type": "InputValidation",
-                    "required": True,
-                    "completed": True,
-                    "value": "comprehensive",
-                    "description": "Comprehensive input validation"
-                },
-                {
-                    "id": "webapp-waf-001",
-                    "name": "Web Application Firewall",
-                    "type": "WAF",
-                    "required": False,
-                    "completed": True,
-                    "value": "enabled",
-                    "description": "WAF protection enabled"
-                },
-                {
-                    "id": "webapp-deployment-001",
-                    "name": "Deployment Security",
-                    "type": "Deployment",
-                    "required": True,
-                    "completed": True,
-                    "value": "secure",
-                    "description": "Secure deployment configuration"
-                },
-                {
-                    "id": "webapp-encryption-001",
-                    "name": "HTTPS/TLS Configuration", 
-                    "type": "Encryption",  # CRITICAL: Using 'Encryption' instead of 'Https'
-                    "required": True,
-                    "completed": True,
-                    "value": "tls_1_3",
-                    "description": "HTTPS with TLS 1.3 encryption"
-                }
-            ]
-            
-            print(f"🌐 Testing realistic WebApp questionnaire with all common branches")
-            print(f"📋 Branch types: {[b['type'] for b in realistic_webapp_questionnaire]}")
-            print(f"🔐 HTTPS branch mapped to 'Encryption' type")
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                json=realistic_webapp_questionnaire,
-                headers={"Content-Type": "application/json"}
-            )
-            
-            print(f"📡 Response Status: {response.status_code}")
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.log_test("Realistic WebApp Questionnaire Test", True, 
-                            f"✅ SUCCESS! Realistic questionnaire working: {data}")
-                
-                # Verify response structure
-                if 'validation' in data and 'recommendations' in data:
-                    validation = data['validation']
-                    print(f"📊 Validation Results:")
-                    print(f"   Is Complete: {validation.get('is_complete', 'N/A')}")
-                    print(f"   Completion %: {validation.get('completion_percentage', 'N/A')}")
-                    print(f"   Completed Count: {validation.get('completed_count', 'N/A')}")
-                    print(f"   Required Count: {validation.get('required_count', 'N/A')}")
-                    print(f"   Recommendations: {len(data.get('recommendations', []))}")
+                if response.status_code == 200:
+                    data = response.json()
                     
-                return True
-            elif response.status_code == 500:
-                try:
-                    error_data = response.json()
-                    self.log_test("Realistic WebApp Questionnaire Test", False, 
-                                f"❌ 500 ERROR: {error_data}")
-                    print(f"🚨 500 ERROR WITH REALISTIC DATA: {error_data}")
-                    return False
-                except:
-                    error_text = response.text
-                    self.log_test("Realistic WebApp Questionnaire Test", False, 
-                                f"❌ 500 ERROR: {error_text}")
-                    print(f"🚨 500 ERROR WITH REALISTIC DATA: {error_text}")
-                    return False
-            elif response.status_code == 422:
-                error_data = response.json()
-                self.log_test("Realistic WebApp Questionnaire Test", False, 
-                            f"❌ VALIDATION ERROR (422): {error_data}")
-                print(f"🔍 VALIDATION ERROR WITH REALISTIC DATA: {error_data}")
-                return False
-            else:
-                self.log_test("Realistic WebApp Questionnaire Test", False, 
-                            f"❌ Unexpected HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Realistic WebApp Questionnaire Test", False, f"Request error: {str(e)}")
-            return False
+                    # Verify expected structure
+                    if 'prompts' not in data:
+                        self.log_test(f"{node_type} Node Prompts", False, 
+                                    f"Missing 'prompts' field. Response: {data}")
+                        all_passed = False
+                        continue
+                    
+                    prompts_count = len(data.get('prompts', []))
+                    
+                    self.log_test(f"{node_type} Node Prompts", True, 
+                                f"{node_type} prompts retrieved successfully - {prompts_count} prompts")
+                    
+                    print(f"📋 {node_type} Node Prompts: {prompts_count}")
+                    
+                else:
+                    self.log_test(f"{node_type} Node Prompts", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    all_passed = False
+                    
+            except Exception as e:
+                self.log_test(f"{node_type} Node Prompts", False, f"Request error: {str(e)}")
+                all_passed = False
+        
+        return all_passed
 
-    def test_get_supported_types_for_reference(self):
-        """Get supported intelligent node types for reference"""
+    def test_check_dependencies_api(self):
+        """Test POST /api/intelligent-nodes/{node_subtype}/check-dependencies - Dependency checking"""
+        test_cases = [
+            {
+                'node_type': 'WebApp',
+                'answers': {
+                    'webapp_api_endpoints': True,
+                    'webapp_database_connection': True
+                },
+                'expected_dependencies': ['API', 'Database']
+            },
+            {
+                'node_type': 'WebApp', 
+                'answers': {
+                    'webapp_api_endpoints': True,
+                    'webapp_database_connection': False
+                },
+                'expected_dependencies': ['API']
+            },
+            {
+                'node_type': 'Database',
+                'answers': {
+                    'database_backup_enabled': True,
+                    'database_monitoring_enabled': False
+                },
+                'expected_dependencies': ['Backup']
+            }
+        ]
+        
+        all_passed = True
+        
+        for test_case in test_cases:
+            try:
+                node_type = test_case['node_type']
+                answers = test_case['answers']
+                expected = test_case['expected_dependencies']
+                
+                response = self.session.post(
+                    f"{self.base_url}/intelligent-nodes/{node_type}/check-dependencies",
+                    json=answers,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Verify response structure
+                    if 'dependencies' not in data:
+                        self.log_test(f"{node_type} Dependencies Check", False, 
+                                    f"Missing 'dependencies' field. Response: {data}")
+                        all_passed = False
+                        continue
+                    
+                    actual_dependencies = data['dependencies']
+                    
+                    # Check if expected dependencies are present
+                    missing_deps = [dep for dep in expected if dep not in actual_dependencies]
+                    unexpected_deps = [dep for dep in actual_dependencies if dep not in expected]
+                    
+                    if missing_deps or unexpected_deps:
+                        self.log_test(f"{node_type} Dependencies Check", False, 
+                                    f"Dependencies mismatch. Expected: {expected}, Got: {actual_dependencies}")
+                        all_passed = False
+                    else:
+                        self.log_test(f"{node_type} Dependencies Check", True, 
+                                    f"Dependencies check passed - {actual_dependencies}")
+                        
+                        print(f"🔗 {node_type} Dependencies: {actual_dependencies}")
+                    
+                else:
+                    self.log_test(f"{node_type} Dependencies Check", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    all_passed = False
+                    
+            except Exception as e:
+                self.log_test(f"{node_type} Dependencies Check", False, f"Request error: {str(e)}")
+                all_passed = False
+        
+        return all_passed
+
+    # ============================================================================
+    # CRITICAL API ENDPOINTS - Diagram Management
+    # ============================================================================
+    
+    def test_get_diagrams(self):
+        """Test GET /api/diagrams - Diagram management"""
         try:
-            response = self.session.get(f"{self.base_url}/intelligent-nodes/supported-types")
+            response = self.session.get(f"{self.base_url}/diagrams")
             
             if response.status_code == 200:
                 data = response.json()
-                self.log_test("Get Supported Types", True, 
-                            f"Supported types: {data}")
-                print(f"📋 SUPPORTED INTELLIGENT NODE TYPES: {data}")
+                
+                # Should return a list
+                if not isinstance(data, list):
+                    self.log_test("Get Diagrams", False, 
+                                f"Expected list, got: {type(data)}. Response: {data}")
+                    return False
+                
+                diagrams_count = len(data)
+                
+                self.log_test("Get Diagrams", True, 
+                            f"Diagrams retrieved successfully - {diagrams_count} diagrams found")
+                
+                print(f"📊 Diagrams Count: {diagrams_count}")
+                
                 return True
             else:
-                self.log_test("Get Supported Types", False, 
+                self.log_test("Get Diagrams", False, 
                             f"HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("Get Supported Types", False, f"Request error: {str(e)}")
+            self.log_test("Get Diagrams", False, f"Request error: {str(e)}")
             return False
 
-    def test_get_webapp_template_for_reference(self):
-        """Get WebApp template to understand the expected branch structure"""
+    def test_create_diagram(self):
+        """Test POST /api/diagrams - Create diagram"""
         try:
-            response = self.session.get(f"{self.base_url}/intelligent-nodes/WebApp/template")
+            diagram_data = {
+                "title": f"Test Diagram - Questionnaire Flow Cleanup {datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                "description": "Test diagram created during questionnaire flow cleanup verification"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/diagrams",
+                json=diagram_data,
+                headers={"Content-Type": "application/json"}
+            )
             
             if response.status_code == 200:
                 data = response.json()
-                self.log_test("Get WebApp Template", True, 
-                            f"WebApp template structure: {data}")
-                print(f"🏗️ WEBAPP TEMPLATE STRUCTURE:")
-                print(f"   Node Type: {data.get('node_type')}")
-                print(f"   Node Subtype: {data.get('node_subtype')}")
-                print(f"   Required Branches: {data.get('required_branches')}")
                 
-                # This will help us understand the correct enum values
-                if 'required_branches' in data:
-                    print(f"✅ CORRECT SECURITY BRANCH ENUM VALUES: {data['required_branches']}")
-                    # Check if 'Encryption' is in the required branches
-                    if 'Encryption' in data['required_branches']:
-                        print(f"🔐 CONFIRMED: 'Encryption' is a valid SecurityBranchType enum value")
-                    if 'Https' in data['required_branches']:
-                        print(f"⚠️  WARNING: 'Https' found in required branches - this might be the issue")
+                # Verify expected structure
+                expected_fields = ['id', 'title', 'description', 'nodes', 'edges', 'created_at']
+                missing_fields = [field for field in expected_fields if field not in data]
+                
+                if missing_fields:
+                    self.log_test("Create Diagram", False, 
+                                f"Missing expected fields: {missing_fields}. Response: {data}")
+                    return False
+                
+                # Store diagram ID for potential cleanup
+                self.created_diagram_id = data['id']
+                
+                self.log_test("Create Diagram", True, 
+                            f"Diagram created successfully - ID: {data['id']}")
+                
+                print(f"📊 Created Diagram ID: {data['id']}")
+                print(f"   Title: {data['title']}")
+                print(f"   Nodes: {len(data.get('nodes', []))}")
+                print(f"   Edges: {len(data.get('edges', []))}")
                 
                 return True
             else:
-                self.log_test("Get WebApp Template", False, 
+                self.log_test("Create Diagram", False, 
                             f"HTTP {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_test("Get WebApp Template", False, f"Request error: {str(e)}")
+            self.log_test("Create Diagram", False, f"Request error: {str(e)}")
+            return False
+
+    # ============================================================================
+    # LEGACY SYSTEM COMPATIBILITY TESTS
+    # ============================================================================
+    
+    def test_legacy_questionnaire_completion_flow(self):
+        """Test the complete legacy questionnaire flow that should still work"""
+        try:
+            # Step 1: Get WebApp questionnaire
+            response = self.session.get(f"{self.base_url}/questionnaires/WebApp")
+            
+            if response.status_code != 200:
+                self.log_test("Legacy Questionnaire Flow", False, 
+                            f"Failed to get WebApp questionnaire: HTTP {response.status_code}")
+                return False
+            
+            questionnaire_data = response.json()
+            
+            # Step 2: Simulate questionnaire completion
+            completion_data = {
+                "responses": {
+                    "authentication_method": "oauth2",
+                    "encryption_enabled": True,
+                    "input_validation": "comprehensive"
+                },
+                "business_context": {
+                    "criticality": "high",
+                    "data_classification": "confidential"
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/WebApp/complete",
+                json=completion_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify expected completion response structure
+                expected_fields = ['completion_id', 'findings', 'recommendations']
+                missing_fields = [field for field in expected_fields if field not in data]
+                
+                if missing_fields:
+                    self.log_test("Legacy Questionnaire Flow", False, 
+                                f"Missing expected completion fields: {missing_fields}")
+                    return False
+                
+                self.log_test("Legacy Questionnaire Flow", True, 
+                            f"Legacy questionnaire completion flow working - Completion ID: {data.get('completion_id')}")
+                
+                print(f"🔄 Legacy Flow Results:")
+                print(f"   Completion ID: {data.get('completion_id')}")
+                print(f"   Findings: {len(data.get('findings', []))}")
+                print(f"   Recommendations: {len(data.get('recommendations', []))}")
+                
+                return True
+            else:
+                self.log_test("Legacy Questionnaire Flow", False, 
+                            f"Questionnaire completion failed: HTTP {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Legacy Questionnaire Flow", False, f"Request error: {str(e)}")
+            return False
+
+    def test_enhanced_system_disabled(self):
+        """Verify that enhanced questionnaire system endpoints are properly disabled/simplified"""
+        # This test checks that we're not getting conflicts from the enhanced system
+        try:
+            # Try to access what would be enhanced system endpoints
+            # These should either not exist or return simplified responses
+            
+            response = self.session.get(f"{self.base_url}/questionnaires/WebApp")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check that we're getting the simplified legacy response, not enhanced
+                # Legacy system should have simpler structure
+                if 'enhanced_features' in data or 'questionnaire_manager' in data:
+                    self.log_test("Enhanced System Disabled", False, 
+                                f"Enhanced system features still present in response: {data}")
+                    return False
+                
+                self.log_test("Enhanced System Disabled", True, 
+                            "Enhanced system properly disabled - receiving legacy system responses")
+                
+                print(f"✅ Enhanced System Status: Properly disabled")
+                print(f"   Response structure indicates legacy system only")
+                
+                return True
+            else:
+                self.log_test("Enhanced System Disabled", False, 
+                            f"Unexpected response: HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Enhanced System Disabled", False, f"Request error: {str(e)}")
             return False
 
     # ============================================================================
@@ -423,26 +413,30 @@ class WebAppValidateCompletenessHttpsFixTester:
     # ============================================================================
     
     def run_all_tests(self):
-        """Run all HTTPS enum mapping fix tests"""
-        print("🚀 Starting HTTPS Enum Mapping Fix Verification Tests")
+        """Run all questionnaire flow cleanup verification tests"""
+        print("🚀 Starting Questionnaire Flow Cleanup Verification Tests")
         print("=" * 90)
-        print("CRITICAL BUG FIX VERIFICATION: POST /api/intelligent-nodes/WebApp/validate-completeness")
-        print("ISSUE: Questionnaire uses related_branch: 'HTTPS' which isn't in SecurityBranchType enum")
-        print("FIX: Frontend maps 'https' -> 'Encryption', so test with 'Encryption' as type value")
+        print("QUESTIONNAIRE FLOW CLEANUP VERIFICATION")
+        print("Testing backend API endpoints after disabling enhanced QuestionnaireManager")
+        print("Focus: Legacy SecurityQuestionnaire system endpoints")
         print("=" * 90)
         
         tests = [
             # Basic connectivity
             self.test_health_check,
             
-            # Reference data to understand expected format
-            self.test_get_supported_types_for_reference,
-            self.test_get_webapp_template_for_reference,
+            # Core questionnaire endpoints (legacy system)
+            self.test_get_webapp_questionnaire,
+            self.test_get_intelligent_node_prompts,
+            self.test_check_dependencies_api,
             
-            # CRITICAL: Test the HTTPS enum mapping fix
-            self.test_validate_completeness_with_encryption_type,
-            self.test_validate_completeness_with_https_type_should_fail,
-            self.test_validate_completeness_realistic_webapp_questionnaire,
+            # Critical API endpoints
+            self.test_get_diagrams,
+            self.test_create_diagram,
+            
+            # Legacy system compatibility
+            self.test_legacy_questionnaire_completion_flow,
+            self.test_enhanced_system_disabled,
         ]
         
         passed = 0
@@ -462,18 +456,20 @@ class WebAppValidateCompletenessHttpsFixTester:
         
         # Print summary
         print("=" * 90)
-        print("🎯 HTTPS ENUM MAPPING FIX VERIFICATION SUMMARY")
+        print("🎯 QUESTIONNAIRE FLOW CLEANUP VERIFICATION SUMMARY")
         print("=" * 90)
         print(f"✅ PASSED: {passed}")
         print(f"❌ FAILED: {failed}")
         print(f"📊 SUCCESS RATE: {(passed / (passed + failed) * 100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 ALL TESTS PASSED! The HTTPS enum mapping fix is working correctly.")
-            print("✅ 500 error is fixed - endpoint returns HTTP 200 with 'Encryption' type")
-            print("✅ 'Https' type correctly fails with validation error")
-            print("✅ Realistic WebApp questionnaire data works correctly")
-            print("✅ Frontend fix (https -> Encryption mapping) verified")
+            print("\n🎉 ALL TESTS PASSED! Questionnaire flow cleanup verification successful.")
+            print("✅ Core questionnaire endpoints working correctly")
+            print("✅ Intelligent node prompts accessible")
+            print("✅ Dependency checking functional")
+            print("✅ Diagram management operational")
+            print("✅ Legacy questionnaire completion flow working")
+            print("✅ Enhanced system properly disabled")
         else:
             print(f"\n⚠️  {failed} tests failed. Analysis:")
             
@@ -481,20 +477,14 @@ class WebAppValidateCompletenessHttpsFixTester:
             error_tests = [result for result in self.test_results if not result['success']]
             
             for error_test in error_tests:
-                if "500" in error_test['message'] and "Encryption" in error_test['message']:
-                    print(f"🚨 CRITICAL: 500 error still exists with 'Encryption' type")
-                    print(f"   This means the fix is not working properly")
-                    print(f"   Details: {error_test['message']}")
-                elif "UNEXPECTED SUCCESS" in error_test['message']:
-                    print(f"🚨 CRITICAL: 'Https' type should fail but returned success")
-                    print(f"   This means the enum validation is not working")
-                    print(f"   Details: {error_test['message']}")
+                print(f"🚨 FAILED: {error_test['test']}")
+                print(f"   Issue: {error_test['message']}")
         
         return passed, failed
 
 def main():
     """Main test execution"""
-    tester = WebAppValidateCompletenessHttpsFixTester()
+    tester = QuestionnaireFlowCleanupTester()
     passed, failed = tester.run_all_tests()
     
     # Exit with appropriate code
