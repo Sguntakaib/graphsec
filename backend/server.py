@@ -34,6 +34,10 @@ from questionnaire_completion_processor import QuestionnaireCompletionProcessor
 from vulnerability_engine import vulnerability_engine, VulnerabilityAnalysisResult, VulnerabilityNode, VulnerabilitySeverity
 from questionnaire_analyzer import questionnaire_analyzer
 
+# Import advanced layout system
+from advanced_layout_engine import layout_engine, LayoutAlgorithm
+from layout_optimizer import layout_optimizer, LayoutMetrics
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
