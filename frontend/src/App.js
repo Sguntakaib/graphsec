@@ -2487,12 +2487,12 @@ function AppContent() {
 }
 
 function App() {
-            <button
-              onClick={() => setViewMode('modeling')}
-              className={`px-3 py-1 rounded-md transition-colors text-sm ${
-                viewMode === 'modeling'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-300 hover:text-white'
+  return (
+    <QuestionnaireProvider>
+      <ReactFlowProvider>
+        <AppContent />
+      </ReactFlowProvider>
+    </QuestionnaireProvider>
               }`}
             >
               <Layers className="h-4 w-4 inline mr-2" />
