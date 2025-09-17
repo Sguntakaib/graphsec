@@ -10,6 +10,7 @@ import {
   Save,
   RefreshCw 
 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const SecurityQuestionnaire = ({ 
   nodeSubtype, 
