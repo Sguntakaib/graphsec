@@ -2483,10 +2483,8 @@ function AppContent() {
         }}
       /> */}
     </React.Suspense>
-          <div className="flex items-center space-x-4">
-            <Shield className="h-8 w-8 text-blue-400" />
-            <div>
-              <h1 className="text-xl font-bold text-white">Security Modeling Platform</h1>
+  );
+}
               <div className="text-xs text-gray-400">
                 Advanced Threat Modeling & Attack Path Analysis
               </div>
