@@ -65,6 +65,12 @@ questionnaires:
       question: "How is database access controlled?"
       type: "single_choice"
       options: ["Role-based access with least privilege", "Basic user roles", "Shared accounts", "No access control", "Unknown"]
+      option_descriptions:
+        "Role-based access with least privilege": "Fine-grained role-based access control where users have only the minimum permissions needed for their function."
+        "Basic user roles": "Simple role-based access with broad permissions - users may have more access than necessary."
+        "Shared accounts": "Multiple users share database accounts - makes auditing and access control difficult."
+        "No access control": "No restrictions on database access - any user can access any data."
+        "Unknown": "Database access control implementation is unclear or not documented."
       help_text: "Proper access control ensures users can only access necessary data."
       related_branch: "AccessControl"
     - id: "database_backup_strategy"
