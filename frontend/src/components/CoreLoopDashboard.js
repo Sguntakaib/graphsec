@@ -205,8 +205,20 @@ const CoreLoopDashboard = () => {
         }
       );
 
+      // Use specific endpoints for WebApp, API, and Database to get option_descriptions
+      let promptsEndpoint;
+      if (questionnaireData.node_subtype === 'WebApp') {
+        promptsEndpoint = `/questionnaires/WebApp?level=basic`;
+      } else if (questionnaireData.node_subtype === 'API') {
+        promptsEndpoint = `/questionnaires/API?level=basic`;
+      } else if (questionnaireData.node_subtype === 'Database') {
+        promptsEndpoint = `/questionnaires/Database?level=basic`;
+      } else {
+        promptsEndpoint = `/questionnaires/${questionnaireData.node_subtype}`;
+      }
+
       const promptsResult = await callAPI(
-        `/questionnaires/${questionnaireData.node_subtype}`,
+        promptsEndpoint,
         null,
         'GET'
       );
