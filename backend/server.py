@@ -3970,6 +3970,122 @@ async def get_webapp_comprehensive_questionnaire(level: str = "basic"):
         logger.error(f"Error loading WebApp comprehensive questionnaire: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to load questionnaire: {str(e)}")
 
+@api_router.get("/questionnaires/API")
+async def get_api_comprehensive_questionnaire(level: str = "basic"):
+    """Get comprehensive API questionnaire from api.yaml file"""
+    try:
+        # Load questionnaire from YAML file
+        import yaml
+        questionnaire_path = Path(__file__).parent / "questionnaires" / "api.yaml"
+        
+        if not questionnaire_path.exists():
+            raise HTTPException(status_code=404, detail="API questionnaire not found")
+        
+        with open(questionnaire_path, 'r', encoding='utf-8') as file:
+            questionnaire_data = yaml.safe_load(file)
+        
+        # Get questionnaire level (basic, advanced, expert) - default to basic
+        valid_levels = ["basic", "advanced", "expert"]
+        if level not in valid_levels:
+            level = "basic"
+        
+        # Extract questions for the specified level
+        level_questions = questionnaire_data.get("questionnaires", {}).get(level, [])
+        
+        # Format questions for API response
+        formatted_questions = []
+        for question in level_questions:
+            formatted_questions.append({
+                "id": question["id"],
+                "question": question["question"],
+                "type": question["type"],
+                "options": question.get("options", []),
+                "option_descriptions": question.get("option_descriptions", {}),
+                "help_text": question.get("help_text", ""),
+                "related_branch": question.get("related_branch", ""),
+                "required": True  # All comprehensive questionnaire questions are required
+            })
+        
+        return {
+            "node_subtype": "API",
+            "node_type": questionnaire_data.get("node_type", "Asset"),
+            "category": questionnaire_data.get("category", "Application Services"),
+            "description": questionnaire_data.get("description", "REST/GraphQL API Endpoint"),
+            "questionnaire_type": f"Comprehensive Security Assessment - {level.title()} Level",
+            "level": level,
+            "security_branches": questionnaire_data.get("required_branches", []),
+            "prompts": formatted_questions,
+            "total_questions": len(formatted_questions),
+            "threat_intelligence": questionnaire_data.get("threat_intelligence", {}),
+            "risk_factors": questionnaire_data.get("risk_factors", {}),
+            "dependencies": questionnaire_data.get("dependencies", {}),
+            "available_levels": valid_levels,
+            "completion_required": True,  # Flag to indicate all questions must be answered before vulnerability analysis
+            "is_comprehensive": True  # Flag to indicate this is the comprehensive system
+        }
+        
+    except Exception as e:
+        logger.error(f"Error loading API comprehensive questionnaire: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to load questionnaire: {str(e)}")
+
+@api_router.get("/questionnaires/Database")
+async def get_database_comprehensive_questionnaire(level: str = "basic"):
+    """Get comprehensive Database questionnaire from database.yaml file"""
+    try:
+        # Load questionnaire from YAML file
+        import yaml
+        questionnaire_path = Path(__file__).parent / "questionnaires" / "database.yaml"
+        
+        if not questionnaire_path.exists():
+            raise HTTPException(status_code=404, detail="Database questionnaire not found")
+        
+        with open(questionnaire_path, 'r', encoding='utf-8') as file:
+            questionnaire_data = yaml.safe_load(file)
+        
+        # Get questionnaire level (basic, advanced, expert) - default to basic
+        valid_levels = ["basic", "advanced", "expert"]
+        if level not in valid_levels:
+            level = "basic"
+        
+        # Extract questions for the specified level
+        level_questions = questionnaire_data.get("questionnaires", {}).get(level, [])
+        
+        # Format questions for API response
+        formatted_questions = []
+        for question in level_questions:
+            formatted_questions.append({
+                "id": question["id"],
+                "question": question["question"],
+                "type": question["type"],
+                "options": question.get("options", []),
+                "option_descriptions": question.get("option_descriptions", {}),
+                "help_text": question.get("help_text", ""),
+                "related_branch": question.get("related_branch", ""),
+                "required": True  # All comprehensive questionnaire questions are required
+            })
+        
+        return {
+            "node_subtype": "Database",
+            "node_type": questionnaire_data.get("node_type", "Asset"),
+            "category": questionnaire_data.get("category", "Application Services"),
+            "description": questionnaire_data.get("description", "Database System"),
+            "questionnaire_type": f"Comprehensive Security Assessment - {level.title()} Level",
+            "level": level,
+            "security_branches": questionnaire_data.get("required_branches", []),
+            "prompts": formatted_questions,
+            "total_questions": len(formatted_questions),
+            "threat_intelligence": questionnaire_data.get("threat_intelligence", {}),
+            "risk_factors": questionnaire_data.get("risk_factors", {}),
+            "dependencies": questionnaire_data.get("dependencies", {}),
+            "available_levels": valid_levels,
+            "completion_required": True,  # Flag to indicate all questions must be answered before vulnerability analysis
+            "is_comprehensive": True  # Flag to indicate this is the comprehensive system
+        }
+        
+    except Exception as e:
+        logger.error(f"Error loading Database comprehensive questionnaire: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to load questionnaire: {str(e)}")
+
 # CONDITIONAL QUESTIONNAIRE ENDPOINT - Enhanced with API/DB type conditioning
 @api_router.get("/questionnaires/{node_subtype}/conditional")
 async def get_conditional_questionnaire(node_subtype: str, level: str = "basic", responses: str = None):
