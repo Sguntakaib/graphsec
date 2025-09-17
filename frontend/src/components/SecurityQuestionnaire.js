@@ -399,7 +399,8 @@ const SecurityQuestionnaire = ({
           <div className="space-y-2">
             {prompt.options?.map((option, index) => {
               const selectedOptions = Array.isArray(currentValue) ? currentValue : [];
-              return (
+              const optionDescription = prompt.option_descriptions?.[option];
+              const optionElement = (
                 <label 
                   key={index}
                   className="flex items-center space-x-3 p-3 border border-gray-600 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors"
@@ -416,9 +417,27 @@ const SecurityQuestionnaire = ({
                     }}
                     className="text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-white">{option}</span>
+                  <span className="text-white flex-grow">{option}</span>
+                  {optionDescription && (
+                    <HelpCircle className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                  )}
                 </label>
               );
+
+              if (optionDescription) {
+                return (
+                  <Tooltip key={index}>
+                    <TooltipTrigger asChild>
+                      {optionElement}
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs bg-gray-900 border-gray-700 text-gray-100">
+                      <p className="text-sm">{optionDescription}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              }
+
+              return optionElement;
             })}
           </div>
         );
