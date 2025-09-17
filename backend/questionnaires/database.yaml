@@ -77,6 +77,12 @@ questionnaires:
       question: "What backup strategy is implemented?"
       type: "single_choice"
       options: ["Automated encrypted backups", "Regular backups", "Manual backups", "No backup strategy", "Unknown"]
+      option_descriptions:
+        "Automated encrypted backups": "Fully automated backup process with encryption at rest, regular testing, and secure off-site storage to ensure data protection and availability."
+        "Regular backups": "Scheduled backup process with basic protections, but may lack encryption or comprehensive testing procedures."
+        "Manual backups": "Backup process requiring manual intervention - inconsistent and prone to human error or delays."
+        "No backup strategy": "No systematic backup approach in place - high risk of permanent data loss during incidents."
+        "Unknown": "Database backup strategy is unclear or not documented."
       help_text: "Database backups ensure data recovery in case of loss or corruption."
       related_branch: "Backup"
     - id: "database_patch_management"
