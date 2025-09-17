@@ -109,6 +109,7 @@ class SecurityPrompt(BaseModel):
     question: str
     type: PromptType
     options: Optional[List[str]] = None
+    option_descriptions: Dict[str, str] = {}
     default_value: Optional[Any] = None
     help_text: str = ""
     validation_rules: Dict[str, Any] = {}
