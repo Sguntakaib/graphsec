@@ -2671,7 +2671,7 @@ function AppContent() {
       </div>
 
       {/* Security Questionnaire Modal - Only show if enhanced system is not active and no existing questionnaire for this node */}
-      {!questionnaireState.isFlowActive && 
+      {(!questionnaireState.isFlowActive || currentQuestionnaireNode?.subtype === 'API') && 
        !questionnaireState.questionnaires[currentQuestionnaireNode?.id] && (
         <SecurityQuestionnaire
           nodeSubtype={currentQuestionnaireNode?.subtype || currentQuestionnaireNode?.data?.subtype}
