@@ -3941,6 +3941,7 @@ async def get_webapp_comprehensive_questionnaire(level: str = "basic"):
                 "question": question["question"],
                 "type": question["type"],
                 "options": question.get("options", []),
+                "option_descriptions": question.get("option_descriptions", {}),
                 "help_text": question.get("help_text", ""),
                 "related_branch": question.get("related_branch", ""),
                 "required": True  # All comprehensive questionnaire questions are required
