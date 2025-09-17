@@ -101,6 +101,12 @@ questionnaires:
       question: "What API logging and monitoring is in place?"
       type: "single_choice"
       options: ["Comprehensive API logging", "Basic request logging", "Minimal logging", "No logging", "Unknown"]
+      option_descriptions:
+        "Comprehensive API logging": "Complete audit trail including requests, responses, authentication events, errors, and security events with real-time monitoring and alerting."
+        "Basic request logging": "Logs API requests and basic response information, but may miss security events, detailed error information, or real-time monitoring."
+        "Minimal logging": "Limited logging of basic API activity - insufficient for security monitoring, troubleshooting, or forensic analysis."
+        "No logging": "No API activity logging - impossible to detect security incidents, troubleshoot issues, or maintain audit trails."
+        "Unknown": "API logging and monitoring configuration is unclear or not documented."
       help_text: "API logging enables security monitoring and forensic analysis."
       related_branch: "Monitoring"
 
