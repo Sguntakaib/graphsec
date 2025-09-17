@@ -509,9 +509,18 @@ function AppContent() {
   const startEnhancedQuestionnaire = useCallback(async (nodeId, nodeSubtype, parentNodeId = null) => {
     console.log('🎬 Starting enhanced questionnaire:', { nodeId, nodeSubtype, parentNodeId });
     
+    // Prevent duplicate questionnaires
+    if (activeQuestionnaires.has(nodeId)) {
+      console.log('⚠️ Questionnaire already active for node:', nodeId);
+      return;
+    }
+    
     // Force API nodes to use legacy system immediately
     if (nodeSubtype === 'API') {
       console.log('🔄 API node detected - using legacy intelligent-nodes system');
+      
+      // Add to active questionnaires
+      setActiveQuestionnaires(prev => new Set([...prev, nodeId]));
       
       // Find the actual node to get its full data including parentNode
       const apiNode = nodes.find(n => n.id === nodeId);
