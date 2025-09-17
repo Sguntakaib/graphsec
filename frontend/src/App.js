@@ -1899,9 +1899,9 @@ function AppContent() {
   const handleQuestionnaireOverviewEdit = (node) => {
     setShowQuestionnaireOverview(false);
     
-    // Use enhanced questionnaire system
+    // Use legacy questionnaire system
     const nodeSubtype = node.subtype || node.data?.subtype;
-    startEnhancedQuestionnaire(node.id, nodeSubtype);
+    startLegacyQuestionnaire(node.id, nodeSubtype);
   };
 
   const handleNodeBranchUpdate = (nodeId, updatedBranches) => {
