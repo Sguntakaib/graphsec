@@ -686,6 +686,7 @@ const SecurityQuestionnaire = ({
         </div>
       </div>
     </div>
+    </TooltipProvider>
   );
 };
 
