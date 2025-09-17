@@ -48,6 +48,12 @@ questionnaires:
       question: "How are user sessions managed?"
       type: "single_choice"
       options: ["Secure session management", "Standard sessions", "Basic sessions", "No session management", "Unknown"]
+      option_descriptions:
+        "Secure session management": "Implements HTTPS-only cookies, secure session IDs, session rotation, timeout controls, and protection against session hijacking and fixation attacks."
+        "Standard sessions": "Basic session handling with standard security practices like secure cookies and reasonable timeouts, but may lack advanced protections."
+        "Basic sessions": "Simple session implementation with minimal security features - vulnerable to common session-based attacks."
+        "No session management": "Application does not maintain user sessions, requiring re-authentication for each request or operating statelessly."
+        "Unknown": "Session management implementation is unclear or not documented."
       help_text: "Secure session management prevents session hijacking and fixation attacks."
       related_branch: "SessionManagement"
     - id: "webapp_error_handling"
