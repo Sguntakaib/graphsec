@@ -41,6 +41,12 @@ questionnaires:
       question: "Is rate limiting implemented?"
       type: "single_choice"
       options: ["Per-user rate limiting", "Global rate limiting", "Basic throttling", "No rate limiting", "Unknown"]
+      option_descriptions:
+        "Per-user rate limiting": "Individual rate limits for each user or API key, providing fair usage and preventing individual users from overwhelming the API."
+        "Global rate limiting": "System-wide rate limiting that applies to all API consumers collectively - protects the service but may affect legitimate users."
+        "Basic throttling": "Simple rate limiting with minimal configuration - may not adequately protect against sophisticated abuse."
+        "No rate limiting": "No restrictions on API request frequency - vulnerable to denial-of-service attacks and abuse."
+        "Unknown": "API rate limiting implementation is unclear or not documented."
       help_text: "Rate limiting prevents API abuse and ensures service availability."
       related_branch: "RateLimiting"
     - id: "api_database_access"
