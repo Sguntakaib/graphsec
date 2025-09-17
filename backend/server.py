@@ -1388,7 +1388,7 @@ async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = None):
             "is_connected": nx.is_connected(G.to_undirected()) if len(nodes) > 1 else True,
             "node_types": list(set(node.get("type", "Unknown") for node in nodes)),
             "density": nx.density(G) if len(nodes) > 1 else 0,
-            "vulnerability_density": vulnerability_count / len(nodes) if nodes else 0
+            "vulnerability_density": metrics.vulnerability_nodes / len(nodes) if nodes else 0
         }
     }
     
