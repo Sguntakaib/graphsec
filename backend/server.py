@@ -1400,45 +1400,59 @@ async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = None):
 # Enhanced Auto-Layout API with algorithm selection
 @api_router.get("/diagrams/{diagram_id}/layout-algorithms")
 async def get_available_layout_algorithms():
-    """Get available auto-layout algorithms"""
+    """Get available advanced auto-layout algorithms"""
     return {
         "algorithms": [
             {
-                "id": "smart_hierarchical",
-                "name": "Smart Hierarchical",
-                "description": "Security-aware hierarchical layout based on threat model semantics",
-                "best_for": "Security models with clear asset/threat relationships",
-                "complexity": "O(n)"
+                "id": "enhanced_smart_hierarchical",
+                "name": "Enhanced Smart Hierarchical",
+                "description": "Advanced hierarchical layout with collision detection and adaptive spacing",
+                "best_for": "Security models with vulnerability nodes and clear hierarchies",
+                "complexity": "O(n log n)",
+                "features": ["collision_detection", "adaptive_spacing", "multi_ring_orbital", "canvas_optimization"]
             },
             {
-                "id": "force_directed", 
-                "name": "Force-Directed",
-                "description": "Spring-based layout that minimizes edge crossings",
-                "best_for": "General network diagrams with natural clustering",
-                "complexity": "O(n²)"
+                "id": "organic_flow", 
+                "name": "Organic Flow",
+                "description": "Natural, flowing layouts that mimic real network topologies using force-directed algorithms",
+                "best_for": "Complex networks with natural clustering and flow patterns",
+                "complexity": "O(n²)",
+                "features": ["force_directed", "orbital_satellites", "traffic_flow_simulation", "clustering"]
             },
             {
-                "id": "circular",
-                "name": "Circular",
-                "description": "Circular layout with nodes grouped by type",
-                "best_for": "Showing relationships between different security domains",
-                "complexity": "O(n)"
+                "id": "security_perimeter",
+                "name": "Security Perimeter",
+                "description": "Layout based on security zones and concentric perimeters",
+                "best_for": "Defense-in-depth architectures with clear security zones",
+                "complexity": "O(n)",
+                "features": ["concentric_zones", "threat_vector_alignment", "asset_protection_layers", "attack_path_visualization"]
             },
             {
-                "id": "layered_security",
-                "name": "Layered Security",
-                "description": "Concentric circles representing security perimeters",
-                "best_for": "Defense-in-depth security architectures",
-                "complexity": "O(n)"
+                "id": "force_directed_advanced",
+                "name": "Advanced Force-Directed",
+                "description": "Enhanced spring-based layout with custom forces and node weighting",
+                "best_for": "General network diagrams requiring precise edge crossing minimization",
+                "complexity": "O(n²)",
+                "features": ["custom_forces", "node_weighting", "collision_avoidance", "edge_optimization"]
             },
             {
-                "id": "network_topology",
-                "name": "Network Topology",
-                "description": "Graph structure-aware layout using topological analysis",
-                "best_for": "Complex network diagrams with hierarchical structure",
-                "complexity": "O(n log n)"
+                "id": "network_topology_advanced",
+                "name": "Advanced Network Topology",
+                "description": "Sophisticated graph structure-aware layout using advanced topological analysis",
+                "best_for": "Complex hierarchical networks with multiple relationship types",
+                "complexity": "O(n log n)",
+                "features": ["hierarchical_analysis", "planar_layout", "shell_organization", "topology_optimization"]
             }
-        ]
+        ],
+        "features": {
+            "auto_selection": "Algorithm automatically selected based on diagram characteristics",
+            "collision_detection": "Advanced spatial grid-based collision detection",
+            "canvas_optimization": "Dynamic canvas sizing based on content",
+            "multi_ring_orbital": "Vulnerability nodes positioned in optimal orbital rings",
+            "performance_optimization": "Optimized for large diagrams (100+ nodes)",
+            "visual_enhancements": "Edge routing, visual grouping, and animation support",
+            "caching": "Layout results cached for improved performance"
+        }
     }
 
 # Template Management APIs
