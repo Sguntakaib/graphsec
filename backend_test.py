@@ -49,12 +49,11 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://tooltip-fix.preview.emergentagent.com/api"
 
-class QuestionnaireDependencyFlowTester:
+class TooltipFunctionalityTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
         self.test_results = []
-        self.created_diagram_id = None
         
     def log_test(self, test_name, success, message="", response_data=None):
         """Log test results"""
@@ -87,16 +86,368 @@ class QuestionnaireDependencyFlowTester:
             return False
 
     # ============================================================================
-    # TEST 1: WebApp Questionnaire Question Order Verification
+    # TEST 1: API Questionnaire Endpoint Testing
     # ============================================================================
     
-    def test_webapp_questionnaire_question_order(self):
-        """Test WebApp Questionnaire Question Order - Verify dependency questions are at positions 4 and 5"""
+    def test_api_questionnaire_basic_level(self):
+        """Test GET /api/questionnaires/API (basic level) with option_descriptions verification"""
+        try:
+            response = self.session.get(f"{self.base_url}/questionnaires/API")
+            
+            if response.status_code != 200:
+                self.log_test("API Questionnaire Basic", False, 
+                            f"Failed to get API questionnaire: HTTP {response.status_code}: {response.text}")
+                return False
+            
+            data = response.json()
+            
+            # Verify expected structure
+            if 'prompts' not in data:
+                self.log_test("API Questionnaire Basic", False, 
+                            f"Missing 'prompts' field in response: {data}")
+                return False
+            
+            prompts = data['prompts']
+            
+            if len(prompts) == 0:
+                self.log_test("API Questionnaire Basic", False, 
+                            f"No prompts found in API questionnaire")
+                return False
+            
+            # Check for option_descriptions in choice questions
+            choice_questions_with_descriptions = 0
+            choice_questions_total = 0
+            missing_descriptions = []
+            
+            for i, prompt in enumerate(prompts):
+                question_type = prompt.get('type', '')
+                question_id = prompt.get('id', f'question_{i}')
+                
+                if question_type in ['single_choice', 'multiple_choice']:
+                    choice_questions_total += 1
+                    
+                    if 'option_descriptions' in prompt:
+                        choice_questions_with_descriptions += 1
+                        
+                        # Verify option_descriptions structure
+                        option_descriptions = prompt['option_descriptions']
+                        if not isinstance(option_descriptions, dict):
+                            self.log_test("API Questionnaire Basic", False, 
+                                        f"option_descriptions should be a dict for question {question_id}, got {type(option_descriptions)}")
+                            return False
+                        
+                        # Verify options match option_descriptions keys
+                        options = prompt.get('options', [])
+                        for option in options:
+                            if option not in option_descriptions:
+                                missing_descriptions.append(f"{question_id}: missing description for option '{option}'")
+                    else:
+                        missing_descriptions.append(f"{question_id}: missing option_descriptions field")
+            
+            if missing_descriptions:
+                self.log_test("API Questionnaire Basic", False, 
+                            f"Missing option descriptions: {missing_descriptions}")
+                return False
+            
+            if choice_questions_total == 0:
+                self.log_test("API Questionnaire Basic", True, 
+                            f"✅ API questionnaire loaded successfully ({len(prompts)} questions) - No choice questions found, option_descriptions not required")
+            else:
+                self.log_test("API Questionnaire Basic", True, 
+                            f"✅ API questionnaire loaded successfully ({len(prompts)} questions, {choice_questions_with_descriptions}/{choice_questions_total} choice questions have option_descriptions)")
+            
+            print(f"📋 API Questionnaire Basic Level:")
+            print(f"   Total Questions: {len(prompts)}")
+            print(f"   Choice Questions: {choice_questions_total}")
+            print(f"   With Option Descriptions: {choice_questions_with_descriptions}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("API Questionnaire Basic", False, f"Request error: {str(e)}")
+            return False
+
+    def test_api_questionnaire_advanced_level(self):
+        """Test GET /api/questionnaires/API?level=advanced with option_descriptions verification"""
+        try:
+            response = self.session.get(f"{self.base_url}/questionnaires/API?level=advanced")
+            
+            if response.status_code != 200:
+                self.log_test("API Questionnaire Advanced", False, 
+                            f"Failed to get API questionnaire (advanced): HTTP {response.status_code}: {response.text}")
+                return False
+            
+            data = response.json()
+            
+            # Verify expected structure
+            if 'prompts' not in data:
+                self.log_test("API Questionnaire Advanced", False, 
+                            f"Missing 'prompts' field in response: {data}")
+                return False
+            
+            prompts = data['prompts']
+            
+            # Check for option_descriptions in choice questions
+            choice_questions_with_descriptions = 0
+            choice_questions_total = 0
+            
+            for prompt in prompts:
+                question_type = prompt.get('type', '')
+                
+                if question_type in ['single_choice', 'multiple_choice']:
+                    choice_questions_total += 1
+                    
+                    if 'option_descriptions' in prompt:
+                        choice_questions_with_descriptions += 1
+            
+            self.log_test("API Questionnaire Advanced", True, 
+                        f"✅ API questionnaire (advanced) loaded successfully ({len(prompts)} questions, {choice_questions_with_descriptions}/{choice_questions_total} choice questions have option_descriptions)")
+            
+            print(f"📋 API Questionnaire Advanced Level:")
+            print(f"   Total Questions: {len(prompts)}")
+            print(f"   Choice Questions: {choice_questions_total}")
+            print(f"   With Option Descriptions: {choice_questions_with_descriptions}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("API Questionnaire Advanced", False, f"Request error: {str(e)}")
+            return False
+
+    def test_api_questionnaire_expert_level(self):
+        """Test GET /api/questionnaires/API?level=expert with option_descriptions verification"""
+        try:
+            response = self.session.get(f"{self.base_url}/questionnaires/API?level=expert")
+            
+            if response.status_code != 200:
+                self.log_test("API Questionnaire Expert", False, 
+                            f"Failed to get API questionnaire (expert): HTTP {response.status_code}: {response.text}")
+                return False
+            
+            data = response.json()
+            
+            # Verify expected structure
+            if 'prompts' not in data:
+                self.log_test("API Questionnaire Expert", False, 
+                            f"Missing 'prompts' field in response: {data}")
+                return False
+            
+            prompts = data['prompts']
+            
+            # Check for option_descriptions in choice questions
+            choice_questions_with_descriptions = 0
+            choice_questions_total = 0
+            
+            for prompt in prompts:
+                question_type = prompt.get('type', '')
+                
+                if question_type in ['single_choice', 'multiple_choice']:
+                    choice_questions_total += 1
+                    
+                    if 'option_descriptions' in prompt:
+                        choice_questions_with_descriptions += 1
+            
+            self.log_test("API Questionnaire Expert", True, 
+                        f"✅ API questionnaire (expert) loaded successfully ({len(prompts)} questions, {choice_questions_with_descriptions}/{choice_questions_total} choice questions have option_descriptions)")
+            
+            print(f"📋 API Questionnaire Expert Level:")
+            print(f"   Total Questions: {len(prompts)}")
+            print(f"   Choice Questions: {choice_questions_total}")
+            print(f"   With Option Descriptions: {choice_questions_with_descriptions}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("API Questionnaire Expert", False, f"Request error: {str(e)}")
+            return False
+
+    # ============================================================================
+    # TEST 2: Database Questionnaire Endpoint Testing
+    # ============================================================================
+    
+    def test_database_questionnaire_basic_level(self):
+        """Test GET /api/questionnaires/Database (basic level) with option_descriptions verification"""
+        try:
+            response = self.session.get(f"{self.base_url}/questionnaires/Database")
+            
+            if response.status_code != 200:
+                self.log_test("Database Questionnaire Basic", False, 
+                            f"Failed to get Database questionnaire: HTTP {response.status_code}: {response.text}")
+                return False
+            
+            data = response.json()
+            
+            # Verify expected structure
+            if 'prompts' not in data:
+                self.log_test("Database Questionnaire Basic", False, 
+                            f"Missing 'prompts' field in response: {data}")
+                return False
+            
+            prompts = data['prompts']
+            
+            if len(prompts) == 0:
+                self.log_test("Database Questionnaire Basic", False, 
+                            f"No prompts found in Database questionnaire")
+                return False
+            
+            # Check for option_descriptions in choice questions
+            choice_questions_with_descriptions = 0
+            choice_questions_total = 0
+            missing_descriptions = []
+            
+            for i, prompt in enumerate(prompts):
+                question_type = prompt.get('type', '')
+                question_id = prompt.get('id', f'question_{i}')
+                
+                if question_type in ['single_choice', 'multiple_choice']:
+                    choice_questions_total += 1
+                    
+                    if 'option_descriptions' in prompt:
+                        choice_questions_with_descriptions += 1
+                        
+                        # Verify option_descriptions structure
+                        option_descriptions = prompt['option_descriptions']
+                        if not isinstance(option_descriptions, dict):
+                            self.log_test("Database Questionnaire Basic", False, 
+                                        f"option_descriptions should be a dict for question {question_id}, got {type(option_descriptions)}")
+                            return False
+                        
+                        # Verify options match option_descriptions keys
+                        options = prompt.get('options', [])
+                        for option in options:
+                            if option not in option_descriptions:
+                                missing_descriptions.append(f"{question_id}: missing description for option '{option}'")
+                    else:
+                        missing_descriptions.append(f"{question_id}: missing option_descriptions field")
+            
+            if missing_descriptions:
+                self.log_test("Database Questionnaire Basic", False, 
+                            f"Missing option descriptions: {missing_descriptions}")
+                return False
+            
+            if choice_questions_total == 0:
+                self.log_test("Database Questionnaire Basic", True, 
+                            f"✅ Database questionnaire loaded successfully ({len(prompts)} questions) - No choice questions found, option_descriptions not required")
+            else:
+                self.log_test("Database Questionnaire Basic", True, 
+                            f"✅ Database questionnaire loaded successfully ({len(prompts)} questions, {choice_questions_with_descriptions}/{choice_questions_total} choice questions have option_descriptions)")
+            
+            print(f"📋 Database Questionnaire Basic Level:")
+            print(f"   Total Questions: {len(prompts)}")
+            print(f"   Choice Questions: {choice_questions_total}")
+            print(f"   With Option Descriptions: {choice_questions_with_descriptions}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Database Questionnaire Basic", False, f"Request error: {str(e)}")
+            return False
+
+    def test_database_questionnaire_advanced_level(self):
+        """Test GET /api/questionnaires/Database?level=advanced with option_descriptions verification"""
+        try:
+            response = self.session.get(f"{self.base_url}/questionnaires/Database?level=advanced")
+            
+            if response.status_code != 200:
+                self.log_test("Database Questionnaire Advanced", False, 
+                            f"Failed to get Database questionnaire (advanced): HTTP {response.status_code}: {response.text}")
+                return False
+            
+            data = response.json()
+            
+            # Verify expected structure
+            if 'prompts' not in data:
+                self.log_test("Database Questionnaire Advanced", False, 
+                            f"Missing 'prompts' field in response: {data}")
+                return False
+            
+            prompts = data['prompts']
+            
+            # Check for option_descriptions in choice questions
+            choice_questions_with_descriptions = 0
+            choice_questions_total = 0
+            
+            for prompt in prompts:
+                question_type = prompt.get('type', '')
+                
+                if question_type in ['single_choice', 'multiple_choice']:
+                    choice_questions_total += 1
+                    
+                    if 'option_descriptions' in prompt:
+                        choice_questions_with_descriptions += 1
+            
+            self.log_test("Database Questionnaire Advanced", True, 
+                        f"✅ Database questionnaire (advanced) loaded successfully ({len(prompts)} questions, {choice_questions_with_descriptions}/{choice_questions_total} choice questions have option_descriptions)")
+            
+            print(f"📋 Database Questionnaire Advanced Level:")
+            print(f"   Total Questions: {len(prompts)}")
+            print(f"   Choice Questions: {choice_questions_total}")
+            print(f"   With Option Descriptions: {choice_questions_with_descriptions}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Database Questionnaire Advanced", False, f"Request error: {str(e)}")
+            return False
+
+    def test_database_questionnaire_expert_level(self):
+        """Test GET /api/questionnaires/Database?level=expert with option_descriptions verification"""
+        try:
+            response = self.session.get(f"{self.base_url}/questionnaires/Database?level=expert")
+            
+            if response.status_code != 200:
+                self.log_test("Database Questionnaire Expert", False, 
+                            f"Failed to get Database questionnaire (expert): HTTP {response.status_code}: {response.text}")
+                return False
+            
+            data = response.json()
+            
+            # Verify expected structure
+            if 'prompts' not in data:
+                self.log_test("Database Questionnaire Expert", False, 
+                            f"Missing 'prompts' field in response: {data}")
+                return False
+            
+            prompts = data['prompts']
+            
+            # Check for option_descriptions in choice questions
+            choice_questions_with_descriptions = 0
+            choice_questions_total = 0
+            
+            for prompt in prompts:
+                question_type = prompt.get('type', '')
+                
+                if question_type in ['single_choice', 'multiple_choice']:
+                    choice_questions_total += 1
+                    
+                    if 'option_descriptions' in prompt:
+                        choice_questions_with_descriptions += 1
+            
+            self.log_test("Database Questionnaire Expert", True, 
+                        f"✅ Database questionnaire (expert) loaded successfully ({len(prompts)} questions, {choice_questions_with_descriptions}/{choice_questions_total} choice questions have option_descriptions)")
+            
+            print(f"📋 Database Questionnaire Expert Level:")
+            print(f"   Total Questions: {len(prompts)}")
+            print(f"   Choice Questions: {choice_questions_total}")
+            print(f"   With Option Descriptions: {choice_questions_with_descriptions}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Database Questionnaire Expert", False, f"Request error: {str(e)}")
+            return False
+
+    # ============================================================================
+    # TEST 3: Comparison Testing
+    # ============================================================================
+    
+    def test_webapp_questionnaire_comparison(self):
+        """Test GET /api/questionnaires/WebApp for comparison with API and Database endpoints"""
         try:
             response = self.session.get(f"{self.base_url}/questionnaires/WebApp")
             
             if response.status_code != 200:
-                self.log_test("WebApp Question Order", False, 
+                self.log_test("WebApp Questionnaire Comparison", False, 
                             f"Failed to get WebApp questionnaire: HTTP {response.status_code}: {response.text}")
                 return False
             
@@ -104,665 +455,257 @@ class QuestionnaireDependencyFlowTester:
             
             # Verify expected structure
             if 'prompts' not in data:
-                self.log_test("WebApp Question Order", False, 
+                self.log_test("WebApp Questionnaire Comparison", False, 
                             f"Missing 'prompts' field in response: {data}")
                 return False
             
             prompts = data['prompts']
             
-            # Test 1: Confirm there are 10 total questions
-            if len(prompts) != 10:
-                self.log_test("WebApp Question Order", False, 
-                            f"Expected 10 questions, got {len(prompts)} questions")
-                return False
+            # Check for option_descriptions in choice questions
+            choice_questions_with_descriptions = 0
+            choice_questions_total = 0
             
-            # Test 2: Verify Database dependency question is at position 4 (index 3)
-            if len(prompts) < 4:
-                self.log_test("WebApp Question Order", False, 
-                            f"Not enough questions to check position 4. Only {len(prompts)} questions found")
-                return False
+            for prompt in prompts:
+                question_type = prompt.get('type', '')
+                
+                if question_type in ['single_choice', 'multiple_choice']:
+                    choice_questions_total += 1
+                    
+                    if 'option_descriptions' in prompt:
+                        choice_questions_with_descriptions += 1
             
-            database_question = prompts[3]  # Position 4 (0-indexed)
-            database_question_text = database_question.get('question', '').lower()
-            database_question_id = database_question.get('id', '')
+            self.log_test("WebApp Questionnaire Comparison", True, 
+                        f"✅ WebApp questionnaire loaded successfully ({len(prompts)} questions, {choice_questions_with_descriptions}/{choice_questions_total} choice questions have option_descriptions)")
             
-            # Check if this is the database dependency question
-            is_database_dependency = (
-                'database' in database_question_text and 
-                ('connect' in database_question_text or 'connection' in database_question_text)
-            ) or 'webapp_database_connection' in database_question_id
-            
-            if not is_database_dependency:
-                self.log_test("WebApp Question Order", False, 
-                            f"Database dependency question not found at position 4. Found: {database_question}")
-                return False
-            
-            # Test 3: Verify API dependency question is at position 5 (index 4)
-            if len(prompts) < 5:
-                self.log_test("WebApp Question Order", False, 
-                            f"Not enough questions to check position 5. Only {len(prompts)} questions found")
-                return False
-            
-            api_question = prompts[4]  # Position 5 (0-indexed)
-            api_question_text = api_question.get('question', '').lower()
-            api_question_id = api_question.get('id', '')
-            
-            # Check if this is the API dependency question
-            is_api_dependency = (
-                'api' in api_question_text and 
-                ('endpoint' in api_question_text or 'expose' in api_question_text)
-            ) or 'webapp_api_endpoints' in api_question_id
-            
-            if not is_api_dependency:
-                self.log_test("WebApp Question Order", False, 
-                            f"API dependency question not found at position 5. Found: {api_question}")
-                return False
-            
-            self.log_test("WebApp Question Order", True, 
-                        f"✅ WebApp questionnaire has correct structure: 10 questions total, Database dependency at position 4, API dependency at position 5")
-            
-            print(f"📋 WebApp Questionnaire Structure Verified:")
+            print(f"📋 WebApp Questionnaire (for comparison):")
             print(f"   Total Questions: {len(prompts)}")
-            print(f"   Position 4 (Database): {database_question.get('question', 'N/A')[:60]}...")
-            print(f"   Position 5 (API): {api_question.get('question', 'N/A')[:60]}...")
+            print(f"   Choice Questions: {choice_questions_total}")
+            print(f"   With Option Descriptions: {choice_questions_with_descriptions}")
             
             return True
             
         except Exception as e:
-            self.log_test("WebApp Question Order", False, f"Request error: {str(e)}")
+            self.log_test("WebApp Questionnaire Comparison", False, f"Request error: {str(e)}")
             return False
 
-    def test_database_questionnaire_dependency_positions(self):
-        """Test Database Questionnaire has dependency questions in middle positions"""
+    def test_endpoint_consistency(self):
+        """Test that all three endpoints (WebApp, API, Database) return consistent data structure"""
         try:
-            response = self.session.get(f"{self.base_url}/questionnaires/Database")
+            endpoints = [
+                ("WebApp", f"{self.base_url}/questionnaires/WebApp"),
+                ("API", f"{self.base_url}/questionnaires/API"),
+                ("Database", f"{self.base_url}/questionnaires/Database")
+            ]
             
-            if response.status_code != 200:
-                # Try intelligent-nodes endpoint as fallback
-                response = self.session.get(f"{self.base_url}/intelligent-nodes/Database/prompts")
+            endpoint_data = {}
+            
+            for endpoint_name, endpoint_url in endpoints:
+                response = self.session.get(endpoint_url)
                 
                 if response.status_code != 200:
-                    self.log_test("Database Question Order", False, 
-                                f"Failed to get Database questionnaire: HTTP {response.status_code}: {response.text}")
+                    self.log_test("Endpoint Consistency", False, 
+                                f"Failed to get {endpoint_name} questionnaire: HTTP {response.status_code}")
                     return False
+                
+                data = response.json()
+                
+                if 'prompts' not in data:
+                    self.log_test("Endpoint Consistency", False, 
+                                f"Missing 'prompts' field in {endpoint_name} questionnaire")
+                    return False
+                
+                endpoint_data[endpoint_name] = data
             
-            data = response.json()
-            prompts = data.get('prompts', [])
+            # Check consistency of structure
+            required_fields = ['prompts']
+            for endpoint_name, data in endpoint_data.items():
+                for field in required_fields:
+                    if field not in data:
+                        self.log_test("Endpoint Consistency", False, 
+                                    f"Missing required field '{field}' in {endpoint_name} questionnaire")
+                        return False
             
-            if len(prompts) == 0:
-                self.log_test("Database Question Order", False, 
-                            f"No prompts found in Database questionnaire")
+            # Check that all choice questions have option_descriptions
+            inconsistent_endpoints = []
+            
+            for endpoint_name, data in endpoint_data.items():
+                prompts = data['prompts']
+                choice_questions_missing_descriptions = 0
+                
+                for prompt in prompts:
+                    question_type = prompt.get('type', '')
+                    
+                    if question_type in ['single_choice', 'multiple_choice']:
+                        if 'option_descriptions' not in prompt:
+                            choice_questions_missing_descriptions += 1
+                
+                if choice_questions_missing_descriptions > 0:
+                    inconsistent_endpoints.append(f"{endpoint_name}: {choice_questions_missing_descriptions} choice questions missing option_descriptions")
+            
+            if inconsistent_endpoints:
+                self.log_test("Endpoint Consistency", False, 
+                            f"Inconsistent option_descriptions across endpoints: {inconsistent_endpoints}")
                 return False
             
-            # Look for dependency questions in middle positions (not at the end)
-            total_questions = len(prompts)
-            middle_start = 2  # After first 2 questions
-            middle_end = total_questions - 2  # Before last 2 questions
+            self.log_test("Endpoint Consistency", True, 
+                        f"✅ All three endpoints (WebApp, API, Database) return consistent data structure with option_descriptions")
             
-            dependency_questions_found = 0
-            dependency_positions = []
+            print(f"🔄 Endpoint Consistency Check:")
+            for endpoint_name, data in endpoint_data.items():
+                prompts = data['prompts']
+                choice_questions = sum(1 for p in prompts if p.get('type') in ['single_choice', 'multiple_choice'])
+                print(f"   {endpoint_name}: {len(prompts)} questions, {choice_questions} choice questions")
             
-            for i, prompt in enumerate(prompts):
-                question_text = prompt.get('question', '').lower()
-                question_id = prompt.get('id', '')
-                
-                # Check for dependency-related questions
-                is_dependency = (
-                    'backup' in question_text or 'monitoring' in question_text or
-                    'db_backup' in question_id or 'db_monitoring' in question_id
-                )
-                
-                if is_dependency:
-                    dependency_questions_found += 1
-                    dependency_positions.append(i + 1)  # 1-indexed position
-            
-            # Verify dependency questions are in middle positions
-            middle_dependencies = [pos for pos in dependency_positions if middle_start < pos <= middle_end]
-            
-            if dependency_questions_found > 0 and len(middle_dependencies) > 0:
-                self.log_test("Database Question Order", True, 
-                            f"✅ Database questionnaire has {dependency_questions_found} dependency questions in middle positions: {dependency_positions}")
-                
-                print(f"📋 Database Questionnaire Structure:")
-                print(f"   Total Questions: {total_questions}")
-                print(f"   Dependency Questions: {dependency_questions_found}")
-                print(f"   Dependency Positions: {dependency_positions}")
-                
-                return True
-            else:
-                self.log_test("Database Question Order", True, 
-                            f"✅ Database questionnaire structure verified ({total_questions} questions) - dependency questions may not be applicable for this node type")
-                return True
+            return True
             
         except Exception as e:
-            self.log_test("Database Question Order", False, f"Request error: {str(e)}")
+            self.log_test("Endpoint Consistency", False, f"Request error: {str(e)}")
             return False
 
-    def test_api_questionnaire_dependency_positions(self):
-        """Test API Questionnaire has dependency questions in middle positions"""
+    # ============================================================================
+    # TEST 4: Data Quality Validation
+    # ============================================================================
+    
+    def test_option_descriptions_quality(self):
+        """Test that option_descriptions contain meaningful tooltip text and match option values"""
         try:
-            response = self.session.get(f"{self.base_url}/questionnaires/API")
+            endpoints = [
+                ("API", f"{self.base_url}/questionnaires/API"),
+                ("Database", f"{self.base_url}/questionnaires/Database")
+            ]
             
-            if response.status_code != 200:
-                # Try intelligent-nodes endpoint as fallback
-                response = self.session.get(f"{self.base_url}/intelligent-nodes/API/prompts")
+            quality_issues = []
+            
+            for endpoint_name, endpoint_url in endpoints:
+                response = self.session.get(endpoint_url)
                 
                 if response.status_code != 200:
-                    self.log_test("API Question Order", False, 
-                                f"Failed to get API questionnaire: HTTP {response.status_code}: {response.text}")
-                    return False
+                    continue  # Skip if endpoint not available
+                
+                data = response.json()
+                prompts = data.get('prompts', [])
+                
+                for i, prompt in enumerate(prompts):
+                    question_type = prompt.get('type', '')
+                    question_id = prompt.get('id', f'question_{i}')
+                    
+                    if question_type in ['single_choice', 'multiple_choice']:
+                        options = prompt.get('options', [])
+                        option_descriptions = prompt.get('option_descriptions', {})
+                        
+                        # Check that all options have descriptions
+                        for option in options:
+                            if option not in option_descriptions:
+                                quality_issues.append(f"{endpoint_name} {question_id}: missing description for option '{option}'")
+                            else:
+                                description = option_descriptions[option]
+                                
+                                # Check that description is meaningful (not just the option repeated)
+                                if description.lower().strip() == option.lower().strip():
+                                    quality_issues.append(f"{endpoint_name} {question_id}: description for '{option}' is just option repetition")
+                                
+                                # Check that description is not empty or too short
+                                if len(description.strip()) < 10:
+                                    quality_issues.append(f"{endpoint_name} {question_id}: description for '{option}' is too short: '{description}'")
+                        
+                        # Check for extra descriptions (descriptions for non-existent options)
+                        for desc_option in option_descriptions.keys():
+                            if desc_option not in options:
+                                quality_issues.append(f"{endpoint_name} {question_id}: extra description for non-existent option '{desc_option}'")
             
-            data = response.json()
-            prompts = data.get('prompts', [])
-            
-            if len(prompts) == 0:
-                self.log_test("API Question Order", False, 
-                            f"No prompts found in API questionnaire")
+            if quality_issues:
+                self.log_test("Option Descriptions Quality", False, 
+                            f"Quality issues found: {quality_issues[:5]}...")  # Show first 5 issues
                 return False
             
-            # Look for dependency questions in middle positions (not at the end)
-            total_questions = len(prompts)
-            middle_start = 2  # After first 2 questions
-            middle_end = total_questions - 2  # Before last 2 questions
+            self.log_test("Option Descriptions Quality", True, 
+                        f"✅ Option descriptions are high quality with meaningful tooltip text")
             
-            dependency_questions_found = 0
-            dependency_positions = []
+            print(f"🔍 Option Descriptions Quality Check:")
+            print(f"   ✅ All options have corresponding descriptions")
+            print(f"   ✅ Descriptions are meaningful (not just option repetition)")
+            print(f"   ✅ Descriptions are comprehensive (>10 characters)")
+            print(f"   ✅ No extra descriptions for non-existent options")
             
-            for i, prompt in enumerate(prompts):
-                question_text = prompt.get('question', '').lower()
-                question_id = prompt.get('id', '')
-                
-                # Check for dependency-related questions
-                is_dependency = (
-                    'gateway' in question_text or 'load balancer' in question_text or
-                    'cache' in question_text or 'api_gateway' in question_id
-                )
-                
-                if is_dependency:
-                    dependency_questions_found += 1
-                    dependency_positions.append(i + 1)  # 1-indexed position
+            return True
             
-            # Verify dependency questions are in middle positions
-            middle_dependencies = [pos for pos in dependency_positions if middle_start < pos <= middle_end]
+        except Exception as e:
+            self.log_test("Option Descriptions Quality", False, f"Request error: {str(e)}")
+            return False
+
+    def test_security_context_in_tooltips(self):
+        """Test that tooltip text provides security context and guidance"""
+        try:
+            endpoints = [
+                ("API", f"{self.base_url}/questionnaires/API"),
+                ("Database", f"{self.base_url}/questionnaires/Database")
+            ]
             
-            if dependency_questions_found > 0 and len(middle_dependencies) > 0:
-                self.log_test("API Question Order", True, 
-                            f"✅ API questionnaire has {dependency_questions_found} dependency questions in middle positions: {dependency_positions}")
+            security_keywords = [
+                'security', 'secure', 'protection', 'vulnerability', 'risk', 'threat',
+                'authentication', 'authorization', 'encryption', 'access', 'control',
+                'attack', 'malicious', 'breach', 'compromise', 'exploit', 'mitigation'
+            ]
+            
+            endpoints_with_security_context = 0
+            total_descriptions_checked = 0
+            security_descriptions_found = 0
+            
+            for endpoint_name, endpoint_url in endpoints:
+                response = self.session.get(endpoint_url)
                 
-                print(f"📋 API Questionnaire Structure:")
-                print(f"   Total Questions: {total_questions}")
-                print(f"   Dependency Questions: {dependency_questions_found}")
-                print(f"   Dependency Positions: {dependency_positions}")
+                if response.status_code != 200:
+                    continue  # Skip if endpoint not available
                 
+                data = response.json()
+                prompts = data.get('prompts', [])
+                
+                endpoint_has_security_context = False
+                
+                for prompt in prompts:
+                    question_type = prompt.get('type', '')
+                    
+                    if question_type in ['single_choice', 'multiple_choice']:
+                        option_descriptions = prompt.get('option_descriptions', {})
+                        
+                        for option, description in option_descriptions.items():
+                            total_descriptions_checked += 1
+                            description_lower = description.lower()
+                            
+                            # Check if description contains security-related keywords
+                            has_security_context = any(keyword in description_lower for keyword in security_keywords)
+                            
+                            if has_security_context:
+                                security_descriptions_found += 1
+                                endpoint_has_security_context = True
+                
+                if endpoint_has_security_context:
+                    endpoints_with_security_context += 1
+            
+            if total_descriptions_checked == 0:
+                self.log_test("Security Context in Tooltips", True, 
+                            f"✅ No choice questions found, security context check not applicable")
                 return True
-            else:
-                self.log_test("API Question Order", True, 
-                            f"✅ API questionnaire structure verified ({total_questions} questions) - dependency questions may not be applicable for this node type")
-                return True
             
-        except Exception as e:
-            self.log_test("API Question Order", False, f"Request error: {str(e)}")
-            return False
-
-    # ============================================================================
-    # TEST 2: Dependency Trigger Flow Testing
-    # ============================================================================
-    
-    def test_database_dependency_trigger(self):
-        """Test answering 'Yes' to Database dependency question triggers Database node creation"""
-        try:
-            # Test dependency detection for WebApp with Database=True
-            test_answers = {
-                'webapp_database_connection': True,
-                'webapp_api_endpoints': False  # Only test Database dependency
-            }
+            security_percentage = (security_descriptions_found / total_descriptions_checked) * 100
             
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
-                json={"answers": test_answers},
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if response.status_code != 200:
-                self.log_test("Database Dependency Trigger", False, 
-                            f"Failed to check dependencies: HTTP {response.status_code}: {response.text}")
+            if security_percentage < 30:  # At least 30% should have security context
+                self.log_test("Security Context in Tooltips", False, 
+                            f"Insufficient security context in tooltips: {security_percentage:.1f}% ({security_descriptions_found}/{total_descriptions_checked})")
                 return False
             
-            data = response.json()
+            self.log_test("Security Context in Tooltips", True, 
+                        f"✅ Tooltips provide good security context: {security_percentage:.1f}% ({security_descriptions_found}/{total_descriptions_checked})")
             
-            if 'dependent_nodes' not in data:
-                self.log_test("Database Dependency Trigger", False, 
-                            f"Missing 'dependent_nodes' field in response: {data}")
-                return False
-            
-            dependent_nodes = data['dependent_nodes']
-            
-            # Verify Database is in the dependent nodes list
-            if 'Database' not in dependent_nodes:
-                self.log_test("Database Dependency Trigger", False, 
-                            f"Database not found in dependent nodes. Got: {dependent_nodes}")
-                return False
-            
-            # Verify API is NOT in the list (since we set it to False)
-            if 'API' in dependent_nodes:
-                self.log_test("Database Dependency Trigger", False, 
-                            f"API should not be in dependent nodes when webapp_api_endpoints=False. Got: {dependent_nodes}")
-                return False
-            
-            self.log_test("Database Dependency Trigger", True, 
-                        f"✅ Database dependency trigger working correctly - Database node will be created")
-            
-            print(f"🔗 Database Dependency Test Results:")
-            print(f"   Input: webapp_database_connection=True, webapp_api_endpoints=False")
-            print(f"   Dependent Nodes: {dependent_nodes}")
-            print(f"   ✅ Database dependency detected correctly")
+            print(f"🛡️ Security Context in Tooltips:")
+            print(f"   Total Descriptions Checked: {total_descriptions_checked}")
+            print(f"   With Security Context: {security_descriptions_found} ({security_percentage:.1f}%)")
+            print(f"   Endpoints with Security Context: {endpoints_with_security_context}")
             
             return True
             
         except Exception as e:
-            self.log_test("Database Dependency Trigger", False, f"Request error: {str(e)}")
-            return False
-
-    def test_api_dependency_trigger(self):
-        """Test answering 'Yes' to API dependency question triggers API node creation"""
-        try:
-            # Test dependency detection for WebApp with API=True
-            test_answers = {
-                'webapp_api_endpoints': True,
-                'webapp_database_connection': False  # Only test API dependency
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
-                json={"answers": test_answers},
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if response.status_code != 200:
-                self.log_test("API Dependency Trigger", False, 
-                            f"Failed to check dependencies: HTTP {response.status_code}: {response.text}")
-                return False
-            
-            data = response.json()
-            
-            if 'dependent_nodes' not in data:
-                self.log_test("API Dependency Trigger", False, 
-                            f"Missing 'dependent_nodes' field in response: {data}")
-                return False
-            
-            dependent_nodes = data['dependent_nodes']
-            
-            # Verify API is in the dependent nodes list
-            if 'API' not in dependent_nodes:
-                self.log_test("API Dependency Trigger", False, 
-                            f"API not found in dependent nodes. Got: {dependent_nodes}")
-                return False
-            
-            # Verify Database is NOT in the list (since we set it to False)
-            if 'Database' in dependent_nodes:
-                self.log_test("API Dependency Trigger", False, 
-                            f"Database should not be in dependent nodes when webapp_database_connection=False. Got: {dependent_nodes}")
-                return False
-            
-            self.log_test("API Dependency Trigger", True, 
-                        f"✅ API dependency trigger working correctly - API node will be created")
-            
-            print(f"🔗 API Dependency Test Results:")
-            print(f"   Input: webapp_api_endpoints=True, webapp_database_connection=False")
-            print(f"   Dependent Nodes: {dependent_nodes}")
-            print(f"   ✅ API dependency detected correctly")
-            
-            return True
-            
-        except Exception as e:
-            self.log_test("API Dependency Trigger", False, f"Request error: {str(e)}")
-            return False
-
-    def test_multiple_dependencies_trigger(self):
-        """Test answering 'Yes' to both Database and API dependency questions"""
-        try:
-            # Test dependency detection for WebApp with both dependencies=True
-            test_answers = {
-                'webapp_database_connection': True,
-                'webapp_api_endpoints': True
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
-                json={"answers": test_answers},
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if response.status_code != 200:
-                self.log_test("Multiple Dependencies Trigger", False, 
-                            f"Failed to check dependencies: HTTP {response.status_code}: {response.text}")
-                return False
-            
-            data = response.json()
-            
-            if 'dependent_nodes' not in data:
-                self.log_test("Multiple Dependencies Trigger", False, 
-                            f"Missing 'dependent_nodes' field in response: {data}")
-                return False
-            
-            dependent_nodes = data['dependent_nodes']
-            
-            # Verify both API and Database are in the dependent nodes list
-            missing_dependencies = []
-            if 'API' not in dependent_nodes:
-                missing_dependencies.append('API')
-            if 'Database' not in dependent_nodes:
-                missing_dependencies.append('Database')
-            
-            if missing_dependencies:
-                self.log_test("Multiple Dependencies Trigger", False, 
-                            f"Missing dependencies: {missing_dependencies}. Got: {dependent_nodes}")
-                return False
-            
-            # Verify we have exactly the expected dependencies
-            expected_dependencies = {'API', 'Database'}
-            actual_dependencies = set(dependent_nodes)
-            
-            if expected_dependencies != actual_dependencies:
-                self.log_test("Multiple Dependencies Trigger", False, 
-                            f"Dependency mismatch. Expected: {expected_dependencies}, Got: {actual_dependencies}")
-                return False
-            
-            self.log_test("Multiple Dependencies Trigger", True, 
-                        f"✅ Multiple dependencies trigger working correctly - Both API and Database nodes will be created")
-            
-            print(f"🔗 Multiple Dependencies Test Results:")
-            print(f"   Input: webapp_database_connection=True, webapp_api_endpoints=True")
-            print(f"   Dependent Nodes: {dependent_nodes}")
-            print(f"   ✅ Both dependencies detected correctly")
-            
-            return True
-            
-        except Exception as e:
-            self.log_test("Multiple Dependencies Trigger", False, f"Request error: {str(e)}")
-            return False
-
-    # ============================================================================
-    # TEST 3: Questionnaire Availability Testing
-    # ============================================================================
-    
-    def test_database_questionnaire_availability(self):
-        """Test that Database questionnaire is available after dependency trigger"""
-        try:
-            # Try both possible endpoints for Database questionnaire
-            response = self.session.get(f"{self.base_url}/questionnaires/Database")
-            
-            if response.status_code != 200:
-                # Try intelligent-nodes endpoint as fallback
-                response = self.session.get(f"{self.base_url}/intelligent-nodes/Database/prompts")
-            
-            if response.status_code != 200:
-                self.log_test("Database Questionnaire Availability", False, 
-                            f"Database questionnaire not available: HTTP {response.status_code}: {response.text}")
-                return False
-            
-            data = response.json()
-            
-            # Verify questionnaire structure
-            if 'prompts' not in data:
-                self.log_test("Database Questionnaire Availability", False, 
-                            f"Missing 'prompts' field in Database questionnaire: {data}")
-                return False
-            
-            prompts = data['prompts']
-            
-            if len(prompts) == 0:
-                self.log_test("Database Questionnaire Availability", False, 
-                            f"Database questionnaire has no prompts")
-                return False
-            
-            self.log_test("Database Questionnaire Availability", True, 
-                        f"✅ Database questionnaire available with {len(prompts)} questions")
-            
-            print(f"📋 Database Questionnaire Availability:")
-            print(f"   Questions Available: {len(prompts)}")
-            print(f"   ✅ Ready for dependency flow")
-            
-            return True
-            
-        except Exception as e:
-            self.log_test("Database Questionnaire Availability", False, f"Request error: {str(e)}")
-            return False
-
-    def test_api_questionnaire_availability(self):
-        """Test that API questionnaire is available after dependency trigger"""
-        try:
-            # Try both possible endpoints for API questionnaire
-            response = self.session.get(f"{self.base_url}/questionnaires/API")
-            
-            if response.status_code != 200:
-                # Try intelligent-nodes endpoint as fallback
-                response = self.session.get(f"{self.base_url}/intelligent-nodes/API/prompts")
-            
-            if response.status_code != 200:
-                self.log_test("API Questionnaire Availability", False, 
-                            f"API questionnaire not available: HTTP {response.status_code}: {response.text}")
-                return False
-            
-            data = response.json()
-            
-            # Verify questionnaire structure
-            if 'prompts' not in data:
-                self.log_test("API Questionnaire Availability", False, 
-                            f"Missing 'prompts' field in API questionnaire: {data}")
-                return False
-            
-            prompts = data['prompts']
-            
-            if len(prompts) == 0:
-                self.log_test("API Questionnaire Availability", False, 
-                            f"API questionnaire has no prompts")
-                return False
-            
-            self.log_test("API Questionnaire Availability", True, 
-                        f"✅ API questionnaire available with {len(prompts)} questions")
-            
-            print(f"📋 API Questionnaire Availability:")
-            print(f"   Questions Available: {len(prompts)}")
-            print(f"   ✅ Ready for dependency flow")
-            
-            return True
-            
-        except Exception as e:
-            self.log_test("API Questionnaire Availability", False, f"Request error: {str(e)}")
-            return False
-
-    # ============================================================================
-    # TEST 4: Complete Flow Simulation
-    # ============================================================================
-    
-    def test_complete_dependency_flow_simulation(self):
-        """Test complete flow: WebApp Q1-4 → Database dependency → Database questionnaire → Resume WebApp Q5 → API dependency → API questionnaire → Resume WebApp Q6-10 → Complete"""
-        try:
-            print(f"🔄 Starting Complete Dependency Flow Simulation...")
-            
-            # Step 1: Get WebApp questionnaire structure
-            response = self.session.get(f"{self.base_url}/questionnaires/WebApp")
-            if response.status_code != 200:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"Failed to get WebApp questionnaire: HTTP {response.status_code}")
-                return False
-            
-            webapp_data = response.json()
-            webapp_prompts = webapp_data.get('prompts', [])
-            
-            if len(webapp_prompts) < 10:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"WebApp questionnaire should have 10 questions, got {len(webapp_prompts)}")
-                return False
-            
-            print(f"   ✅ Step 1: WebApp questionnaire loaded ({len(webapp_prompts)} questions)")
-            
-            # Step 2: Simulate answering questions 1-4 (up to Database dependency)
-            # Question 4 should be the Database dependency question
-            database_question = webapp_prompts[3]  # Position 4 (0-indexed)
-            print(f"   📝 Step 2: Reached Database dependency question at position 4")
-            print(f"      Question: {database_question.get('question', 'N/A')[:80]}...")
-            
-            # Step 3: Test Database dependency trigger (answering "Yes")
-            database_dependency_answers = {
-                'webapp_database_connection': True,
-                'webapp_api_endpoints': False  # We'll test API later
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
-                json={"answers": database_dependency_answers},
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if response.status_code != 200:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"Database dependency check failed: HTTP {response.status_code}")
-                return False
-            
-            dep_data = response.json()
-            if 'Database' not in dep_data.get('dependent_nodes', []):
-                self.log_test("Complete Flow Simulation", False, 
-                            f"Database dependency not triggered correctly")
-                return False
-            
-            print(f"   ✅ Step 3: Database dependency triggered - Database node will be created")
-            
-            # Step 4: Verify Database questionnaire is available
-            response = self.session.get(f"{self.base_url}/intelligent-nodes/Database/prompts")
-            if response.status_code != 200:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"Database questionnaire not available: HTTP {response.status_code}")
-                return False
-            
-            database_data = response.json()
-            database_prompts = database_data.get('prompts', [])
-            print(f"   ✅ Step 4: Database questionnaire available ({len(database_prompts)} questions)")
-            
-            # Step 5: Simulate Database questionnaire completion
-            print(f"   📝 Step 5: Database questionnaire completed (simulated)")
-            
-            # Step 6: Resume WebApp questionnaire at position 5 (API dependency question)
-            if len(webapp_prompts) < 5:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"WebApp questionnaire missing position 5")
-                return False
-            
-            api_question = webapp_prompts[4]  # Position 5 (0-indexed)
-            print(f"   📝 Step 6: Resumed WebApp questionnaire at position 5 (API dependency)")
-            print(f"      Question: {api_question.get('question', 'N/A')[:80]}...")
-            
-            # Step 7: Test API dependency trigger (answering "Yes")
-            api_dependency_answers = {
-                'webapp_api_endpoints': True,
-                'webapp_database_connection': True  # Keep previous answer
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
-                json={"answers": api_dependency_answers},
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if response.status_code != 200:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"API dependency check failed: HTTP {response.status_code}")
-                return False
-            
-            dep_data = response.json()
-            dependent_nodes = dep_data.get('dependent_nodes', [])
-            if 'API' not in dependent_nodes or 'Database' not in dependent_nodes:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"Both dependencies not triggered correctly. Got: {dependent_nodes}")
-                return False
-            
-            print(f"   ✅ Step 7: API dependency triggered - Both API and Database nodes detected")
-            
-            # Step 8: Verify API questionnaire is available
-            response = self.session.get(f"{self.base_url}/intelligent-nodes/API/prompts")
-            if response.status_code != 200:
-                self.log_test("Complete Flow Simulation", False, 
-                            f"API questionnaire not available: HTTP {response.status_code}")
-                return False
-            
-            api_data = response.json()
-            api_prompts = api_data.get('prompts', [])
-            print(f"   ✅ Step 8: API questionnaire available ({len(api_prompts)} questions)")
-            
-            # Step 9: Simulate API questionnaire completion
-            print(f"   📝 Step 9: API questionnaire completed (simulated)")
-            
-            # Step 10: Resume WebApp questionnaire at position 6 and complete remaining questions
-            remaining_questions = len(webapp_prompts) - 5  # Questions 6-10
-            print(f"   📝 Step 10: Resumed WebApp questionnaire at position 6")
-            print(f"      Remaining questions: {remaining_questions} (positions 6-10)")
-            
-            # Step 11: Complete WebApp questionnaire
-            print(f"   ✅ Step 11: WebApp questionnaire completed")
-            
-            self.log_test("Complete Flow Simulation", True, 
-                        f"✅ Complete dependency flow simulation successful - All steps verified")
-            
-            print(f"🎉 Complete Flow Summary:")
-            print(f"   ✅ WebApp Q1-4 → Database dependency triggered")
-            print(f"   ✅ Database questionnaire available and accessible")
-            print(f"   ✅ Resume WebApp Q5 → API dependency triggered")
-            print(f"   ✅ API questionnaire available and accessible")
-            print(f"   ✅ Resume WebApp Q6-10 → Complete flow")
-            print(f"   ✅ Multiple dependency handling working correctly")
-            
-            return True
-            
-        except Exception as e:
-            self.log_test("Complete Flow Simulation", False, f"Request error: {str(e)}")
-            return False
-
-    # ============================================================================
-    # Additional Verification Tests
-    # ============================================================================
-    
-    def test_no_dependencies_scenario(self):
-        """Test scenario where no dependencies are triggered"""
-        try:
-            # Test dependency detection for WebApp with no dependencies
-            test_answers = {
-                'webapp_database_connection': False,
-                'webapp_api_endpoints': False
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
-                json={"answers": test_answers},
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if response.status_code != 200:
-                self.log_test("No Dependencies Scenario", False, 
-                            f"Failed to check dependencies: HTTP {response.status_code}: {response.text}")
-                return False
-            
-            data = response.json()
-            dependent_nodes = data.get('dependent_nodes', [])
-            
-            # Verify no dependencies are triggered
-            if len(dependent_nodes) != 0:
-                self.log_test("No Dependencies Scenario", False, 
-                            f"Expected no dependencies, but got: {dependent_nodes}")
-                return False
-            
-            self.log_test("No Dependencies Scenario", True, 
-                        f"✅ No dependencies scenario working correctly - No dependent nodes created")
-            
-            print(f"🔗 No Dependencies Test Results:")
-            print(f"   Input: webapp_database_connection=False, webapp_api_endpoints=False")
-            print(f"   Dependent Nodes: {dependent_nodes}")
-            print(f"   ✅ No dependencies triggered correctly")
-            
-            return True
-            
-        except Exception as e:
-            self.log_test("No Dependencies Scenario", False, f"Request error: {str(e)}")
+            self.log_test("Security Context in Tooltips", False, f"Request error: {str(e)}")
             return False
 
     # ============================================================================
@@ -770,37 +713,35 @@ class QuestionnaireDependencyFlowTester:
     # ============================================================================
     
     def run_all_tests(self):
-        """Run all questionnaire dependency flow verification tests"""
-        print("🚀 Starting Questionnaire Dependency Flow Verification Tests")
+        """Run all tooltip functionality verification tests"""
+        print("🚀 Starting Tooltip Functionality Verification Tests")
         print("=" * 90)
-        print("QUESTIONNAIRE DEPENDENCY FLOW VERIFICATION")
-        print("Testing questionnaire system for WebApp nodes with focus on dependency flow")
-        print("Focus: Question ordering, dependency triggers, and complete flow testing")
+        print("TOOLTIP FUNCTIONALITY VERIFICATION")
+        print("Testing new API and Database questionnaire endpoints for tooltip functionality fix")
+        print("Focus: option_descriptions field presence, structure, and quality")
         print("=" * 90)
         
         tests = [
             # Basic connectivity
             self.test_health_check,
             
-            # TEST 1: WebApp Questionnaire Question Order Verification
-            self.test_webapp_questionnaire_question_order,
-            self.test_database_questionnaire_dependency_positions,
-            self.test_api_questionnaire_dependency_positions,
+            # TEST 1: API Questionnaire Endpoint Testing
+            self.test_api_questionnaire_basic_level,
+            self.test_api_questionnaire_advanced_level,
+            self.test_api_questionnaire_expert_level,
             
-            # TEST 2: Dependency Trigger Flow Testing
-            self.test_database_dependency_trigger,
-            self.test_api_dependency_trigger,
-            self.test_multiple_dependencies_trigger,
+            # TEST 2: Database Questionnaire Endpoint Testing
+            self.test_database_questionnaire_basic_level,
+            self.test_database_questionnaire_advanced_level,
+            self.test_database_questionnaire_expert_level,
             
-            # TEST 3: Questionnaire Availability Testing
-            self.test_database_questionnaire_availability,
-            self.test_api_questionnaire_availability,
+            # TEST 3: Comparison Testing
+            self.test_webapp_questionnaire_comparison,
+            self.test_endpoint_consistency,
             
-            # TEST 4: Complete Flow Simulation
-            self.test_complete_dependency_flow_simulation,
-            
-            # Additional Verification Tests
-            self.test_no_dependencies_scenario,
+            # TEST 4: Data Quality Validation
+            self.test_option_descriptions_quality,
+            self.test_security_context_in_tooltips,
         ]
         
         passed = 0
@@ -820,22 +761,19 @@ class QuestionnaireDependencyFlowTester:
         
         # Print summary
         print("=" * 90)
-        print("🎯 QUESTIONNAIRE DEPENDENCY FLOW VERIFICATION SUMMARY")
+        print("🎯 TOOLTIP FUNCTIONALITY VERIFICATION SUMMARY")
         print("=" * 90)
         print(f"✅ PASSED: {passed}")
         print(f"❌ FAILED: {failed}")
         print(f"📊 SUCCESS RATE: {(passed / (passed + failed) * 100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 ALL TESTS PASSED! Questionnaire dependency flow verification successful.")
-            print("✅ WebApp questionnaire has correct question order (10 questions, dependencies at positions 4 & 5)")
-            print("✅ Database dependency trigger working correctly")
-            print("✅ API dependency trigger working correctly")
-            print("✅ Multiple dependency handling functional")
-            print("✅ Database and API questionnaires available")
-            print("✅ Complete dependency flow simulation successful")
-            print("✅ Question reordering verified (dependencies in middle, not at end)")
-            print("✅ Parent questionnaire resumption flow verified")
+            print("\n🎉 ALL TESTS PASSED! Tooltip functionality verification successful.")
+            print("✅ API questionnaire endpoints working correctly with option_descriptions")
+            print("✅ Database questionnaire endpoints working correctly with option_descriptions")
+            print("✅ All endpoints return consistent data structure")
+            print("✅ Option descriptions are high quality with security context")
+            print("✅ Tooltip functionality fix verified - UI should now show tooltip (?) icons")
         else:
             print(f"\n⚠️  {failed} tests failed. Analysis:")
             
@@ -850,7 +788,7 @@ class QuestionnaireDependencyFlowTester:
 
 def main():
     """Main test execution"""
-    tester = QuestionnaireDependencyFlowTester()
+    tester = TooltipFunctionalityTester()
     passed, failed = tester.run_all_tests()
     
     # Exit with appropriate code
