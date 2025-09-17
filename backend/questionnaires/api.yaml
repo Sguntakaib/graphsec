@@ -65,6 +65,12 @@ questionnaires:
       question: "How is API input validation implemented?"
       type: "single_choice"
       options: ["Schema validation + sanitization", "Basic validation", "Client-side only", "No validation", "Unknown"]
+      option_descriptions:
+        "Schema validation + sanitization": "Comprehensive validation using JSON/XML schemas plus input sanitization to prevent injection attacks and ensure data integrity."
+        "Basic validation": "Simple validation checks for required fields and basic format validation, but may miss sophisticated attack vectors."
+        "Client-side only": "Validation performed only by API clients - easily bypassed by attackers and provides no security protection."
+        "No validation": "No input validation is performed - highly vulnerable to injection attacks and malformed data."
+        "Unknown": "API input validation approach is unclear or not documented."
       help_text: "Input validation prevents injection attacks and ensures data integrity."
       related_branch: "InputValidation"
     - id: "api_https_enforcement"
