@@ -940,15 +940,18 @@ frontend:
 
   - task: "Advanced Layout Panel - Auto-Layout and Optimize Buttons Testing"
     implemented: true
-    working: "NA"
+    working: false
     file: "frontend/src/components/AdvancedLayoutControls.js, backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "🧪 TESTING AUTO-LAYOUT AND OPTIMIZE BUTTONS: Starting comprehensive testing of Advanced Layout panel functionality. TESTING SCOPE: 1) Auto-Layout button functionality and API calls to /api/diagrams/{id}/auto-layout 2) Optimize button functionality and API calls to /api/diagrams/{id}/optimize-layout 3) Multi-node diagram testing with 2-3 security nodes 4) Visual verification of node repositioning 5) API response validation and error handling 6) Browser console monitoring for errors. BACKEND ENDPOINTS CONFIRMED: Both endpoints exist in server.py with proper implementation. Frontend integration through AdvancedLayoutControls component verified. Ready to execute comprehensive UI and integration testing."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL API INTEGRATION ISSUE: Comprehensive testing revealed that while the UI components work correctly, there are backend API integration problems. FINDINGS: ✅ UI COMPONENTS WORKING: Advanced Layout panel visible, Auto-Layout and Optimize buttons found and enabled when nodes present (6 nodes on canvas from Web Application template) ✅ API CALLS TRIGGERED: Both buttons successfully trigger API calls - POST /api/diagrams/{id}/auto-layout and POST /api/diagrams/{id}/optimize-layout ❌ BACKEND API ERRORS: Both endpoints return HTTP 404 'Diagram not found' errors despite diagram existing and being used for template application. CONSOLE ERRORS: 'Failed to auto-layout diagram: Request failed with status code 404' and 'Failed to optimize layout: Request failed with status code 404'. ROOT CAUSE: Backend endpoints cannot find the diagram by ID even though the diagram exists and other operations (template application, layout-algorithms) work correctly. The layout endpoints have a different diagram lookup mechanism that's failing."
 
   - task: "Comprehensive WebApp Questionnaire System"
     implemented: true
