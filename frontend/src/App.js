@@ -1386,14 +1386,27 @@ function AppContent() {
 
         // Mark dependency as COMPLETED if this node is a dependency of another node
         const completedNode = currentQuestionnaireNode;
-        const parentNodeId = completedNode.data?.parentNode;
+        let parentNodeId = completedNode.data?.parentNode;
         const dependencyType = completedNode.subtype || completedNode.data?.subtype;
+        
+        // If parentNodeId is not in data, check if this is a dependent questionnaire scenario
+        if (!parentNodeId && questionnaireQueue.length > 0) {
+          // This might be a dependent questionnaire - try to find parent from queue context
+          const parentFromQueue = nodes.find(n => 
+            questionnaireQueue.some(qn => qn.data?.parentNode === n.id)
+          );
+          if (parentFromQueue) {
+            parentNodeId = parentFromQueue.id;
+          }
+        }
         
         if (parentNodeId && dependencyType) {
           console.log(`✅ Marking dependency as COMPLETED: ${parentNodeId} → ${dependencyType}`);
           setDependencyState(parentNodeId, dependencyType, 'COMPLETED');
         } else {
           console.log(`⚠️ Could not mark dependency as completed - missing parentNodeId: ${parentNodeId} or dependencyType: ${dependencyType}`);
+          console.log('🔍 Current node data:', completedNode);
+          console.log('🔍 Questionnaire queue:', questionnaireQueue);
         }
 
         // Handle dependent node questionnaires
