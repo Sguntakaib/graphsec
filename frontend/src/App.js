@@ -2483,7 +2483,6 @@ function AppContent() {
         }}
       /> */}
     </React.Suspense>
-        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Shield className="h-8 w-8 text-blue-400" />
             <div>
