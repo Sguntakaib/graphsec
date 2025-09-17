@@ -36,6 +36,7 @@ import VulnerabilityEdge from './components/VulnerabilityEdge';
 import VulnerabilityFilter from './components/VulnerabilityFilter';
 import VulnerabilityLegend from './components/VulnerabilityLegend';
 import VulnerabilityReport from './components/VulnerabilityReport';
+import AdvancedLayoutControls from './components/AdvancedLayoutControls';
 import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram, applyTemplateToCurrentDiagram } from './services/api';
 import { analyzeNodeVulnerabilities, getNodeVulnerabilities, createVulnerabilityNodes, createVulnerabilityEdges } from './services/vulnerabilityApi';
 import { 
