@@ -91,6 +91,12 @@ questionnaires:
       question: "What logging and monitoring is in place?"
       type: "single_choice"
       options: ["Comprehensive security logging", "Basic application logging", "Minimal logging", "No logging", "Unknown"]
+      option_descriptions:
+        "Comprehensive security logging": "Detailed logging of security events, authentication attempts, access patterns, errors, and potential threats with real-time monitoring and alerting."
+        "Basic application logging": "Standard application logs capturing basic events and errors, but may lack security-focused monitoring and correlation."
+        "Minimal logging": "Limited logging of only critical events - insufficient for security monitoring or incident investigation."
+        "No logging": "No logging is implemented - creates blind spots for security monitoring and compliance requirements."
+        "Unknown": "Logging and monitoring capabilities are unclear or not documented."
       help_text: "Security logging enables threat detection and incident response."
       related_branch: "Logging"
     - id: "webapp_data_encryption"
