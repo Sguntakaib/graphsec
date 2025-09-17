@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://appsec-survey.preview.emergentagent.com/api"
+BASE_URL = "https://layout-builder-1.preview.emergentagent.com/api"
 
 class Phase2QuestionnaireTester:
     def __init__(self):
