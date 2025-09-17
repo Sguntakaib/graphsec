@@ -126,6 +126,7 @@ function AppContent() {
   const [currentQueueIndex, setCurrentQueueIndex] = useState(0);
   const [parentQuestionnaireState, setParentQuestionnaireState] = useState(null); // For resuming parent questionnaires
   const [dependencyStates, setDependencyStates] = useState({}); // Track dependency states per parent node: {parentNodeId: {API: 'COMPLETED', Database: 'CREATED'}}
+  const [activeQuestionnaires, setActiveQuestionnaires] = useState(new Set()); // Track which questionnaires are currently active to prevent duplicates
   
   // Vulnerability system state
   const [vulnerabilityAnalyses, setVulnerabilityAnalyses] = useState({}); // Store vulnerability analyses by node ID
