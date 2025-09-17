@@ -226,7 +226,9 @@ const SecurityQuestionnaire = ({
       'webapp_api_endpoints': 'API',
       'webapp_database_connection': 'Database',
       'database_backup_enabled': 'Backup',
-      'database_monitoring_integration': 'Monitoring'
+      'database_monitoring_integration': 'Monitoring',
+      'api_database_access': 'Database',
+      'api_external_services': 'ExternalService'
     };
     
     // If current question triggers a dependency and answer is Yes/True
