@@ -147,6 +147,9 @@ function AppContent() {
   });
   const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]);
   const [autoVulnerabilityAnalysis, setAutoVulnerabilityAnalysis] = useState(false); // Disabled by default - require manual trigger after complete questionnaire
+  const [showConnectionLegend, setShowConnectionLegend] = useState(true);
+  const [showPerformancePanel, setShowPerformancePanel] = useState(false);
+  const [showMiniMap, setShowMiniMap] = useState(true);
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
