@@ -1,24 +1,34 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - QUESTIONNAIRE FLOW CLEANUP VERIFICATION
-Tests backend API endpoints after questionnaire flow cleanup to ensure they are still working correctly.
+Backend API Testing - QUESTIONNAIRE DEPENDENCY FLOW VERIFICATION
+Tests the questionnaire system for WebApp nodes with focus on dependency flow.
 
 TESTING FOCUS:
-1. Core questionnaire endpoints that the simplified legacy system relies on:
-   - GET /api/questionnaires/WebApp - WebApp questionnaire prompts
-   - GET /api/intelligent-nodes/{node_subtype}/prompts - Other node types
-   - POST /api/intelligent-nodes/{node_subtype}/check-dependencies - Dependency checking for conditional questionnaires
+1. **Test WebApp Questionnaire Question Order**: 
+   - Verify that Database dependency question is at position 4 (not at the end)
+   - Verify that API dependency question is at position 5 (not at the end)
+   - Confirm there are 10 total questions in WebApp basic questionnaire
 
-2. Critical API endpoints that support the simplified flow:
-   - GET /api/diagrams - Diagram management
-   - POST /api/diagrams - Create diagram
-   - Health check endpoint
+2. **Test Dependency Trigger Flow**: 
+   - Test answering "Yes" to Database dependency question (position 4)
+   - Verify it creates Database node and opens Database questionnaire
+   - Test that Database questionnaire has dependency questions in middle positions
+   - Verify after Database questionnaire completes, WebApp questionnaire resumes from position 5
 
-3. Test priority: Focus on endpoints that the legacy SecurityQuestionnaire system uses,
-   since we disabled the enhanced QuestionnaireManager system
+3. **Test API Dependency Flow**:
+   - Test answering "Yes" to API dependency question (position 5) 
+   - Verify it creates API node and opens API questionnaire
+   - Test that API questionnaire has dependency questions in middle positions
+   - Verify after API questionnaire completes, WebApp questionnaire resumes from position 6
 
-CONTEXT: We just completed a major cleanup of the questionnaire flow system by disabling 
-the enhanced QuestionnaireManager and streamlining to use only the legacy SecurityQuestionnaire system.
+4. **Test Complete Flow**:
+   - Test complete flow: WebApp Q1-4 → Database dependency → Database questionnaire → Resume WebApp Q5 → API dependency → API questionnaire → Resume WebApp Q6-10 → Complete
+
+Focus on verifying:
+- Question reordering worked (dependencies in middle, not at end)
+- Parent questionnaire resumption after child completion
+- Multiple dependency handling (both Database and API)
+- All questionnaire types (WebApp, Database, API) have dependencies in correct positions
 """
 
 import requests
