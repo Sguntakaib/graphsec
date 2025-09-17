@@ -2493,11 +2493,8 @@ function App() {
         <AppContent />
       </ReactFlowProvider>
     </QuestionnaireProvider>
-              }`}
-            >
-              <Layers className="h-4 w-4 inline mr-2" />
-              Modeling
-            </button>
+  );
+}
             <button
               onClick={() => setViewMode('analysis')}
               className={`px-3 py-1 rounded-md transition-colors text-sm ${
