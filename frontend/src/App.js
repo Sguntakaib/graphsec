@@ -2485,14 +2485,8 @@ function AppContent() {
     </React.Suspense>
   );
 }
-              <div className="text-xs text-gray-400">
-                Advanced Threat Modeling & Attack Path Analysis
-              </div>
-            </div>
-          </div>
-          
-          {/* View Mode Toggle */}
-          <div className="flex items-center space-x-2 bg-gray-700 rounded-lg p-1">
+
+function App() {
             <button
               onClick={() => setViewMode('modeling')}
               className={`px-3 py-1 rounded-md transition-colors text-sm ${
