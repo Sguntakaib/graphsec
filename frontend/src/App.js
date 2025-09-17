@@ -1414,7 +1414,8 @@ function AppContent() {
       }
 
       // Check if this is the completion of a resumed parent questionnaire
-      if (parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id && !result?.partialCompletion) {
+      // Only clear parent state if this is actual completion (not just navigation to a question)
+      if (parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id && !result?.partialCompletion && result?.isActualCompletion) {
         console.log('✅ Parent questionnaire completed after resumption, clearing parent state');
         setParentQuestionnaireState(null);
       }
