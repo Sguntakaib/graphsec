@@ -1617,6 +1617,7 @@ async def get_security_prompts(node_subtype: str):
                 "question": prompt.question,
                 "type": prompt.type.value,
                 "options": prompt.options,
+                "option_descriptions": getattr(prompt, 'option_descriptions', {}),
                 "default_value": prompt.default_value,
                 "help_text": prompt.help_text,
                 "related_branch": prompt.related_branch.value,
