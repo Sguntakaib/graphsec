@@ -115,6 +115,12 @@ questionnaires:
       question: "Are security headers implemented?"
       type: "single_choice"
       options: ["Comprehensive security headers", "Basic headers", "Minimal headers", "No security headers", "Unknown"]
+      option_descriptions:
+        "Comprehensive security headers": "Full suite of security headers including CSP, HSTS, X-Frame-Options, X-Content-Type-Options, and others to protect against various web attacks."
+        "Basic headers": "Some important security headers are implemented but coverage may be incomplete or configurations may not be optimal."
+        "Minimal headers": "Very few security headers are used - leaves the application vulnerable to common web-based attacks."
+        "No security headers": "No security headers are implemented - application is highly vulnerable to clickjacking, XSS, and other client-side attacks."
+        "Unknown": "Security header implementation is unclear or not documented."
       help_text: "Security headers provide protection against common web vulnerabilities."
       related_branch: "CSP"
 
