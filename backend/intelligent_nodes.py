@@ -305,6 +305,14 @@ class IntelligentNodeEngine:
                     question="What type of API is this?",
                     type=PromptType.SINGLE_CHOICE,
                     options=["REST API", "GraphQL API", "SOAP API", "gRPC API", "WebSocket API", "Other"],
+                    option_descriptions={
+                        "REST API": "Representational State Transfer API using HTTP methods - most common API type with well-established security practices and standards.",
+                        "GraphQL API": "Query language and runtime for APIs allowing clients to request specific data - requires careful security controls to prevent query abuse.",
+                        "SOAP API": "Simple Object Access Protocol using XML messaging - enterprise-focused with built-in security standards like WS-Security.",
+                        "gRPC API": "High-performance RPC framework using HTTP/2 and Protocol Buffers - offers built-in authentication and encryption capabilities.",
+                        "WebSocket API": "Real-time bidirectional communication protocol - requires additional security considerations for persistent connections.",
+                        "Other": "Different API type not listed above - security considerations will vary based on specific API protocol and implementation."
+                    },
                     help_text="API type affects security considerations and implementation approach",
                     related_branch=SecurityBranchType.API
                 ),
