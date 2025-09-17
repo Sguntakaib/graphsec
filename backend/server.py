@@ -6136,6 +6136,216 @@ async def analyze_backup_security(request: EnhancedVulnerabilityRequest):
         logger.error(f"Error in backup security analysis: {e}")
         raise HTTPException(status_code=500, detail=f"Backup security analysis failed: {str(e)}")
 
+@api_router.post("/diagrams/{diagram_id}/layout-animation")
+async def generate_layout_animation(diagram_id: str, 
+                                  from_algorithm: str, 
+                                  to_algorithm: str,
+                                  duration: float = 1.0,
+                                  fps: int = 30):
+    """Generate smooth animation between two layout algorithms"""
+    
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    if not nodes:
+        return {"frames": [], "duration": 0, "fps": 0}
+    
+    # Create NetworkX graph
+    G = nx.DiGraph()
+    for node in nodes:
+        G.add_node(node["id"], **node)
+    
+    for edge in edges:
+        if edge.get("source") and edge.get("target"):
+            G.add_edge(edge["source"], edge["target"])
+    
+    # Generate start and end layouts
+    start_algorithm = getattr(LayoutAlgorithm, from_algorithm.upper(), LayoutAlgorithm.ENHANCED_SMART_HIERARCHICAL)
+    end_algorithm = getattr(LayoutAlgorithm, to_algorithm.upper(), LayoutAlgorithm.ORGANIC_FLOW)
+    
+    start_positions = layout_engine.generate_layout(G, nodes, edges, start_algorithm)
+    end_positions = layout_engine.generate_layout(G, nodes, edges, end_algorithm)
+    
+    # Generate animation frames
+    animation_frames = layout_optimizer.generate_layout_animation(
+        start_positions, end_positions, duration, fps
+    )
+    
+    return {
+        "frames": [
+            {
+                "frame_number": frame.frame_number,
+                "timestamp": frame.timestamp,
+                "positions": frame.node_positions
+            }
+            for frame in animation_frames
+        ],
+        "duration": duration,
+        "fps": fps,
+        "total_frames": len(animation_frames),
+        "from_algorithm": from_algorithm,
+        "to_algorithm": to_algorithm
+    }
+
+@api_router.get("/diagrams/{diagram_id}/layout-metrics")
+async def get_layout_metrics(diagram_id: str, algorithm: Optional[str] = None):
+    """Get comprehensive layout quality metrics"""
+    
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    if not nodes:
+        return {"metrics": None, "suggestions": []}
+    
+    # Generate layout to analyze
+    G = nx.DiGraph()
+    for node in nodes:
+        G.add_node(node["id"], **node)
+    
+    for edge in edges:
+        if edge.get("source") and edge.get("target"):
+            G.add_edge(edge["source"], edge["target"])
+    
+    algorithm_enum = None
+    if algorithm:
+        try:
+            algorithm_enum = LayoutAlgorithm(algorithm)
+        except ValueError:
+            algorithm_enum = None
+    
+    layout_positions = layout_engine.generate_layout(G, nodes, edges, algorithm_enum)
+    
+    # Calculate metrics
+    final_algorithm = algorithm or layout_engine.select_optimal_layout_algorithm(nodes, edges).value
+    metrics = layout_optimizer.calculate_layout_metrics(
+        layout_positions, nodes, edges, final_algorithm, 0.0
+    )
+    
+    # Generate suggestions
+    suggestions = layout_optimizer.suggest_layout_improvements(metrics)
+    
+    return {
+        "metrics": {
+            "total_nodes": metrics.total_nodes,
+            "vulnerability_nodes": metrics.vulnerability_nodes,
+            "main_nodes": metrics.main_nodes,
+            "overlapping_nodes": metrics.overlapping_nodes,
+            "average_spacing": metrics.average_spacing,
+            "canvas_utilization": metrics.canvas_utilization,
+            "edge_crossings": metrics.edge_crossings,
+            "layout_time": metrics.layout_time,
+            "algorithm_used": metrics.algorithm_used
+        },
+        "suggestions": suggestions,
+        "quality_score": max(0, min(100, 
+            100 - (metrics.overlapping_nodes * 10) - 
+            max(0, metrics.edge_crossings - metrics.total_nodes) * 2 +
+            (metrics.canvas_utilization * 20) +
+            max(0, min(20, metrics.average_spacing / 10))
+        ))
+    }
+
+@api_router.post("/diagrams/{diagram_id}/optimize-layout")
+async def optimize_diagram_layout(diagram_id: str):
+    """Automatically optimize layout by selecting best algorithm and parameters"""
+    
+    diagram = await db.diagrams.find_one({"id": diagram_id})
+    if not diagram:
+        raise HTTPException(status_code=404, detail="Diagram not found")
+    
+    nodes = diagram.get("nodes", [])
+    edges = diagram.get("edges", [])
+    
+    if not nodes:
+        return {"optimized": False, "reason": "No nodes to optimize"}
+    
+    # Test multiple algorithms and select the best one
+    G = nx.DiGraph()
+    for node in nodes:
+        G.add_node(node["id"], **node)
+    
+    for edge in edges:
+        if edge.get("source") and edge.get("target"):
+            G.add_edge(edge["source"], edge["target"])
+    
+    best_algorithm = None
+    best_score = -1
+    best_layout = {}
+    best_metrics = None
+    
+    # Test all available algorithms
+    algorithms_to_test = [
+        LayoutAlgorithm.ENHANCED_SMART_HIERARCHICAL,
+        LayoutAlgorithm.ORGANIC_FLOW,
+        LayoutAlgorithm.SECURITY_PERIMETER,
+        LayoutAlgorithm.FORCE_DIRECTED_ADVANCED,
+        LayoutAlgorithm.NETWORK_TOPOLOGY_ADVANCED
+    ]
+    
+    for algorithm in algorithms_to_test:
+        try:
+            layout_positions = layout_engine.generate_layout(G, nodes, edges, algorithm)
+            metrics = layout_optimizer.calculate_layout_metrics(
+                layout_positions, nodes, edges, algorithm.value, 0.0
+            )
+            
+            # Calculate quality score
+            score = max(0, min(100, 
+                100 - (metrics.overlapping_nodes * 10) - 
+                max(0, metrics.edge_crossings - metrics.total_nodes) * 2 +
+                (metrics.canvas_utilization * 20) +
+                max(0, min(20, metrics.average_spacing / 10))
+            ))
+            
+            if score > best_score:
+                best_score = score
+                best_algorithm = algorithm
+                best_layout = layout_positions
+                best_metrics = metrics
+                
+        except Exception as e:
+            # Skip algorithms that fail
+            continue
+    
+    if best_algorithm is None:
+        return {"optimized": False, "reason": "No suitable algorithm found"}
+    
+    # Generate optimization report
+    suggestions = layout_optimizer.suggest_layout_improvements(best_metrics)
+    visual_groups = layout_optimizer.create_visual_groups(nodes, best_layout)
+    edge_paths = layout_optimizer.optimize_edge_routing(best_layout, edges)
+    
+    return {
+        "optimized": True,
+        "best_algorithm": best_algorithm.value,
+        "quality_score": best_score,
+        "layout_positions": best_layout,
+        "metrics": {
+            "total_nodes": best_metrics.total_nodes,
+            "vulnerability_nodes": best_metrics.vulnerability_nodes,
+            "main_nodes": best_metrics.main_nodes,
+            "overlapping_nodes": best_metrics.overlapping_nodes,
+            "average_spacing": best_metrics.average_spacing,
+            "canvas_utilization": best_metrics.canvas_utilization,
+            "edge_crossings": best_metrics.edge_crossings,
+            "layout_time": best_metrics.layout_time,
+            "algorithm_used": best_metrics.algorithm_used
+        },
+        "suggestions": suggestions,
+        "visual_enhancements": {
+            "visual_groups": visual_groups,
+            "edge_paths": edge_paths
+        }
+    }
+
 # Duplicate ProductDesignSecurity route removed - now positioned before generic route
 
 # Include the router in the main app
