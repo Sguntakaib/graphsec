@@ -12,7 +12,7 @@ import sys
 import math
 
 # Use the production URL from review request
-BASE_URL = "https://questionnaire-audit.preview.emergentagent.com/api"
+BASE_URL = "https://webapp-api-manager.preview.emergentagent.com/api"
 
 class Phase2IntegrationTester:
     def __init__(self):
