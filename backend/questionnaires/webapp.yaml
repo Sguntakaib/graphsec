@@ -103,6 +103,12 @@ questionnaires:
       question: "How is sensitive data encrypted?"
       type: "single_choice"
       options: ["Encryption at rest and in transit", "Encryption in transit only", "Basic encryption", "No encryption", "Unknown"]
+      option_descriptions:
+        "Encryption at rest and in transit": "Comprehensive encryption protecting data both when stored (databases, files) and when transmitted (HTTPS, API calls) using strong encryption standards."
+        "Encryption in transit only": "Data is encrypted during transmission but stored in plaintext - vulnerable to data breaches if storage is compromised."
+        "Basic encryption": "Some encryption is implemented but may use weak algorithms, poor key management, or incomplete coverage of sensitive data."
+        "No encryption": "Sensitive data is stored and transmitted in plaintext - highly vulnerable to data breaches and interception."
+        "Unknown": "Data encryption implementation is unclear or not documented."
       help_text: "Data encryption protects sensitive information from unauthorized access."
       related_branch: "Encryption"
     - id: "webapp_security_headers"
