@@ -1275,9 +1275,11 @@ def _scale_layout(pos: Dict, width: int, height: int) -> Dict[str, Dict[str, flo
     return layout_positions
 
 @api_router.post("/diagrams/{diagram_id}/auto-layout")
-async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = "smart_hierarchical"):
+async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = None):
     """Generate automatic layout for diagram nodes with advanced algorithms"""
-    from typing import Dict, List, Tuple
+    import time
+    
+    start_time = time.time()
     
     diagram = await db.diagrams.find_one({"id": diagram_id})
     if not diagram:
@@ -1287,7 +1289,15 @@ async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = "smart
     edges = diagram.get("edges", [])
     
     if not nodes:
-        return {"layout_positions": {}, "algorithm": algorithm, "node_count": 0}
+        return {"layout_positions": {}, "algorithm": "none", "node_count": 0, "metrics": None}
+    
+    # Create cache key for layout result
+    cache_key = f"{diagram_id}_{algorithm}_{len(nodes)}_{len(edges)}"
+    
+    # Check for cached result
+    cached_result = layout_optimizer.get_cached_layout(cache_key)
+    if cached_result:
+        return cached_result
     
     # Create NetworkX graph
     G = nx.DiGraph()
@@ -1297,7 +1307,8 @@ async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = "smart
         G.add_node(node["id"], 
                   type=node.get("type", "Unknown"),
                   subtype=node.get("subtype", ""),
-                  label=node.get("label", ""))
+                  label=node.get("label", ""),
+                  severity=node.get("severity", "Medium"))
     
     # Add edges
     for edge in edges:
@@ -1306,48 +1317,85 @@ async def auto_layout_diagram(diagram_id: str, algorithm: Optional[str] = "smart
         if source and target and G.has_node(source) and G.has_node(target):
             G.add_edge(source, target)
     
-    layout_positions = {}
+    # Map algorithm string to enum
+    algorithm_enum = None
+    if algorithm == "enhanced_smart_hierarchical":
+        algorithm_enum = LayoutAlgorithm.ENHANCED_SMART_HIERARCHICAL
+    elif algorithm == "organic_flow":
+        algorithm_enum = LayoutAlgorithm.ORGANIC_FLOW
+    elif algorithm == "security_perimeter":
+        algorithm_enum = LayoutAlgorithm.SECURITY_PERIMETER
+    elif algorithm == "force_directed_advanced":
+        algorithm_enum = LayoutAlgorithm.FORCE_DIRECTED_ADVANCED
+    elif algorithm == "network_topology_advanced":
+        algorithm_enum = LayoutAlgorithm.NETWORK_TOPOLOGY_ADVANCED
     
-    if algorithm == "smart_hierarchical":
-        # Enhanced hierarchical layout based on security relationships
-        layout_positions = _smart_hierarchical_layout(G, nodes)
-        
-    elif algorithm == "force_directed":
-        # Spring layout with custom parameters
-        if len(nodes) > 1:
-            pos = nx.spring_layout(G, k=3, iterations=50, seed=42)
-            # Scale and center the layout
-            layout_positions = _scale_layout(pos, 800, 600)
-        else:
-            layout_positions = {nodes[0]["id"]: {"x": 400, "y": 300}}
-            
-    elif algorithm == "circular":
-        # Circular layout with node type grouping
-        layout_positions = _circular_layout_by_type(G, nodes)
-        
-    elif algorithm == "layered_security":
-        # Security-focused layered layout
-        layout_positions = _layered_security_layout(G, nodes)
-        
-    elif algorithm == "network_topology":
-        # Network topology-aware layout
-        layout_positions = _network_topology_layout(G, nodes)
-        
-    else:
-        # Default to smart hierarchical
-        layout_positions = _smart_hierarchical_layout(G, nodes)
+    # Check if optimization is needed for large layouts
+    optimization_info = layout_optimizer.optimize_large_layout(nodes, edges, algorithm or "auto")
     
-    return {
+    # Generate layout using advanced engine
+    layout_positions = layout_engine.generate_layout(G, nodes, edges, algorithm_enum)
+    
+    # Calculate layout time
+    calculation_time = time.time() - start_time
+    
+    # Calculate comprehensive metrics
+    final_algorithm = algorithm or layout_engine.select_optimal_layout_algorithm(nodes, edges).value
+    metrics = layout_optimizer.calculate_layout_metrics(
+        layout_positions, nodes, edges, final_algorithm, calculation_time
+    )
+    
+    # Generate optimization suggestions
+    suggestions = layout_optimizer.suggest_layout_improvements(metrics)
+    
+    # Calculate visual grouping information
+    visual_groups = layout_optimizer.create_visual_groups(nodes, layout_positions)
+    
+    # Calculate optimized edge paths
+    edge_paths = layout_optimizer.optimize_edge_routing(layout_positions, edges)
+    
+    result = {
         "layout_positions": layout_positions,
-        "algorithm": algorithm,
+        "algorithm": final_algorithm,
         "node_count": len(nodes),
         "edge_count": len(edges),
+        "metrics": {
+            "total_nodes": metrics.total_nodes,
+            "vulnerability_nodes": metrics.vulnerability_nodes,
+            "main_nodes": metrics.main_nodes,
+            "overlapping_nodes": metrics.overlapping_nodes,
+            "average_spacing": metrics.average_spacing,
+            "canvas_utilization": metrics.canvas_utilization,
+            "edge_crossings": metrics.edge_crossings,
+            "layout_time": metrics.layout_time,
+            "algorithm_used": metrics.algorithm_used
+        },
+        "optimization": {
+            "status": optimization_info.get("status", "standard_processing"),
+            "suggestions": suggestions,
+            "chunks": optimization_info.get("chunks", 1)
+        },
+        "visual_enhancements": {
+            "visual_groups": visual_groups,
+            "edge_paths": edge_paths
+        },
+        "canvas_info": {
+            "width": layout_engine.canvas.width,
+            "height": layout_engine.canvas.height,
+            "utilization": metrics.canvas_utilization
+        },
         "graph_info": {
-            "is_connected": nx.is_connected(G.to_undirected()),
+            "is_connected": nx.is_connected(G.to_undirected()) if len(nodes) > 1 else True,
             "node_types": list(set(node.get("type", "Unknown") for node in nodes)),
-            "density": nx.density(G) if len(nodes) > 1 else 0
+            "density": nx.density(G) if len(nodes) > 1 else 0,
+            "vulnerability_density": vulnerability_count / len(nodes) if nodes else 0
         }
     }
+    
+    # Cache the result
+    layout_optimizer.cache_layout_result(cache_key, result)
+    
+    return result
 
 # Enhanced Auto-Layout API with algorithm selection
 @api_router.get("/diagrams/{diagram_id}/layout-algorithms")
