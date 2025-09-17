@@ -18,6 +18,13 @@ questionnaires:
       question: "What authentication method is implemented?"
       type: "single_choice"
       options: ["OAuth2/OIDC", "SAML", "Username/Password with MFA", "Username/Password only", "No Authentication", "Unknown"]
+      option_descriptions:
+        "OAuth2/OIDC": "Modern federated authentication using OAuth 2.0 or OpenID Connect, providing secure token-based authentication with third-party identity providers."
+        "SAML": "Security Assertion Markup Language for enterprise single sign-on, commonly used in corporate environments for federated authentication."
+        "Username/Password with MFA": "Traditional credentials enhanced with multi-factor authentication (SMS, TOTP, hardware tokens) for additional security."
+        "Username/Password only": "Basic authentication using only username and password - vulnerable to credential-based attacks."
+        "No Authentication": "Application does not require user authentication - publicly accessible or relies on external security controls."
+        "Unknown": "Authentication method is unclear or not documented."
       help_text: "Strong authentication methods prevent unauthorized access to the web application."
       related_branch: "Authentication"
     - id: "webapp_input_validation"
