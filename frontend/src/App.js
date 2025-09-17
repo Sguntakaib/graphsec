@@ -2681,13 +2681,13 @@ function AppContent() {
         </div>
       </div>
 
-      {/* Security Questionnaire Modal - Only show if enhanced system is not active and no existing questionnaire for this node */}
-      {(!questionnaireState.isFlowActive || currentQuestionnaireNode?.subtype === 'API') && 
-       !questionnaireState.questionnaires[currentQuestionnaireNode?.id] && (
-        <SecurityQuestionnaire
-          nodeSubtype={currentQuestionnaireNode?.subtype || currentQuestionnaireNode?.data?.subtype}
+      {/* Legacy Security Questionnaire - ENABLED: Main questionnaire system */}
+      {showSecurityQuestionnaire && currentQuestionnaireNode && (
+        <SecurityQuestionnaire 
+          nodeSubtype={currentQuestionnaireNode.subtype || currentQuestionnaireNode.data?.subtype} 
           onComplete={handleSecurityQuestionnaireComplete}
           onCancel={handleSecurityQuestionnaireCancel}
+          existingValues={{}}
           isVisible={showSecurityQuestionnaire}
           sourceNode={currentQuestionnaireNode}
           currentNodes={nodes}
