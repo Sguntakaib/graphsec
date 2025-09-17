@@ -284,7 +284,19 @@ export const completeQuestionnaire = async (nodeSubtype, requestData) => {
 
 export const getQuestionnairePrompts = async (nodeSubtype) => {
   try {
-    const response = await apiClient.get(`/questionnaires/${nodeSubtype}`);
+    // Use specific endpoints for WebApp, API, and Database to get option_descriptions
+    let endpoint;
+    if (nodeSubtype === 'WebApp') {
+      endpoint = `/questionnaires/WebApp?level=basic`;
+    } else if (nodeSubtype === 'API') {
+      endpoint = `/questionnaires/API?level=basic`;
+    } else if (nodeSubtype === 'Database') {
+      endpoint = `/questionnaires/Database?level=basic`;
+    } else {
+      endpoint = `/questionnaires/${nodeSubtype}`;
+    }
+    
+    const response = await apiClient.get(endpoint);
     return response.data;
   } catch (error) {
     throw new Error(`Failed to get questionnaire prompts: ${error.message}`);
