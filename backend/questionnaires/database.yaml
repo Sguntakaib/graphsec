@@ -30,6 +30,12 @@ questionnaires:
       question: "Is data encrypted at rest?"
       type: "single_choice"
       options: ["Transparent Data Encryption (TDE)", "File-level encryption", "Disk encryption", "No encryption", "Unknown"]
+      option_descriptions:
+        "Transparent Data Encryption (TDE)": "Database-level encryption that automatically encrypts data as it's written to disk and decrypts when read, providing comprehensive protection."
+        "File-level encryption": "Individual database files are encrypted, but may not cover all data storage locations like logs and temporary files."
+        "Disk encryption": "Full disk encryption protects against physical theft but data is unencrypted when the database is running."
+        "No encryption": "Database files are stored in plaintext - highly vulnerable if storage media is compromised."
+        "Unknown": "Data encryption at rest status is unclear or not documented."
       help_text: "Encryption at rest protects stored data from unauthorized access."
       related_branch: "Encryption"
     - id: "database_encryption_in_transit"
