@@ -148,12 +148,59 @@ export const getRiskAnalysis = async (diagramId) => {
   }
 };
 
-export const autoLayoutDiagram = async (diagramId) => {
+export const autoLayoutDiagram = async (diagramId, algorithm = null) => {
   try {
-    const response = await apiClient.post(`/diagrams/${diagramId}/auto-layout`);
+    const url = algorithm 
+      ? `/diagrams/${diagramId}/auto-layout?algorithm=${algorithm}`
+      : `/diagrams/${diagramId}/auto-layout`;
+    const response = await apiClient.post(url);
     return response.data;
   } catch (error) {
     throw new Error(`Failed to auto-layout diagram: ${error.message}`);
+  }
+};
+
+export const getLayoutAlgorithms = async (diagramId) => {
+  try {
+    const response = await apiClient.get(`/diagrams/${diagramId}/layout-algorithms`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to get layout algorithms: ${error.message}`);
+  }
+};
+
+export const generateLayoutAnimation = async (diagramId, fromAlgorithm, toAlgorithm, duration = 1.0, fps = 30) => {
+  try {
+    const response = await apiClient.post(`/diagrams/${diagramId}/layout-animation`, {
+      from_algorithm: fromAlgorithm,
+      to_algorithm: toAlgorithm,
+      duration,
+      fps
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to generate layout animation: ${error.message}`);
+  }
+};
+
+export const getLayoutMetrics = async (diagramId, algorithm = null) => {
+  try {
+    const url = algorithm 
+      ? `/diagrams/${diagramId}/layout-metrics?algorithm=${algorithm}`
+      : `/diagrams/${diagramId}/layout-metrics`;
+    const response = await apiClient.get(url);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to get layout metrics: ${error.message}`);
+  }
+};
+
+export const optimizeLayout = async (diagramId) => {
+  try {
+    const response = await apiClient.post(`/diagrams/${diagramId}/optimize-layout`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to optimize layout: ${error.message}`);
   }
 };
 
