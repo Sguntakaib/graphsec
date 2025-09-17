@@ -511,10 +511,15 @@ function AppContent() {
     // Force API nodes to use legacy system immediately
     if (nodeSubtype === 'API') {
       console.log('🔄 API node detected - using legacy intelligent-nodes system');
+      
+      // Find the actual node to get its full data including parentNode
+      const apiNode = nodes.find(n => n.id === nodeId);
+      console.log('🔍 Found API node:', apiNode);
+      
       setCurrentQuestionnaireNode({
         id: nodeId,
         subtype: nodeSubtype,
-        data: { subtype: nodeSubtype }
+        data: apiNode?.data || { subtype: nodeSubtype }
       });
       setShowSecurityQuestionnaire(true);
       return;
