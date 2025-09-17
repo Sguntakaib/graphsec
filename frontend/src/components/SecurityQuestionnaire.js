@@ -56,12 +56,12 @@ const SecurityQuestionnaire = ({
   useEffect(() => {
     if (prompts.length > 0 && resumeFromPromptIndex !== null && resumeFromPromptIndex >= prompts.length) {
       // If we're supposed to resume beyond the last question, the questionnaire is actually complete
-      console.log(`🎯 Resume index ${resumeFromPromptIndex} is beyond questionnaire length ${prompts.length}, marking as complete`);
+      console.log(`🎯 Resume index ${resumeFromPromptIndex} is beyond questionnaire length ${prompts.length}, questionnaire is complete`);
       
-      // Auto-complete the questionnaire since all questions have been answered
-      setTimeout(() => {
-        handleComplete();
-      }, 100); // Small delay to ensure component is fully initialized
+      // Don't auto-complete, just show the completion state
+      // The user should still need to click Complete button if they want to finalize
+      // Set the current index to the last question instead
+      setCurrentPromptIndex(prompts.length - 1);
     }
   }, [prompts.length, resumeFromPromptIndex]);
 
