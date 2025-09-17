@@ -29,6 +29,12 @@ questionnaires:
       question: "How is API authorization implemented?"
       type: "single_choice"
       options: ["Role-based with scopes", "Simple role-based", "API key permissions", "No authorization", "Unknown"]
+      option_descriptions:
+        "Role-based with scopes": "Fine-grained authorization using roles and scopes to control access to specific API operations and data."
+        "Simple role-based": "Basic role-based access control with broad permissions - may grant more access than necessary."
+        "API key permissions": "Authorization based on API key permissions - simpler but less flexible than role-based systems."
+        "No authorization": "All authenticated users have the same access level - no restriction on API operations."
+        "Unknown": "API authorization implementation is unclear or not documented."
       help_text: "Proper authorization ensures API consumers can only access appropriate resources."
       related_branch: "Authorization"
     - id: "api_rate_limiting"
