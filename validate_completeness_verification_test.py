@@ -15,7 +15,7 @@ import json
 import sys
 
 # Backend URL from the review request
-BASE_URL = "https://questionnaire-debug.preview.emergentagent.com/api"
+BASE_URL = "https://questionnaire-audit.preview.emergentagent.com/api"
 
 class ValidateCompletenessVerificationTester:
     def __init__(self):

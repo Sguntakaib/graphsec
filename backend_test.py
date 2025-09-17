@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://questionnaire-debug.preview.emergentagent.com/api"
+BASE_URL = "https://questionnaire-audit.preview.emergentagent.com/api"
 
 class WebAppValidateCompletenessHttpsFixTester:
     def __init__(self):
