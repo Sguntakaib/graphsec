@@ -526,10 +526,15 @@ function AppContent() {
       const apiNode = nodes.find(n => n.id === nodeId);
       console.log('🔍 Found API node:', apiNode);
       
+      // Set questionnaire node with proper parent information
       setCurrentQuestionnaireNode({
         id: nodeId,
         subtype: nodeSubtype,
-        data: apiNode?.data || { subtype: nodeSubtype }
+        data: {
+          ...(apiNode?.data || {}),
+          subtype: nodeSubtype,
+          parentNode: parentNodeId || apiNode?.data?.parentNode // Use parentNodeId parameter or existing data
+        }
       });
       setShowSecurityQuestionnaire(true);
       return;
