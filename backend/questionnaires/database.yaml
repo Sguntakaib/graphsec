@@ -42,6 +42,11 @@ questionnaires:
       question: "Is data encrypted in transit?"
       type: "single_choice"
       options: ["SSL/TLS enforced", "SSL/TLS available", "Unencrypted connections", "Unknown"]
+      option_descriptions:
+        "SSL/TLS enforced": "All database connections are required to use encrypted SSL/TLS, preventing man-in-the-middle attacks and data interception."
+        "SSL/TLS available": "Encrypted connections are supported but not enforced - some connections may be unencrypted and vulnerable."
+        "Unencrypted connections": "All database traffic is transmitted in plaintext - highly vulnerable to network-based attacks."
+        "Unknown": "Database connection encryption status is unclear or not documented."
       help_text: "Encryption in transit protects data during transmission."
       related_branch: "Encryption"
     - id: "database_backup_enabled"
