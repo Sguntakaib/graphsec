@@ -18,6 +18,12 @@ questionnaires:
       question: "How is database authentication configured?"
       type: "single_choice"
       options: ["Strong authentication with MFA", "Username/password with complexity", "Basic authentication", "No authentication", "Unknown"]
+      option_descriptions:
+        "Strong authentication with MFA": "Multi-factor authentication with strong password policies, account lockout, and integration with enterprise identity management systems."
+        "Username/password with complexity": "Standard username/password authentication with complexity requirements and password rotation policies."
+        "Basic authentication": "Simple username/password authentication with minimal security controls - vulnerable to credential attacks."
+        "No authentication": "Database allows anonymous or unrestricted access - extremely vulnerable to unauthorized data access."
+        "Unknown": "Database authentication configuration is unclear or not documented."
       help_text: "Strong database authentication prevents unauthorized data access."
       related_branch: "AccessControl"
     - id: "database_encryption_at_rest"
