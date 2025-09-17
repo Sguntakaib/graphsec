@@ -36,11 +36,25 @@ const SecurityQuestionnaire = ({
       // Check if we're resuming a parent questionnaire
       if (resumeFromPromptIndex !== null && partialAnswers) {
         console.log(`🔄 Resuming parent questionnaire from prompt ${resumeFromPromptIndex}`);
-        setCurrentPromptIndex(resumeFromPromptIndex);
+        
+        // Fetch prompts first to determine total questions
+        fetchSecurityPrompts().then(() => {
+          // After fetching prompts, check if this was the last question
+          if (resumeFromPromptIndex >= prompts.length - 1) {
+            // This was the last question - complete the questionnaire immediately
+            console.log('🎯 Resumed at last question - completing questionnaire automatically');
+            handleComplete();
+          } else {
+            // Move to the NEXT question after the dependency trigger
+            const nextPromptIndex = resumeFromPromptIndex + 1;
+            console.log(`🔄 Moving to next question: ${nextPromptIndex}`);
+            setCurrentPromptIndex(nextPromptIndex);
+          }
+        });
+        
         setAnswers(partialAnswers);
         setValidation(null);
         setError(null);
-        fetchSecurityPrompts();
       } else {
         // Reset state when opening questionnaire for a new node
         setCurrentPromptIndex(0);
