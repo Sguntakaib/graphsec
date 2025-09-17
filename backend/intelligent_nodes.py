@@ -231,6 +231,16 @@ class IntelligentNodeEngine:
                     question="What type of database is this?",
                     type=PromptType.SINGLE_CHOICE,
                     options=["MySQL", "PostgreSQL", "MongoDB", "Oracle", "SQL Server", "Redis", "DynamoDB", "Other"],
+                    option_descriptions={
+                        "MySQL": "Open-source relational database management system widely used for web applications with strong community support and extensive security features.",
+                        "PostgreSQL": "Advanced open-source relational database with enterprise-grade features, strong security controls, and excellent compliance capabilities.",
+                        "MongoDB": "NoSQL document database offering flexible schema design, built-in security features, and horizontal scaling capabilities.",
+                        "Oracle": "Enterprise-grade relational database with comprehensive security features, advanced encryption, and robust access controls.",
+                        "SQL Server": "Microsoft's relational database platform with integrated security, compliance tools, and enterprise management features.",
+                        "Redis": "In-memory data structure store used as database, cache, and message broker with authentication and encryption capabilities.",
+                        "DynamoDB": "Amazon's managed NoSQL database service with built-in security, encryption at rest and in transit, and fine-grained access control.",
+                        "Other": "Different database type not listed above - security considerations will vary based on specific database technology and configuration."
+                    },
                     help_text="Different database types have different security considerations.",
                     related_branch=SecurityBranchType.ACCESS_CONTROL
                 ),
