@@ -508,6 +508,18 @@ function AppContent() {
   const startEnhancedQuestionnaire = useCallback(async (nodeId, nodeSubtype, parentNodeId = null) => {
     console.log('🎬 Starting enhanced questionnaire:', { nodeId, nodeSubtype, parentNodeId });
     
+    // Force API nodes to use legacy system immediately
+    if (nodeSubtype === 'API') {
+      console.log('🔄 API node detected - using legacy intelligent-nodes system');
+      setCurrentQuestionnaireNode({
+        id: nodeId,
+        subtype: nodeSubtype,
+        data: { subtype: nodeSubtype }
+      });
+      setShowSecurityQuestionnaire(true);
+      return;
+    }
+    
     try {
       // Check if this node type supports intelligent expansion
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/supported-types`);
