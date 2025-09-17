@@ -382,7 +382,7 @@ const SecurityQuestionnaire = ({
                     <TooltipTrigger asChild>
                       {optionElement}
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs bg-gray-900 border-gray-700 text-gray-100">
+                    <TooltipContent side="right" className="z-[60] max-w-xs bg-gray-900 border-gray-700 text-gray-100">
                       <p className="text-sm">{optionDescription}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -430,7 +430,7 @@ const SecurityQuestionnaire = ({
                     <TooltipTrigger asChild>
                       {optionElement}
                     </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs bg-gray-900 border-gray-700 text-gray-100">
+                    <TooltipContent side="right" className="z-[60] max-w-xs bg-gray-900 border-gray-700 text-gray-100">
                       <p className="text-sm">{optionDescription}</p>
                     </TooltipContent>
                   </Tooltip>
