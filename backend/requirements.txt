@@ -35,3 +35,4 @@ multidict>=6.0.0
 yarl
 attrs
 propcache
+aiohappyeyeballs
