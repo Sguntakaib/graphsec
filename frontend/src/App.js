@@ -1413,6 +1413,13 @@ function AppContent() {
         if (parentNodeId && dependencyType) {
           console.log(`✅ Marking dependency as COMPLETED: ${parentNodeId} → ${dependencyType}`);
           setDependencyState(parentNodeId, dependencyType, 'COMPLETED');
+          
+          // Remove from active questionnaires
+          setActiveQuestionnaires(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(completedNode.id);
+            return newSet;
+          });
         } else {
           console.log(`⚠️ Could not mark dependency as completed - missing parentNodeId: ${parentNodeId} or dependencyType: ${dependencyType}`);
           console.log('🔍 Current node data:', completedNode);
