@@ -89,6 +89,12 @@ questionnaires:
       question: "How is database patch management handled?"
       type: "single_choice"
       options: ["Automated patching with testing", "Regular manual patching", "Irregular patching", "No patch management", "Unknown"]
+      option_descriptions:
+        "Automated patching with testing": "Fully automated patch deployment with comprehensive testing in staging environments and rollback capabilities for maximum security and reliability."
+        "Regular manual patching": "Scheduled manual patch application with some testing - consistent but resource-intensive and potentially slower response to critical vulnerabilities."
+        "Irregular patching": "Inconsistent patching approach - leaves systems vulnerable to known exploits for extended periods."
+        "No patch management": "No systematic approach to applying database patches - extremely vulnerable to known security vulnerabilities."
+        "Unknown": "Database patch management approach is unclear or not documented."
       help_text: "Regular patching protects against known database vulnerabilities."
       related_branch: "PatchManagement"
     - id: "database_network_security"
