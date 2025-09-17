@@ -101,6 +101,12 @@ questionnaires:
       question: "How is database network access secured?"
       type: "single_choice"
       options: ["Private network with firewall", "Firewall protection", "Network restrictions", "No network security", "Unknown"]
+      option_descriptions:
+        "Private network with firewall": "Database isolated on private network with firewall rules, VPN access, and network segmentation for comprehensive protection."
+        "Firewall protection": "Basic firewall rules controlling database access, but may lack comprehensive network isolation or monitoring."
+        "Network restrictions": "Limited network controls like IP allowlisting, but may not provide comprehensive protection against network-based attacks."
+        "No network security": "Database accessible without network restrictions - vulnerable to network-based attacks and unauthorized access."
+        "Unknown": "Database network security configuration is unclear or not documented."
       help_text: "Network security controls limit database access to authorized systems."
       related_branch: "NetworkSecurity"
     - id: "database_logging"
