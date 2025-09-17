@@ -143,11 +143,19 @@ const CoreLoopDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await callAPI(
-        `/questionnaires/${questionnaireData.node_subtype}`,
-        null,
-        'GET'
-      );
+      // Use specific endpoints for WebApp, API, and Database to get option_descriptions
+      let endpoint;
+      if (questionnaireData.node_subtype === 'WebApp') {
+        endpoint = `/questionnaires/WebApp?level=basic`;
+      } else if (questionnaireData.node_subtype === 'API') {
+        endpoint = `/questionnaires/API?level=basic`;
+      } else if (questionnaireData.node_subtype === 'Database') {
+        endpoint = `/questionnaires/Database?level=basic`;
+      } else {
+        endpoint = `/questionnaires/${questionnaireData.node_subtype}`;
+      }
+      
+      const result = await callAPI(endpoint, null, 'GET');
       setResults(prev => ({ ...prev, prompts: result }));
     } catch (err) {
       setError(`Questionnaire Prompts Error: ${err.message}`);
