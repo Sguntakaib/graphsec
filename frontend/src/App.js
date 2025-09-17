@@ -1381,11 +1381,14 @@ function AppContent() {
 
         // Mark dependency as COMPLETED if this node is a dependency of another node
         const completedNode = currentQuestionnaireNode;
-        if (completedNode.data?.parentNode) {
-          const parentNodeId = completedNode.data.parentNode;
-          const dependencyType = completedNode.subtype || completedNode.data?.subtype;
+        const parentNodeId = completedNode.data?.parentNode;
+        const dependencyType = completedNode.subtype || completedNode.data?.subtype;
+        
+        if (parentNodeId && dependencyType) {
           console.log(`✅ Marking dependency as COMPLETED: ${parentNodeId} → ${dependencyType}`);
           setDependencyState(parentNodeId, dependencyType, 'COMPLETED');
+        } else {
+          console.log(`⚠️ Could not mark dependency as completed - missing parentNodeId: ${parentNodeId} or dependencyType: ${dependencyType}`);
         }
 
         // Handle dependent node questionnaires
