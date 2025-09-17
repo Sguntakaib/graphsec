@@ -89,6 +89,12 @@ questionnaires:
       question: "How are API errors handled?"
       type: "single_choice"
       options: ["Secure error responses", "Generic error messages", "Detailed error info", "No error handling", "Unknown"]
+      option_descriptions:
+        "Secure error responses": "Error messages provide helpful information to legitimate users while avoiding disclosure of sensitive system details or internal structure."
+        "Generic error messages": "Simple, non-specific error messages that don't reveal system details but may be less helpful for debugging legitimate issues."
+        "Detailed error info": "Comprehensive error information including system details, file paths, or database errors - helpful for development but reveals sensitive information."
+        "No error handling": "API doesn't handle errors gracefully, potentially exposing stack traces, system information, or causing service disruption."
+        "Unknown": "API error handling approach is unclear or not documented."
       help_text: "Proper error handling prevents information disclosure through API responses."
       related_branch: "ErrorHandling"
     - id: "api_logging_monitoring"
