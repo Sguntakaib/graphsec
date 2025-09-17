@@ -1458,29 +1458,10 @@ function AppContent() {
     } catch (error) {
       console.error('Error completing security questionnaire:', error);
     } finally {
-      // If dependent questionnaires were triggered, don't close - the handleDependentNodeCreation will manage the flow
+      // Simplified questionnaire flow - handle dependent questionnaires if triggered
       if (result?.triggerDependentQuestionnaires && result?.dependentNodes?.length > 0) {
-        console.log('🔄 Dependent questionnaires triggered, keeping modal open for chaining');
-        
-        // If this is a partial completion (from immediate dependency trigger), store resume info
-        if (result.partialCompletion && result.currentPromptIndex !== undefined) {
-          // Store parent questionnaire state for resuming after dependency handling
-          console.log(`📝 Storing parent questionnaire state - resume at prompt ${result.currentPromptIndex}`);
-          setParentQuestionnaireState({
-            nodeId: currentQuestionnaireNode.id,
-            nodeSubtype: currentQuestionnaireNode.subtype || currentQuestionnaireNode.data?.subtype,
-            resumeFromPromptIndex: result.currentPromptIndex,
-            partialAnswers: result.answers
-          });
-        }
-        
+        console.log('🔄 Dependent questionnaires triggered, will chain after current completes');
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
-      }
-
-      // If this was a resumed parent questionnaire completion, clear the parent state
-      if (parentQuestionnaireState && currentQuestionnaireNode?.id === parentQuestionnaireState.nodeId) {
-        console.log('✅ Parent questionnaire completed, clearing parent state');
-        setParentQuestionnaireState(null);
       }
 
       // Check if there are more questionnaires in the queue
@@ -1491,33 +1472,13 @@ function AppContent() {
         setCurrentQuestionnaireNode(nextNode);
         console.log(`🔄 Moving to next questionnaire in queue: ${nextNode?.data?.subtype}`);
       } else {
-        // All dependent questionnaires completed - check if we need to resume parent
-        if (parentQuestionnaireState) {
-          console.log('🔄 Resuming parent questionnaire after dependent completion:', parentQuestionnaireState);
-          
-          // Resume the parent questionnaire
-          setCurrentQuestionnaireNode({
-            id: parentQuestionnaireState.nodeId,
-            subtype: parentQuestionnaireState.nodeSubtype,
-            data: { subtype: parentQuestionnaireState.nodeSubtype }
-          });
-          
-          // Clear the queue but keep the modal open for parent resumption
-          setQuestionnaireQueue([]);
-          setCurrentQueueIndex(0);
-          // Don't clear parentQuestionnaireState yet - it will be used by the resumed questionnaire
-          
-          console.log(`🔄 Parent questionnaire will resume from prompt ${parentQuestionnaireState.resumeFromPromptIndex}`);
-          return; // Keep modal open for parent questionnaire resumption
-        } else {
-          // No parent to resume - close everything
-          console.log('✅ All questionnaires completed, closing modal');
-          setShowSecurityQuestionnaire(false);
-          setCurrentQuestionnaireNode(null);
-          setQuestionnaireQueue([]);
-          setCurrentQueueIndex(0);
-          setParentQuestionnaireState(null);
-        }
+        // All questionnaires completed - close everything
+        console.log('✅ All questionnaires completed, closing modal');
+        setShowSecurityQuestionnaire(false);
+        setCurrentQuestionnaireNode(null);
+        setQuestionnaireQueue([]);
+        setCurrentQueueIndex(0);
+        setParentQuestionnaireState(null);
       }
     }
   };
