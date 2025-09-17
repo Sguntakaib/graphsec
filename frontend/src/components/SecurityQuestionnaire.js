@@ -74,11 +74,17 @@ const SecurityQuestionnaire = ({
     try {
       setLoading(true);
       
-      // Use comprehensive questionnaire for WebApp, fallback to intelligent-nodes for others
+      // Use comprehensive questionnaire for WebApp, API, and Database - fallback to intelligent-nodes for others
       let response;
       if (nodeSubtype === 'WebApp') {
         console.log('🎯 Using comprehensive WebApp questionnaire system');
         response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`);
+      } else if (nodeSubtype === 'API') {
+        console.log('🎯 Using comprehensive API questionnaire system');
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/API?level=basic`);
+      } else if (nodeSubtype === 'Database') {
+        console.log('🎯 Using comprehensive Database questionnaire system');
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Database?level=basic`);
       } else {
         console.log('🎯 Falling back to intelligent-nodes system for', nodeSubtype);
         response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
@@ -90,10 +96,10 @@ const SecurityQuestionnaire = ({
       
       const data = await response.json();
       
-      if (nodeSubtype === 'WebApp') {
+      if (nodeSubtype === 'WebApp' || nodeSubtype === 'API' || nodeSubtype === 'Database') {
         // Comprehensive questionnaire response format
         setPrompts(data.prompts || []);
-        console.log(`🎯 Loaded ${data.total_questions} comprehensive WebApp questions (${data.level} level)`);
+        console.log(`🎯 Loaded ${data.total_questions} comprehensive ${nodeSubtype} questions (${data.level} level)`);
         if (data.completion_required) {
           console.log('⚠️ All questions must be answered before vulnerability analysis');
         }
