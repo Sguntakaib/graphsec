@@ -17,6 +17,12 @@ questionnaires:
       question: "What authentication method does the API use?"
       type: "single_choice"
       options: ["OAuth2/JWT", "API Keys", "Basic Authentication", "No Authentication", "Unknown"]
+      option_descriptions:
+        "OAuth2/JWT": "Modern token-based authentication using OAuth 2.0 or JSON Web Tokens with support for scopes and time-limited access."
+        "API Keys": "Authentication using API keys - simple but requires secure key management and rotation practices."
+        "Basic Authentication": "Username/password authentication sent with each request - less secure and harder to manage at scale."
+        "No Authentication": "API endpoints are publicly accessible without authentication - high risk for data exposure."
+        "Unknown": "API authentication method is unclear or not documented."
       help_text: "Strong API authentication prevents unauthorized access to API endpoints."
       related_branch: "Authentication"
     - id: "api_authorization_model"
