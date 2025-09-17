@@ -488,8 +488,13 @@ function AppContent() {
           );
 
           if (supportedType) {
-            // This node supports intelligent expansion - start enhanced questionnaire
-            await startEnhancedQuestionnaire(newNode.id, nodeData.subtype);
+            // This node supports intelligent expansion - start legacy questionnaire
+            setCurrentQuestionnaireNode({
+              id: newNode.id,
+              subtype: nodeData.subtype,
+              data: { subtype: nodeData.subtype }
+            });
+            setShowSecurityQuestionnaire(true);
           }
         }
       } catch (error) {
