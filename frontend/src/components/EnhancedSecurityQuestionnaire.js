@@ -104,7 +104,19 @@ const EnhancedSecurityQuestionnaire = ({
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}`);
+      // Use specific endpoints for WebApp, API, and Database to get option_descriptions
+      let endpoint;
+      if (nodeSubtype === 'WebApp') {
+        endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`;
+      } else if (nodeSubtype === 'API') {
+        endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/API?level=basic`;
+      } else if (nodeSubtype === 'Database') {
+        endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Database?level=basic`;
+      } else {
+        endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}`;
+      }
+      
+      const response = await fetch(endpoint);
       
       if (response.ok) {
         const data = await response.json();
