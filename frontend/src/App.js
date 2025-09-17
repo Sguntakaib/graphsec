@@ -1412,6 +1412,12 @@ function AppContent() {
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
       }
 
+      // Check if this is the completion of a resumed parent questionnaire
+      if (parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id && !result?.partialCompletion) {
+        console.log('✅ Parent questionnaire completed after resumption, clearing parent state');
+        setParentQuestionnaireState(null);
+      }
+
       // Check if this is a dependency questionnaire completion and we need to resume parent
       if (questionnaireQueue.length > currentQueueIndex + 1) {
         // Move to next questionnaire in queue (next dependency)
