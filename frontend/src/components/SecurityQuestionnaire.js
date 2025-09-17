@@ -52,6 +52,19 @@ const SecurityQuestionnaire = ({
     }
   }, [isVisible, nodeSubtype, resumeFromPromptIndex, partialAnswers]);
 
+  // Check if resumption index is beyond the questionnaire length after prompts are loaded
+  useEffect(() => {
+    if (prompts.length > 0 && resumeFromPromptIndex !== null && resumeFromPromptIndex >= prompts.length) {
+      // If we're supposed to resume beyond the last question, the questionnaire is actually complete
+      console.log(`🎯 Resume index ${resumeFromPromptIndex} is beyond questionnaire length ${prompts.length}, marking as complete`);
+      
+      // Auto-complete the questionnaire since all questions have been answered
+      setTimeout(() => {
+        handleComplete();
+      }, 100); // Small delay to ensure component is fully initialized
+    }
+  }, [prompts.length, resumeFromPromptIndex]);
+
   // Additional effect to reset state when the modal is closed and reopened
   useEffect(() => {
     if (isVisible && resumeFromPromptIndex === null) {
