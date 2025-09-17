@@ -77,6 +77,12 @@ questionnaires:
       question: "Is HTTPS enforced for all API calls?"
       type: "single_choice"
       options: ["HTTPS only", "HTTPS preferred", "Mixed HTTP/HTTPS", "HTTP only", "Unknown"]
+      option_descriptions:
+        "HTTPS only": "All API endpoints require HTTPS with secure TLS configuration, HTTP requests are automatically redirected or rejected for maximum security."
+        "HTTPS preferred": "HTTPS is the default but HTTP may be accepted in some cases - provides encryption for most traffic but potential security gaps."
+        "Mixed HTTP/HTTPS": "Some API endpoints use HTTPS while others use HTTP - inconsistent protection leaves sensitive data vulnerable during transmission."
+        "HTTP only": "All API communication is unencrypted - highly vulnerable to man-in-the-middle attacks and data interception."
+        "Unknown": "API HTTPS enforcement policy is unclear or not documented."
       help_text: "HTTPS encryption protects API data in transit."
       related_branch: "Encryption"
     - id: "api_error_handling"
