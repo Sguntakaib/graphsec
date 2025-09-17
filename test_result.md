@@ -938,6 +938,18 @@ frontend:
         agent: "main"
         comment: "🔧 ENHANCED SYSTEM DEPENDENCY TRACKING: Extended dependency completion tracking to the enhanced questionnaire system (QuestionnaireManager and EnhancedSecurityQuestionnaire). ISSUES FIXED: 1) Enhanced system was bypassing legacy completion handler where dependency tracking was implemented - added dependency completion tracking to QuestionnaireManager.handleQuestionnaireComplete 2) EnhancedSecurityQuestionnaire was not filtering completed dependencies - added getIncompleteDependencies prop and filtering logic 3) QuestionnaireManager.handleDependentNodeCreation now filters out completed dependencies before creating nodes. COMPLETE SOLUTION: Both legacy SecurityQuestionnaire and enhanced EnhancedSecurityQuestionnaire systems now properly track dependency completion states and filter out completed dependencies, preventing inappropriate re-triggering. Ready for comprehensive testing."
 
+  - task: "Advanced Layout Panel - Auto-Layout and Optimize Buttons Testing"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/AdvancedLayoutControls.js, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "🧪 TESTING AUTO-LAYOUT AND OPTIMIZE BUTTONS: Starting comprehensive testing of Advanced Layout panel functionality. TESTING SCOPE: 1) Auto-Layout button functionality and API calls to /api/diagrams/{id}/auto-layout 2) Optimize button functionality and API calls to /api/diagrams/{id}/optimize-layout 3) Multi-node diagram testing with 2-3 security nodes 4) Visual verification of node repositioning 5) API response validation and error handling 6) Browser console monitoring for errors. BACKEND ENDPOINTS CONFIRMED: Both endpoints exist in server.py with proper implementation. Frontend integration through AdvancedLayoutControls component verified. Ready to execute comprehensive UI and integration testing."
+
   - task: "Comprehensive WebApp Questionnaire System"
     implemented: true
     working: true
