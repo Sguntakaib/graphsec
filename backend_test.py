@@ -184,7 +184,7 @@ class QuestionnaireFlowCleanupTester:
                 
                 response = self.session.post(
                     f"{self.base_url}/intelligent-nodes/{node_type}/check-dependencies",
-                    json=answers,
+                    json={"answers": answers},
                     headers={"Content-Type": "application/json"}
                 )
                 
