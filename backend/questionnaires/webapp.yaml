@@ -43,6 +43,12 @@ questionnaires:
       question: "Is HTTPS enforced?"
       type: "single_choice"
       options: ["HTTPS only (HSTS enabled)", "HTTPS preferred", "Mixed HTTP/HTTPS", "HTTP only", "Unknown"]
+      option_descriptions:
+        "HTTPS only (HSTS enabled)": "All connections forced to use HTTPS with HTTP Strict Transport Security headers, preventing downgrade attacks and ensuring encrypted communication."
+        "HTTPS preferred": "HTTPS is available and recommended but HTTP connections may still be accepted - some risk of insecure connections."
+        "Mixed HTTP/HTTPS": "Some parts of the application use HTTPS while others use HTTP - creates security vulnerabilities and user confusion."
+        "HTTP only": "All communication is unencrypted - highly vulnerable to man-in-the-middle attacks and data interception."
+        "Unknown": "HTTPS implementation status is unclear or not documented."
       help_text: "HTTPS encryption protects data in transit and prevents man-in-the-middle attacks."
       related_branch: "Encryption"
     - id: "webapp_database_connection"
