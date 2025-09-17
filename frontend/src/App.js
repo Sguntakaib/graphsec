@@ -68,7 +68,8 @@ import {
   Network,
   AlertTriangle,
   Filter,
-  X
+  X,
+  Plus
 } from 'lucide-react';
 
 const nodeTypes = {
