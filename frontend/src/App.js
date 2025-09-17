@@ -2569,6 +2569,20 @@ function AppContent() {
         <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
           {viewMode === 'modeling' && (
             <>
+              {/* Advanced Layout Controls */}
+              <div className="p-4 border-b border-gray-700">
+                <AdvancedLayoutControls 
+                  currentDiagram={currentDiagram}
+                  nodes={nodes}
+                  edges={edges}
+                  setNodes={setNodes}
+                  setEdges={setEdges}
+                  isLoading={isLoading}
+                  setIsLoading={setIsLoading}
+                  fitView={fitView}
+                />
+              </div>
+              
               {/* Simulation Debugger */}
               <SimulationDebugger
                 nodes={nodes}
