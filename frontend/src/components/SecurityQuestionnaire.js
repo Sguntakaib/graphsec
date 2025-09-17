@@ -344,7 +344,8 @@ const SecurityQuestionnaire = ({
         recommendations: validationResult.recommendations,
         smartNodeResult,
         dependentNodes,
-        triggerDependentQuestionnaires: dependentNodes.length > 0
+        triggerDependentQuestionnaires: dependentNodes.length > 0,
+        isActualCompletion: true // Flag to indicate this was a real completion button click
       });
     }
   };
