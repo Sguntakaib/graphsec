@@ -79,6 +79,12 @@ questionnaires:
       question: "How are application errors handled?"
       type: "single_choice"
       options: ["Secure error handling (no info disclosure)", "Generic error messages", "Detailed error messages", "No error handling", "Unknown"]
+      option_descriptions:
+        "Secure error handling (no info disclosure)": "Errors are logged securely on the server while users receive generic messages that don't reveal system details to potential attackers."
+        "Generic error messages": "Users see basic error messages without sensitive details, but error handling may not be comprehensively implemented."
+        "Detailed error messages": "Error messages include technical details, stack traces, or system information - provides useful information to attackers."
+        "No error handling": "Errors are not properly handled, potentially causing system crashes or exposing sensitive debugging information."
+        "Unknown": "Error handling approach is unclear or not documented."
       help_text: "Proper error handling prevents information disclosure to attackers."
       related_branch: "ErrorHandling"
     - id: "webapp_logging_monitoring"
