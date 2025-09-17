@@ -1957,8 +1957,8 @@ function AppContent() {
       setQuestionnaireQueue(allDependentNodes);
       setCurrentQueueIndex(0);
       
-      // Start enhanced questionnaire for the first dependent node
-      console.log(`🚀 Starting enhanced questionnaire for dependent node:`, {
+      // Start questionnaire for the first dependent node using legacy system
+      console.log(`🚀 Starting legacy questionnaire for dependent node:`, {
         nodeId: allDependentNodes[0].id,
         nodeSubtype: allDependentNodes[0].subtype || allDependentNodes[0].data?.subtype,
         parentId: currentQuestionnaireNode?.id
@@ -1967,12 +1967,15 @@ function AppContent() {
       const firstNode = allDependentNodes[0];
       const nodeSubtype = firstNode.subtype || firstNode.data?.subtype;
       
-      // Use enhanced questionnaire system
-      startEnhancedQuestionnaire(
-        firstNode.id, 
-        nodeSubtype,
-        currentQuestionnaireNode?.id
-      );
+      // Set the first questionnaire in the queue as current
+      setCurrentQuestionnaireNode({
+        id: firstNode.id,
+        subtype: nodeSubtype,
+        data: { subtype: nodeSubtype }
+      });
+      
+      // Keep the modal open for the first dependent questionnaire
+      setShowSecurityQuestionnaire(true);
     }
   };
 
