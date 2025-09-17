@@ -1996,6 +1996,29 @@ function AppContent() {
     setShowThreatModelingWizard(false);
   };
 
+  // Add missing handler functions for the new layout
+  const [showNodeCreationModal, setShowNodeCreationModal] = useState(false);
+
+  const handleCreateNodeFromModal = (nodeType) => {
+    const newNodeId = `node_${Date.now()}`;
+    const newNode = {
+      id: newNodeId,
+      type: 'custom',
+      position: { x: 300 + Math.random() * 200, y: 200 + Math.random() * 200 },
+      data: {
+        ...nodeType,
+        label: nodeType.name,
+        id: newNodeId,
+        intelligentNode: true,
+        questionnaire_responses: {}
+      }
+    };
+    
+    setNodes((nds) => [...nds, newNode]);
+    saveStateToUndoStack();
+    setShowNodeCreationModal(false);
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event) => {
