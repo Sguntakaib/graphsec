@@ -167,8 +167,8 @@ class QuestionnaireFlowCleanupTester:
             {
                 'node_type': 'Database',
                 'answers': {
-                    'database_backup_enabled': True,
-                    'database_monitoring_enabled': False
+                    'db_backup_enabled': True,
+                    'db_monitoring_enabled': False
                 },
                 'expected_dependencies': ['Backup']
             }
