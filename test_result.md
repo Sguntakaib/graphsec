@@ -57,8 +57,8 @@
 ##   test_priority: "high_first"  # or "sequential" or "stuck_first"
 ##
 ## agent_communication:
-##     -agent: "main"  # or "testing" or "user"
-##     -message: "Communication message between agents"
+##     -agent: "main"
+##     -message: "🎯 QUESTIONNAIRE FLOW CLEANUP COMPLETED: Successfully resolved the 'fucked up' questionnaire flow issues by simplifying the system architecture. CHANGES MADE: 1) ✅ Disabled Enhanced QuestionnaireManager System - Commented out QuestionnaireManager component and imports to prevent dual system conflicts and multiple initializations 2) ✅ Streamlined Legacy SecurityQuestionnaire System - Removed complex parent resumption logic, simplified questionnaire queue management, removed enhanced/legacy system conflicts 3) ✅ Fixed Dependency Handling - Updated handleDependentNodeCreation to use legacy system only, removed startEnhancedQuestionnaire calls that were causing flow confusion 4) ✅ Cleaned Up State Management - Removed unused questionnaireState/questionnaireActions variables, simplified parent questionnaire state logic, removed complex resumption flows 5) ✅ Verified System Stability - Application loads cleanly without multiple QuestionnaireManager initialization messages, no more enhanced vs legacy system conflicts, questionnaire flow simplified and stable. TECHNICAL SUMMARY: The root cause was dual questionnaire systems (enhanced + legacy) running simultaneously, causing flow control conflicts, duplicate initializations, and complex state management issues. Solution was to disable the enhanced system entirely and use only the proven legacy SecurityQuestionnaire system with simplified flow logic. The questionnaire system now operates with a single, clear flow path without the complex parent resumption and queue management that was causing the flow to get 'fucked up'."
 
 # Protocol Guidelines for Main agent
 #
