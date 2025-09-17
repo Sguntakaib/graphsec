@@ -36,3 +36,5 @@ yarl
 attrs
 propcache
 aiohappyeyeballs
+aiosignal
+frozenlist
