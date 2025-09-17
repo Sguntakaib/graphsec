@@ -2006,6 +2006,13 @@ function AppContent() {
   };
 
   const handleSecurityQuestionnaireCancel = () => {
+    if (currentQuestionnaireNode) {
+      setActiveQuestionnaires(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(currentQuestionnaireNode.id);
+        return newSet;
+      });
+    }
     setShowSecurityQuestionnaire(false);
     setCurrentQuestionnaireNode(null);
     setQuestionnaireQueue([]);
