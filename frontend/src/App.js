@@ -510,89 +510,20 @@ function AppContent() {
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
-  // Helper function to start enhanced questionnaire
-  const startEnhancedQuestionnaire = useCallback(async (nodeId, nodeSubtype, parentNodeId = null) => {
-    console.log('🎬 Starting enhanced questionnaire:', { nodeId, nodeSubtype, parentNodeId });
+  // Helper function to start legacy questionnaire
+  const startLegacyQuestionnaire = useCallback(async (nodeId, nodeSubtype, parentNodeId = null) => {
+    console.log('🎬 Starting legacy questionnaire:', { nodeId, nodeSubtype, parentNodeId });
     
-    // Prevent duplicate questionnaires
-    if (activeQuestionnaires.has(nodeId)) {
-      console.log('⚠️ Questionnaire already active for node:', nodeId);
-      return;
-    }
+    // Use legacy questionnaire system only
+    console.log('🎯 Using legacy questionnaire system');
     
-    // Force API nodes to use legacy system immediately
-    if (nodeSubtype === 'API') {
-      console.log('🔄 API node detected - using legacy intelligent-nodes system');
-      
-      // Add to active questionnaires
-      setActiveQuestionnaires(prev => new Set([...prev, nodeId]));
-      
-      // Find the actual node to get its full data including parentNode
-      const apiNode = nodes.find(n => n.id === nodeId);
-      console.log('🔍 Found API node:', apiNode);
-      
-      // Set questionnaire node with proper parent information
-      setCurrentQuestionnaireNode({
-        id: nodeId,
-        subtype: nodeSubtype,
-        data: {
-          ...(apiNode?.data || {}),
-          subtype: nodeSubtype,
-          parentNode: parentNodeId || apiNode?.data?.parentNode // Use parentNodeId parameter or existing data
-        }
-      });
-      setShowSecurityQuestionnaire(true);
-      return;
-    }
-    
-    try {
-      // Check if this node type supports intelligent expansion
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/supported-types`);
-      if (response.ok) {
-        const data = await response.json();
-        const supportedType = data.supported_types.find(
-          type => type.node_subtype === nodeSubtype
-        );
-
-        if (supportedType) {
-          console.log('✅ Node type supported, attempting enhanced questionnaire...');
-          
-          // Check if enhanced system is already active for this node
-          if (questionnaireState.isFlowActive) {
-            console.log('🔄 Enhanced system already active, skipping duplicate initialization');
-            return;
-          }
-          
-          // Use legacy questionnaire system only
-          console.log('🎯 Using legacy questionnaire system');
-          console.log('🎯 Setting currentQuestionnaireNode to:', { id: nodeId, subtype: nodeSubtype });
-          console.log('🎯 Current showSecurityQuestionnaire state:', showSecurityQuestionnaire);
-          
-          setCurrentQuestionnaireNode({
-            id: nodeId,
-            subtype: nodeSubtype,
-            data: { subtype: nodeSubtype }
-          });
-          setShowSecurityQuestionnaire(true);
-          
-          console.log('🎯 After setting - showSecurityQuestionnaire should be true');
-        } else {
-          console.log('❌ Node type not supported for questionnaire');
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error starting enhanced questionnaire:', error);
-      
-      // Always fallback to old system on error
-      console.log('🔄 Fallback: Using old questionnaire system');
-      setCurrentQuestionnaireNode({
-        id: nodeId,
-        subtype: nodeSubtype,
-        data: { subtype: nodeSubtype }
-      });
-      setShowSecurityQuestionnaire(true);
-    }
-  }, [nodes, questionnaireActions, setCurrentQuestionnaireNode, setShowSecurityQuestionnaire]);
+    setCurrentQuestionnaireNode({
+      id: nodeId,
+      subtype: nodeSubtype,
+      data: { subtype: nodeSubtype }
+    });
+    setShowSecurityQuestionnaire(true);
+  }, []);
 
   const handleSaveDiagram = async () => {
     setIsLoading(true);
