@@ -52,15 +52,11 @@ const SecurityQuestionnaire = ({
     }
   }, [isVisible, nodeSubtype, resumeFromPromptIndex, partialAnswers]);
 
-  // Check if resumption index is beyond the questionnaire length after prompts are loaded
+  // Additional validation for resumption index
   useEffect(() => {
     if (prompts.length > 0 && resumeFromPromptIndex !== null && resumeFromPromptIndex >= prompts.length) {
-      // If we're supposed to resume beyond the last question, the questionnaire is actually complete
-      console.log(`🎯 Resume index ${resumeFromPromptIndex} is beyond questionnaire length ${prompts.length}, questionnaire is complete`);
-      
-      // Don't auto-complete, just show the completion state
-      // The user should still need to click Complete button if they want to finalize
-      // Set the current index to the last question instead
+      // If resume index is beyond questionnaire length, clamp it to the last question
+      console.log(`⚠️ Resume index ${resumeFromPromptIndex} is beyond questionnaire length ${prompts.length}, clamping to last question`);
       setCurrentPromptIndex(prompts.length - 1);
     }
   }, [prompts.length, resumeFromPromptIndex]);
