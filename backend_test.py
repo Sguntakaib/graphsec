@@ -1,34 +1,43 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - QUESTIONNAIRE DEPENDENCY FLOW VERIFICATION
-Tests the questionnaire system for WebApp nodes with focus on dependency flow.
+Backend API Testing - TOOLTIP FUNCTIONALITY VERIFICATION
+Tests the new API and Database questionnaire endpoints to verify tooltip functionality fix.
 
 TESTING FOCUS:
-1. **Test WebApp Questionnaire Question Order**: 
-   - Verify that Database dependency question is at position 4 (not at the end)
-   - Verify that API dependency question is at position 5 (not at the end)
-   - Confirm there are 10 total questions in WebApp basic questionnaire
+1. **API Questionnaire Endpoint Testing:**
+   - Test GET /api/questionnaires/API (basic level)
+   - Test GET /api/questionnaires/API?level=advanced
+   - Test GET /api/questionnaires/API?level=expert
+   - Verify response structure includes all required fields
+   - **CRITICAL:** Verify "option_descriptions" field is present and populated for questions with multiple choice options
+   - Verify option_descriptions contain proper tooltip text for each option
 
-2. **Test Dependency Trigger Flow**: 
-   - Test answering "Yes" to Database dependency question (position 4)
-   - Verify it creates Database node and opens Database questionnaire
-   - Test that Database questionnaire has dependency questions in middle positions
-   - Verify after Database questionnaire completes, WebApp questionnaire resumes from position 5
+2. **Database Questionnaire Endpoint Testing:**
+   - Test GET /api/questionnaires/Database (basic level)
+   - Test GET /api/questionnaires/Database?level=advanced  
+   - Test GET /api/questionnaires/Database?level=expert
+   - Verify response structure matches WebApp endpoint format
+   - **CRITICAL:** Verify "option_descriptions" field is present and populated
+   - Verify tooltip text is comprehensive and helpful
 
-3. **Test API Dependency Flow**:
-   - Test answering "Yes" to API dependency question (position 5) 
-   - Verify it creates API node and opens API questionnaire
-   - Test that API questionnaire has dependency questions in middle positions
-   - Verify after API questionnaire completes, WebApp questionnaire resumes from position 6
+3. **Comparison Testing:**
+   - Compare response structure between /api/questionnaires/WebApp, /api/questionnaires/API, and /api/questionnaires/Database
+   - Ensure all three endpoints return consistent data structure
+   - Verify all endpoints include option_descriptions field for choice questions
 
-4. **Test Complete Flow**:
-   - Test complete flow: WebApp Q1-4 → Database dependency → Database questionnaire → Resume WebApp Q5 → API dependency → API questionnaire → Resume WebApp Q6-10 → Complete
+4. **Data Quality Validation:**
+   - Verify that option_descriptions keys match the actual option values
+   - Ensure tooltip text is meaningful and provides security context
+   - Check that all single_choice and multiple_choice questions have corresponding option_descriptions
 
-Focus on verifying:
-- Question reordering worked (dependencies in middle, not at end)
-- Parent questionnaire resumption after child completion
-- Multiple dependency handling (both Database and API)
-- All questionnaire types (WebApp, Database, API) have dependencies in correct positions
+**EXPECTED RESULTS:**
+- All endpoints should return HTTP 200
+- Response should include "option_descriptions" field in question objects
+- Option descriptions should be a dictionary mapping option values to tooltip text
+- Tooltip text should be comprehensive security guidance (not just option repetition)
+
+**CRITICAL SUCCESS CRITERIA:**
+This fix addresses the UI issue where API and Database questionnaires were missing tooltip (?) icons while WebApp questionnaires showed them correctly. The new specific endpoints should provide the same option_descriptions data that WebApp provides.
 """
 
 import requests
