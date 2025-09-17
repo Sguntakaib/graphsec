@@ -225,8 +225,8 @@ const SecurityQuestionnaire = ({
     const dependencyTriggers = {
       'webapp_api_endpoints': 'API',
       'webapp_database_connection': 'Database',
-      'db_backup_enabled': 'Backup',
-      'db_monitoring_enabled': 'Monitoring'
+      'database_backup_enabled': 'Backup',
+      'database_monitoring_integration': 'Monitoring'
     };
     
     // If current question triggers a dependency and answer is Yes/True
