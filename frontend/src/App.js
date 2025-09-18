@@ -575,15 +575,33 @@ function AppContent() {
       try {
         if (diagramToUse) {
           console.log('💾 Saving new node to database');
+          
+          // Format the node data to match backend SecurityNode model
+          const backendNodeData = {
+            id: newNode.id,
+            type: newNode.data.type || "Asset", // Map to NodeType enum
+            subtype: newNode.data.subtype,
+            label: newNode.data.label,
+            position: {
+              x: parseFloat(newNode.position.x.toString()),
+              y: parseFloat(newNode.position.y.toString())
+            },
+            data: {
+              ...newNode.data,
+              category: newNode.data.category,
+              categoryTitle: newNode.data.categoryTitle,
+              description: newNode.data.description,
+              criticality: newNode.data.criticality,
+              data_classification: newNode.data.data_classification
+            },
+            mitre_ids: newNode.data.mitre_ids || [],
+            cve_ids: newNode.data.cve_ids || []
+          };
+          
           const updatedDiagram = {
             ...diagramToUse,
-            nodes: [...(diagramToUse.nodes || []), {
-              id: newNode.id,
-              type: newNode.type,
-              position: newNode.position,
-              data: newNode.data,
-              subtype: newNode.data.subtype
-            }]
+            nodes: [...(diagramToUse.nodes || []), backendNodeData],
+            edges: diagramToUse.edges || []
           };
           
           await updateDiagram(diagramToUse.id, updatedDiagram);
