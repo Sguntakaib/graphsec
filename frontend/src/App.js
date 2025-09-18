@@ -1583,29 +1583,24 @@ function AppContent() {
         if (isCompletingCurrentFromStack && parentQuestionnaireStack.length > 1) {
           // This questionnaire is completed and there's a grandparent to resume
           console.log('✅ Current questionnaire completed, popping from stack and resuming grandparent');
-          setParentQuestionnaireStack(prev => {
-            const newStack = prev.slice(0, -1); // Remove the completed questionnaire
-            return newStack;
+          
+          // Get the grandparent before popping the current questionnaire
+          const grandparentState = parentQuestionnaireStack[parentQuestionnaireStack.length - 2]; // Second to last item
+          console.log('🔄 Resuming grandparent questionnaire:', grandparentState);
+          
+          // Pop the completed questionnaire from stack
+          setParentQuestionnaireStack(prev => prev.slice(0, -1));
+          
+          // Resume the grandparent questionnaire
+          setCurrentQuestionnaireNode({
+            id: grandparentState.nodeId,
+            subtype: grandparentState.nodeSubtype,
+            data: { subtype: grandparentState.nodeSubtype }
           });
           
-          // Resume the grandparent questionnaire (now at the top of the stack)
-          setParentQuestionnaireStack(prev => {
-            if (prev.length > 0) {
-              const grandparentState = prev[prev.length - 1];
-              console.log('🔄 Resuming grandparent questionnaire:', grandparentState);
-              
-              setCurrentQuestionnaireNode({
-                id: grandparentState.nodeId,
-                subtype: grandparentState.nodeSubtype,
-                data: { subtype: grandparentState.nodeSubtype }
-              });
-              
-              // Clear the queue
-              setQuestionnaireQueue([]);
-              setCurrentQueueIndex(0);
-            }
-            return prev;
-          });
+          // Clear the queue
+          setQuestionnaireQueue([]);
+          setCurrentQueueIndex(0);
         } else if (isCompletingCurrentFromStack && parentQuestionnaireStack.length === 1) {
           // This is the last questionnaire in the stack - close everything
           console.log('✅ Last parent questionnaire completed, closing modal');
