@@ -566,8 +566,31 @@ function AppContent() {
         }
       }
 
-      // Add the node first
+      // Add the node to React state first
       setNodes((nds) => nds.concat(newNode));
+
+      // Save the node to the database if we have a diagram
+      try {
+        if (currentDiagram) {
+          console.log('💾 Saving new node to database');
+          const updatedDiagram = {
+            ...currentDiagram,
+            nodes: [...(currentDiagram.nodes || []), {
+              id: newNode.id,
+              type: newNode.type,
+              position: newNode.position,
+              data: newNode.data,
+              subtype: newNode.data.subtype
+            }]
+          };
+          
+          await updateDiagram(currentDiagram.id, updatedDiagram);
+          setCurrentDiagram(updatedDiagram);
+          console.log('✅ Node saved to database');
+        }
+      } catch (error) {
+        console.error('❌ Error saving node to database:', error);
+      }
 
       // Check if this node type supports intelligent expansion
       try {
