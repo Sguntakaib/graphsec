@@ -1,49 +1,47 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - QUESTIONNAIRE OVERVIEW FUNCTIONALITY VERIFICATION
-Tests the questionnaire overview functionality for double-click issue debugging.
+Backend API Testing - DOUBLE-CLICK QUESTIONNAIRE FUNCTIONALITY VERIFICATION
+Tests the backend APIs that support the double-click questionnaire functionality.
 
 TESTING FOCUS:
-1. **Create Test Diagram with Web Application Template:**
-   - Create a new diagram using Web Application template
-   - Verify template application creates nodes with proper structure
-   - Ensure nodes have the required fields for questionnaire functionality
+1. **Create Test Diagram:**
+   - Create a new diagram for testing
+   - Add nodes with questionnaire responses
+   - Verify diagram and node creation APIs work correctly
 
-2. **Test Questionnaire Data Retrieval API:**
+2. **Test Questionnaire Retrieval API:**
    - Test GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire
-   - Verify API returns proper questionnaire data for template nodes
-   - Test with different node types from Web Application template
-   - Check response structure and data completeness
+   - Verify API returns proper questionnaire data for nodes
+   - Test with different node types (WebApp, API, Database)
+   - Check response structure includes existing answers pre-filled
 
-3. **Verify Template Nodes Have Proper Questionnaire Data:**
-   - Test nodes from Web Application template (WebApp, Database, etc.)
-   - Verify each node type has associated questionnaire prompts
-   - Check that questionnaire data is properly structured
-   - Ensure no missing or malformed data that could cause "Error Loading Overview"
+3. **Test Questionnaire Update API:**
+   - Test POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire
+   - Verify API can save questionnaire responses
+   - Test updating existing responses
+   - Verify data persistence
 
-4. **Test Empty vs Answered Questionnaire Scenarios:**
-   - Test nodes with no questionnaire responses (empty state)
-   - Test nodes with partial questionnaire responses
-   - Test nodes with complete questionnaire responses
-   - Verify API handles all scenarios gracefully
+4. **Test Node Management APIs:**
+   - Test diagram creation and node management
+   - Verify nodes can be created with proper structure
+   - Test node data retrieval and updates
 
-5. **API Error Detection:**
-   - Check for any API errors that might cause "Error Loading Overview"
-   - Test error handling for missing nodes or invalid IDs
-   - Verify proper HTTP status codes and error messages
-   - Test edge cases that might cause frontend failures
+5. **Integration Testing:**
+   - Test the complete flow: create diagram → add nodes → save responses → retrieve responses
+   - Verify backend can handle the double-click questionnaire workflow
+   - Test error handling and edge cases
 
 **EXPECTED RESULTS:**
-- Web Application template creates nodes successfully
-- GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire returns HTTP 200
-- Response includes proper questionnaire structure with prompts and responses
-- API handles empty, partial, and complete questionnaire states
-- No API errors that would cause "Error Loading Overview: Failed to fetch questionnaire data"
+- Diagram creation API works correctly
+- Node questionnaire retrieval API returns HTTP 200 with proper structure
+- Questionnaire update API saves responses correctly
+- Backend supports the complete double-click questionnaire workflow
+- APIs handle all scenarios that would be triggered by double-clicking nodes
 
 **CRITICAL SUCCESS CRITERIA:**
-This test debugs why double-clicking nodes shows "Error Loading Overview: Failed to fetch questionnaire data" 
-instead of the questionnaire overview modal. The goal is to identify and resolve any backend issues 
-preventing proper questionnaire data retrieval.
+This test verifies that the backend APIs are ready to support the fixed double-click 
+questionnaire functionality in CustomNode.js. The goal is to ensure all backend 
+endpoints work correctly for the double-click → questionnaire modal workflow.
 """
 
 import requests
