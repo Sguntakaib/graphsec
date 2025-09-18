@@ -188,13 +188,29 @@ function AppContent() {
         setParentQuestionnaireState(null);
         
         // Set the state directly to open questionnaire
-        setCurrentQuestionnaireNode({
+        const questionnaireNode = {
           id: node.id,
           subtype: nodeSubtype,
           data: { subtype: nodeSubtype }
+        };
+        
+        console.log('🔧 Setting questionnaire state:', {
+          showSecurityQuestionnaire: true,
+          currentQuestionnaireNode: questionnaireNode,
+          existingAnswers
         });
+        
+        setCurrentQuestionnaireNode(questionnaireNode);
         setCurrentQuestionnaireAnswers(existingAnswers);
         setShowSecurityQuestionnaire(true);
+        
+        // Force a state check after setting
+        setTimeout(() => {
+          console.log('🔍 State check after 100ms:', {
+            showSecurityQuestionnaire: true, // Should be true
+            currentQuestionnaireNode: questionnaireNode // Should be set
+          });
+        }, 100);
       }
     };
 
