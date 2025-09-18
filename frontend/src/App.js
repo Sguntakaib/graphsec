@@ -1535,25 +1535,30 @@ function AppContent() {
       if (result?.triggerDependentQuestionnaires && result?.dependentNodes?.length > 0) {
         console.log('🔄 Dependent questionnaires triggered, storing parent state for resumption');
         
-        // Store parent questionnaire state for resumption after dependencies complete
+        // Store parent questionnaire state in stack for resumption after dependencies complete
         if (result.partialCompletion) {
-          // This is a partial completion from dependency trigger - store parent state
-          setParentQuestionnaireState({
+          // Push current questionnaire to the parent stack
+          const parentState = {
             nodeId: currentQuestionnaireNode.id,
             nodeSubtype: currentQuestionnaireNode.subtype,
             resumeFromPromptIndex: result.currentPromptIndex, // Resume from the next question after dependency trigger
             partialAnswers: result.answers
-          });
-          console.log(`🔄 Stored parent questionnaire state for resumption at prompt ${result.currentPromptIndex}`);
+          };
+          setParentQuestionnaireStack(prev => [...prev, parentState]);
+          console.log(`🔄 Pushed parent questionnaire to stack at prompt ${result.currentPromptIndex}. Stack depth: ${parentQuestionnaireStack.length + 1}`);
         }
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
       }
 
       // Check if this is the completion of a resumed parent questionnaire
-      // Only clear parent state if this is actual completion (not just navigation to a question)
-      if (parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id && !result?.partialCompletion && result?.isActualCompletion) {
-        console.log('✅ Parent questionnaire completed after resumption, clearing parent state');
-        setParentQuestionnaireState(null);
+      // Only pop from stack if this is actual completion (not just navigation to a question)
+      const isCompletingParentFromStack = parentQuestionnaireStack.length > 0 && 
+        parentQuestionnaireStack[parentQuestionnaireStack.length - 1]?.nodeId === currentQuestionnaireNode.id && 
+        !result?.partialCompletion && result?.isActualCompletion;
+      
+      if (isCompletingParentFromStack) {
+        console.log('✅ Parent questionnaire completed after resumption, popping from stack');
+        setParentQuestionnaireStack(prev => prev.slice(0, -1)); // Pop the completed parent
       }
 
       // Check if this is a dependency questionnaire completion and we need to resume parent
