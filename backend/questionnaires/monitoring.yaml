@@ -53,6 +53,12 @@ questionnaires:
       question: "What is the monitoring data retention policy?"
       type: "single_choice"
       options: ["Long-term (>1 year)", "Medium-term (3-12 months)", "Short-term (<3 months)", "No Defined Policy", "Unknown"]
+      option_descriptions:
+        "Long-term (>1 year)": "Extended monitoring data retention supporting long-term trend analysis, capacity planning, compliance requirements, and historical incident investigation."
+        "Medium-term (3-12 months)": "Moderate retention period balancing storage costs with operational needs - suitable for most troubleshooting and trend analysis requirements."
+        "Short-term (<3 months)": "Minimal retention focused on immediate operational needs - limited ability to analyze long-term trends or investigate historical incidents."
+        "No Defined Policy": "No structured retention policy for monitoring data - unpredictable data availability and potential compliance issues."
+        "Unknown": "Monitoring data retention policy is unclear or not documented."
       help_text: "Appropriate retention supports troubleshooting, compliance, and trend analysis."
       related_branch: "AuditLogging"
     - id: "monitoring_access_control"
