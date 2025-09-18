@@ -1452,6 +1452,7 @@ function AppContent() {
         console.log('✅ All questionnaires completed, closing modal');
         setShowSecurityQuestionnaire(false);
         setCurrentQuestionnaireNode(null);
+        setCurrentQuestionnaireAnswers({}); // Clear existing answers
         setQuestionnaireQueue([]);
         setCurrentQueueIndex(0);
         setParentQuestionnaireState(null);
