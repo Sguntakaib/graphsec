@@ -594,13 +594,13 @@ class QuestionnaireCompletionTester:
                 {
                     "name": "Invalid WebApp Branch Type",
                     "url": f"{self.base_url}/intelligent-nodes/WebApp/validate-completeness",
-                    "data": [{"type": "InvalidBranch", "implementation_status": "implemented", "security_level": "high"}],
+                    "data": [{"id": "invalid", "name": "Invalid", "type": "InvalidBranch", "required": True, "completed": True, "value": "test"}],
                     "expected_completion": 0.0
                 },
                 {
                     "name": "Invalid API Branch Type",
                     "url": f"{self.base_url}/intelligent-nodes/API/validate-completeness", 
-                    "data": [{"type": "InvalidBranch", "implementation_status": "implemented", "security_level": "high"}],
+                    "data": [{"id": "invalid", "name": "Invalid", "type": "InvalidBranch", "required": True, "completed": True, "value": "test"}],
                     "expected_completion": 0.0
                 }
             ]
