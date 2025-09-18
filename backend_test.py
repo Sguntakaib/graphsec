@@ -1479,6 +1479,9 @@ class DoubleClickQuestionnaireTester:
             # Basic connectivity
             self.test_health_check,
             
+            # CRITICAL TEST: Double-Click Questionnaire Save/Retrieve Issue (REVIEW REQUEST)
+            self.test_double_click_questionnaire_save_retrieve_issue,
+            
             # REVIEW REQUEST: Double-Click Questionnaire Backend Support Tests
             self.test_api_questionnaire_endpoint,
             self.test_backup_questionnaire_endpoint,
