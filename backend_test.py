@@ -536,7 +536,7 @@ class DoubleClickQuestionnaireTester:
                 return False
             
             verified_data = verify_response.json()
-            saved_responses = verified_data.get('responses', {})
+            saved_responses = verified_data.get('questionnaire_responses', {})
             
             # Check if at least some responses were persisted
             if len(saved_responses) > 0:
