@@ -52,6 +52,12 @@ questionnaires:
       question: "What is the backup retention policy?"
       type: "single_choice"
       options: ["Long-term (>1 year)", "Medium-term (3-12 months)", "Short-term (<3 months)", "No Retention Policy", "Unknown"]
+      option_descriptions:
+        "Long-term (>1 year)": "Extended backup retention supporting long-term recovery requirements, regulatory compliance, and historical data analysis - higher storage costs but comprehensive coverage."
+        "Medium-term (3-12 months)": "Moderate retention period balancing recovery capabilities with storage costs - suitable for most business requirements and basic compliance needs."
+        "Short-term (<3 months)": "Minimal retention period focused on immediate recovery needs - lower storage costs but limited ability to recover from older incidents or meet compliance requirements."
+        "No Retention Policy": "No defined backup retention strategy - unpredictable backup availability and potential compliance violations."
+        "Unknown": "Backup retention policy is unclear or not documented."
       help_text: "Retention policies balance storage costs with recovery requirements and compliance needs."
       related_branch: "Backup"
     - id: "backup_testing"
