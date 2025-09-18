@@ -142,15 +142,15 @@ class MonitoringQuestionnaireFixTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Verify basic structure
-                if data.get('success') and data.get('node_subtype') == 'Backup':
-                    prompts_count = data.get('prompts_count', 0)
+                # Verify basic structure (actual API format)
+                if data.get('node_subtype') == 'Backup' and 'prompts' in data:
+                    prompts = data.get('prompts', [])
                     self.log_test("Backup Questionnaire Prompts", True, 
-                                f"✅ Backup endpoint still works: {prompts_count} prompts")
+                                f"✅ Backup endpoint still works: {len(prompts)} prompts")
                     return True
                 else:
                     self.log_test("Backup Questionnaire Prompts", False, 
-                                f"Invalid response structure: {data}")
+                                f"Invalid response structure: missing node_subtype or prompts")
                     return False
             else:
                 self.log_test("Backup Questionnaire Prompts", False, 
