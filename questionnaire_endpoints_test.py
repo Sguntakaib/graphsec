@@ -340,13 +340,13 @@ class QuestionnaireEndpointsTester:
             self.log_test("ExternalAttacker Prompts Endpoint", False, f"Request error: {str(e)}")
             return False
 
-    def test_actor_prompts_endpoint(self):
-        """Test GET /api/intelligent-nodes/Actor/prompts"""
+    def test_clouddeployment_prompts_endpoint(self):
+        """Test GET /api/intelligent-nodes/CloudDeployment/prompts (alternative fallback)"""
         try:
-            response = self.session.get(f"{self.base_url}/intelligent-nodes/Actor/prompts")
+            response = self.session.get(f"{self.base_url}/intelligent-nodes/CloudDeployment/prompts")
             
             if response.status_code != 200:
-                self.log_test("Actor Prompts Endpoint", False, 
+                self.log_test("CloudDeployment Prompts Endpoint", False, 
                             f"HTTP {response.status_code}: {response.text}")
                 return False
             
@@ -354,25 +354,25 @@ class QuestionnaireEndpointsTester:
             
             # Verify expected fields for intelligent-nodes
             if 'prompts' not in data:
-                self.log_test("Actor Prompts Endpoint", False, 
+                self.log_test("CloudDeployment Prompts Endpoint", False, 
                             f"Missing 'prompts' field. Response: {data}")
                 return False
             
             # Verify data types and content
             if not isinstance(data['prompts'], list):
-                self.log_test("Actor Prompts Endpoint", False, 
+                self.log_test("CloudDeployment Prompts Endpoint", False, 
                             f"'prompts' should be a list, got {type(data['prompts'])}")
                 return False
             
             if len(data['prompts']) == 0:
-                self.log_test("Actor Prompts Endpoint", False, 
+                self.log_test("CloudDeployment Prompts Endpoint", False, 
                             "No prompts returned - prompts list is empty")
                 return False
             
             # Verify prompts structure
             for i, prompt in enumerate(data['prompts']):
                 if not isinstance(prompt, dict):
-                    self.log_test("Actor Prompts Endpoint", False, 
+                    self.log_test("CloudDeployment Prompts Endpoint", False, 
                                 f"Prompt {i} should be a dict, got {type(prompt)}")
                     return False
                 
@@ -381,17 +381,17 @@ class QuestionnaireEndpointsTester:
                 prompt_missing_fields = [field for field in prompt_required_fields if field not in prompt]
                 
                 if prompt_missing_fields:
-                    self.log_test("Actor Prompts Endpoint", False, 
+                    self.log_test("CloudDeployment Prompts Endpoint", False, 
                                 f"Prompt {i} missing fields: {prompt_missing_fields}")
                     return False
             
-            self.log_test("Actor Prompts Endpoint", True, 
-                        f"✅ Actor prompts: {len(data['prompts'])} prompts available")
+            self.log_test("CloudDeployment Prompts Endpoint", True, 
+                        f"✅ CloudDeployment prompts: {len(data['prompts'])} prompts available")
             
             return True
             
         except Exception as e:
-            self.log_test("Actor Prompts Endpoint", False, f"Request error: {str(e)}")
+            self.log_test("CloudDeployment Prompts Endpoint", False, f"Request error: {str(e)}")
             return False
 
     # ============================================================================
