@@ -498,9 +498,9 @@ class QuestionnaireEndpointsTester:
                     "name": "ExternalAttacker"
                 },
                 {
-                    "url": f"{self.base_url}/intelligent-nodes/Actor/prompts",
+                    "url": f"{self.base_url}/intelligent-nodes/CloudDeployment/prompts",
                     "type": "intelligent-nodes",
-                    "name": "Actor"
+                    "name": "CloudDeployment"
                 }
             ]
             
