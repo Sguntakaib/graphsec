@@ -40,6 +40,12 @@ questionnaires:
       question: "How are backups encrypted?"
       type: "single_choice"
       options: ["Customer Managed KMS Keys", "AWS Managed Keys", "Default Encryption", "No Encryption", "Unknown"]
+      option_descriptions:
+        "Customer Managed KMS Keys": "Customer-controlled encryption keys with full key lifecycle management, rotation policies, and audit trails - provides maximum security and control over backup encryption."
+        "AWS Managed Keys": "Cloud provider managed encryption keys with automatic rotation and management - good security with reduced administrative overhead."
+        "Default Encryption": "Basic encryption using platform default settings - provides encryption but may lack advanced key management features or customization options."
+        "No Encryption": "Backup data stored without encryption - highly vulnerable to unauthorized access if storage media is compromised or stolen."
+        "Unknown": "Backup encryption implementation is unclear or not documented."
       help_text: "Encryption protects backup data from unauthorized access during storage and transit."
       related_branch: "Encryption"
     - id: "backup_retention"
