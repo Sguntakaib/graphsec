@@ -2806,13 +2806,15 @@ function AppContent() {
           onCreateLinkedNodes={handleCreateLinkedNodes}
           getIncompleteDependencies={getIncompleteDependencies}
           resumeFromPromptIndex={
-            parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id 
-              ? parentQuestionnaireState.resumeFromPromptIndex 
+            parentQuestionnaireStack.length > 0 && 
+            parentQuestionnaireStack[parentQuestionnaireStack.length - 1]?.nodeId === currentQuestionnaireNode.id 
+              ? parentQuestionnaireStack[parentQuestionnaireStack.length - 1].resumeFromPromptIndex 
               : null
           }
           partialAnswers={
-            parentQuestionnaireState?.nodeId === currentQuestionnaireNode.id 
-              ? parentQuestionnaireState.partialAnswers 
+            parentQuestionnaireStack.length > 0 && 
+            parentQuestionnaireStack[parentQuestionnaireStack.length - 1]?.nodeId === currentQuestionnaireNode.id 
+              ? parentQuestionnaireStack[parentQuestionnaireStack.length - 1].partialAnswers 
               : null
           }
         />
