@@ -872,19 +872,23 @@ class DoubleClickQuestionnaireTester:
     # ============================================================================
     
     def run_all_tests(self):
-        """Run all tests with focus on Database questionnaire consistency fix"""
-        print("🚀 Starting Database Questionnaire Consistency Fix Verification")
+        """Run all tests with focus on questionnaire resumption fix"""
+        print("🚀 Starting Questionnaire Resumption Fix Verification")
         print("=" * 90)
-        print("DATABASE QUESTIONNAIRE CONSISTENCY FIX VERIFICATION")
-        print("Primary Focus: GET /api/intelligent-nodes/Database/prompts endpoint consistency")
-        print("Secondary: Double-click questionnaire functionality verification")
+        print("QUESTIONNAIRE RESUMPTION FIX VERIFICATION")
+        print("Primary Focus: Database → Backup dependency flow and resumption logic")
+        print("Testing Fix: Changed App.js lines 1549 and 1561 from currentPromptIndex + 1 to currentPromptIndex")
+        print("Expected: Question 5 should NOT be skipped after Backup child node completion")
         print("=" * 90)
         
         tests = [
             # Basic connectivity
             self.test_health_check,
             
-            # CRITICAL TEST: Database Questionnaire Consistency Fix
+            # CRITICAL TEST: Questionnaire Resumption Fix
+            self.test_questionnaire_resumption_fix,
+            
+            # SECONDARY TEST: Database Questionnaire Consistency Fix
             self.test_database_questionnaire_consistency_fix,
             
             # Additional comprehensive tests
