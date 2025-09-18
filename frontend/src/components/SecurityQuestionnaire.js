@@ -117,9 +117,9 @@ const SecurityQuestionnaire = ({
     }
   };
 
-  // Map questionnaire prompt types to correct SecurityBranch enum values based on webapp.yaml
+  // Map questionnaire prompt types to correct SecurityBranch enum values based on webapp.yaml and api.yaml
   const mapPromptTypeToSecurityBranch = (promptId, relatedBranch) => {
-    // Direct mappings based on webapp.yaml related_branch values
+    // Direct mappings based on YAML files' related_branch values
     const branchMappings = {
       // WebApp.yaml branch mappings
       'Authentication': 'Authentication',
@@ -131,6 +131,13 @@ const SecurityQuestionnaire = ({
       'ErrorHandling': 'ErrorHandling',
       'Logging': 'Logging',
       'CSP': 'CSP',
+      
+      // API.yaml branch mappings
+      'ApiSecurity': 'ApiSecurity',
+      'Authorization': 'Authorization',
+      'RateLimiting': 'RateLimiting',
+      'Monitoring': 'Monitoring',
+      'ExternalService': 'ExternalService',
       
       // Legacy mappings
       'login': 'Authentication',
@@ -149,7 +156,10 @@ const SecurityQuestionnaire = ({
       'error_handling': 'ErrorHandling',
       'errorhandling': 'ErrorHandling',
       'logging': 'Logging',
-      'csp': 'CSP'
+      'csp': 'CSP',
+      'authorization': 'Authorization',
+      'rate_limiting': 'RateLimiting',
+      'monitoring': 'Monitoring'
     };
 
     // First try direct related_branch mapping (most reliable)
@@ -162,8 +172,9 @@ const SecurityQuestionnaire = ({
       return branchMappings[promptId];
     }
 
-    // Try to extract from prompt ID patterns for webapp.yaml questions
+    // Try to extract from prompt ID patterns for YAML questions
     if (promptId.includes('authentication')) return 'Authentication';
+    if (promptId.includes('authorization')) return 'Authorization';
     if (promptId.includes('input_validation')) return 'InputValidation';
     if (promptId.includes('https') || promptId.includes('data_encryption')) return 'SSL/TLS';
     if (promptId.includes('database')) return 'Database';
@@ -172,6 +183,8 @@ const SecurityQuestionnaire = ({
     if (promptId.includes('error_handling')) return 'ErrorHandling';
     if (promptId.includes('logging')) return 'Logging';
     if (promptId.includes('security_headers')) return 'CSP';
+    if (promptId.includes('rate_limiting')) return 'RateLimiting';
+    if (promptId.includes('monitoring')) return 'Monitoring';
 
     // Default fallback - use related_branch as PascalCase if available
     if (relatedBranch) {
