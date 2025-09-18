@@ -15,7 +15,7 @@ import json
 import sys
 
 # Backend URL from the review request
-BASE_URL = "https://seclogtracker.preview.emergentagent.com/api"
+BASE_URL = "https://prompt-count-fix.preview.emergentagent.com/api"
 
 class ValidateCompletenessVerificationTester:
     def __init__(self):
