@@ -1936,12 +1936,30 @@ function AppContent() {
     setParentQuestionnaireState(null); // Clear parent state on cancel
   };
 
-  const handleQuestionnaireOverviewEdit = (node) => {
+  const handleQuestionnaireOverviewEdit = async (node) => {
     setShowQuestionnaireOverview(false);
+    
+    // Get existing answers from the backend
+    let existingAnswers = {};
+    try {
+      if (currentDiagram) {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          existingAnswers = data.questionnaire_responses || {};
+          console.log('📝 Fetched existing questionnaire answers:', existingAnswers);
+        }
+      }
+    } catch (error) {
+      console.error('⚠️ Error fetching existing questionnaire answers:', error);
+    }
     
     // Use legacy questionnaire system
     const nodeSubtype = node.subtype || node.data?.subtype;
-    startLegacyQuestionnaire(node.id, nodeSubtype);
+    startLegacyQuestionnaire(node.id, nodeSubtype, null, existingAnswers);
   };
 
   const handleNodeBranchUpdate = (nodeId, updatedBranches) => {
