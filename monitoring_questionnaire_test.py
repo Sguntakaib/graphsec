@@ -179,21 +179,24 @@ class MonitoringQuestionnaireFixTester:
                 
                 supported_types = data['supported_types']
                 
+                # Extract node_subtype values from the list of objects
+                node_subtypes = [item.get('node_subtype') for item in supported_types if isinstance(item, dict)]
+                
                 # Verify Monitoring is in the list
-                if 'Monitoring' in supported_types:
+                if 'Monitoring' in node_subtypes:
                     self.log_test("Supported Types Includes Monitoring", True, 
-                                f"✅ Monitoring is in supported types: {supported_types}")
+                                f"✅ Monitoring is in supported types: {node_subtypes}")
                     
                     # Also verify Backup is still there
-                    if 'Backup' in supported_types:
+                    if 'Backup' in node_subtypes:
                         print(f"   ✅ Backup is also in supported types (good)")
                     else:
-                        print(f"   ⚠️  Backup not in supported types: {supported_types}")
+                        print(f"   ⚠️  Backup not in supported types: {node_subtypes}")
                     
                     return True
                 else:
                     self.log_test("Supported Types Includes Monitoring", False, 
-                                f"❌ Monitoring NOT in supported types: {supported_types}")
+                                f"❌ Monitoring NOT in supported types: {node_subtypes}")
                     return False
             else:
                 self.log_test("Supported Types Includes Monitoring", False, 
