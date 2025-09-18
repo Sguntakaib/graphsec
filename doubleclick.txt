@@ -1,0 +1,210 @@
+# Double-Click Questionnaire Implementation Plan
+
+## Overview
+This document explains how the double-click questionnaire functionality is implemented for all intelligent node types including API, Database backup (Backup), and Database monitoring (Monitoring) nodes.
+
+## How Double-Click Questionnaire Works
+
+### 1. Frontend Components
+
+#### CustomNode.js (Double-Tap Detection)
+- Detects double-tap/double-click events on nodes using a tap counter with 300ms window
+- When double-tap is detected, dispatches a custom `nodeDoubleTap` event to the window
+- Works for all node types without any restrictions
+
+```javascript
+const handleNodeClick = (event) => {
+  setTapCount(prev => {
+    const newCount = prev + 1;
+    
+    if (tapTimer.current) {
+      clearTimeout(tapTimer.current);
+    }
+    
+    tapTimer.current = setTimeout(() => {
+      if (newCount === 2) {
+        // Double tap detected
+        const customEvent = new CustomEvent('nodeDoubleTap', {
+          detail: { nodeId: id, nodeData: data }
+        });
+        window.dispatchEvent(customEvent);
+      }
+      setTapCount(0);
+    }, 300); // 300ms window for double tap
+    
+    return newCount;
+  });
+};
+```
+
+#### App.js (Double-Click Handler)
+- Listens for `nodeDoubleTap` events and handles questionnaire opening
+- **FIXED**: Now checks for existing questionnaire responses in multiple locations:
+  1. `node.data.questionnaireResponses` (for auto-created dependent nodes)
+  2. `node.questionnaireResponses` (for regular nodes)
+  3. Backend API as fallback
+
+```javascript
+// Enhanced double-click handler with improved state restoration
+const handleNodeDoubleTap = async (event) => {
+  const { nodeId, nodeData } = event.detail;
+  const node = nodes.find(n => n.id === nodeId);
+  
+  // Multi-source existing answers retrieval
+  let existingAnswers = {};
+  
+  // Check node data first (most reliable for auto-created nodes)
+  if (node.data?.questionnaireResponses && Object.keys(node.data.questionnaireResponses).length > 0) {
+    existingAnswers = node.data.questionnaireResponses;
+  } else if (node.questionnaireResponses && Object.keys(node.questionnaireResponses).length > 0) {
+    existingAnswers = node.questionnaireResponses;
+  } else {
+    // Fallback to backend API
+    // ... backend fetch logic
+  }
+  
+  // Open questionnaire with existing answers
+  setCurrentQuestionnaireAnswers(existingAnswers);
+  setShowSecurityQuestionnaire(true);
+};
+```
+
+#### SecurityQuestionnaire.js (Questionnaire Display)
+- Already supports API, Backup, and Monitoring node types in `fetchSecurityPrompts()`
+- Routes to appropriate backend endpoints:
+  - `GET /api/questionnaires/API?level=basic`
+  - `GET /api/questionnaires/Backup?level=basic`
+  - `GET /api/questionnaires/Monitoring?level=basic`
+
+### 2. Backend Support
+
+#### Questionnaire Endpoints
+All three node types have dedicated comprehensive questionnaire endpoints:
+
+1. **API Questionnaire**: `GET /api/questionnaires/API`
+   - Returns 9 comprehensive security prompts
+   - Covers authentication, authorization, rate limiting, input validation, CORS policy
+
+2. **Backup Questionnaire**: `GET /api/questionnaires/Backup`
+   - Returns 5 comprehensive security prompts  
+   - Covers backup strategy, encryption, retention, testing
+
+3. **Monitoring Questionnaire**: `GET /api/questionnaires/Monitoring`
+   - Returns 5 comprehensive security prompts
+   - Covers monitoring platform, coverage, alerting, data retention, access control
+
+#### YAML Configuration Files
+Each node type has a corresponding YAML file:
+- `/app/backend/questionnaires/api.yaml`
+- `/app/backend/questionnaires/backup.yaml`
+- `/app/backend/questionnaires/monitoring.yaml`
+
+#### Intelligent Node Templates
+All three node types are defined in `intelligent_nodes.py`:
+- **API**: Lines 293-382 with 7 required security branches
+- **Backup**: Lines 615-657 with 4 required security branches  
+- **Monitoring**: Lines 660-702 with 4 required security branches
+
+### 3. State Management
+
+#### Questionnaire Response Storage
+Completed questionnaires store responses in multiple locations:
+1. **Node Data**: `node.data.questionnaireResponses` (primary for auto-created nodes)
+2. **Node Root**: `node.questionnaireResponses` (for regular nodes)
+3. **Backend Database**: Via diagram persistence APIs
+
+#### State Restoration Process
+When double-clicking a completed questionnaire:
+1. **Detect Double-Click**: CustomNode dispatches `nodeDoubleTap` event
+2. **Find Existing State**: App.js checks node data, then backend API
+3. **Restore Questionnaire**: SecurityQuestionnaire opens with pre-filled answers
+4. **Enable Editing**: User can review/modify existing responses
+
+## Implementation Steps Completed
+
+### ✅ 1. Backend Verification
+- Confirmed all questionnaire endpoints working (API: 9 prompts, Backup: 5 prompts, Monitoring: 5 prompts)
+- Verified YAML configuration files exist and contain proper question definitions
+- Tested intelligent node templates are properly registered
+
+### ✅ 2. Frontend Support Confirmation  
+- Verified SecurityQuestionnaire.js already supports all three node types
+- Confirmed double-click detection works for all node types
+- No additional frontend routing needed
+
+### ✅ 3. State Restoration Fix
+- **CRITICAL FIX**: Enhanced double-click handler to check node data before backend API
+- Resolves issue where completed questionnaires appeared fresh on double-click
+- Implemented multi-source fallback for questionnaire response retrieval
+
+### ✅ 4. End-to-End Flow
+Complete double-click questionnaire flow now working:
+1. User completes API/Backup/Monitoring questionnaire → responses saved to node data
+2. User double-clicks completed node → existing responses loaded from node data
+3. Questionnaire opens with pre-filled answers → user can review/edit
+4. Changes saved back to node data and backend → state persisted
+
+## Key Features
+
+### State Persistence
+- **Auto-Created Nodes**: Questionnaire responses stored in `node.data.questionnaireResponses`
+- **Regular Nodes**: Questionnaire responses stored in `node.questionnaireResponses`
+- **Backend Sync**: Responses also synced to backend database for persistence
+
+### Multi-Node Support
+- **Database Dependencies**: When Database questionnaire triggers backup/monitoring dependencies, auto-created Backup/Monitoring nodes get their own questionnaires
+- **Independent Questionnaires**: Each node type has its own specific security questions
+- **Contextual Questions**: Questions tailored to each node type's security concerns
+
+### User Experience
+- **Visual Feedback**: Completed nodes show completion status
+- **Easy Access**: Double-click any node to review/edit its security configuration
+- **State Memory**: Previously answered questions remain filled for easy review
+- **Flexible Editing**: Can modify any answer and re-save questionnaire
+
+## Testing Verified
+
+### Backend APIs (100% Working)
+- ✅ `GET /api/questionnaires/API` - Returns 9 prompts
+- ✅ `GET /api/questionnaires/Backup` - Returns 5 prompts  
+- ✅ `GET /api/questionnaires/Monitoring` - Returns 5 prompts
+- ✅ Node response save/retrieve APIs working correctly
+
+### Frontend Integration (Fixed & Working)
+- ✅ Double-click detection on all node types
+- ✅ Questionnaire modal opening for API, Backup, Monitoring nodes
+- ✅ **FIXED**: State restoration from node data (primary) and backend (fallback)
+- ✅ Pre-filled questionnaires with existing answers
+
+### End-to-End Flow (Verified)
+- ✅ Complete questionnaire → double-click → questionnaire reopens with saved state
+- ✅ Works for auto-created dependent nodes (Backup/Monitoring from Database)
+- ✅ Works for manually created nodes (API, Backup, Monitoring from sidebar)
+
+## Future Enhancements
+
+### Potential Improvements
+1. **Visual Indicators**: Add completion badges/icons to nodes with completed questionnaires
+2. **Bulk Operations**: Allow bulk questionnaire completion for multiple similar nodes
+3. **Export/Import**: Enable questionnaire template sharing between diagrams
+4. **Audit Trail**: Track questionnaire completion and modification history
+
+### Additional Node Types
+The same implementation pattern can be extended to other intelligent node types:
+1. Add YAML configuration file in `/app/backend/questionnaires/`
+2. Add template definition in `intelligent_nodes.py`
+3. Add endpoint in `server.py` following the pattern
+4. Add support in `SecurityQuestionnaire.js` fetchSecurityPrompts()
+
+## Conclusion
+
+The double-click questionnaire functionality is now fully operational for API, Database backup (Backup), and Database monitoring (Monitoring) nodes. The key fix was enhancing the state restoration to prioritize node data over backend APIs, ensuring that completed questionnaires properly restore their saved state when double-clicked.
+
+All components work together seamlessly:
+- **CustomNode.js**: Detects double-clicks universally
+- **App.js**: Handles state restoration with multi-source fallback  
+- **SecurityQuestionnaire.js**: Displays appropriate questionnaires per node type
+- **Backend APIs**: Provide questionnaire definitions and persistence
+- **Node Data**: Serves as primary storage for completed responses
+
+This implementation provides a robust, user-friendly way to configure and review security settings for any intelligent node type in the security modeling platform.
