@@ -555,7 +555,7 @@ function AppContent() {
         console.log('🆕 Creating new diagram automatically for dropped node');
         try {
           const newDiagram = await createDiagram({
-            id: generateId(),
+            id: `diagram-${Date.now()}`,
             title: 'New Security Model',
             description: 'Security architecture diagram'
           });
