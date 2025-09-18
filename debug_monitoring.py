@@ -36,13 +36,13 @@ def debug_monitoring_rules():
     print("🧪 TESTING WITH SAMPLE RESPONSES")
     print("=" * 60)
     
-    # Sample responses from the browser logs
+    # Sample responses that should trigger rules based on actual questionnaire structure
     sample_responses = {
-        "monitoring_coverage": "basic",
-        "alerting_enabled": False,
-        "log_retention": "30_days", 
-        "incident_response": False,
-        "performance_monitoring": False
+        "monitoring_platform": "Datadog",  # Should trigger monitoring_integration_enhancement
+        "monitoring_coverage": "Basic Monitoring",  # Should trigger monitoring_coverage_enhancement
+        "monitoring_alerting": "Basic Email Alerts",  # Should trigger monitoring_alerting_enhancement
+        "monitoring_data_retention": "Short-term (<3 months)",  # Should trigger monitoring_data_retention_enhancement
+        "monitoring_access_control": "Basic Access Control"  # Should trigger monitoring_access_enhancement
     }
     
     print(f"📋 Sample responses: {sample_responses}")
