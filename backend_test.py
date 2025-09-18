@@ -1,29 +1,26 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - MONITORING QUESTIONNAIRE 404 FIX VERIFICATION
-Tests the newly added Monitoring questionnaire functionality that was causing 404 errors.
+Backend API Testing - DATABASE QUESTIONNAIRE CONSISTENCY FIX VERIFICATION
+Tests the specific fix for Database questionnaire consistency issue.
 
 TESTING FOCUS:
 🔧 PRIMARY TEST:
-1. **Test GET /api/intelligent-nodes/Monitoring/prompts endpoint**
-   - Should return HTTP 200 (not 404)
-   - Should contain monitoring questionnaire prompts
-   - Verify response includes proper structure with prompts and node_subtype
-
-🔧 VERIFICATION TESTS:
-2. **Test that other intelligent node endpoints still work:**
-   - GET /api/intelligent-nodes/Backup/prompts (this was working before)
-   - GET /api/intelligent-nodes/supported-types (should now include Monitoring)
+1. **Test GET /api/intelligent-nodes/Database/prompts endpoint**
+   - Should return HTTP 200 with correct response structure
+   - Should contain success=true and prompts_count field
+   - Response format: {success: true, node_subtype: 'Database', prompts_count: X, prompts: [...]}
+   - Verify prompts_count matches actual length of prompts array
+   - Test multiple times (3-5 times) to ensure consistency
 
 **EXPECTED RESULTS:**
-- Monitoring endpoint should return success with monitoring security prompts
-- No more 404 errors for Monitoring questionnaire
-- Response should match the format: {success: true, prompts_count: X, node_subtype: 'Monitoring'}
+- Database endpoint should return consistent prompts_count that matches prompts.length
+- No more prompts_count=0 (missing field) issues
+- Resolves parent-child questionnaire resumption failures
 
 **CONTEXT:** 
-This fixes the exact issue shown in user console logs where GET /api/intelligent-nodes/Monitoring/prompts 
-was returning 404. The fix adds the missing Monitoring IntelligentNodeTemplate to the main 
-intelligent_nodes.py file, following the same pattern as the previously fixed Backup questionnaire.
+This fixes the exact issue where GET /api/intelligent-nodes/Database/prompts was returning 
+prompts_count=0 (missing field) but actual prompts.length=5, causing parent-child 
+questionnaire resumption failures. The fix adds the missing success and prompts_count fields.
 
 **ADDITIONAL TESTS:**
 Also includes comprehensive double-click questionnaire functionality verification tests.
