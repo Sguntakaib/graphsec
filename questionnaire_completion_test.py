@@ -280,14 +280,14 @@ class QuestionnaireCompletionTester:
         try:
             # Test with all 8 expected branches to verify they are recognized
             all_webapp_branches = [
-                {"branch_type": "Authentication", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "Authorization", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "InputValidation", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "SessionManagement", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "ErrorHandling", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "Logging", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "SSL/TLS", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "CSP", "implementation_status": "implemented", "security_level": "high"}
+                {"type": "Authentication", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "Authorization", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "InputValidation", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "SessionManagement", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "ErrorHandling", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "Logging", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "SSL/TLS", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "CSP", "implementation_status": "implemented", "security_level": "high"}
             ]
             
             response = self.session.post(
