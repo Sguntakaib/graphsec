@@ -1,43 +1,49 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - TOOLTIP FUNCTIONALITY VERIFICATION
-Tests the new API and Database questionnaire endpoints to verify tooltip functionality fix.
+Backend API Testing - QUESTIONNAIRE OVERVIEW FUNCTIONALITY VERIFICATION
+Tests the questionnaire overview functionality for double-click issue debugging.
 
 TESTING FOCUS:
-1. **API Questionnaire Endpoint Testing:**
-   - Test GET /api/questionnaires/API (basic level)
-   - Test GET /api/questionnaires/API?level=advanced
-   - Test GET /api/questionnaires/API?level=expert
-   - Verify response structure includes all required fields
-   - **CRITICAL:** Verify "option_descriptions" field is present and populated for questions with multiple choice options
-   - Verify option_descriptions contain proper tooltip text for each option
+1. **Create Test Diagram with Web Application Template:**
+   - Create a new diagram using Web Application template
+   - Verify template application creates nodes with proper structure
+   - Ensure nodes have the required fields for questionnaire functionality
 
-2. **Database Questionnaire Endpoint Testing:**
-   - Test GET /api/questionnaires/Database (basic level)
-   - Test GET /api/questionnaires/Database?level=advanced  
-   - Test GET /api/questionnaires/Database?level=expert
-   - Verify response structure matches WebApp endpoint format
-   - **CRITICAL:** Verify "option_descriptions" field is present and populated
-   - Verify tooltip text is comprehensive and helpful
+2. **Test Questionnaire Data Retrieval API:**
+   - Test GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire
+   - Verify API returns proper questionnaire data for template nodes
+   - Test with different node types from Web Application template
+   - Check response structure and data completeness
 
-3. **Comparison Testing:**
-   - Compare response structure between /api/questionnaires/WebApp, /api/questionnaires/API, and /api/questionnaires/Database
-   - Ensure all three endpoints return consistent data structure
-   - Verify all endpoints include option_descriptions field for choice questions
+3. **Verify Template Nodes Have Proper Questionnaire Data:**
+   - Test nodes from Web Application template (WebApp, Database, etc.)
+   - Verify each node type has associated questionnaire prompts
+   - Check that questionnaire data is properly structured
+   - Ensure no missing or malformed data that could cause "Error Loading Overview"
 
-4. **Data Quality Validation:**
-   - Verify that option_descriptions keys match the actual option values
-   - Ensure tooltip text is meaningful and provides security context
-   - Check that all single_choice and multiple_choice questions have corresponding option_descriptions
+4. **Test Empty vs Answered Questionnaire Scenarios:**
+   - Test nodes with no questionnaire responses (empty state)
+   - Test nodes with partial questionnaire responses
+   - Test nodes with complete questionnaire responses
+   - Verify API handles all scenarios gracefully
+
+5. **API Error Detection:**
+   - Check for any API errors that might cause "Error Loading Overview"
+   - Test error handling for missing nodes or invalid IDs
+   - Verify proper HTTP status codes and error messages
+   - Test edge cases that might cause frontend failures
 
 **EXPECTED RESULTS:**
-- All endpoints should return HTTP 200
-- Response should include "option_descriptions" field in question objects
-- Option descriptions should be a dictionary mapping option values to tooltip text
-- Tooltip text should be comprehensive security guidance (not just option repetition)
+- Web Application template creates nodes successfully
+- GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire returns HTTP 200
+- Response includes proper questionnaire structure with prompts and responses
+- API handles empty, partial, and complete questionnaire states
+- No API errors that would cause "Error Loading Overview: Failed to fetch questionnaire data"
 
 **CRITICAL SUCCESS CRITERIA:**
-This fix addresses the UI issue where API and Database questionnaires were missing tooltip (?) icons while WebApp questionnaires showed them correctly. The new specific endpoints should provide the same option_descriptions data that WebApp provides.
+This test debugs why double-clicking nodes shows "Error Loading Overview: Failed to fetch questionnaire data" 
+instead of the questionnaire overview modal. The goal is to identify and resolve any backend issues 
+preventing proper questionnaire data retrieval.
 """
 
 import requests
