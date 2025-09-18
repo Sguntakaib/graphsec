@@ -88,13 +88,14 @@ class VulnerabilityAnalysisTester:
             # Create a test node ID for Backup
             backup_node_id = f"backup-test-{uuid.uuid4().hex[:8]}"
             
-            # Sample questionnaire responses that should trigger informational vulnerabilities
-            # Based on actual vulnerability rules in vulnerability_rules.py
+            # Sample questionnaire responses from review request that should trigger "Best Practice Enhancement" vulnerabilities
             backup_responses = {
-                "backup_strategy": "Regular Scheduled Backups",  # Triggers backup_strategy_enhancement
-                "backup_testing": "Basic Testing",              # Triggers backup_testing_enhancement  
-                "backup_encryption": "Basic Encryption",        # Triggers backup_encryption_enhancement
-                "backup_retention": "Standard Retention"        # Triggers backup_retention_enhancement
+                "backup_strategy": "basic",
+                "backup_frequency": "weekly", 
+                "backup_encryption": False,
+                "backup_retention": "30_days",
+                "backup_testing": False,
+                "backup_location": "local"
             }
             
             # Test data for vulnerability analysis
