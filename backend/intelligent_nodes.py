@@ -656,6 +656,67 @@ class IntelligentNodeEngine:
             }
         )
         
+        # Monitoring Node Template
+        templates["Monitoring"] = IntelligentNodeTemplate(
+            node_type="Control",
+            node_subtype="Monitoring",
+            required_branches=[
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.AUDIT_LOGGING,
+                SecurityBranchType.INCIDENT_RESPONSE,
+                SecurityBranchType.COMPLIANCE
+            ],
+            security_prompts=[
+                SecurityPrompt(
+                    id="monitoring_platform",
+                    question="What monitoring platform is used?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["AWS CloudWatch", "Prometheus + Grafana", "Datadog", "New Relic", "Splunk", "Custom Solution", "Unknown"],
+                    help_text="Different monitoring platforms have varying capabilities for security monitoring and alerting.",
+                    related_branch=SecurityBranchType.MONITORING
+                ),
+                SecurityPrompt(
+                    id="monitoring_coverage",
+                    question="What is the scope of monitoring coverage?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Comprehensive (Infrastructure + Applications + Security)", "Infrastructure + Applications", "Infrastructure Only", "Basic Monitoring", "Unknown"],
+                    help_text="Comprehensive monitoring provides visibility across all system layers.",
+                    related_branch=SecurityBranchType.MONITORING
+                ),
+                SecurityPrompt(
+                    id="monitoring_alerting",
+                    question="How is alerting configured?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Multi-Channel Intelligent Alerting", "Basic Email Alerts", "Dashboard Only", "No Alerting", "Unknown"],
+                    help_text="Effective alerting ensures rapid notification of security and performance issues.",
+                    related_branch=SecurityBranchType.MONITORING
+                ),
+                SecurityPrompt(
+                    id="monitoring_data_retention",
+                    question="What is the monitoring data retention policy?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Long-term (>1 year)", "Medium-term (3-12 months)", "Short-term (<3 months)", "No Defined Policy", "Unknown"],
+                    help_text="Appropriate retention supports troubleshooting, compliance, and trend analysis.",
+                    related_branch=SecurityBranchType.AUDIT_LOGGING
+                ),
+                SecurityPrompt(
+                    id="monitoring_access_control",
+                    question="How is access to monitoring data controlled?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Role-Based Access + MFA", "Basic Access Control", "Shared Access", "No Access Control", "Unknown"],
+                    help_text="Proper access control protects sensitive monitoring data from unauthorized access.",
+                    related_branch=SecurityBranchType.COMPLIANCE
+                )
+            ],
+            risk_factors={
+                "no_access_control": 3.5,
+                "insufficient_monitoring": 4.0,
+                "no_encryption": 3.0,
+                "weak_alerting": 2.5,
+                "no_backup": 2.0
+            }
+        )
+        
         # GCP Service Node Template
         templates["GCPService"] = IntelligentNodeTemplate(
             node_type="Service",
