@@ -152,20 +152,42 @@ function AppContent() {
     setZoomLevel(Math.round(viewport.zoom * 100) / 100);
   }, []);
 
-  // Double-tap handler for nodes
+  // Double-tap handler for nodes - Direct questionnaire access
   useEffect(() => {
-    const handleNodeDoubleTap = (event) => {
+    const handleNodeDoubleTap = async (event) => {
       const { nodeId, nodeData } = event.detail;
       const node = nodes.find(n => n.id === nodeId);
       if (node && currentDiagram) {
-        setOverviewNode(node);
-        setShowQuestionnaireOverview(true);
+        console.log('🎯 Double-tap detected on node:', nodeId);
+        
+        // Get existing answers from the backend
+        let existingAnswers = {};
+        try {
+          const response = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            existingAnswers = data.questionnaire_responses || {};
+            console.log('📝 Fetched existing questionnaire answers for double-click:', existingAnswers);
+          } else {
+            console.log('⚠️ No existing questionnaire data found, starting fresh questionnaire');
+          }
+        } catch (error) {
+          console.error('⚠️ Error fetching existing questionnaire answers:', error);
+        }
+        
+        // Directly open Security Questionnaire with existing answers
+        const nodeSubtype = node.subtype || node.data?.subtype;
+        console.log('🚀 Opening Security Questionnaire directly from double-click');
+        startLegacyQuestionnaire(node.id, nodeSubtype, null, existingAnswers);
       }
     };
 
     window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
     return () => window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
-  }, [nodes, currentDiagram]);
+  }, [nodes, currentDiagram, startLegacyQuestionnaire]);
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
