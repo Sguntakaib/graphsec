@@ -206,6 +206,18 @@ const SecurityQuestionnaire = ({
         description: prompt.help_text || prompt.question
       }));
 
+      console.log('🔍 Sending validation data to backend:', {
+        nodeSubtype,
+        branches: branches.map(b => ({
+          id: b.id,
+          type: b.type,
+          completed: b.completed,
+          value: b.value
+        })),
+        answersProvided: Object.keys(answers).length,
+        completedBranchesCount: branches.filter(b => b.completed).length
+      });
+
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/validate-completeness`,
         {
@@ -219,8 +231,11 @@ const SecurityQuestionnaire = ({
 
       if (response.ok) {
         const validationData = await response.json();
+        console.log('🔍 Backend validation response:', validationData);
         setValidation(validationData.validation);
         return validationData;
+      } else {
+        console.error('❌ Validation API error:', response.status, await response.text());
       }
     } catch (err) {
       console.error('Validation error:', err);
