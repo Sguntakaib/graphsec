@@ -1269,20 +1269,21 @@ class DoubleClickQuestionnaireTester:
         
         # Print summary
         print("=" * 90)
-        print("🎯 DATABASE QUESTIONNAIRE CONSISTENCY FIX VERIFICATION SUMMARY")
+        print("🎯 DOUBLE-CLICK QUESTIONNAIRE BACKEND SUPPORT VERIFICATION SUMMARY")
         print("=" * 90)
         print(f"✅ PASSED: {passed}")
         print(f"❌ FAILED: {failed}")
         print(f"📊 SUCCESS RATE: {(passed / (passed + failed) * 100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 ALL TESTS PASSED! Database questionnaire consistency fix verification successful.")
-            print("✅ CRITICAL: Database questionnaire consistency fix working correctly")
-            print("✅ GET /api/intelligent-nodes/Database/prompts returns proper response structure")
-            print("✅ success=true and prompts_count field present and consistent")
-            print("✅ prompts_count matches actual prompts.length (resolves original bug)")
-            print("✅ Consistency verified across multiple test iterations")
-            print("✅ Parent-child questionnaire resumption issue resolved")
+            print("\n🎉 ALL TESTS PASSED! Double-click questionnaire backend support verification successful.")
+            print("✅ CRITICAL: API questionnaire endpoint working correctly")
+            print("✅ CRITICAL: Backup questionnaire endpoint working correctly")
+            print("✅ CRITICAL: Monitoring questionnaire endpoint working correctly")
+            print("✅ All endpoints return HTTP 200 with proper response structure")
+            print("✅ All endpoints include prompts, level=basic, and total_questions fields")
+            print("✅ All prompts have proper structure (id, question, type, options where applicable)")
+            print("✅ Backend is ready to support double-click questionnaire functionality")
             print("✅ Additional questionnaire functionality tests also passed")
         else:
             print(f"\n⚠️  {failed} tests failed. Analysis:")
@@ -1294,14 +1295,18 @@ class DoubleClickQuestionnaireTester:
                 print(f"🚨 FAILED: {error_test['test']}")
                 print(f"   Issue: {error_test['message']}")
                 
-            # Check if the critical test failed
-            critical_test_failed = any('Database Consistency Fix' in result['test'] for result in error_tests)
-            if critical_test_failed:
-                print(f"\n🚨 CRITICAL ISSUE: Database questionnaire consistency fix verification failed!")
-                print(f"   This means the original bug may still exist:")
-                print(f"   - prompts_count field may be missing or incorrect")
-                print(f"   - Parent-child questionnaire resumption may still fail")
-                print(f"   - Immediate attention required to resolve the consistency issue")
+            # Check if the critical tests failed
+            critical_tests_failed = any(
+                any(endpoint in result['test'] for endpoint in ['API Questionnaire', 'Backup Questionnaire', 'Monitoring Questionnaire', 'Double-Click Questionnaire Backend Support'])
+                for result in error_tests
+            )
+            if critical_tests_failed:
+                print(f"\n🚨 CRITICAL ISSUE: Double-click questionnaire backend support verification failed!")
+                print(f"   This means one or more questionnaire endpoints are not working:")
+                print(f"   - API questionnaire endpoint may be returning errors or incorrect data")
+                print(f"   - Backup questionnaire endpoint may be returning errors or incorrect data")
+                print(f"   - Monitoring questionnaire endpoint may be returning errors or incorrect data")
+                print(f"   - Frontend implementation should be delayed until backend issues are resolved")
         
         return passed, failed
 
