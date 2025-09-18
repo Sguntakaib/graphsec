@@ -378,21 +378,21 @@ class DoubleClickQuestionnaireTester:
                 if response.status_code == 200:
                     data = response.json()
                     
-                    # Verify response structure
-                    required_fields = ['prompts', 'responses', 'node_subtype']
+                    # Verify response structure (actual API format)
+                    required_fields = ['prompts', 'questionnaire_responses', 'node_subtype']
                     missing_fields = [field for field in required_fields if field not in data]
                     
                     if missing_fields:
                         print(f"   ❌ {node_subtype} node missing fields: {missing_fields}")
                         continue
                     
-                    # Verify responses are now populated (should have saved responses from previous test)
-                    if not isinstance(data['responses'], dict):
-                        print(f"   ❌ {node_subtype} node responses not a dict: {type(data['responses'])}")
+                    # Verify questionnaire_responses are now populated (should have saved responses from previous test)
+                    if not isinstance(data['questionnaire_responses'], dict):
+                        print(f"   ❌ {node_subtype} node questionnaire_responses not a dict: {type(data['questionnaire_responses'])}")
                         continue
                     
                     # Check if responses were persisted
-                    response_count = len(data['responses'])
+                    response_count = len(data['questionnaire_responses'])
                     if response_count > 0:
                         success_count += 1
                         print(f"   ✅ {node_subtype} node: {len(data['prompts'])} prompts, {response_count} saved responses")
