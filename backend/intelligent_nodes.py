@@ -292,11 +292,13 @@ class IntelligentNodeEngine:
             node_type="Asset",
             node_subtype="API",
             required_branches=[
+                SecurityBranchType.API_SECURITY,
                 SecurityBranchType.AUTHENTICATION,
                 SecurityBranchType.AUTHORIZATION,
                 SecurityBranchType.RATE_LIMITING,
                 SecurityBranchType.INPUT_VALIDATION,
-                SecurityBranchType.CORS
+                SecurityBranchType.MONITORING,
+                SecurityBranchType.ENCRYPTION
             ],
             dependencies={
                 # API might depend on authentication services
