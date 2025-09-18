@@ -611,6 +611,51 @@ class IntelligentNodeEngine:
             }
         )
         
+        # Backup Node Template
+        templates["Backup"] = IntelligentNodeTemplate(
+            node_type="Control",
+            node_subtype="Backup",
+            required_branches=[
+                SecurityBranchType.BACKUP,
+                SecurityBranchType.ENCRYPTION,
+                SecurityBranchType.ACCESS_CONTROL,
+                SecurityBranchType.COMPLIANCE
+            ],
+            security_prompts=[
+                SecurityPrompt(
+                    id="backup_strategy",
+                    question="What backup strategy is implemented?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Comprehensive Multi-Tier Backup", "Regular Scheduled Backups", "Ad-hoc Backups", "No Backup Strategy", "Unknown"],
+                    help_text="A comprehensive backup strategy ensures data protection across all critical systems.",
+                    related_branch=SecurityBranchType.BACKUP
+                ),
+                SecurityPrompt(
+                    id="backup_encryption",
+                    question="How are backups encrypted?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Customer Managed KMS Keys", "AWS Managed Keys", "Default Encryption", "No Encryption", "Unknown"],
+                    help_text="Encryption protects backup data from unauthorized access during storage and transit.",
+                    related_branch=SecurityBranchType.ENCRYPTION
+                ),
+                SecurityPrompt(
+                    id="backup_retention",
+                    question="What is the backup retention policy?",
+                    type=PromptType.SINGLE_CHOICE,
+                    options=["Long-term (>1 year)", "Medium-term (3-12 months)", "Short-term (<3 months)", "No Retention Policy", "Unknown"],
+                    help_text="Retention policies balance storage costs with recovery requirements and compliance needs.",
+                    related_branch=SecurityBranchType.BACKUP
+                )
+            ],
+            risk_factors={
+                "no_backup_testing": 4.5,
+                "single_region_backup": 3.5,
+                "weak_access_control": 4.0,
+                "no_encryption": 4.5,
+                "no_monitoring": 3.0
+            }
+        )
+        
         # GCP Service Node Template
         templates["GCPService"] = IntelligentNodeTemplate(
             node_type="Service",
