@@ -53,14 +53,20 @@ const SecurityQuestionnaire = ({
     }
   }, [isVisible, nodeSubtype, resumeFromPromptIndex, partialAnswers]);
 
-  // Additional validation for resumption index
+  // Additional validation for resumption index - only after prompts are properly loaded
   useEffect(() => {
-    if (prompts.length > 0 && resumeFromPromptIndex !== null && resumeFromPromptIndex >= prompts.length) {
-      // If resume index is beyond questionnaire length, clamp it to the last question
-      console.log(`⚠️ Resume index ${resumeFromPromptIndex} is beyond questionnaire length ${prompts.length}, clamping to last question`);
-      setCurrentPromptIndex(prompts.length - 1);
+    if (prompts.length > 0 && resumeFromPromptIndex !== null && !loading) {
+      // Only clamp if we're sure the prompts are fully loaded and it's still beyond length
+      if (resumeFromPromptIndex >= prompts.length) {
+        console.log(`⚠️ Resume index ${resumeFromPromptIndex} is beyond questionnaire length ${prompts.length}, clamping to last question`);
+        setCurrentPromptIndex(prompts.length - 1);
+      } else {
+        // If resume index is valid, use it directly
+        console.log(`✅ Resume index ${resumeFromPromptIndex} is valid for questionnaire length ${prompts.length}`);
+        setCurrentPromptIndex(resumeFromPromptIndex);
+      }
     }
-  }, [prompts.length, resumeFromPromptIndex]);
+  }, [prompts.length, resumeFromPromptIndex, loading]);
 
   // Additional effect to reset state when the modal is closed and reopened
   useEffect(() => {
