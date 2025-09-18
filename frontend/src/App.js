@@ -424,6 +424,14 @@ function AppContent() {
       return;
     }
     
+    // For custom nodes (WebApp, API, Database, etc.), let the CustomNode component
+    // handle the click events including double-tap detection for questionnaires
+    if (node.type === 'custom') {
+      // Don't handle the click here - let CustomNode's handleNodeClick take over
+      // This allows the double-tap detection logic in CustomNode.js to work properly
+      return;
+    }
+    
     setSelectedNode(node);
     setContextMenu(null); // Close context menu when clicking node
   }, []);
