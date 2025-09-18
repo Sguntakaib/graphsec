@@ -868,6 +868,342 @@ class DoubleClickQuestionnaireTester:
             return False
 
     # ============================================================================
+    # REVIEW REQUEST: Double-Click Questionnaire Backend Support Testing
+    # ============================================================================
+    
+    def test_api_questionnaire_endpoint(self):
+        """Test GET /api/questionnaires/API?level=basic endpoint"""
+        try:
+            print("🎯 TESTING: API Questionnaire Endpoint")
+            print("=" * 60)
+            
+            response = self.session.get(f"{self.base_url}/questionnaires/API?level=basic")
+            
+            if response.status_code != 200:
+                self.log_test("API Questionnaire Endpoint", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            try:
+                data = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("API Questionnaire Endpoint", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            # Verify required fields
+            required_fields = ['prompts', 'level', 'total_questions']
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if missing_fields:
+                self.log_test("API Questionnaire Endpoint", False, 
+                            f"Missing required fields: {missing_fields}")
+                return False
+            
+            # Verify level field is set to "basic"
+            if data.get('level') != 'basic':
+                self.log_test("API Questionnaire Endpoint", False, 
+                            f"Level field should be 'basic', got: {data.get('level')}")
+                return False
+            
+            # Verify prompts field contains questionnaire questions
+            prompts = data.get('prompts', [])
+            if not isinstance(prompts, list) or len(prompts) == 0:
+                self.log_test("API Questionnaire Endpoint", False, 
+                            f"Prompts should be a non-empty list, got: {type(prompts)} with {len(prompts)} items")
+                return False
+            
+            # Verify total_questions field
+            total_questions = data.get('total_questions')
+            if not isinstance(total_questions, int) or total_questions <= 0:
+                self.log_test("API Questionnaire Endpoint", False, 
+                            f"total_questions should be a positive integer, got: {total_questions}")
+                return False
+            
+            # Verify prompts array contains valid questions with proper structure
+            for i, prompt in enumerate(prompts):
+                if not isinstance(prompt, dict):
+                    self.log_test("API Questionnaire Endpoint", False, 
+                                f"Prompt {i} should be a dict, got: {type(prompt)}")
+                    return False
+                
+                # Check for required prompt fields
+                prompt_required_fields = ['id', 'question', 'type']
+                prompt_missing_fields = [field for field in prompt_required_fields if field not in prompt]
+                
+                if prompt_missing_fields:
+                    self.log_test("API Questionnaire Endpoint", False, 
+                                f"Prompt {i} missing required fields: {prompt_missing_fields}")
+                    return False
+                
+                # Verify options field exists for choice-type questions
+                if prompt.get('type') in ['single_choice', 'multiple_choice'] and 'options' not in prompt:
+                    self.log_test("API Questionnaire Endpoint", False, 
+                                f"Prompt {i} with type '{prompt.get('type')}' missing options field")
+                    return False
+            
+            self.log_test("API Questionnaire Endpoint", True, 
+                        f"✅ API questionnaire endpoint working correctly - HTTP 200, {len(prompts)} prompts, level=basic, total_questions={total_questions}")
+            
+            print(f"   📊 Response Summary:")
+            print(f"      Status: HTTP 200")
+            print(f"      Level: {data.get('level')}")
+            print(f"      Total Questions: {total_questions}")
+            print(f"      Prompts Count: {len(prompts)}")
+            print(f"      Sample Question: {prompts[0].get('question', 'N/A')[:50]}..." if prompts else "      No prompts")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("API Questionnaire Endpoint", False, f"Request error: {str(e)}")
+            return False
+
+    def test_backup_questionnaire_endpoint(self):
+        """Test GET /api/questionnaires/Backup?level=basic endpoint"""
+        try:
+            print("🎯 TESTING: Backup Questionnaire Endpoint")
+            print("=" * 60)
+            
+            response = self.session.get(f"{self.base_url}/questionnaires/Backup?level=basic")
+            
+            if response.status_code != 200:
+                self.log_test("Backup Questionnaire Endpoint", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            try:
+                data = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Backup Questionnaire Endpoint", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            # Verify required fields
+            required_fields = ['prompts', 'level', 'total_questions']
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if missing_fields:
+                self.log_test("Backup Questionnaire Endpoint", False, 
+                            f"Missing required fields: {missing_fields}")
+                return False
+            
+            # Verify level field is set to "basic"
+            if data.get('level') != 'basic':
+                self.log_test("Backup Questionnaire Endpoint", False, 
+                            f"Level field should be 'basic', got: {data.get('level')}")
+                return False
+            
+            # Verify prompts field contains questionnaire questions
+            prompts = data.get('prompts', [])
+            if not isinstance(prompts, list) or len(prompts) == 0:
+                self.log_test("Backup Questionnaire Endpoint", False, 
+                            f"Prompts should be a non-empty list, got: {type(prompts)} with {len(prompts)} items")
+                return False
+            
+            # Verify total_questions field
+            total_questions = data.get('total_questions')
+            if not isinstance(total_questions, int) or total_questions <= 0:
+                self.log_test("Backup Questionnaire Endpoint", False, 
+                            f"total_questions should be a positive integer, got: {total_questions}")
+                return False
+            
+            # Verify prompts array contains valid questions with proper structure
+            for i, prompt in enumerate(prompts):
+                if not isinstance(prompt, dict):
+                    self.log_test("Backup Questionnaire Endpoint", False, 
+                                f"Prompt {i} should be a dict, got: {type(prompt)}")
+                    return False
+                
+                # Check for required prompt fields
+                prompt_required_fields = ['id', 'question', 'type']
+                prompt_missing_fields = [field for field in prompt_required_fields if field not in prompt]
+                
+                if prompt_missing_fields:
+                    self.log_test("Backup Questionnaire Endpoint", False, 
+                                f"Prompt {i} missing required fields: {prompt_missing_fields}")
+                    return False
+                
+                # Verify options field exists for choice-type questions
+                if prompt.get('type') in ['single_choice', 'multiple_choice'] and 'options' not in prompt:
+                    self.log_test("Backup Questionnaire Endpoint", False, 
+                                f"Prompt {i} with type '{prompt.get('type')}' missing options field")
+                    return False
+            
+            self.log_test("Backup Questionnaire Endpoint", True, 
+                        f"✅ Backup questionnaire endpoint working correctly - HTTP 200, {len(prompts)} prompts, level=basic, total_questions={total_questions}")
+            
+            print(f"   📊 Response Summary:")
+            print(f"      Status: HTTP 200")
+            print(f"      Level: {data.get('level')}")
+            print(f"      Total Questions: {total_questions}")
+            print(f"      Prompts Count: {len(prompts)}")
+            print(f"      Sample Question: {prompts[0].get('question', 'N/A')[:50]}..." if prompts else "      No prompts")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Backup Questionnaire Endpoint", False, f"Request error: {str(e)}")
+            return False
+
+    def test_monitoring_questionnaire_endpoint(self):
+        """Test GET /api/questionnaires/Monitoring?level=basic endpoint"""
+        try:
+            print("🎯 TESTING: Monitoring Questionnaire Endpoint")
+            print("=" * 60)
+            
+            response = self.session.get(f"{self.base_url}/questionnaires/Monitoring?level=basic")
+            
+            if response.status_code != 200:
+                self.log_test("Monitoring Questionnaire Endpoint", False, 
+                            f"HTTP {response.status_code}: {response.text}")
+                return False
+            
+            try:
+                data = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Monitoring Questionnaire Endpoint", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            # Verify required fields
+            required_fields = ['prompts', 'level', 'total_questions']
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if missing_fields:
+                self.log_test("Monitoring Questionnaire Endpoint", False, 
+                            f"Missing required fields: {missing_fields}")
+                return False
+            
+            # Verify level field is set to "basic"
+            if data.get('level') != 'basic':
+                self.log_test("Monitoring Questionnaire Endpoint", False, 
+                            f"Level field should be 'basic', got: {data.get('level')}")
+                return False
+            
+            # Verify prompts field contains questionnaire questions
+            prompts = data.get('prompts', [])
+            if not isinstance(prompts, list) or len(prompts) == 0:
+                self.log_test("Monitoring Questionnaire Endpoint", False, 
+                            f"Prompts should be a non-empty list, got: {type(prompts)} with {len(prompts)} items")
+                return False
+            
+            # Verify total_questions field
+            total_questions = data.get('total_questions')
+            if not isinstance(total_questions, int) or total_questions <= 0:
+                self.log_test("Monitoring Questionnaire Endpoint", False, 
+                            f"total_questions should be a positive integer, got: {total_questions}")
+                return False
+            
+            # Verify prompts array contains valid questions with proper structure
+            for i, prompt in enumerate(prompts):
+                if not isinstance(prompt, dict):
+                    self.log_test("Monitoring Questionnaire Endpoint", False, 
+                                f"Prompt {i} should be a dict, got: {type(prompt)}")
+                    return False
+                
+                # Check for required prompt fields
+                prompt_required_fields = ['id', 'question', 'type']
+                prompt_missing_fields = [field for field in prompt_required_fields if field not in prompt]
+                
+                if prompt_missing_fields:
+                    self.log_test("Monitoring Questionnaire Endpoint", False, 
+                                f"Prompt {i} missing required fields: {prompt_missing_fields}")
+                    return False
+                
+                # Verify options field exists for choice-type questions
+                if prompt.get('type') in ['single_choice', 'multiple_choice'] and 'options' not in prompt:
+                    self.log_test("Monitoring Questionnaire Endpoint", False, 
+                                f"Prompt {i} with type '{prompt.get('type')}' missing options field")
+                    return False
+            
+            self.log_test("Monitoring Questionnaire Endpoint", True, 
+                        f"✅ Monitoring questionnaire endpoint working correctly - HTTP 200, {len(prompts)} prompts, level=basic, total_questions={total_questions}")
+            
+            print(f"   📊 Response Summary:")
+            print(f"      Status: HTTP 200")
+            print(f"      Level: {data.get('level')}")
+            print(f"      Total Questions: {total_questions}")
+            print(f"      Prompts Count: {len(prompts)}")
+            print(f"      Sample Question: {prompts[0].get('question', 'N/A')[:50]}..." if prompts else "      No prompts")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Monitoring Questionnaire Endpoint", False, f"Request error: {str(e)}")
+            return False
+
+    def test_double_click_questionnaire_backend_support(self):
+        """Comprehensive test for double-click questionnaire backend support for API, Backup, and Monitoring"""
+        try:
+            print("🎯 COMPREHENSIVE TEST: Double-Click Questionnaire Backend Support")
+            print("=" * 80)
+            print("Testing API, Backup, and Monitoring questionnaire endpoints")
+            print("Verifying backend support for double-click questionnaire functionality")
+            print("=" * 80)
+            
+            # Test all three endpoints
+            endpoints_to_test = [
+                {
+                    "name": "API",
+                    "url": f"{self.base_url}/questionnaires/API?level=basic",
+                    "test_method": self.test_api_questionnaire_endpoint
+                },
+                {
+                    "name": "Backup", 
+                    "url": f"{self.base_url}/questionnaires/Backup?level=basic",
+                    "test_method": self.test_backup_questionnaire_endpoint
+                },
+                {
+                    "name": "Monitoring",
+                    "url": f"{self.base_url}/questionnaires/Monitoring?level=basic", 
+                    "test_method": self.test_monitoring_questionnaire_endpoint
+                }
+            ]
+            
+            success_count = 0
+            total_tests = len(endpoints_to_test)
+            detailed_results = []
+            
+            for endpoint in endpoints_to_test:
+                print(f"\n🔍 Testing {endpoint['name']} questionnaire endpoint...")
+                
+                # Run the specific test method
+                if endpoint['test_method']():
+                    success_count += 1
+                    detailed_results.append(f"✅ {endpoint['name']}: Working correctly")
+                else:
+                    detailed_results.append(f"❌ {endpoint['name']}: Failed")
+            
+            # Summary
+            print(f"\n📊 DOUBLE-CLICK QUESTIONNAIRE BACKEND SUPPORT SUMMARY:")
+            print(f"=" * 60)
+            for result in detailed_results:
+                print(f"   {result}")
+            
+            print(f"\n📈 Overall Results:")
+            print(f"   ✅ Passed: {success_count}/{total_tests}")
+            print(f"   📊 Success Rate: {(success_count/total_tests*100):.1f}%")
+            
+            if success_count == total_tests:
+                self.log_test("Double-Click Questionnaire Backend Support", True, 
+                            f"✅ ALL ENDPOINTS WORKING: {success_count}/{total_tests} questionnaire endpoints (API, Backup, Monitoring) are working correctly for double-click functionality")
+                print(f"\n🎉 SUCCESS: All double-click questionnaire backend endpoints are working!")
+                print(f"   ✅ API questionnaire endpoint: Ready for frontend integration")
+                print(f"   ✅ Backup questionnaire endpoint: Ready for frontend integration") 
+                print(f"   ✅ Monitoring questionnaire endpoint: Ready for frontend integration")
+                return True
+            else:
+                failed_count = total_tests - success_count
+                self.log_test("Double-Click Questionnaire Backend Support", False, 
+                            f"❌ PARTIAL FAILURE: {failed_count}/{total_tests} questionnaire endpoints failed. Only {success_count} endpoints working correctly.")
+                print(f"\n⚠️  PARTIAL FAILURE: {failed_count} endpoints need attention before frontend implementation")
+                return False
+            
+        except Exception as e:
+            self.log_test("Double-Click Questionnaire Backend Support", False, f"Request error: {str(e)}")
+            return False
+
+    # ============================================================================
     # Test Runner
     # ============================================================================
     
