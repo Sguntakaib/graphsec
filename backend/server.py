@@ -1654,21 +1654,29 @@ async def validate_node_completeness(
     branches: List[Dict[str, Any]]
 ):
     """Validate if a node configuration is complete"""
+    logger.info(f"🔍 Validation request for {node_subtype}:")
+    logger.info(f"   Received {len(branches)} branches")
+    
     # Convert dict branches to SecurityBranch objects
     security_branches = []
-    for branch_data in branches:
+    for i, branch_data in enumerate(branches):
+        completed = branch_data.get("completed", False)
+        branch_type = branch_data.get("type", "LOGIN")
+        logger.info(f"   Branch {i+1}: {branch_data.get('id')} -> type='{branch_type}', completed={completed}, value='{branch_data.get('value')}'")
+        
         branch = SecurityBranch(
             id=branch_data.get("id", ""),
             name=branch_data.get("name", ""),
             type=branch_data.get("type", "LOGIN"),
             required=branch_data.get("required", True),
-            completed=branch_data.get("completed", False),
+            completed=completed,
             value=branch_data.get("value"),
             description=branch_data.get("description", "")
         )
         security_branches.append(branch)
     
     validation_result = intelligent_node_engine.validate_node_completeness(node_subtype, security_branches)
+    logger.info(f"🔍 Validation result: {validation_result}")
     
     return {
         "node_subtype": node_subtype,
