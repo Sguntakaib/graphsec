@@ -1,31 +1,29 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - QUESTIONNAIRE RESUMPTION FIX VERIFICATION
-Tests the specific fix for questionnaire resumption off-by-one error.
+Backend API Testing - VULNERABILITY ANALYSIS FOR BACKUP AND MONITORING NODES
+Tests vulnerability analysis specifically for Backup and Monitoring node types after adding INFORMATIONAL severity level.
 
 TESTING FOCUS:
-🔧 PRIMARY TEST: QUESTIONNAIRE RESUMPTION FIX
-1. **Database questionnaire dependency triggering (Question 4 → Backup child node)**
-2. **Verify that after Backup completes, Database questionnaire resumes at Question 5 (not skip to Question 6)**
-3. **Test the full flow: Database Q1→Q2→Q3→Q4→Backup(3 questions)→Database Q5→Q6→...→Q10**
+🎯 PRIMARY TEST: VULNERABILITY ANALYSIS WITH INFORMATIONAL SEVERITY
+1. **Test POST /vulnerabilities/analyze/{node_id} endpoint with Backup node type**
+2. **Test POST /vulnerabilities/analyze/{node_id} endpoint with Monitoring node type**
+3. **Use sample questionnaire responses that should trigger Informational severity vulnerabilities**
+4. **Verify vulnerability nodes are generated with proper structure including INFORMATIONAL severity**
+5. **Confirm the fix resolves the previous "'Informational' is not a valid VulnerabilitySeverity" error**
 
-**THE FIX:**
-- Changed App.js lines 1549 and 1561 from `result.currentPromptIndex + 1` to `result.currentPromptIndex`
-- This should fix the off-by-one error that was causing questions to be skipped
+**CONTEXT:**
+- Frontend vulnerability analysis filtering has been fixed to include Backup and Monitoring nodes
+- Backend VulnerabilitySeverity enum now includes INFORMATIONAL = "Informational"
+- Color mapping added for INFORMATIONAL severity (#6B7280, lightbulb icon)
+- Backup and Monitoring vulnerability rules use "Informational" severity level for best practice recommendations
 
-**SPECIFIC TEST SCENARIO:**
-1. Database questionnaire has 10 questions
-2. Question 4 (backup question) should trigger a Backup child node with 3 questions  
-3. After Backup child node completes, the parent Database questionnaire should resume at Question 5 (not skip to Question 6)
+**TEST SCENARIOS:**
+- Backup node with basic backup strategy → should generate informational backup enhancement vulnerabilities
+- Monitoring node with basic monitoring setup → should generate informational monitoring enhancement vulnerabilities
+- Verify both return HTTP 200 with vulnerability nodes array containing INFORMATIONAL severity vulnerabilities
 
-**EXPECTED RESULTS:**
-- Database questionnaire should have 10 questions with dependency questions at specific positions
-- Backup dependency should trigger correctly from Database question 4
-- Question resumption should work without skipping questions
-- Complete flow should process all questions in correct sequence
-
-**ADDITIONAL TESTS:**
-Also includes comprehensive questionnaire functionality verification tests.
+**EXPECTED SUCCESS:**
+Both Backup and Monitoring nodes should now successfully generate vulnerability nodes with INFORMATIONAL severity without the previous 500 error.
 """
 
 import requests
