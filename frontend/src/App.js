@@ -187,7 +187,7 @@ function AppContent() {
 
     window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
     return () => window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
-  }, [nodes, currentDiagram, startLegacyQuestionnaire]);
+  }, [nodes, currentDiagram]);
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
