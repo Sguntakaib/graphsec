@@ -524,13 +524,13 @@ class QuestionnaireCompletionTester:
         try:
             # Test with all 7 expected branches to verify they are recognized
             all_api_branches = [
-                {"branch_type": "ApiSecurity", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "Authentication", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "Authorization", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "RateLimiting", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "InputValidation", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "Monitoring", "implementation_status": "implemented", "security_level": "high"},
-                {"branch_type": "Encryption", "implementation_status": "implemented", "security_level": "high"}
+                {"type": "ApiSecurity", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "Authentication", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "Authorization", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "RateLimiting", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "InputValidation", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "Monitoring", "implementation_status": "implemented", "security_level": "high"},
+                {"type": "Encryption", "implementation_status": "implemented", "security_level": "high"}
             ]
             
             response = self.session.post(
