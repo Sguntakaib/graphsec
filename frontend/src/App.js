@@ -1931,6 +1931,7 @@ function AppContent() {
     }
     setShowSecurityQuestionnaire(false);
     setCurrentQuestionnaireNode(null);
+    setCurrentQuestionnaireAnswers({}); // Clear existing answers
     setQuestionnaireQueue([]);
     setCurrentQueueIndex(0);
     setParentQuestionnaireState(null); // Clear parent state on cancel
