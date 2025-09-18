@@ -1208,18 +1208,24 @@ class DoubleClickQuestionnaireTester:
     # ============================================================================
     
     def run_all_tests(self):
-        """Run all tests with focus on questionnaire resumption fix"""
-        print("🚀 Starting Questionnaire Resumption Fix Verification")
+        """Run all tests with focus on double-click questionnaire backend support"""
+        print("🚀 Starting Double-Click Questionnaire Backend Support Testing")
         print("=" * 90)
-        print("QUESTIONNAIRE RESUMPTION FIX VERIFICATION")
-        print("Primary Focus: Database → Backup dependency flow and resumption logic")
-        print("Testing Fix: Changed App.js lines 1549 and 1561 from currentPromptIndex + 1 to currentPromptIndex")
-        print("Expected: Question 5 should NOT be skipped after Backup child node completion")
+        print("DOUBLE-CLICK QUESTIONNAIRE BACKEND SUPPORT VERIFICATION")
+        print("Primary Focus: API, Backup, and Monitoring questionnaire endpoints")
+        print("Testing: GET /api/questionnaires/{API|Backup|Monitoring}?level=basic")
+        print("Expected: HTTP 200, prompts field, level=basic, total_questions field")
         print("=" * 90)
         
         tests = [
             # Basic connectivity
             self.test_health_check,
+            
+            # REVIEW REQUEST: Double-Click Questionnaire Backend Support Tests
+            self.test_api_questionnaire_endpoint,
+            self.test_backup_questionnaire_endpoint,
+            self.test_monitoring_questionnaire_endpoint,
+            self.test_double_click_questionnaire_backend_support,
             
             # CRITICAL TEST: Questionnaire Resumption Fix
             self.test_questionnaire_resumption_fix,
