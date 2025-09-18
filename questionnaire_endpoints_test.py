@@ -609,7 +609,7 @@ class QuestionnaireEndpointsTester:
             print("✅ API questionnaire endpoint working correctly")
             print("✅ Database questionnaire endpoint working correctly")
             print("✅ ExternalAttacker prompts endpoint working correctly")
-            print("✅ Actor prompts endpoint working correctly")
+            print("✅ CloudDeployment prompts endpoint working correctly")
             print("✅ Error handling working correctly")
             print("✅ Response formats are consistent and compatible with SecurityQuestionnaire.js")
             print("✅ No 'Error Loading Questionnaire' issues should occur")
