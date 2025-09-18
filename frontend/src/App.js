@@ -2641,7 +2641,7 @@ function AppContent() {
           nodeSubtype={currentQuestionnaireNode.subtype || currentQuestionnaireNode.data?.subtype} 
           onComplete={handleSecurityQuestionnaireComplete}
           onCancel={handleSecurityQuestionnaireCancel}
-          existingValues={{}}
+          existingValues={currentQuestionnaireAnswers}
           isVisible={showSecurityQuestionnaire}
           sourceNode={currentQuestionnaireNode}
           currentNodes={nodes}
