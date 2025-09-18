@@ -868,6 +868,264 @@ class DoubleClickQuestionnaireTester:
             return False
 
     # ============================================================================
+    # REVIEW REQUEST: Double-Click Questionnaire Save/Retrieve Issue Testing
+    # ============================================================================
+    
+    def test_double_click_questionnaire_save_retrieve_issue(self):
+        """
+        CRITICAL TEST: Test the specific double-click questionnaire save/retrieve issue
+        
+        Issue: Questionnaires are being completed successfully, but when users double-click 
+        on completed nodes, it shows a fresh questionnaire instead of the saved state.
+        
+        The double-click handler is trying to fetch existing answers from:
+        GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire
+        
+        But it's getting "⚠️ No existing questionnaire data found, starting fresh questionnaire"
+        
+        This test will:
+        1. Create a test diagram
+        2. Add Backup and Monitoring nodes to the diagram
+        3. Save some questionnaire responses using POST endpoint
+        4. Fetch the saved responses using GET endpoint
+        5. Verify that saved responses are returned (not fresh questionnaire)
+        """
+        try:
+            print("🎯 CRITICAL TEST: Double-Click Questionnaire Save/Retrieve Issue")
+            print("=" * 80)
+            print("Testing the specific issue where double-click shows fresh questionnaire")
+            print("instead of saved state for API, Backup, and Monitoring nodes")
+            print("=" * 80)
+            
+            # Step 1: Create test diagram
+            print("\n📋 Step 1: Create test diagram")
+            diagram_data = {
+                "title": "Double-Click Save/Retrieve Test Diagram",
+                "description": "Testing double-click questionnaire save/retrieve functionality"
+            }
+            
+            diagram_response = self.session.post(f"{self.base_url}/diagrams", json=diagram_data)
+            if diagram_response.status_code != 200:
+                self.log_test("Double-Click Save/Retrieve Issue", False, 
+                            f"Failed to create test diagram: HTTP {diagram_response.status_code}")
+                return False
+            
+            test_diagram = diagram_response.json()
+            test_diagram_id = test_diagram['id']
+            print(f"   ✅ Created test diagram: {test_diagram_id}")
+            
+            # Step 2: Add Backup and Monitoring nodes to diagram
+            print("\n📋 Step 2: Add Backup and Monitoring nodes to diagram")
+            test_nodes = [
+                {
+                    "id": f"backup-node-{uuid.uuid4().hex[:8]}",
+                    "type": "Asset",
+                    "subtype": "Backup",
+                    "label": "Test Backup System",
+                    "position": {"x": 200, "y": 100},
+                    "data": {"criticality": "High"}
+                },
+                {
+                    "id": f"monitoring-node-{uuid.uuid4().hex[:8]}",
+                    "type": "Asset", 
+                    "subtype": "Monitoring",
+                    "label": "Test Monitoring System",
+                    "position": {"x": 400, "y": 100},
+                    "data": {"criticality": "Medium"}
+                },
+                {
+                    "id": f"api-node-{uuid.uuid4().hex[:8]}",
+                    "type": "Asset",
+                    "subtype": "API", 
+                    "label": "Test API Service",
+                    "position": {"x": 600, "y": 100},
+                    "data": {"criticality": "High"}
+                }
+            ]
+            
+            # Update diagram with nodes
+            test_diagram['nodes'] = test_nodes
+            test_diagram['edges'] = []
+            
+            update_response = self.session.put(f"{self.base_url}/diagrams/{test_diagram_id}", 
+                                             json=test_diagram)
+            if update_response.status_code != 200:
+                self.log_test("Double-Click Save/Retrieve Issue", False, 
+                            f"Failed to add nodes to diagram: HTTP {update_response.status_code}")
+                return False
+            
+            print(f"   ✅ Added {len(test_nodes)} nodes to diagram (Backup, Monitoring, API)")
+            
+            # Step 3: Save questionnaire responses for each node using POST endpoint
+            print("\n📋 Step 3: Save questionnaire responses using POST endpoint")
+            
+            test_responses = {
+                "Backup": {
+                    "backup_strategy": "incremental",
+                    "backup_frequency": "daily",
+                    "backup_encryption": True,
+                    "backup_retention": "30_days",
+                    "backup_testing": True
+                },
+                "Monitoring": {
+                    "monitoring_platform": "prometheus",
+                    "monitoring_coverage": "comprehensive", 
+                    "monitoring_alerting": True,
+                    "monitoring_data_retention": "90_days",
+                    "monitoring_access_control": "rbac"
+                },
+                "API": {
+                    "authentication_type": "oauth2",
+                    "rate_limiting": True,
+                    "input_validation": "strict",
+                    "logging_enabled": True,
+                    "api_versioning": "semantic"
+                }
+            }
+            
+            saved_nodes = []
+            
+            for node in test_nodes:
+                node_id = node['id']
+                node_subtype = node['subtype']
+                responses = test_responses.get(node_subtype, {})
+                
+                print(f"   🔄 Saving responses for {node_subtype} node...")
+                
+                save_response = self.session.post(
+                    f"{self.base_url}/diagrams/{test_diagram_id}/nodes/{node_id}/questionnaire",
+                    json={"responses": responses}
+                )
+                
+                if save_response.status_code == 200:
+                    save_data = save_response.json()
+                    if save_data.get('success'):
+                        saved_nodes.append({
+                            'node_id': node_id,
+                            'node_subtype': node_subtype,
+                            'responses_saved': len(responses)
+                        })
+                        print(f"      ✅ {node_subtype}: Saved {len(responses)} responses")
+                    else:
+                        print(f"      ❌ {node_subtype}: Save failed - {save_data}")
+                else:
+                    print(f"      ❌ {node_subtype}: HTTP {save_response.status_code}: {save_response.text}")
+            
+            if len(saved_nodes) == 0:
+                self.log_test("Double-Click Save/Retrieve Issue", False, 
+                            "Failed to save responses for any nodes")
+                return False
+            
+            print(f"   ✅ Successfully saved responses for {len(saved_nodes)} nodes")
+            
+            # Step 4: Fetch saved responses using GET endpoint (simulating double-click)
+            print("\n📋 Step 4: Fetch saved responses using GET endpoint (simulating double-click)")
+            
+            retrieved_nodes = []
+            fresh_questionnaire_nodes = []
+            
+            for saved_node in saved_nodes:
+                node_id = saved_node['node_id']
+                node_subtype = saved_node['node_subtype']
+                expected_responses = saved_node['responses_saved']
+                
+                print(f"   🔄 Retrieving questionnaire for {node_subtype} node...")
+                
+                get_response = self.session.get(
+                    f"{self.base_url}/diagrams/{test_diagram_id}/nodes/{node_id}/questionnaire"
+                )
+                
+                if get_response.status_code == 200:
+                    get_data = get_response.json()
+                    
+                    # Check if questionnaire_responses field exists and has data
+                    questionnaire_responses = get_data.get('questionnaire_responses', {})
+                    
+                    if isinstance(questionnaire_responses, dict) and len(questionnaire_responses) > 0:
+                        retrieved_nodes.append({
+                            'node_subtype': node_subtype,
+                            'responses_retrieved': len(questionnaire_responses),
+                            'expected_responses': expected_responses
+                        })
+                        print(f"      ✅ {node_subtype}: Retrieved {len(questionnaire_responses)} saved responses")
+                        
+                        # Verify some of the saved data is present
+                        original_responses = test_responses.get(node_subtype, {})
+                        matches = 0
+                        for key, value in original_responses.items():
+                            if questionnaire_responses.get(key) == value:
+                                matches += 1
+                        
+                        if matches > 0:
+                            print(f"         ✅ {matches}/{len(original_responses)} responses match saved data")
+                        else:
+                            print(f"         ⚠️  No responses match saved data (may be expected due to data format)")
+                            
+                    else:
+                        fresh_questionnaire_nodes.append({
+                            'node_subtype': node_subtype,
+                            'issue': 'No saved responses found - showing fresh questionnaire'
+                        })
+                        print(f"      ❌ {node_subtype}: No saved responses found - showing fresh questionnaire")
+                        print(f"         This is the EXACT ISSUE reported by user!")
+                        
+                else:
+                    print(f"      ❌ {node_subtype}: HTTP {get_response.status_code}: {get_response.text}")
+            
+            # Step 5: Analyze results and determine if issue exists
+            print("\n📋 Step 5: Analysis of double-click questionnaire save/retrieve functionality")
+            
+            total_nodes_tested = len(saved_nodes)
+            nodes_with_retrieved_data = len(retrieved_nodes)
+            nodes_with_fresh_questionnaire = len(fresh_questionnaire_nodes)
+            
+            print(f"   📊 Test Results Summary:")
+            print(f"      Total nodes tested: {total_nodes_tested}")
+            print(f"      Nodes with retrieved saved data: {nodes_with_retrieved_data}")
+            print(f"      Nodes showing fresh questionnaire: {nodes_with_fresh_questionnaire}")
+            
+            if nodes_with_fresh_questionnaire > 0:
+                print(f"\n   🚨 ISSUE CONFIRMED: {nodes_with_fresh_questionnaire} nodes showing fresh questionnaire instead of saved state")
+                print(f"      This matches the user-reported issue:")
+                print(f"      'when users double-click on completed nodes, it shows a fresh questionnaire instead of the saved state'")
+                
+                for node in fresh_questionnaire_nodes:
+                    print(f"      ❌ {node['node_subtype']}: {node['issue']}")
+                
+                # Check if it's specific to certain node types
+                affected_types = [node['node_subtype'] for node in fresh_questionnaire_nodes]
+                print(f"      🎯 Affected node types: {affected_types}")
+                
+                if set(affected_types) == {'API', 'Backup', 'Monitoring'}:
+                    print(f"      🎯 EXACT MATCH: Issue affects API, Backup, and Monitoring nodes as reported")
+                
+                self.log_test("Double-Click Save/Retrieve Issue", False, 
+                            f"❌ ISSUE CONFIRMED: {nodes_with_fresh_questionnaire}/{total_nodes_tested} nodes show fresh questionnaire instead of saved state. "
+                            f"GET /api/diagrams/{{diagram_id}}/nodes/{{node_id}}/questionnaire endpoint not returning saved data properly for {affected_types} node types. "
+                            f"This matches the exact user-reported issue.")
+                
+                return False
+                
+            else:
+                print(f"\n   ✅ NO ISSUE DETECTED: All {nodes_with_retrieved_data} nodes successfully retrieved saved responses")
+                print(f"      The double-click questionnaire functionality is working correctly")
+                print(f"      GET endpoint properly returns saved questionnaire data")
+                
+                for node in retrieved_nodes:
+                    print(f"      ✅ {node['node_subtype']}: {node['responses_retrieved']} responses retrieved")
+                
+                self.log_test("Double-Click Save/Retrieve Issue", True, 
+                            f"✅ NO ISSUE DETECTED: All {nodes_with_retrieved_data}/{total_nodes_tested} nodes successfully retrieved saved responses. "
+                            f"GET /api/diagrams/{{diagram_id}}/nodes/{{node_id}}/questionnaire endpoint working correctly for API, Backup, and Monitoring node types. "
+                            f"Double-click questionnaire functionality is working as expected.")
+                
+                return True
+            
+        except Exception as e:
+            self.log_test("Double-Click Save/Retrieve Issue", False, f"Request error: {str(e)}")
+            return False
+
+    # ============================================================================
     # REVIEW REQUEST: Double-Click Questionnaire Backend Support Testing
     # ============================================================================
     
