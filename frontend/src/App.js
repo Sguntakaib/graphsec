@@ -1585,6 +1585,23 @@ function AppContent() {
         
         // The SecurityQuestionnaire component will use the parent state from stack for resumption
         // Don't pop from stack here - it will be popped when parent completes
+      } else if (parentQuestionnaireStack.length > 0) {
+        // No more dependencies, but there's still a parent questionnaire to resume (grandparent scenario)
+        const parentState = parentQuestionnaireStack[parentQuestionnaireStack.length - 1];
+        console.log('🔄 No more dependencies, resuming grandparent questionnaire from stack:', parentState);
+        
+        setCurrentQuestionnaireNode({
+          id: parentState.nodeId,
+          subtype: parentState.nodeSubtype,
+          data: { subtype: parentState.nodeSubtype }
+        });
+        
+        // Clear the queue but keep parent stack for the SecurityQuestionnaire component
+        setQuestionnaireQueue([]);
+        setCurrentQueueIndex(0);
+        
+        // The SecurityQuestionnaire component will use the parent state from stack for resumption
+        // Don't pop from stack here - it will be popped when grandparent completes
       } else {
         // All questionnaires completed - close everything
         console.log('✅ All questionnaires completed, closing modal');
