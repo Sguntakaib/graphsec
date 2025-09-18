@@ -182,6 +182,11 @@ function AppContent() {
         const nodeSubtype = node.subtype || node.data?.subtype;
         console.log('🚀 Opening Security Questionnaire directly from double-click');
         
+        // Clear any existing questionnaire state to prevent completion logic from triggering
+        setQuestionnaireQueue([]);
+        setCurrentQueueIndex(0);
+        setParentQuestionnaireState(null);
+        
         // Set the state directly to open questionnaire
         setCurrentQuestionnaireNode({
           id: node.id,
