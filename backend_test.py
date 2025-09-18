@@ -333,10 +333,10 @@ class DoubleClickQuestionnaireTester:
                 if response.status_code == 200:
                     data = response.json()
                     
-                    # Verify update was successful
-                    if 'message' in data and 'success' in data['message'].lower():
+                    # Verify update was successful (actual API format)
+                    if 'success' in data and data['success'] and 'updated_responses' in data:
                         success_count += 1
-                        print(f"   ✅ {node_subtype} node: Updated with {len(responses)} responses")
+                        print(f"   ✅ {node_subtype} node: Updated with {data['updated_responses']} responses")
                     else:
                         print(f"   ❌ {node_subtype} node: Unexpected response format: {data}")
                         
