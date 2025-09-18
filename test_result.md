@@ -950,6 +950,18 @@ frontend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE CONDITIONAL DEPENDENCY TESTING COMPLETE: All test scenarios passed successfully! WebApp Dependencies: ✅ API endpoints only → ['API'] ✅ Database connection only → ['Database'] ✅ Both API and Database → ['API', 'Database'] ✅ API false → [] Database Dependencies: ✅ Backup enabled → ['Backup'] ✅ Monitoring enabled → ['Monitoring'] ✅ Both enabled → ['Backup', 'Monitoring'] Edge Cases: ✅ Empty answers → [] ✅ Mixed true/false → only true values returned ✅ Invalid subtype → gracefully handled with empty array. The immediate dependency triggering system is fully functional and ready for the new immediate node creation flow."
 
+  - task: "Database Questionnaire Consistency Fix"
+    implemented: true
+    working: true
+    file: "backend/server.py, backend/intelligent_nodes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL DATABASE QUESTIONNAIRE CONSISTENCY FIX VERIFIED: Successfully tested the specific fix for Database questionnaire consistency issue. COMPREHENSIVE TESTING RESULTS: ✅ GET /api/intelligent-nodes/Database/prompts endpoint now returns correct response structure with success=true and prompts_count field ✅ Response format verified: {success: true, node_subtype: 'Database', prompts_count: 5, prompts: [...]} ✅ CONSISTENCY VERIFICATION: prompts_count=5 matches actual prompts.length=5 consistently across 5 test iterations ✅ ORIGINAL BUG RESOLVED: No more prompts_count=0 (missing field) issues that were causing parent-child questionnaire resumption failures ✅ EXPECTED OUTCOME ACHIEVED: Endpoint returns consistent prompts_count that matches prompts.length, resolving the resumption issue mentioned in logs. The Database questionnaire consistency fix is working correctly and production-ready."
+
   - task: "Conditional Node Expansion Frontend Fix"
     implemented: true
     working: "NA"
