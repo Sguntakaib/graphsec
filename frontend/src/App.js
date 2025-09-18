@@ -1541,7 +1541,7 @@ function AppContent() {
           const parentState = {
             nodeId: currentQuestionnaireNode.id,
             nodeSubtype: currentQuestionnaireNode.subtype,
-            resumeFromPromptIndex: result.currentPromptIndex, // Resume from the next question after dependency trigger
+            resumeFromPromptIndex: result.currentPromptIndex + 1, // Resume from the NEXT question after dependency trigger
             partialAnswers: result.answers
           };
           setParentQuestionnaireStack(prev => [...prev, parentState]);
