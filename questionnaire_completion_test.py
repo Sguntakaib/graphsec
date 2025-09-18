@@ -138,64 +138,58 @@ class QuestionnaireCompletionTester:
             # Test scenario: 6 questions answered out of 10 should show proper completion percentage (not 33.3%)
             realistic_webapp_branches = [
                 {
+                    "id": "auth_branch",
+                    "name": "Authentication Branch",
                     "type": "Authentication",
-                    "implementation_status": "implemented",
-                    "security_level": "high",
-                    "details": {
-                        "method": "OAuth2/OIDC",
-                        "multi_factor": True,
-                        "session_timeout": 30
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "oauth2",
+                    "description": "OAuth2/OIDC authentication implementation"
                 },
                 {
-                    "type": "Authorization", 
-                    "implementation_status": "implemented",
-                    "security_level": "high",
-                    "details": {
-                        "model": "RBAC",
-                        "principle": "least_privilege",
-                        "review_frequency": "quarterly"
-                    }
+                    "id": "authz_branch",
+                    "name": "Authorization Branch", 
+                    "type": "Authorization",
+                    "required": True,
+                    "completed": True,
+                    "value": "rbac",
+                    "description": "Role-based access control implementation"
                 },
                 {
+                    "id": "input_validation_branch",
+                    "name": "Input Validation Branch",
                     "type": "InputValidation",
-                    "implementation_status": "implemented", 
-                    "security_level": "medium",
-                    "details": {
-                        "validation_type": "comprehensive",
-                        "sanitization": True,
-                        "encoding": "context_aware"
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "comprehensive",
+                    "description": "Comprehensive input validation implementation"
                 },
                 {
+                    "id": "session_mgmt_branch",
+                    "name": "Session Management Branch",
                     "type": "SessionManagement",
-                    "implementation_status": "implemented",
-                    "security_level": "high",
-                    "details": {
-                        "secure_cookies": True,
-                        "session_regeneration": True,
-                        "timeout_handling": "automatic"
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "secure",
+                    "description": "Secure session management implementation"
                 },
                 {
+                    "id": "error_handling_branch",
+                    "name": "Error Handling Branch",
                     "type": "ErrorHandling",
-                    "implementation_status": "implemented",
-                    "security_level": "medium",
-                    "details": {
-                        "error_disclosure": "minimal",
-                        "logging": "comprehensive",
-                        "user_feedback": "generic"
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "minimal_disclosure",
+                    "description": "Minimal error disclosure implementation"
                 },
                 {
+                    "id": "logging_branch",
+                    "name": "Logging Branch",
                     "type": "Logging",
-                    "implementation_status": "implemented",
-                    "security_level": "high",
-                    "details": {
-                        "audit_trail": True,
-                        "retention_period": "2_years",
-                        "monitoring": "real_time"
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "comprehensive",
+                    "description": "Comprehensive audit logging implementation"
                 }
                 # Missing SSL/TLS and CSP branches to test 6/8 completion (75%)
             ]
