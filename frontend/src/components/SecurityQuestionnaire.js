@@ -198,7 +198,10 @@ const SecurityQuestionnaire = ({
         name: prompt.related_branch || prompt.id,
         type: mapPromptTypeToSecurityBranch(prompt.id, prompt.related_branch),
         required: true,
-        completed: answers[prompt.id] !== undefined && answers[prompt.id] !== null,
+        completed: answers[prompt.id] !== undefined && 
+                  answers[prompt.id] !== null && 
+                  answers[prompt.id] !== '' &&
+                  answers[prompt.id] !== 'Unknown',
         value: answers[prompt.id],
         description: prompt.help_text || prompt.question
       }));
