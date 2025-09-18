@@ -512,8 +512,8 @@ function AppContent() {
   }, []);
 
   // Helper function to start legacy questionnaire
-  const startLegacyQuestionnaire = useCallback(async (nodeId, nodeSubtype, parentNodeId = null) => {
-    console.log('🎬 Starting legacy questionnaire:', { nodeId, nodeSubtype, parentNodeId });
+  const startLegacyQuestionnaire = useCallback(async (nodeId, nodeSubtype, parentNodeId = null, existingAnswers = {}) => {
+    console.log('🎬 Starting legacy questionnaire:', { nodeId, nodeSubtype, parentNodeId, existingAnswers });
     
     // Use legacy questionnaire system only
     console.log('🎯 Using legacy questionnaire system');
@@ -523,6 +523,9 @@ function AppContent() {
       subtype: nodeSubtype,
       data: { subtype: nodeSubtype }
     });
+    
+    // Store existing answers for the questionnaire
+    setCurrentQuestionnaireAnswers(existingAnswers);
     setShowSecurityQuestionnaire(true);
   }, []);
 
