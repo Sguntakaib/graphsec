@@ -396,44 +396,40 @@ class QuestionnaireCompletionTester:
             # Test scenario: 4 questions answered out of 9 should show proper completion percentage (not 500 error)
             realistic_api_branches = [
                 {
+                    "id": "api_security_branch",
+                    "name": "API Security Branch",
                     "type": "ApiSecurity",
-                    "implementation_status": "implemented",
-                    "security_level": "high",
-                    "details": {
-                        "api_gateway": True,
-                        "security_headers": "comprehensive",
-                        "cors_policy": "restrictive"
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "comprehensive",
+                    "description": "Comprehensive API security implementation"
                 },
                 {
-                    "type": "Authentication", 
-                    "implementation_status": "implemented",
-                    "security_level": "high",
-                    "details": {
-                        "method": "JWT",
-                        "token_expiry": 3600,
-                        "refresh_tokens": True
-                    }
+                    "id": "auth_branch",
+                    "name": "Authentication Branch", 
+                    "type": "Authentication",
+                    "required": True,
+                    "completed": True,
+                    "value": "jwt",
+                    "description": "JWT-based authentication implementation"
                 },
                 {
+                    "id": "authz_branch",
+                    "name": "Authorization Branch",
                     "type": "Authorization",
-                    "implementation_status": "implemented", 
-                    "security_level": "medium",
-                    "details": {
-                        "model": "RBAC",
-                        "scope_validation": True,
-                        "resource_access": "fine_grained"
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "rbac",
+                    "description": "Role-based access control implementation"
                 },
                 {
+                    "id": "rate_limiting_branch",
+                    "name": "Rate Limiting Branch",
                     "type": "RateLimiting",
-                    "implementation_status": "implemented",
-                    "security_level": "high",
-                    "details": {
-                        "algorithm": "token_bucket",
-                        "per_user_limits": True,
-                        "burst_protection": True
-                    }
+                    "required": True,
+                    "completed": True,
+                    "value": "token_bucket",
+                    "description": "Token bucket rate limiting implementation"
                 }
                 # Missing InputValidation, Monitoring, Encryption branches to test 4/7 completion (~57%)
             ]
