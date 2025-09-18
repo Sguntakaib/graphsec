@@ -1511,7 +1511,7 @@ function AppContent() {
         const isQuestionnaireComplete = await checkQuestionnaireCompleteness(currentQuestionnaireNode.id, currentQuestionnaireNode.subtype);
         
         // Only trigger vulnerability analysis if enabled AND questionnaire is complete
-        if (autoVulnerabilityAnalysis && ['WebApp', 'API', 'Database'].includes(currentQuestionnaireNode.subtype)) {
+        if (autoVulnerabilityAnalysis && ['WebApp', 'API', 'Database', 'Backup', 'Monitoring'].includes(currentQuestionnaireNode.subtype)) {
           if (isQuestionnaireComplete) {
             console.log('🔍 Auto-triggering vulnerability analysis for COMPLETE questionnaire');
             
