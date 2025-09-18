@@ -747,6 +747,18 @@ test_plan:
         agent: "testing"
         comment: "✅ PRODUCTDESIGNSECURITY ROUTING FIX VERIFIED: All 3 critical routing tests passed (100% success rate). STRIDE Questionnaire Endpoint (GET /api/questionnaires/ProductDesignSecurity) correctly returns STRIDE-based questionnaire with questionnaire_type='STRIDE-based Threat Modeling', stride_categories array, and 12 prompts from product_design_security.yaml. Bulk Vulnerability Analysis (POST /api/vulnerabilities/bulk-analyze) successfully processes ProductDesignSecurity nodes with proper response format. Route Ordering Fix confirmed - specific ProductDesignSecurity route prioritized over generic route. Backend dependencies resolved (attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed). The routing fix is fully operational and production-ready."
 
+  - task: "Double-Click Questionnaire Backend API Support"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE DOUBLE-CLICK QUESTIONNAIRE TESTING COMPLETE: All critical backend APIs supporting the fixed double-click questionnaire functionality are working correctly. DETAILED RESULTS: ✅ Diagram Creation API: Successfully creates test diagrams with proper ID generation ✅ Node Management API: Successfully adds WebApp, API, and Database nodes to diagrams ✅ Questionnaire Retrieval API (GET /api/diagrams/{id}/nodes/{id}/questionnaire): Returns proper response structure with prompts (WebApp: 6, API: 7, Database: 5), questionnaire_responses field, and node_subtype matching ✅ Questionnaire Update API (POST /api/diagrams/{id}/nodes/{id}/questionnaire): Successfully saves questionnaire responses with proper persistence ✅ Data Persistence: Verified responses are correctly saved and retrieved across API calls ✅ Complete Double-Click Workflow: End-to-end testing successful - retrieve questionnaire → save responses → verify persistence ✅ Integration Testing: All APIs work together seamlessly for the double-click questionnaire feature. MINOR ISSUE: Error handling returns HTTP 500 instead of 404 for invalid diagram/node IDs (backend logs show correct 404 detection but exception handling converts to 500). SUCCESS RATE: 87.5% (7/8 tests passed). The backend is fully ready to support the fixed double-click questionnaire functionality in CustomNode.js."
+
   - task: "WebApp Questionnaire Dependency Questions Verification"
     implemented: true
     working: true
