@@ -155,9 +155,19 @@ function AppContent() {
   // Double-tap handler for nodes - Direct questionnaire access
   useEffect(() => {
     const handleNodeDoubleTap = async (event) => {
+      console.log('🎯 App.js: Received nodeDoubleTap event:', event.detail);
+      
       const { nodeId, nodeData } = event.detail;
       const node = nodes.find(n => n.id === nodeId);
-      if (node && currentDiagram) {
+      
+      console.log('🔍 Double-tap handler state check:', {
+        nodeId,
+        nodeFound: !!node,
+        currentDiagram: !!currentDiagram,
+        nodesLength: nodes.length
+      });
+      
+      if (node) { // Remove currentDiagram requirement for now
         console.log('🎯 Double-tap detected on node:', nodeId);
         
         // Get existing answers from the backend
