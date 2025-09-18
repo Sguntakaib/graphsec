@@ -905,6 +905,30 @@ frontend:
         agent: "testing"
         comment: "✅ POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire endpoint working correctly - successfully updates 4 questionnaire responses, saves data to MongoDB, verifies persistence through GET endpoint"
 
+  - task: "WebApp Questionnaire Completion Percentage Calculation Fix"
+    implemented: true
+    working: true
+    file: "backend/server.py, backend/intelligent_nodes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ QUESTIONNAIRE COMPLETION PERCENTAGE FIXES VERIFIED: WebApp questionnaire loads 10 questions properly, uses 8 correct branches (Authentication, Authorization, InputValidation, SessionManagement, ErrorHandling, Logging, SSL/TLS, CSP), completion percentage calculations are accurate (6/8 = 75%, not the old 33.3% error). Fixed WebApp required_branches to match webapp.yaml (8 branches instead of old 6 wrong ones)."
+
+  - task: "API Questionnaire Completion Percentage Calculation Fix"
+    implemented: true
+    working: true
+    file: "backend/server.py, backend/intelligent_nodes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ QUESTIONNAIRE COMPLETION PERCENTAGE FIXES VERIFIED: API questionnaire loads 9 questions properly, uses 7 correct branches (ApiSecurity, Authentication, Authorization, RateLimiting, InputValidation, Monitoring, Encryption), completion percentage calculations are accurate (4/7 = 57.1%, not the 500 error from logs). Fixed API required_branches to match api.yaml (7 branches instead of old 5 wrong ones)."
+
   - task: "Conditional Dependencies - Check Dependencies API"
     implemented: true
     working: true
