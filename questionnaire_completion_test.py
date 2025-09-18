@@ -514,13 +514,13 @@ class QuestionnaireCompletionTester:
         try:
             # Test with all 7 expected branches to verify they are recognized
             all_api_branches = [
-                {"type": "ApiSecurity", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "Authentication", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "Authorization", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "RateLimiting", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "InputValidation", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "Monitoring", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "Encryption", "implementation_status": "implemented", "security_level": "high"}
+                {"id": "api_sec", "name": "API Security", "type": "ApiSecurity", "required": True, "completed": True, "value": "comprehensive"},
+                {"id": "auth", "name": "Authentication", "type": "Authentication", "required": True, "completed": True, "value": "jwt"},
+                {"id": "authz", "name": "Authorization", "type": "Authorization", "required": True, "completed": True, "value": "rbac"},
+                {"id": "rate_limit", "name": "Rate Limiting", "type": "RateLimiting", "required": True, "completed": True, "value": "token_bucket"},
+                {"id": "input_val", "name": "Input Validation", "type": "InputValidation", "required": True, "completed": True, "value": "strict"},
+                {"id": "monitoring", "name": "Monitoring", "type": "Monitoring", "required": True, "completed": True, "value": "comprehensive"},
+                {"id": "encryption", "name": "Encryption", "type": "Encryption", "required": True, "completed": True, "value": "aes256"}
             ]
             
             response = self.session.post(
