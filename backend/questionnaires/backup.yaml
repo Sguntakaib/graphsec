@@ -27,6 +27,13 @@ questionnaires:
       question: "What is the backup frequency for critical data?"
       type: "single_choice"
       options: ["Continuous/Real-time", "Daily", "Weekly", "Monthly", "Irregular", "Unknown"]
+      option_descriptions:
+        "Continuous/Real-time": "Continuous data replication or real-time backup capturing changes as they occur - provides minimal data loss potential but requires robust infrastructure."
+        "Daily": "Daily backup schedule providing good balance between data protection and resource utilization - acceptable for most business-critical applications."
+        "Weekly": "Weekly backup frequency suitable for less critical data with longer acceptable recovery point objectives - lower resource usage but higher potential data loss."
+        "Monthly": "Monthly backup schedule appropriate only for archival or rarely changing data - significant risk of data loss for active systems."
+        "Irregular": "Inconsistent backup frequency without defined schedule - unpredictable data protection coverage and high risk during gaps."
+        "Unknown": "Backup frequency schedule is unclear or not documented."
       help_text: "Backup frequency determines the maximum acceptable data loss in case of failure."
       related_branch: "Backup"
     - id: "backup_encryption"
