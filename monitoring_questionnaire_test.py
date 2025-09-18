@@ -83,19 +83,13 @@ class MonitoringQuestionnaireFixTester:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Verify response structure
-                required_fields = ['success', 'prompts_count', 'node_subtype']
+                # Verify response structure (actual API format)
+                required_fields = ['prompts', 'node_subtype']
                 missing_fields = [field for field in required_fields if field not in data]
                 
                 if missing_fields:
                     self.log_test("Monitoring Questionnaire Prompts", False, 
                                 f"Missing required fields: {missing_fields}")
-                    return False
-                
-                # Verify success is true
-                if not data.get('success', False):
-                    self.log_test("Monitoring Questionnaire Prompts", False, 
-                                f"Success field is false: {data}")
                     return False
                 
                 # Verify node_subtype is Monitoring
@@ -104,20 +98,20 @@ class MonitoringQuestionnaireFixTester:
                                 f"Wrong node_subtype: expected 'Monitoring', got '{data.get('node_subtype')}'")
                     return False
                 
-                # Verify prompts_count is reasonable (should have monitoring prompts)
-                prompts_count = data.get('prompts_count', 0)
-                if prompts_count < 3:  # Should have at least 3 monitoring prompts
+                # Verify prompts are present and reasonable count
+                prompts = data.get('prompts', [])
+                if not prompts or len(prompts) < 3:  # Should have at least 3 monitoring prompts
                     self.log_test("Monitoring Questionnaire Prompts", False, 
-                                f"Too few prompts: expected at least 3, got {prompts_count}")
+                                f"Too few prompts: expected at least 3, got {len(prompts)}")
                     return False
                 
                 self.log_test("Monitoring Questionnaire Prompts", True, 
-                            f"✅ Monitoring endpoint returns HTTP 200 with {prompts_count} prompts, node_subtype='Monitoring'")
+                            f"✅ Monitoring endpoint returns HTTP 200 with {len(prompts)} prompts, node_subtype='Monitoring'")
                 
                 print(f"   📊 Response Details:")
-                print(f"      Success: {data.get('success')}")
-                print(f"      Prompts Count: {data.get('prompts_count')}")
                 print(f"      Node Subtype: {data.get('node_subtype')}")
+                print(f"      Prompts Count: {len(prompts)}")
+                print(f"      Sample Prompt IDs: {[p.get('id', 'unknown') for p in prompts[:3]]}")
                 
                 return True
                 
