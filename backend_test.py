@@ -47,7 +47,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://tooltip-fix.preview.emergentagent.com/api"
+BASE_URL = "https://full-stack-init-1.preview.emergentagent.com/api"
 
 class TooltipFunctionalityTester:
     def __init__(self):
