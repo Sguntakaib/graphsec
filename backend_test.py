@@ -1,47 +1,32 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - DOUBLE-CLICK QUESTIONNAIRE FUNCTIONALITY VERIFICATION
-Tests the backend APIs that support the double-click questionnaire functionality.
+Backend API Testing - MONITORING QUESTIONNAIRE 404 FIX VERIFICATION
+Tests the newly added Monitoring questionnaire functionality that was causing 404 errors.
 
 TESTING FOCUS:
-1. **Create Test Diagram:**
-   - Create a new diagram for testing
-   - Add nodes with questionnaire responses
-   - Verify diagram and node creation APIs work correctly
+🔧 PRIMARY TEST:
+1. **Test GET /api/intelligent-nodes/Monitoring/prompts endpoint**
+   - Should return HTTP 200 (not 404)
+   - Should contain monitoring questionnaire prompts
+   - Verify response includes proper structure with prompts and node_subtype
 
-2. **Test Questionnaire Retrieval API:**
-   - Test GET /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire
-   - Verify API returns proper questionnaire data for nodes
-   - Test with different node types (WebApp, API, Database)
-   - Check response structure includes existing answers pre-filled
-
-3. **Test Questionnaire Update API:**
-   - Test POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire
-   - Verify API can save questionnaire responses
-   - Test updating existing responses
-   - Verify data persistence
-
-4. **Test Node Management APIs:**
-   - Test diagram creation and node management
-   - Verify nodes can be created with proper structure
-   - Test node data retrieval and updates
-
-5. **Integration Testing:**
-   - Test the complete flow: create diagram → add nodes → save responses → retrieve responses
-   - Verify backend can handle the double-click questionnaire workflow
-   - Test error handling and edge cases
+🔧 VERIFICATION TESTS:
+2. **Test that other intelligent node endpoints still work:**
+   - GET /api/intelligent-nodes/Backup/prompts (this was working before)
+   - GET /api/intelligent-nodes/supported-types (should now include Monitoring)
 
 **EXPECTED RESULTS:**
-- Diagram creation API works correctly
-- Node questionnaire retrieval API returns HTTP 200 with proper structure
-- Questionnaire update API saves responses correctly
-- Backend supports the complete double-click questionnaire workflow
-- APIs handle all scenarios that would be triggered by double-clicking nodes
+- Monitoring endpoint should return success with monitoring security prompts
+- No more 404 errors for Monitoring questionnaire
+- Response should match the format: {success: true, prompts_count: X, node_subtype: 'Monitoring'}
 
-**CRITICAL SUCCESS CRITERIA:**
-This test verifies that the backend APIs are ready to support the fixed double-click 
-questionnaire functionality in CustomNode.js. The goal is to ensure all backend 
-endpoints work correctly for the double-click → questionnaire modal workflow.
+**CONTEXT:** 
+This fixes the exact issue shown in user console logs where GET /api/intelligent-nodes/Monitoring/prompts 
+was returning 404. The fix adds the missing Monitoring IntelligentNodeTemplate to the main 
+intelligent_nodes.py file, following the same pattern as the previously fixed Backup questionnaire.
+
+**ADDITIONAL TESTS:**
+Also includes comprehensive double-click questionnaire functionality verification tests.
 """
 
 import requests
