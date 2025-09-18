@@ -284,7 +284,7 @@ export const completeQuestionnaire = async (nodeSubtype, requestData) => {
 
 export const getQuestionnairePrompts = async (nodeSubtype) => {
   try {
-    // Use specific endpoints for WebApp, API, and Database to get option_descriptions
+    // Use specific endpoints for WebApp, API, Database, Backup, and Monitoring to get option_descriptions
     let endpoint;
     if (nodeSubtype === 'WebApp') {
       endpoint = `/questionnaires/WebApp?level=basic`;
@@ -292,6 +292,10 @@ export const getQuestionnairePrompts = async (nodeSubtype) => {
       endpoint = `/questionnaires/API?level=basic`;
     } else if (nodeSubtype === 'Database') {
       endpoint = `/questionnaires/Database?level=basic`;
+    } else if (nodeSubtype === 'Backup') {
+      endpoint = `/questionnaires/Backup?level=basic`;
+    } else if (nodeSubtype === 'Monitoring') {
+      endpoint = `/questionnaires/Monitoring?level=basic`;
     } else {
       endpoint = `/questionnaires/${nodeSubtype}`;
     }
