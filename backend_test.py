@@ -225,13 +225,13 @@ class VulnerabilityAnalysisTester:
             # Create a test node ID for Monitoring
             monitoring_node_id = f"monitoring-test-{uuid.uuid4().hex[:8]}"
             
-            # Sample questionnaire responses that should trigger informational vulnerabilities
-            # Based on actual vulnerability rules in vulnerability_rules.py
+            # Sample questionnaire responses from review request for monitoring node
             monitoring_responses = {
-                "monitoring_coverage": "Basic Monitoring",      # Triggers monitoring_coverage_enhancement
-                "monitoring_alerting": "Basic Alerts",         # Triggers monitoring_alerting_enhancement
-                "monitoring_data_retention": "30 days",        # Triggers monitoring_data_retention_enhancement
-                "monitoring_integration": "Basic Integration"   # Triggers monitoring_integration_enhancement
+                "monitoring_coverage": "basic",
+                "alerting_enabled": False,
+                "log_retention": "30_days", 
+                "incident_response": False,
+                "performance_monitoring": False
             }
             
             # Test data for vulnerability analysis
