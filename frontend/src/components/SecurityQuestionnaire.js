@@ -108,7 +108,7 @@ const SecurityQuestionnaire = ({
       
       const data = await response.json();
       
-      if (nodeSubtype === 'WebApp' || nodeSubtype === 'API' || nodeSubtype === 'Database') {
+      if (nodeSubtype === 'WebApp' || nodeSubtype === 'API' || nodeSubtype === 'Database' || nodeSubtype === 'Backup' || nodeSubtype === 'Monitoring') {
         // Comprehensive questionnaire response format
         setPrompts(data.prompts || []);
         console.log(`🎯 Loaded ${data.total_questions} comprehensive ${nodeSubtype} questions (${data.level} level)`);
