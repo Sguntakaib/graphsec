@@ -1594,6 +1594,18 @@ agent_communication:
         agent: "testing"
         comment: "✅ POST /api/wizard/generate-model endpoint working correctly - tested complete wizard data generation (5 nodes, 8 recommendations), minimal data handling (2 nodes, 5 recommendations), and error handling (graceful empty data processing). All responses include proper success status, generated nodes with correct structure (id, type, position, data), recommendations, implementation plans, and accurate summary counts."
 
+  - task: "Questionnaire API Endpoints - SecurityQuestionnaire.js Compatibility"
+    implemented: true
+    working: true
+    file: "backend/server.py, backend/questionnaire_loader.py, backend/intelligent_nodes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ QUESTIONNAIRE API ENDPOINTS VERIFICATION COMPLETE: All critical questionnaire endpoints used by SecurityQuestionnaire.js are working correctly with 100% success rate (9/9 tests passed). COMPREHENSIVE QUESTIONNAIRE ENDPOINTS: GET /api/questionnaires/WebApp?level=basic (10 prompts), GET /api/questionnaires/API?level=basic (9 prompts), GET /api/questionnaires/Database?level=basic (10 prompts) - all return proper response format with prompts/total_questions/level fields and option_descriptions for tooltips. FALLBACK INTELLIGENT NODES ENDPOINTS: GET /api/intelligent-nodes/ExternalAttacker/prompts (3 prompts), GET /api/intelligent-nodes/CloudDeployment/prompts (5 prompts) - both return proper prompts field. ERROR HANDLING: Invalid node types return appropriate error codes, malformed requests handled gracefully. CRITICAL SUCCESS: No 'Error Loading Questionnaire' issues should occur - all endpoints return expected data structures compatible with SecurityQuestionnaire.js frontend component."
+
 agent_communication:
   - agent: "testing"
     message: "🚨 CRITICAL PHASE 1 CORE LOOP TESTING RESULTS: Comprehensive testing of 4 critical Phase 1 Core Loop endpoints completed with 1/4 tests passing (25% success rate). ❌ CRITICAL FAILURES: 1) POST /api/questionnaires/WebApp/complete - HTTP 500 'Node not found in diagram' error, not working in standalone mode, requires diagram_id/node_id dependencies 2) GET /api/questionnaires/WebApp - HTTP 500 'IntelligentNodeEngine.create_security_branches() takes 2 positional arguments but 3 were given' implementation bug 3) POST /api/rules/evaluate - HTTP 500 'RuleEvaluationResult object has no attribute dict' attribute error. ✅ WORKING ENDPOINT: POST /api/simulate returns HTTP 200 with all required fields (simulation_id, attack_paths, risk_analysis, mitre_techniques, recommendations) in standalone mode. ❌ ROOT CAUSE: The Phase 1 Core Loop endpoints have fundamental implementation bugs and API contract mismatches preventing the questionnaire → findings pipeline from functioning. Backend service dependencies resolved (installed multidict, attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs), but core endpoint logic needs fixes."
