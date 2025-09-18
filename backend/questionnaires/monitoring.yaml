@@ -29,6 +29,12 @@ questionnaires:
       question: "What is the scope of monitoring coverage?"
       type: "single_choice"
       options: ["Comprehensive (Infrastructure + Applications + Security)", "Infrastructure + Applications", "Infrastructure Only", "Basic Monitoring", "Unknown"]
+      option_descriptions:
+        "Comprehensive (Infrastructure + Applications + Security)": "Complete monitoring across all system layers including server metrics, application performance, security events, and user behavior - provides full operational visibility."
+        "Infrastructure + Applications": "Monitoring of both infrastructure components and application performance but may lack security event monitoring or user behavior analytics."
+        "Infrastructure Only": "Basic monitoring of servers, networks, and hardware components without application-level insights or security monitoring - limited operational visibility."
+        "Basic Monitoring": "Minimal monitoring with basic health checks and availability monitoring - insufficient for comprehensive operational management or incident response."
+        "Unknown": "Monitoring coverage scope is unclear or not documented."
       help_text: "Comprehensive monitoring provides visibility across all system layers."
       related_branch: "Monitoring"
     - id: "monitoring_alerting"
