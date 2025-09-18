@@ -199,7 +199,7 @@ function AppContent() {
         // Clear any existing questionnaire state to prevent completion logic from triggering
         setQuestionnaireQueue([]);
         setCurrentQueueIndex(0);
-        setParentQuestionnaireState(null);
+        setParentQuestionnaireStack([]); // Clear parent stack
         
         // Set the state directly to open questionnaire
         const questionnaireNode = {
