@@ -551,6 +551,7 @@ function AppContent() {
       };
 
       // Create a diagram automatically if none exists
+      let diagramToUse = currentDiagram;
       if (!currentDiagram) {
         console.log('🆕 Creating new diagram automatically for dropped node');
         try {
@@ -560,6 +561,7 @@ function AppContent() {
             description: 'Security architecture diagram'
           });
           setCurrentDiagram(newDiagram);
+          diagramToUse = newDiagram;
           console.log('✅ Auto-created diagram:', newDiagram.id);
         } catch (error) {
           console.error('❌ Error creating auto-diagram:', error);
@@ -571,11 +573,11 @@ function AppContent() {
 
       // Save the node to the database if we have a diagram
       try {
-        if (currentDiagram) {
+        if (diagramToUse) {
           console.log('💾 Saving new node to database');
           const updatedDiagram = {
-            ...currentDiagram,
-            nodes: [...(currentDiagram.nodes || []), {
+            ...diagramToUse,
+            nodes: [...(diagramToUse.nodes || []), {
               id: newNode.id,
               type: newNode.type,
               position: newNode.position,
@@ -584,7 +586,7 @@ function AppContent() {
             }]
           };
           
-          await updateDiagram(currentDiagram.id, updatedDiagram);
+          await updateDiagram(diagramToUse.id, updatedDiagram);
           setCurrentDiagram(updatedDiagram);
           console.log('✅ Node saved to database');
         }
