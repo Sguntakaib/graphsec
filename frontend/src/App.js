@@ -170,9 +170,18 @@ function AppContent() {
       if (node) { // Remove currentDiagram requirement for now
         console.log('🎯 Double-tap detected on node:', nodeId);
         
-        // Get existing answers from the backend (skip if no diagram)
+        // Get existing answers - try node data first, then backend API
         let existingAnswers = {};
-        if (currentDiagram) {
+        
+        // First check if questionnaire responses are stored in node data (for auto-created dependent nodes)
+        if (node.data?.questionnaireResponses && Object.keys(node.data.questionnaireResponses).length > 0) {
+          existingAnswers = node.data.questionnaireResponses;
+          console.log('📝 Found existing questionnaire answers in node data:', existingAnswers);
+        } else if (node.questionnaireResponses && Object.keys(node.questionnaireResponses).length > 0) {
+          existingAnswers = node.questionnaireResponses;
+          console.log('📝 Found existing questionnaire answers in node root:', existingAnswers);
+        } else if (currentDiagram) {
+          // Fallback to backend API if no data in node
           try {
             const response = await fetch(
               `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
@@ -181,12 +190,12 @@ function AppContent() {
             if (response.ok) {
               const data = await response.json();
               existingAnswers = data.questionnaire_responses || {};
-              console.log('📝 Fetched existing questionnaire answers for double-click:', existingAnswers);
+              console.log('📝 Fetched existing questionnaire answers from backend:', existingAnswers);
             } else {
-              console.log('⚠️ No existing questionnaire data found, starting fresh questionnaire');
+              console.log('⚠️ No existing questionnaire data found in backend, starting fresh questionnaire');
             }
           } catch (error) {
-            console.error('⚠️ Error fetching existing questionnaire answers:', error);
+            console.error('⚠️ Error fetching existing questionnaire answers from backend:', error);
           }
         } else {
           console.log('⚠️ No currentDiagram available, starting fresh questionnaire');
