@@ -64,6 +64,12 @@ questionnaires:
       question: "How frequently are backup restores tested?"
       type: "single_choice"
       options: ["Monthly", "Quarterly", "Annually", "Never Tested", "Unknown"]
+      option_descriptions:
+        "Monthly": "Frequent backup restore testing providing high confidence in backup viability and rapid identification of backup issues - best practice for critical systems."
+        "Quarterly": "Regular restore testing providing reasonable assurance of backup integrity with moderate resource investment - suitable for most business-critical systems."
+        "Annually": "Minimal restore testing that may miss backup problems for extended periods - acceptable only for less critical systems with longer recovery tolerances."
+        "Never Tested": "No backup restore testing performed - high risk that backups may be corrupted, incomplete, or unrecoverable when needed."
+        "Unknown": "Backup restore testing frequency is unclear or not documented."
       help_text: "Regular restore testing ensures backups are viable when needed for recovery."
       related_branch: "DataIntegrity"
 
