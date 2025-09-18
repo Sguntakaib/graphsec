@@ -402,7 +402,7 @@ class QuestionnaireCompletionTester:
             # Test scenario: 4 questions answered out of 9 should show proper completion percentage (not 500 error)
             realistic_api_branches = [
                 {
-                    "branch_type": "ApiSecurity",
+                    "type": "ApiSecurity",
                     "implementation_status": "implemented",
                     "security_level": "high",
                     "details": {
@@ -412,7 +412,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "Authentication", 
+                    "type": "Authentication", 
                     "implementation_status": "implemented",
                     "security_level": "high",
                     "details": {
@@ -422,7 +422,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "Authorization",
+                    "type": "Authorization",
                     "implementation_status": "implemented", 
                     "security_level": "medium",
                     "details": {
@@ -432,7 +432,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "RateLimiting",
+                    "type": "RateLimiting",
                     "implementation_status": "implemented",
                     "security_level": "high",
                     "details": {
