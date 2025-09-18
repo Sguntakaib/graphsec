@@ -117,78 +117,69 @@ const SecurityQuestionnaire = ({
     }
   };
 
-  // Map questionnaire prompt types to correct SecurityBranch enum values
+  // Map questionnaire prompt types to correct SecurityBranch enum values based on webapp.yaml
   const mapPromptTypeToSecurityBranch = (promptId, relatedBranch) => {
-    // Common mappings based on prompt IDs and related branches
-    const mappings = {
-      // Authentication related
-      'authentication_method': 'Login',
-      'auth_method': 'Login',
-      'login': 'Login',
-      'authentication': 'Login',
+    // Direct mappings based on webapp.yaml related_branch values
+    const branchMappings = {
+      // WebApp.yaml branch mappings
+      'Authentication': 'Authentication',
+      'InputValidation': 'InputValidation', 
+      'Encryption': 'SSL/TLS',  // For HTTPS and data encryption questions
+      'Database': 'Database',
+      'API': 'API',
+      'SessionManagement': 'SessionManagement',
+      'ErrorHandling': 'ErrorHandling',
+      'Logging': 'Logging',
+      'CSP': 'CSP',
       
-      // Database related
-      'database_connection': 'Database',
-      'database': 'Database',
-      'db_connection': 'Database',
-      
-      // API related
-      'api_endpoints': 'API',
-      'api': 'API',
-      'rest_api': 'API',
-      
-      // Input validation
+      // Legacy mappings
+      'login': 'Authentication',
+      'authentication': 'Authentication',
       'input_validation': 'InputValidation',
       'validation': 'InputValidation',
-      
-      // WAF
-      'waf': 'WAF',
-      'firewall': 'WAF',
-      'web_firewall': 'WAF',
-      
-      // HTTPS/Encryption
-      'https': 'Encryption',
-      'encryption': 'Encryption',
-      'ssl': 'Encryption',
-      'tls': 'Encryption',
-      
-      // Deployment
-      'deployment': 'Deployment',
-      'deploy': 'Deployment',
-      'deployment_security': 'Deployment',
-      
-      // Default fallbacks based on related_branch
-      'encryption': 'Encryption',
-      'access_control': 'AccessControl',
-      'monitoring': 'Monitoring',
-      'logging': 'Logging'
+      'https': 'SSL/TLS',
+      'ssl': 'SSL/TLS',
+      'tls': 'SSL/TLS',
+      'database_connection': 'Database',
+      'database': 'Database',
+      'api_endpoints': 'API',
+      'api': 'API',
+      'session_management': 'SessionManagement',
+      'sessionmanagement': 'SessionManagement',
+      'error_handling': 'ErrorHandling',
+      'errorhandling': 'ErrorHandling',
+      'logging': 'Logging',
+      'csp': 'CSP'
     };
 
-    // First try direct prompt ID mapping
-    if (mappings[promptId]) {
-      return mappings[promptId];
+    // First try direct related_branch mapping (most reliable)
+    if (relatedBranch && branchMappings[relatedBranch]) {
+      return branchMappings[relatedBranch];
     }
 
-    // Then try related_branch mapping
-    if (relatedBranch && mappings[relatedBranch.toLowerCase()]) {
-      return mappings[relatedBranch.toLowerCase()];
+    // Then try prompt ID mapping
+    if (branchMappings[promptId]) {
+      return branchMappings[promptId];
     }
 
-    // Try to extract from prompt ID patterns
-    if (promptId.includes('auth') || promptId.includes('login')) return 'Login';
-    if (promptId.includes('database') || promptId.includes('db')) return 'Database';
-    if (promptId.includes('api')) return 'API';
-    if (promptId.includes('validation') || promptId.includes('input')) return 'InputValidation';
-    if (promptId.includes('waf') || promptId.includes('firewall')) return 'WAF';
-    if (promptId.includes('deploy')) return 'Deployment';
+    // Try to extract from prompt ID patterns for webapp.yaml questions
+    if (promptId.includes('authentication')) return 'Authentication';
+    if (promptId.includes('input_validation')) return 'InputValidation';
+    if (promptId.includes('https') || promptId.includes('data_encryption')) return 'SSL/TLS';
+    if (promptId.includes('database')) return 'Database';
+    if (promptId.includes('api_endpoints')) return 'API';
+    if (promptId.includes('session_management')) return 'SessionManagement';
+    if (promptId.includes('error_handling')) return 'ErrorHandling';
+    if (promptId.includes('logging')) return 'Logging';
+    if (promptId.includes('security_headers')) return 'CSP';
 
     // Default fallback - use related_branch as PascalCase if available
     if (relatedBranch) {
-      return relatedBranch.charAt(0).toUpperCase() + relatedBranch.slice(1).toLowerCase();
+      return relatedBranch;
     }
 
     // Final fallback
-    return 'Login';
+    return 'Authentication';
   };
 
   const validateAnswers = async () => {
