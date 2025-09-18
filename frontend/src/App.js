@@ -550,6 +550,22 @@ function AppContent() {
         },
       };
 
+      // Create a diagram automatically if none exists
+      if (!currentDiagram) {
+        console.log('🆕 Creating new diagram automatically for dropped node');
+        try {
+          const newDiagram = await createDiagram({
+            id: generateId(),
+            title: 'New Security Model',
+            description: 'Security architecture diagram'
+          });
+          setCurrentDiagram(newDiagram);
+          console.log('✅ Auto-created diagram:', newDiagram.id);
+        } catch (error) {
+          console.error('❌ Error creating auto-diagram:', error);
+        }
+      }
+
       // Add the node first
       setNodes((nds) => nds.concat(newNode));
 
@@ -577,7 +593,7 @@ function AppContent() {
         // Continue without intelligent features if API fails
       }
     },
-    [setNodes],
+    [setNodes, currentDiagram],
   );
 
   const onDragOver = useCallback((event) => {
