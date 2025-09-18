@@ -1550,17 +1550,6 @@ function AppContent() {
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
       }
 
-      // Check if this is the completion of a resumed parent questionnaire
-      // Only pop from stack if this is actual completion (not just navigation to a question)
-      const isCompletingParentFromStack = parentQuestionnaireStack.length > 0 && 
-        parentQuestionnaireStack[parentQuestionnaireStack.length - 1]?.nodeId === currentQuestionnaireNode.id && 
-        !result?.partialCompletion && result?.isActualCompletion;
-      
-      if (isCompletingParentFromStack) {
-        console.log('✅ Parent questionnaire completed after resumption, popping from stack');
-        setParentQuestionnaireStack(prev => prev.slice(0, -1)); // Pop the completed parent
-      }
-
       // Check if this is a dependency questionnaire completion and we need to resume parent
       if (questionnaireQueue.length > currentQueueIndex + 1) {
         // Move to next questionnaire in queue (next dependency)
@@ -1585,32 +1574,57 @@ function AppContent() {
         
         // The SecurityQuestionnaire component will use the parent state from stack for resumption
         // Don't pop from stack here - it will be popped when parent completes
-      } else if (parentQuestionnaireStack.length > 0) {
-        // No more dependencies, but there's still a parent questionnaire to resume (grandparent scenario)
-        const parentState = parentQuestionnaireStack[parentQuestionnaireStack.length - 1];
-        console.log('🔄 No more dependencies, resuming grandparent questionnaire from stack:', parentState);
-        
-        setCurrentQuestionnaireNode({
-          id: parentState.nodeId,
-          subtype: parentState.nodeSubtype,
-          data: { subtype: parentState.nodeSubtype }
-        });
-        
-        // Clear the queue but keep parent stack for the SecurityQuestionnaire component
-        setQuestionnaireQueue([]);
-        setCurrentQueueIndex(0);
-        
-        // The SecurityQuestionnaire component will use the parent state from stack for resumption
-        // Don't pop from stack here - it will be popped when grandparent completes
       } else {
-        // All questionnaires completed - close everything
-        console.log('✅ All questionnaires completed, closing modal');
-        setShowSecurityQuestionnaire(false);
-        setCurrentQuestionnaireNode(null);
-        setCurrentQuestionnaireAnswers({}); // Clear existing answers
-        setQuestionnaireQueue([]);
-        setCurrentQueueIndex(0);
-        setParentQuestionnaireStack([]); // Clear the stack
+        // No more dependencies in queue - check if this questionnaire completed and has parent to resume
+        const isCompletingCurrentFromStack = parentQuestionnaireStack.length > 0 && 
+          parentQuestionnaireStack[parentQuestionnaireStack.length - 1]?.nodeId === currentQuestionnaireNode.id && 
+          !result?.partialCompletion && result?.isActualCompletion;
+        
+        if (isCompletingCurrentFromStack && parentQuestionnaireStack.length > 1) {
+          // This questionnaire is completed and there's a grandparent to resume
+          console.log('✅ Current questionnaire completed, popping from stack and resuming grandparent');
+          setParentQuestionnaireStack(prev => {
+            const newStack = prev.slice(0, -1); // Remove the completed questionnaire
+            return newStack;
+          });
+          
+          // Resume the grandparent questionnaire (now at the top of the stack)
+          setParentQuestionnaireStack(prev => {
+            if (prev.length > 0) {
+              const grandparentState = prev[prev.length - 1];
+              console.log('🔄 Resuming grandparent questionnaire:', grandparentState);
+              
+              setCurrentQuestionnaireNode({
+                id: grandparentState.nodeId,
+                subtype: grandparentState.nodeSubtype,
+                data: { subtype: grandparentState.nodeSubtype }
+              });
+              
+              // Clear the queue
+              setQuestionnaireQueue([]);
+              setCurrentQueueIndex(0);
+            }
+            return prev;
+          });
+        } else if (isCompletingCurrentFromStack && parentQuestionnaireStack.length === 1) {
+          // This is the last questionnaire in the stack - close everything
+          console.log('✅ Last parent questionnaire completed, closing modal');
+          setShowSecurityQuestionnaire(false);
+          setCurrentQuestionnaireNode(null);
+          setCurrentQuestionnaireAnswers({});
+          setQuestionnaireQueue([]);
+          setCurrentQueueIndex(0);
+          setParentQuestionnaireStack([]);
+        } else {
+          // All questionnaires completed - close everything
+          console.log('✅ All questionnaires completed, closing modal');
+          setShowSecurityQuestionnaire(false);
+          setCurrentQuestionnaireNode(null);
+          setCurrentQuestionnaireAnswers({}); // Clear existing answers
+          setQuestionnaireQueue([]);
+          setCurrentQueueIndex(0);
+          setParentQuestionnaireStack([]); // Clear the stack
+        }
       }
     }
   };
