@@ -1568,22 +1568,23 @@ function AppContent() {
         const nextNode = questionnaireQueue[currentQueueIndex + 1];
         setCurrentQuestionnaireNode(nextNode);
         console.log(`🔄 Moving to next dependency questionnaire: ${nextNode?.data?.subtype}`);
-      } else if (questionnaireQueue.length > 0 && parentQuestionnaireState) {
-        // All dependencies complete, resume parent questionnaire
-        console.log('🔄 All dependencies completed, resuming parent questionnaire:', parentQuestionnaireState);
+      } else if (questionnaireQueue.length > 0 && parentQuestionnaireStack.length > 0) {
+        // All dependencies complete, resume parent questionnaire from stack
+        const parentState = parentQuestionnaireStack[parentQuestionnaireStack.length - 1];
+        console.log('🔄 All dependencies completed, resuming parent questionnaire from stack:', parentState);
         
         setCurrentQuestionnaireNode({
-          id: parentQuestionnaireState.nodeId,
-          subtype: parentQuestionnaireState.nodeSubtype,
-          data: { subtype: parentQuestionnaireState.nodeSubtype }
+          id: parentState.nodeId,
+          subtype: parentState.nodeSubtype,
+          data: { subtype: parentState.nodeSubtype }
         });
         
-        // Clear the queue but keep parent state for the SecurityQuestionnaire component
+        // Clear the queue but keep parent stack for the SecurityQuestionnaire component
         setQuestionnaireQueue([]);
         setCurrentQueueIndex(0);
         
-        // The SecurityQuestionnaire component will use parentQuestionnaireState for resumption
-        // Don't clear parentQuestionnaireState here - let it be cleared when parent completes
+        // The SecurityQuestionnaire component will use the parent state from stack for resumption
+        // Don't pop from stack here - it will be popped when parent completes
       } else {
         // All questionnaires completed - close everything
         console.log('✅ All questionnaires completed, closing modal');
@@ -1592,7 +1593,7 @@ function AppContent() {
         setCurrentQuestionnaireAnswers({}); // Clear existing answers
         setQuestionnaireQueue([]);
         setCurrentQueueIndex(0);
-        setParentQuestionnaireState(null);
+        setParentQuestionnaireStack([]); // Clear the stack
       }
     }
   };
