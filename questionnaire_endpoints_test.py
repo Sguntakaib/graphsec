@@ -570,7 +570,7 @@ class QuestionnaireEndpointsTester:
             
             # TEST 2: Fallback Intelligent Nodes Endpoints
             self.test_external_attacker_prompts_endpoint,
-            self.test_actor_prompts_endpoint,
+            self.test_clouddeployment_prompts_endpoint,
             
             # TEST 3: Error Conditions Testing
             self.test_invalid_node_types,
