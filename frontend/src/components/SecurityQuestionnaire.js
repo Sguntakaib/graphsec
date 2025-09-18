@@ -80,7 +80,7 @@ const SecurityQuestionnaire = ({
     try {
       setLoading(true);
       
-      // Use comprehensive questionnaire for WebApp, API, and Database - fallback to intelligent-nodes for others
+      // Use comprehensive questionnaire for WebApp, API, Database, Backup, and Monitoring - fallback to intelligent-nodes for others
       let response;
       if (nodeSubtype === 'WebApp') {
         console.log('🎯 Using comprehensive WebApp questionnaire system');
@@ -91,6 +91,12 @@ const SecurityQuestionnaire = ({
       } else if (nodeSubtype === 'Database') {
         console.log('🎯 Using comprehensive Database questionnaire system');
         response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Database?level=basic`);
+      } else if (nodeSubtype === 'Backup') {
+        console.log('🎯 Using comprehensive Backup questionnaire system');
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Backup?level=basic`);
+      } else if (nodeSubtype === 'Monitoring') {
+        console.log('🎯 Using comprehensive Monitoring questionnaire system');
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Monitoring?level=basic`);
       } else {
         console.log('🎯 Falling back to intelligent-nodes system for', nodeSubtype);
         response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
