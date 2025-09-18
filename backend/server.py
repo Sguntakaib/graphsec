@@ -1609,21 +1609,25 @@ async def get_security_prompts(node_subtype: str):
     if not prompts:
         raise HTTPException(status_code=404, detail=f"No security prompts found for {node_subtype}")
     
+    prompts_list = [
+        {
+            "id": prompt.id,
+            "question": prompt.question,
+            "type": prompt.type.value,
+            "options": prompt.options,
+            "option_descriptions": getattr(prompt, 'option_descriptions', {}),
+            "default_value": prompt.default_value,
+            "help_text": prompt.help_text,
+            "related_branch": prompt.related_branch.value,
+            "validation_rules": prompt.validation_rules
+        } for prompt in prompts
+    ]
+    
     return {
+        "success": True,
         "node_subtype": node_subtype,
-        "prompts": [
-            {
-                "id": prompt.id,
-                "question": prompt.question,
-                "type": prompt.type.value,
-                "options": prompt.options,
-                "option_descriptions": getattr(prompt, 'option_descriptions', {}),
-                "default_value": prompt.default_value,
-                "help_text": prompt.help_text,
-                "related_branch": prompt.related_branch.value,
-                "validation_rules": prompt.validation_rules
-            } for prompt in prompts
-        ]
+        "prompts_count": len(prompts_list),
+        "prompts": prompts_list
     }
 
 @api_router.post("/intelligent-nodes/{node_subtype}/create-branches")
