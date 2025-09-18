@@ -140,12 +140,14 @@ class IntelligentNodeEngine:
             node_type="Asset",
             node_subtype="WebApp",
             required_branches=[
-                SecurityBranchType.LOGIN,
-                SecurityBranchType.API,
-                SecurityBranchType.DATABASE,
+                SecurityBranchType.AUTHENTICATION,
+                SecurityBranchType.AUTHORIZATION,
                 SecurityBranchType.INPUT_VALIDATION,
-                SecurityBranchType.WAF,
-                SecurityBranchType.DEPLOYMENT  # New deployment branch
+                SecurityBranchType.SESSION_MANAGEMENT,
+                SecurityBranchType.ERROR_HANDLING,
+                SecurityBranchType.LOGGING,
+                SecurityBranchType.SSL_TLS,  # HTTPS
+                SecurityBranchType.CSP_HEADER  # CSP
             ],
             dependencies={
                 "webapp_api_endpoints": "API",
