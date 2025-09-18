@@ -1790,7 +1790,7 @@ function AppContent() {
     
     // Copy any existing properly named fields
     Object.keys(responses).forEach(key => {
-      if (key.startsWith('webapp_') || key.startsWith('api_') || key.startsWith('database_')) {
+      if (key.startsWith('webapp_') || key.startsWith('api_') || key.startsWith('database_') || key.startsWith('backup_') || key.startsWith('monitoring_')) {
         mapped[key] = responses[key];
       }
     });
