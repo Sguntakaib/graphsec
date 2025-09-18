@@ -759,6 +759,18 @@ test_plan:
         agent: "testing"
         comment: "✅ COMPREHENSIVE DOUBLE-CLICK QUESTIONNAIRE TESTING COMPLETE: All critical backend APIs supporting the fixed double-click questionnaire functionality are working correctly. DETAILED RESULTS: ✅ Diagram Creation API: Successfully creates test diagrams with proper ID generation ✅ Node Management API: Successfully adds WebApp, API, and Database nodes to diagrams ✅ Questionnaire Retrieval API (GET /api/diagrams/{id}/nodes/{id}/questionnaire): Returns proper response structure with prompts (WebApp: 6, API: 7, Database: 5), questionnaire_responses field, and node_subtype matching ✅ Questionnaire Update API (POST /api/diagrams/{id}/nodes/{id}/questionnaire): Successfully saves questionnaire responses with proper persistence ✅ Data Persistence: Verified responses are correctly saved and retrieved across API calls ✅ Complete Double-Click Workflow: End-to-end testing successful - retrieve questionnaire → save responses → verify persistence ✅ Integration Testing: All APIs work together seamlessly for the double-click questionnaire feature. MINOR ISSUE: Error handling returns HTTP 500 instead of 404 for invalid diagram/node IDs (backend logs show correct 404 detection but exception handling converts to 500). SUCCESS RATE: 87.5% (7/8 tests passed). The backend is fully ready to support the fixed double-click questionnaire functionality in CustomNode.js."
 
+  - task: "Double-Click Questionnaire Frontend Functionality"
+    implemented: true
+    working: true
+    file: "frontend/src/components/CustomNode.js, frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DOUBLE-CLICK QUESTIONNAIRE FUNCTIONALITY VERIFIED: Comprehensive testing confirms the double-click questionnaire functionality is working correctly after the React Flow onNodeClick handler fix. DETAILED RESULTS: ✅ Node Creation: Successfully created WebApp, API Gateway, and Database nodes by dragging from sidebar to canvas ✅ Questionnaire Auto-Opening: Questionnaire modal opens automatically when nodes are created, showing proper 'Security Configuration' dialog ✅ WebApp Questionnaire System: Console logs confirm '🎯 Using comprehensive WebApp questionnaire system' and '🎯 Loaded 10 comprehensive WebApp questions (basic level)' ✅ Modal Content Verification: Modal correctly displays 'Configuring: WebApp' with authentication method question and radio button options (OAuth2/OIDC, SAML, Username/Password with MFA, etc.) ✅ Double-Click Re-Opening: After closing modal, double-clicking nodes successfully re-opens the questionnaire modal ✅ Multiple Node Types: Tested WebApp, API Gateway, and Database nodes - all trigger appropriate questionnaire modals ✅ React Flow Integration: The fix to skip 'custom' type nodes in onNodeClick handler allows CustomNode's double-click detection to work properly ✅ End-to-End Flow: Complete flow from node creation → questionnaire opening → interaction → closing → double-click re-opening works seamlessly. CRITICAL SUCCESS CRITERIA MET: Double-clicking nodes opens questionnaire modals (previously broken), CustomNode's click handler no longer blocked by React Flow's onNodeClick, questionnaire system loads and displays correctly, end-to-end double-click → questionnaire flow is fully functional. The double-click questionnaire functionality fix is confirmed working and production-ready."
+
   - task: "WebApp Questionnaire Dependency Questions Verification"
     implemented: true
     working: true
