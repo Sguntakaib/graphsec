@@ -1537,15 +1537,34 @@ function AppContent() {
         
         // Store parent questionnaire state in stack for resumption after dependencies complete
         if (result.partialCompletion) {
-          // Push current questionnaire to the parent stack
-          const parentState = {
-            nodeId: currentQuestionnaireNode.id,
-            nodeSubtype: currentQuestionnaireNode.subtype,
-            resumeFromPromptIndex: result.currentPromptIndex + 1, // Resume from the NEXT question after dependency trigger
-            partialAnswers: result.answers
-          };
-          setParentQuestionnaireStack(prev => [...prev, parentState]);
-          console.log(`🔄 Pushed parent questionnaire to stack at prompt ${result.currentPromptIndex}. Stack depth: ${parentQuestionnaireStack.length + 1}`);
+          // Check if this questionnaire is already at the top of the stack to prevent duplicates
+          const isAlreadyOnTop = parentQuestionnaireStack.length > 0 && 
+            parentQuestionnaireStack[parentQuestionnaireStack.length - 1]?.nodeId === currentQuestionnaireNode.id;
+          
+          if (!isAlreadyOnTop) {
+            // Push current questionnaire to the parent stack
+            const parentState = {
+              nodeId: currentQuestionnaireNode.id,
+              nodeSubtype: currentQuestionnaireNode.subtype,
+              resumeFromPromptIndex: result.currentPromptIndex + 1, // Resume from the NEXT question after dependency trigger
+              partialAnswers: result.answers
+            };
+            setParentQuestionnaireStack(prev => [...prev, parentState]);
+            console.log(`🔄 Pushed parent questionnaire to stack at prompt ${result.currentPromptIndex}. Stack depth: ${parentQuestionnaireStack.length + 1}`);
+          } else {
+            // Update the existing entry with the latest state instead of pushing duplicate
+            setParentQuestionnaireStack(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = {
+                nodeId: currentQuestionnaireNode.id,
+                nodeSubtype: currentQuestionnaireNode.subtype,
+                resumeFromPromptIndex: result.currentPromptIndex + 1, // Resume from the NEXT question after dependency trigger
+                partialAnswers: result.answers
+              };
+              return updated;
+            });
+            console.log(`🔄 Updated existing parent questionnaire in stack at prompt ${result.currentPromptIndex}. Stack depth: ${parentQuestionnaireStack.length}`);
+          }
         }
         return; // Don't close the questionnaire, let handleDependentNodeCreation manage it
       }
