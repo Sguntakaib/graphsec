@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - DATABASE QUESTIONNAIRE CONSISTENCY FIX VERIFICATION
-Tests the specific fix for Database questionnaire consistency issue.
+Backend API Testing - QUESTIONNAIRE RESUMPTION FIX VERIFICATION
+Tests the specific fix for questionnaire resumption off-by-one error.
 
 TESTING FOCUS:
-🔧 PRIMARY TEST:
-1. **Test GET /api/intelligent-nodes/Database/prompts endpoint**
-   - Should return HTTP 200 with correct response structure
-   - Should contain success=true and prompts_count field
-   - Response format: {success: true, node_subtype: 'Database', prompts_count: X, prompts: [...]}
-   - Verify prompts_count matches actual length of prompts array
-   - Test multiple times (3-5 times) to ensure consistency
+🔧 PRIMARY TEST: QUESTIONNAIRE RESUMPTION FIX
+1. **Database questionnaire dependency triggering (Question 4 → Backup child node)**
+2. **Verify that after Backup completes, Database questionnaire resumes at Question 5 (not skip to Question 6)**
+3. **Test the full flow: Database Q1→Q2→Q3→Q4→Backup(3 questions)→Database Q5→Q6→...→Q10**
+
+**THE FIX:**
+- Changed App.js lines 1549 and 1561 from `result.currentPromptIndex + 1` to `result.currentPromptIndex`
+- This should fix the off-by-one error that was causing questions to be skipped
+
+**SPECIFIC TEST SCENARIO:**
+1. Database questionnaire has 10 questions
+2. Question 4 (backup question) should trigger a Backup child node with 3 questions  
+3. After Backup child node completes, the parent Database questionnaire should resume at Question 5 (not skip to Question 6)
 
 **EXPECTED RESULTS:**
-- Database endpoint should return consistent prompts_count that matches prompts.length
-- No more prompts_count=0 (missing field) issues
-- Resolves parent-child questionnaire resumption failures
-
-**CONTEXT:** 
-This fixes the exact issue where GET /api/intelligent-nodes/Database/prompts was returning 
-prompts_count=0 (missing field) but actual prompts.length=5, causing parent-child 
-questionnaire resumption failures. The fix adds the missing success and prompts_count fields.
+- Database questionnaire should have 10 questions with dependency questions at specific positions
+- Backup dependency should trigger correctly from Database question 4
+- Question resumption should work without skipping questions
+- Complete flow should process all questions in correct sequence
 
 **ADDITIONAL TESTS:**
-Also includes comprehensive double-click questionnaire functionality verification tests.
+Also includes comprehensive questionnaire functionality verification tests.
 """
 
 import requests
