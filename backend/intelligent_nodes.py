@@ -87,6 +87,9 @@ class SecurityBranchType(str, Enum):
     MFA = "MFA"
     DDOS_PROTECTION = "DDoSProtection"
     CERTIFICATE_MANAGER = "CertificateManager"
+    
+    # Additional enum values needed for API questionnaires
+    EXTERNAL_SERVICE = "ExternalService"
 
 class PromptType(str, Enum):
     SINGLE_CHOICE = "single_choice"
