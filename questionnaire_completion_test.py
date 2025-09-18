@@ -138,7 +138,7 @@ class QuestionnaireCompletionTester:
             # Test scenario: 6 questions answered out of 10 should show proper completion percentage (not 33.3%)
             realistic_webapp_branches = [
                 {
-                    "branch_type": "Authentication",
+                    "type": "Authentication",
                     "implementation_status": "implemented",
                     "security_level": "high",
                     "details": {
@@ -148,7 +148,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "Authorization", 
+                    "type": "Authorization", 
                     "implementation_status": "implemented",
                     "security_level": "high",
                     "details": {
@@ -158,7 +158,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "InputValidation",
+                    "type": "InputValidation",
                     "implementation_status": "implemented", 
                     "security_level": "medium",
                     "details": {
@@ -168,7 +168,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "SessionManagement",
+                    "type": "SessionManagement",
                     "implementation_status": "implemented",
                     "security_level": "high",
                     "details": {
@@ -178,7 +178,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "ErrorHandling",
+                    "type": "ErrorHandling",
                     "implementation_status": "implemented",
                     "security_level": "medium",
                     "details": {
@@ -188,7 +188,7 @@ class QuestionnaireCompletionTester:
                     }
                 },
                 {
-                    "branch_type": "Logging",
+                    "type": "Logging",
                     "implementation_status": "implemented",
                     "security_level": "high",
                     "details": {
