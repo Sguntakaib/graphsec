@@ -274,14 +274,14 @@ class QuestionnaireCompletionTester:
         try:
             # Test with all 8 expected branches to verify they are recognized
             all_webapp_branches = [
-                {"type": "Authentication", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "Authorization", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "InputValidation", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "SessionManagement", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "ErrorHandling", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "Logging", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "SSL/TLS", "implementation_status": "implemented", "security_level": "high"},
-                {"type": "CSP", "implementation_status": "implemented", "security_level": "high"}
+                {"id": "auth", "name": "Authentication", "type": "Authentication", "required": True, "completed": True, "value": "oauth2"},
+                {"id": "authz", "name": "Authorization", "type": "Authorization", "required": True, "completed": True, "value": "rbac"},
+                {"id": "input_val", "name": "Input Validation", "type": "InputValidation", "required": True, "completed": True, "value": "comprehensive"},
+                {"id": "session", "name": "Session Management", "type": "SessionManagement", "required": True, "completed": True, "value": "secure"},
+                {"id": "error", "name": "Error Handling", "type": "ErrorHandling", "required": True, "completed": True, "value": "minimal"},
+                {"id": "logging", "name": "Logging", "type": "Logging", "required": True, "completed": True, "value": "comprehensive"},
+                {"id": "ssl_tls", "name": "SSL/TLS", "type": "SSL/TLS", "required": True, "completed": True, "value": "enforced"},
+                {"id": "csp", "name": "CSP", "type": "CSP", "required": True, "completed": True, "value": "strict"}
             ]
             
             response = self.session.post(
