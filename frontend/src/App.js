@@ -178,10 +178,18 @@ function AppContent() {
           console.error('⚠️ Error fetching existing questionnaire answers:', error);
         }
         
-        // Directly open Security Questionnaire with existing answers
+        // Directly set questionnaire state instead of calling startLegacyQuestionnaire
         const nodeSubtype = node.subtype || node.data?.subtype;
         console.log('🚀 Opening Security Questionnaire directly from double-click');
-        startLegacyQuestionnaire(node.id, nodeSubtype, null, existingAnswers);
+        
+        // Set the state directly to open questionnaire
+        setCurrentQuestionnaireNode({
+          id: node.id,
+          subtype: nodeSubtype,
+          data: { subtype: nodeSubtype }
+        });
+        setCurrentQuestionnaireAnswers(existingAnswers);
+        setShowSecurityQuestionnaire(true);
       }
     };
 
