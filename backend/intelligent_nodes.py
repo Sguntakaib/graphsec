@@ -838,6 +838,11 @@ class IntelligentNodeEngine:
                 "Security services enabled",
                 "Network configuration defined",
                 "Data encryption configured"
+            ],
+            "Backup": [
+                "Backup strategy specified",
+                "Backup encryption configured",
+                "Backup retention policy defined"
             ]
         }
     
