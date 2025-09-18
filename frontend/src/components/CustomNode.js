@@ -35,22 +35,27 @@ const CustomNode = ({ data, selected, id }) => {
   const handleNodeClick = (event) => {
     event.stopPropagation();
     
-    setTapCount(prev => prev + 1);
-    
-    if (tapTimer.current) {
-      clearTimeout(tapTimer.current);
-    }
-    
-    tapTimer.current = setTimeout(() => {
-      if (tapCount + 1 === 2) {
-        // Double tap detected
-        const customEvent = new CustomEvent('nodeDoubleTap', {
-          detail: { nodeId: id, nodeData: data }
-        });
-        window.dispatchEvent(customEvent);
+    setTapCount(prev => {
+      const newCount = prev + 1;
+      
+      if (tapTimer.current) {
+        clearTimeout(tapTimer.current);
       }
-      setTapCount(0);
-    }, 300); // 300ms window for double tap
+      
+      tapTimer.current = setTimeout(() => {
+        if (newCount === 2) {
+          // Double tap detected
+          console.log('🎯 Double-tap detected on node:', id, 'with data:', data);
+          const customEvent = new CustomEvent('nodeDoubleTap', {
+            detail: { nodeId: id, nodeData: data }
+          });
+          window.dispatchEvent(customEvent);
+        }
+        setTapCount(0);
+      }, 300); // 300ms window for double tap
+      
+      return newCount;
+    });
   };
 
   return (
