@@ -143,7 +143,7 @@ const CoreLoopDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      // Use specific endpoints for WebApp, API, and Database to get option_descriptions
+      // Use specific endpoints for WebApp, API, Database, Backup, and Monitoring to get option_descriptions
       let endpoint;
       if (questionnaireData.node_subtype === 'WebApp') {
         endpoint = `/questionnaires/WebApp?level=basic`;
@@ -151,6 +151,10 @@ const CoreLoopDashboard = () => {
         endpoint = `/questionnaires/API?level=basic`;
       } else if (questionnaireData.node_subtype === 'Database') {
         endpoint = `/questionnaires/Database?level=basic`;
+      } else if (questionnaireData.node_subtype === 'Backup') {
+        endpoint = `/questionnaires/Backup?level=basic`;
+      } else if (questionnaireData.node_subtype === 'Monitoring') {
+        endpoint = `/questionnaires/Monitoring?level=basic`;
       } else {
         endpoint = `/questionnaires/${questionnaireData.node_subtype}`;
       }
