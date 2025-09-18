@@ -695,18 +695,22 @@ class DoubleClickQuestionnaireTester:
     # ============================================================================
     
     def run_all_tests(self):
-        """Run all double-click questionnaire functionality tests"""
-        print("🚀 Starting Double-Click Questionnaire Functionality Tests")
+        """Run all tests with focus on Database questionnaire consistency fix"""
+        print("🚀 Starting Database Questionnaire Consistency Fix Verification")
         print("=" * 90)
-        print("DOUBLE-CLICK QUESTIONNAIRE FUNCTIONALITY VERIFICATION")
-        print("Testing backend APIs that support the fixed double-click questionnaire functionality")
-        print("Focus: GET/POST /api/diagrams/{id}/nodes/{id}/questionnaire endpoints")
+        print("DATABASE QUESTIONNAIRE CONSISTENCY FIX VERIFICATION")
+        print("Primary Focus: GET /api/intelligent-nodes/Database/prompts endpoint consistency")
+        print("Secondary: Double-click questionnaire functionality verification")
         print("=" * 90)
         
         tests = [
             # Basic connectivity
             self.test_health_check,
             
+            # CRITICAL TEST: Database Questionnaire Consistency Fix
+            self.test_database_questionnaire_consistency_fix,
+            
+            # Additional comprehensive tests
             # TEST 1: Diagram and Node Creation
             self.test_create_test_diagram,
             self.test_add_test_nodes,
