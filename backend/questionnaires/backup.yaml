@@ -15,6 +15,12 @@ questionnaires:
       question: "What backup strategy is implemented?"
       type: "single_choice"
       options: ["Comprehensive Multi-Tier Backup", "Regular Scheduled Backups", "Ad-hoc Backups", "No Backup Strategy", "Unknown"]
+      option_descriptions:
+        "Comprehensive Multi-Tier Backup": "Multi-layered backup approach with different backup types (full, incremental, differential), multiple storage tiers, and automated lifecycle management for comprehensive data protection."
+        "Regular Scheduled Backups": "Consistent scheduled backup process with defined frequency and retention, but may lack advanced features like intelligent tiering or lifecycle management."
+        "Ad-hoc Backups": "Irregular, manual backup processes without consistent scheduling - prone to human error and gaps in data protection coverage."
+        "No Backup Strategy": "No systematic backup approach in place - extremely high risk of permanent data loss during system failures or disasters."
+        "Unknown": "Backup strategy implementation is unclear or not documented."
       help_text: "A comprehensive backup strategy ensures data protection across all critical systems."
       related_branch: "Backup"
     - id: "backup_frequency"
