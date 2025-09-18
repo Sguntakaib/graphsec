@@ -1874,7 +1874,7 @@ function AppContent() {
   const analyzeAllNodeVulnerabilities = async () => {
     const securityNodes = nodes.filter(node => 
       node.data?.subtype && 
-      ['WebApp', 'API', 'Database'].includes(node.data.subtype) &&
+      ['WebApp', 'API', 'Database', 'Backup', 'Monitoring'].includes(node.data.subtype) &&
       node.data?.questionnaireResponses
     );
     
