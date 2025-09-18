@@ -15,6 +15,14 @@ questionnaires:
       question: "What monitoring platform is used?"
       type: "single_choice"
       options: ["AWS CloudWatch", "Prometheus + Grafana", "Datadog", "New Relic", "Splunk", "Custom Solution", "Unknown"]
+      option_descriptions:
+        "AWS CloudWatch": "Amazon's comprehensive monitoring service with native AWS integration, metrics collection, log aggregation, and alerting capabilities - ideal for AWS-centric environments."
+        "Prometheus + Grafana": "Open-source monitoring stack with powerful metrics collection, storage, and visualization capabilities - highly customizable and community-supported."
+        "Datadog": "Comprehensive cloud monitoring platform with infrastructure, application performance monitoring, and security monitoring features - enterprise-grade with extensive integrations."
+        "New Relic": "Application performance monitoring platform with deep application insights, error tracking, and performance optimization capabilities - focused on application monitoring."
+        "Splunk": "Enterprise log management and analysis platform with powerful search, correlation, and security information and event management (SIEM) capabilities."
+        "Custom Solution": "In-house developed monitoring solution tailored to specific requirements - provides full control but requires significant development and maintenance resources."
+        "Unknown": "Monitoring platform in use is unclear or not documented."
       help_text: "Different monitoring platforms have varying capabilities for security monitoring and alerting."
       related_branch: "Monitoring"
     - id: "monitoring_coverage"
