@@ -170,22 +170,26 @@ function AppContent() {
       if (node) { // Remove currentDiagram requirement for now
         console.log('🎯 Double-tap detected on node:', nodeId);
         
-        // Get existing answers from the backend
+        // Get existing answers from the backend (skip if no diagram)
         let existingAnswers = {};
-        try {
-          const response = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            existingAnswers = data.questionnaire_responses || {};
-            console.log('📝 Fetched existing questionnaire answers for double-click:', existingAnswers);
-          } else {
-            console.log('⚠️ No existing questionnaire data found, starting fresh questionnaire');
+        if (currentDiagram) {
+          try {
+            const response = await fetch(
+              `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
+            );
+            
+            if (response.ok) {
+              const data = await response.json();
+              existingAnswers = data.questionnaire_responses || {};
+              console.log('📝 Fetched existing questionnaire answers for double-click:', existingAnswers);
+            } else {
+              console.log('⚠️ No existing questionnaire data found, starting fresh questionnaire');
+            }
+          } catch (error) {
+            console.error('⚠️ Error fetching existing questionnaire answers:', error);
           }
-        } catch (error) {
-          console.error('⚠️ Error fetching existing questionnaire answers:', error);
+        } else {
+          console.log('⚠️ No currentDiagram available, starting fresh questionnaire');
         }
         
         // Directly set questionnaire state instead of calling startLegacyQuestionnaire
