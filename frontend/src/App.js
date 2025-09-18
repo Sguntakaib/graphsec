@@ -2073,7 +2073,7 @@ function AppContent() {
     setCurrentQuestionnaireAnswers({}); // Clear existing answers
     setQuestionnaireQueue([]);
     setCurrentQueueIndex(0);
-    setParentQuestionnaireState(null); // Clear parent state on cancel
+    setParentQuestionnaireStack([]); // Clear parent stack on cancel
   };
 
   const handleQuestionnaireOverviewEdit = async (node) => {
