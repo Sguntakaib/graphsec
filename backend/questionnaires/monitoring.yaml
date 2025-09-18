@@ -41,6 +41,12 @@ questionnaires:
       question: "How is alerting configured?"
       type: "single_choice"
       options: ["Multi-Channel Intelligent Alerting", "Basic Email Alerts", "Dashboard Only", "No Alerting", "Unknown"]
+      option_descriptions:
+        "Multi-Channel Intelligent Alerting": "Advanced alerting system with multiple notification channels (email, SMS, Slack, PagerDuty), intelligent routing, escalation policies, and alert correlation to reduce noise."
+        "Basic Email Alerts": "Simple email-based alerting for critical events - provides notification but may lack advanced features like escalation, intelligent routing, or alert correlation."
+        "Dashboard Only": "Monitoring information available only through dashboards without proactive alerting - requires manual monitoring and may miss critical issues."
+        "No Alerting": "No automated alerting configured - critical issues may go unnoticed until they cause visible service disruption or are manually discovered."
+        "Unknown": "Alerting configuration is unclear or not documented."
       help_text: "Effective alerting ensures rapid notification of security and performance issues."
       related_branch: "Monitoring"
     - id: "monitoring_data_retention"
