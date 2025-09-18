@@ -226,12 +226,13 @@ class VulnerabilityAnalysisTester:
             monitoring_node_id = f"monitoring-test-{uuid.uuid4().hex[:8]}"
             
             # Sample questionnaire responses from review request for monitoring node
+            # Updated to match actual questionnaire structure and trigger rules
             monitoring_responses = {
-                "monitoring_coverage": "basic",
-                "alerting_enabled": False,
-                "log_retention": "30_days", 
-                "incident_response": False,
-                "performance_monitoring": False
+                "monitoring_platform": "Datadog",  # Should trigger monitoring_integration_enhancement
+                "monitoring_coverage": "Basic Monitoring",  # Should trigger monitoring_coverage_enhancement
+                "monitoring_alerting": "Basic Email Alerts",  # Should trigger monitoring_alerting_enhancement
+                "monitoring_data_retention": "30 days",  # Should trigger monitoring_data_retention_enhancement
+                "monitoring_access_control": "Basic Access Control"  # Should trigger monitoring_access_enhancement
             }
             
             # Test data for vulnerability analysis
