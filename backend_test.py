@@ -74,6 +74,155 @@ class DoubleClickQuestionnaireTester:
             return False
 
     # ============================================================================
+    # CRITICAL TEST: Database Questionnaire Consistency Fix Verification
+    # ============================================================================
+    
+    def test_database_questionnaire_consistency_fix(self):
+        """
+        CRITICAL TEST: Verify Database questionnaire consistency fix
+        
+        Tests the specific fix for Database questionnaire consistency issue where:
+        - GET /api/intelligent-nodes/Database/prompts was returning prompts_count=0 (missing field)
+        - But actual prompts.length=5, causing parent-child questionnaire resumption failures
+        
+        Expected fix: Response should now include success=true and prompts_count field that matches prompts.length
+        """
+        try:
+            print("🎯 CRITICAL TEST: Database Questionnaire Consistency Fix")
+            print("=" * 70)
+            
+            # Test the endpoint multiple times to ensure consistency (3-5 times as requested)
+            test_iterations = 5
+            all_results = []
+            
+            for iteration in range(1, test_iterations + 1):
+                print(f"📋 Test Iteration {iteration}/{test_iterations}")
+                
+                response = self.session.get(f"{self.base_url}/intelligent-nodes/Database/prompts")
+                
+                if response.status_code != 200:
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"HTTP {response.status_code}: {response.text}")
+                    return False
+                
+                try:
+                    data = response.json()
+                except json.JSONDecodeError as e:
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"Invalid JSON response: {str(e)}")
+                    return False
+                
+                # Verify required fields are present
+                required_fields = ['success', 'node_subtype', 'prompts_count', 'prompts']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if missing_fields:
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"Missing required fields: {missing_fields}")
+                    return False
+                
+                # Verify success field is true
+                if not data.get('success'):
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"success field is not true: {data.get('success')}")
+                    return False
+                
+                # Verify node_subtype is 'Database'
+                if data.get('node_subtype') != 'Database':
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"node_subtype should be 'Database', got: {data.get('node_subtype')}")
+                    return False
+                
+                # Verify prompts is a list
+                prompts = data.get('prompts', [])
+                if not isinstance(prompts, list):
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"prompts should be a list, got: {type(prompts)}")
+                    return False
+                
+                # CRITICAL CHECK: Verify prompts_count matches actual prompts length
+                prompts_count = data.get('prompts_count')
+                actual_prompts_length = len(prompts)
+                
+                if prompts_count != actual_prompts_length:
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"CONSISTENCY ERROR: prompts_count={prompts_count} but actual prompts.length={actual_prompts_length}")
+                    return False
+                
+                # Verify prompts_count is not 0 (the original bug)
+                if prompts_count == 0:
+                    self.log_test(f"Database Consistency Fix - Iteration {iteration}", False, 
+                                f"ORIGINAL BUG STILL EXISTS: prompts_count=0 but should match prompts.length={actual_prompts_length}")
+                    return False
+                
+                # Store results for consistency analysis
+                iteration_result = {
+                    'success': data.get('success'),
+                    'node_subtype': data.get('node_subtype'),
+                    'prompts_count': prompts_count,
+                    'actual_prompts_length': actual_prompts_length,
+                    'prompts_sample': prompts[:2] if prompts else []  # First 2 prompts for verification
+                }
+                all_results.append(iteration_result)
+                
+                print(f"   ✅ Iteration {iteration}: success={data.get('success')}, prompts_count={prompts_count}, actual_length={actual_prompts_length}")
+            
+            # Analyze consistency across all iterations
+            print(f"\n🔍 Consistency Analysis Across {test_iterations} Iterations:")
+            
+            # Check if all iterations returned the same prompts_count
+            prompts_counts = [result['prompts_count'] for result in all_results]
+            unique_counts = set(prompts_counts)
+            
+            if len(unique_counts) > 1:
+                self.log_test("Database Consistency Fix", False, 
+                            f"INCONSISTENCY DETECTED: Different prompts_count values across iterations: {unique_counts}")
+                return False
+            
+            # Check if all iterations returned the same actual_prompts_length
+            actual_lengths = [result['actual_prompts_length'] for result in all_results]
+            unique_lengths = set(actual_lengths)
+            
+            if len(unique_lengths) > 1:
+                self.log_test("Database Consistency Fix", False, 
+                            f"INCONSISTENCY DETECTED: Different actual prompts lengths across iterations: {unique_lengths}")
+                return False
+            
+            # Final verification
+            final_prompts_count = prompts_counts[0]
+            final_actual_length = actual_lengths[0]
+            
+            print(f"   📊 Consistent prompts_count: {final_prompts_count}")
+            print(f"   📊 Consistent actual_length: {final_actual_length}")
+            print(f"   📊 Match verification: {final_prompts_count == final_actual_length}")
+            
+            # Verify the response format matches expected structure
+            sample_response = all_results[0]
+            expected_format = {
+                'success': True,
+                'node_subtype': 'Database',
+                'prompts_count': final_prompts_count,
+                'prompts': 'array'
+            }
+            
+            print(f"\n✅ EXPECTED RESPONSE FORMAT VERIFICATION:")
+            print(f"   success: {sample_response['success']} (expected: True)")
+            print(f"   node_subtype: {sample_response['node_subtype']} (expected: 'Database')")
+            print(f"   prompts_count: {sample_response['prompts_count']} (expected: matches prompts.length)")
+            print(f"   prompts: array with {final_actual_length} items")
+            
+            self.log_test("Database Consistency Fix", True, 
+                        f"✅ CRITICAL FIX VERIFIED: Database questionnaire consistency fix working correctly. "
+                        f"prompts_count={final_prompts_count} matches actual prompts.length={final_actual_length} "
+                        f"consistently across {test_iterations} iterations. Original bug (prompts_count=0) resolved.")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Database Consistency Fix", False, f"Request error: {str(e)}")
+            return False
+
+    # ============================================================================
     # TEST 1: Diagram and Node Creation for Testing
     # ============================================================================
     
