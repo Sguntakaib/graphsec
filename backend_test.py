@@ -746,21 +746,21 @@ class DoubleClickQuestionnaireTester:
         
         # Print summary
         print("=" * 90)
-        print("🎯 DOUBLE-CLICK QUESTIONNAIRE FUNCTIONALITY SUMMARY")
+        print("🎯 DATABASE QUESTIONNAIRE CONSISTENCY FIX VERIFICATION SUMMARY")
         print("=" * 90)
         print(f"✅ PASSED: {passed}")
         print(f"❌ FAILED: {failed}")
         print(f"📊 SUCCESS RATE: {(passed / (passed + failed) * 100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 ALL TESTS PASSED! Double-click questionnaire functionality verification successful.")
-            print("✅ Diagram creation and node management APIs working correctly")
-            print("✅ Questionnaire retrieval API (GET) working correctly")
-            print("✅ Questionnaire update API (POST) working correctly")
-            print("✅ Data persistence verified across API calls")
-            print("✅ Error handling working correctly")
-            print("✅ Complete double-click workflow functional")
-            print("✅ Backend is ready to support the fixed double-click questionnaire feature")
+            print("\n🎉 ALL TESTS PASSED! Database questionnaire consistency fix verification successful.")
+            print("✅ CRITICAL: Database questionnaire consistency fix working correctly")
+            print("✅ GET /api/intelligent-nodes/Database/prompts returns proper response structure")
+            print("✅ success=true and prompts_count field present and consistent")
+            print("✅ prompts_count matches actual prompts.length (resolves original bug)")
+            print("✅ Consistency verified across multiple test iterations")
+            print("✅ Parent-child questionnaire resumption issue resolved")
+            print("✅ Additional questionnaire functionality tests also passed")
         else:
             print(f"\n⚠️  {failed} tests failed. Analysis:")
             
@@ -770,6 +770,15 @@ class DoubleClickQuestionnaireTester:
             for error_test in error_tests:
                 print(f"🚨 FAILED: {error_test['test']}")
                 print(f"   Issue: {error_test['message']}")
+                
+            # Check if the critical test failed
+            critical_test_failed = any('Database Consistency Fix' in result['test'] for result in error_tests)
+            if critical_test_failed:
+                print(f"\n🚨 CRITICAL ISSUE: Database questionnaire consistency fix verification failed!")
+                print(f"   This means the original bug may still exist:")
+                print(f"   - prompts_count field may be missing or incorrect")
+                print(f"   - Parent-child questionnaire resumption may still fail")
+                print(f"   - Immediate attention required to resolve the consistency issue")
         
         return passed, failed
 
