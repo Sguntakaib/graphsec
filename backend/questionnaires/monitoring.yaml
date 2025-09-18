@@ -65,6 +65,12 @@ questionnaires:
       question: "How is access to monitoring data controlled?"
       type: "single_choice"
       options: ["Role-Based Access + MFA", "Basic Access Control", "Shared Access", "No Access Control", "Unknown"]
+      option_descriptions:
+        "Role-Based Access + MFA": "Comprehensive access control with role-based permissions, multi-factor authentication, and audit trails - provides strong security for sensitive monitoring data."
+        "Basic Access Control": "Simple access controls with user authentication and basic permissions - provides some security but may lack advanced features like MFA or detailed audit logging."
+        "Shared Access": "Shared credentials or accounts for monitoring access - makes user accountability difficult and increases security risks."
+        "No Access Control": "Unrestricted access to monitoring data and systems - high risk of unauthorized access to sensitive operational and security information."
+        "Unknown": "Monitoring access control implementation is unclear or not documented."
       help_text: "Proper access control protects sensitive monitoring data from unauthorized access."
       related_branch: "Compliance"
 
