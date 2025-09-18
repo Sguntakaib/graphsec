@@ -5355,7 +5355,9 @@ async def analyze_node_vulnerabilities(node_id: str, request: VulnerabilityAnaly
         }
         
     except Exception as e:
+        import traceback
         logger.error(f"Error analyzing vulnerabilities for node {node_id}: {e}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Vulnerability analysis failed: {str(e)}")
 
 @api_router.get("/vulnerabilities/rules")
