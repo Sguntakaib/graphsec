@@ -288,7 +288,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced API Node Questionnaire System with Dynamic Questions"
+    - "Enhanced Canvas Node Detection System for WebApp Nodes"
   stuck_tasks: 
     - "Phase 1 Core Loop Completion - Findings Management System"
     - "Phase 1 Core Loop Completion - Questionnaire Completion Processor"
