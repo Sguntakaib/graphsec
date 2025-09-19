@@ -292,7 +292,7 @@ const DraggableEdge = ({
       )}
       
       {/* Helper lines (when control points are visible) */}
-      {(selected || isDragging) && (
+      {(selected || isDragging || recentlyInteracted) && (
         <>
           <line
             x1={sourceX}
