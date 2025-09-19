@@ -349,32 +349,6 @@ const DraggableEdge = ({
           />
         </>
       )}
-      
-      {/* Helper lines (when control points are visible) */}
-      {(selected || isDragging || recentlyInteracted) && (
-        <>
-          <line
-            x1={sourceX}
-            y1={sourceY}
-            x2={cp1.x}
-            y2={cp1.y}
-            stroke="#3B82F6"
-            strokeWidth={1}
-            strokeDasharray="3,3"
-            opacity={0.5}
-          />
-          <line
-            x1={cp2.x}
-            y1={cp2.y}
-            x2={targetX}
-            y2={targetY}
-            stroke="#3B82F6"
-            strokeWidth={1}
-            strokeDasharray="3,3"
-            opacity={0.5}
-          />
-        </>
-      )}
     </g>
   );
 };
