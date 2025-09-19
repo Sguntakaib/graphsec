@@ -192,19 +192,21 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
   };
 
   const getCompletionStatus = (node) => {
-    if (!node.data?.questionnaireResponses) return null;
+    if (!node.data?.questionnaireResponses) {
+      return { icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-800', text: 'Not Started' };
+    }
     
     const userAnswers = node.data.questionnaireResponses;
     const answeredCount = Object.keys(userAnswers).filter(key => 
-      userAnswers[key] !== null && userAnswers[key] !== undefined
+      userAnswers[key] !== null && userAnswers[key] !== undefined && userAnswers[key] !== ''
     ).length;
     
     if (answeredCount === 0) {
-      return { icon: XCircle, color: 'text-gray-500', bg: 'bg-gray-50', text: 'Not Started' };
-    } else if (answeredCount >= 5) { // Assuming most questionnaires have around 5-10 questions
-      return { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', text: 'Complete' };
+      return { icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-800', text: 'Not Started' };
+    } else if (answeredCount >= 3) { // More reasonable threshold
+      return { icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-900', text: 'Complete' };
     } else {
-      return { icon: AlertCircle, color: 'text-yellow-600', bg: 'bg-yellow-50', text: 'Partial' };
+      return { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-900', text: 'Partial' };
     }
   };
 
