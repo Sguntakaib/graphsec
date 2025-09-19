@@ -139,184 +139,173 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     node.type !== 'vulnerability' && node.data?.subtype
   );
 
+  // Show node details view if activeNode is selected
+  if (activeNode) {
+    const NodeIcon = getNodeIcon(activeNode.data?.subtype);
+    const status = getCompletionStatus(activeNode);
+
+    return (
+      <div className="bg-white h-full">
+        {/* Header with Back Button */}
+        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={handleBackToList}
+              className="p-2 hover:bg-white rounded-lg transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4 text-blue-600" />
+            </button>
+            <div className="p-2 bg-white rounded-lg shadow-sm">
+              <NodeIcon className="h-5 w-5 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-medium text-gray-900">{activeNode.data?.label || activeNode.id}</h3>
+              <p className="text-sm text-gray-600">{activeNode.data?.subtype}</p>
+            </div>
+            {status && (
+              <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${status.bg}`}>
+                <status.icon className={`h-4 w-4 ${status.color}`} />
+                <span className={`text-xs font-medium ${status.color}`}>{status.text}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Questions and Answers Section */}
+        <div className="flex-1 overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+              <span className="ml-3 text-gray-600">Loading questions...</span>
+            </div>
+          ) : questionsData ? (
+            <div className="p-4">
+              {/* Progress Info */}
+              <div className="mb-6 bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="font-medium text-gray-700">Progress</span>
+                  <span className="font-bold text-gray-900">{questionsData.completionPercentage}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${questionsData.completionPercentage}%` }}
+                  ></div>
+                </div>
+                <div className="mt-2 text-xs text-gray-600">
+                  {questionsData.answeredQuestions} of {questionsData.totalQuestions} questions answered
+                </div>
+              </div>
+
+              {/* Edit Button */}
+              <button
+                onClick={() => onEditQuestionnaire && onEditQuestionnaire(activeNode)}
+                className="w-full mb-6 px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Edit Security Configuration
+              </button>
+
+              {/* Questions List */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 mb-3">Questions & Answers</h4>
+                {questionsData.questions.map((question, index) => (
+                  <div key={question.id || index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <div className="text-sm font-medium text-gray-900 mb-3">
+                      {index + 1}. {question.question}
+                    </div>
+                    <div className="text-sm mb-2">
+                      <span className="text-gray-600 font-medium">Answer: </span>
+                      {formatAnswer(question.userAnswer, question)}
+                    </div>
+                    {question.help_text && (
+                      <div className="mt-3 p-3 bg-blue-50 rounded-md">
+                        <div className="flex items-start space-x-2">
+                          <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-xs text-blue-800">{question.help_text}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {questionsData.questions.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <Info className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+                    <p>No configuration questions available for this node type.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Info className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+              <p>Unable to load questions for this node.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Show nodes list view by default
   return (
-    <div className="bg-white border-b border-gray-200">
+    <div className="bg-white h-full">
       {/* Header */}
       <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-white rounded-lg shadow-sm">
-            <NodeIcon className="h-5 w-5 text-blue-600" />
+            <User className="h-5 w-5 text-blue-600" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-medium text-gray-900">{node.data?.label || node.id}</h3>
-            <p className="text-sm text-gray-600">{node.data?.subtype}</p>
+          <div>
+            <h3 className="font-medium text-gray-900">Canvas Nodes</h3>
+            <p className="text-sm text-gray-600">{availableNodes.length} nodes available</p>
           </div>
-          {status && (
-            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${status.bg}`}>
-              <status.icon className={`h-4 w-4 ${status.color}`} />
-              <span className={`text-xs font-medium ${status.color}`}>{status.text}</span>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Basic Information */}
-      <div className="border-b border-gray-200">
-        <button
-          onClick={() => toggleSection('basic')}
-          className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-        >
-          <span className="font-medium text-gray-900">Basic Information</span>
-          {expandedSections.basic ? 
-            <ChevronDown className="h-4 w-4 text-gray-500" /> : 
-            <ChevronRight className="h-4 w-4 text-gray-500" />
-          }
-        </button>
-        
-        {expandedSections.basic && (
-          <div className="px-4 pb-4 space-y-2">
-            <div className="grid grid-cols-1 gap-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Type:</span>
-                <span className="font-medium text-gray-900">{node.data?.type}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtype:</span>
-                <span className="font-medium text-gray-900">{node.data?.subtype}</span>
-              </div>
-              {node.data?.category && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Category:</span>
-                  <span className="font-medium text-gray-900">{node.data.category}</span>
-                </div>
-              )}
-              {node.data?.description && (
-                <div className="mt-2">
-                  <span className="text-gray-600 block mb-1">Description:</span>
-                  <p className="text-gray-900 text-xs bg-gray-50 p-2 rounded">{node.data.description}</p>
-                </div>
-              )}
-            </div>
+      {/* Nodes List */}
+      <div className="flex-1 overflow-y-auto">
+        {availableNodes.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <User className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+            <p className="text-sm">No nodes on canvas</p>
+            <p className="text-xs text-gray-400 mt-1">Add nodes to see their details here</p>
           </div>
-        )}
-      </div>
-
-      {/* Questionnaire Information */}
-      {questionsData && (
-        <div className="border-b border-gray-200">
-          <button
-            onClick={() => toggleSection('questionnaire')}
-            className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center space-x-2">
-              <span className="font-medium text-gray-900">Security Configuration</span>
-              {questionsData.completionPercentage > 0 && (
-                <span className="text-xs text-gray-500">
-                  ({questionsData.answeredQuestions}/{questionsData.totalQuestions})
-                </span>
-              )}
-            </div>
-            {expandedSections.questionnaire ? 
-              <ChevronDown className="h-4 w-4 text-gray-500" /> : 
-              <ChevronRight className="h-4 w-4 text-gray-500" />
-            }
-          </button>
-          
-          {expandedSections.questionnaire && (
-            <div className="px-4 pb-4">
-              {loading ? (
-                <div className="flex items-center justify-center py-4">
-                  <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                  <span className="ml-2 text-sm text-gray-600">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-gray-600">Completion Progress</span>
-                      <span className="font-medium text-gray-900">{questionsData.completionPercentage}%</span>
+        ) : (
+          <div className="p-4 space-y-3">
+            {availableNodes.map((node) => {
+              const NodeIcon = getNodeIcon(node.data?.subtype);
+              const status = getCompletionStatus(node);
+              
+              return (
+                <div
+                  key={node.id}
+                  onClick={() => handleNodeClick(node)}
+                  className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gray-50 group-hover:bg-blue-50 rounded-lg transition-colors">
+                      <NodeIcon className="h-5 w-5 text-gray-600 group-hover:text-blue-600" />
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${questionsData.completionPercentage}%` }}
-                      ></div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 truncate">
+                        {node.data?.label || node.id}
+                      </h4>
+                      <p className="text-sm text-gray-600">{node.data?.subtype}</p>
                     </div>
-                  </div>
-
-                  {/* Edit Button */}
-                  <button
-                    onClick={() => onEditQuestionnaire && onEditQuestionnaire(node)}
-                    className="w-full mb-4 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-                  >
-                    Edit Security Configuration
-                  </button>
-
-                  {/* Questions and Answers */}
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {questionsData.questions.map((question, index) => (
-                      <div key={question.id || index} className="bg-gray-50 rounded p-3">
-                        <div className="text-sm font-medium text-gray-900 mb-2">
-                          {question.question}
-                        </div>
-                        <div className="text-sm">
-                          {formatAnswer(question.userAnswer, question)}
-                        </div>
-                        {question.help_text && (
-                          <div className="mt-2 text-xs text-gray-600 flex items-start space-x-1">
-                            <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                            <span>{question.help_text}</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    
-                    {questionsData.questions.length === 0 && (
-                      <div className="text-center py-4 text-gray-500 text-sm">
-                        No configuration questions available for this node type.
+                    {status && (
+                      <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${status.bg}`}>
+                        <status.icon className={`h-3 w-3 ${status.color}`} />
+                        <span className={`text-xs font-medium ${status.color}`}>{status.text}</span>
                       </div>
                     )}
                   </div>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Security Information */}
-      {node.data?.securityBranches && (
-        <div className="border-b border-gray-200">
-          <button
-            onClick={() => toggleSection('security')}
-            className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
-          >
-            <span className="font-medium text-gray-900">Security Branches</span>
-            {expandedSections.security ? 
-              <ChevronDown className="h-4 w-4 text-gray-500" /> : 
-              <ChevronRight className="h-4 w-4 text-gray-500" />
-            }
-          </button>
-          
-          {expandedSections.security && (
-            <div className="px-4 pb-4">
-              <div className="space-y-2">
-                {node.data.securityBranches.map((branch, index) => (
-                  <div key={index} className="flex items-center justify-between text-sm">
-                    <span className="text-gray-700">{branch.type}</span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      branch.completed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {branch.completed ? 'Complete' : 'Pending'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
