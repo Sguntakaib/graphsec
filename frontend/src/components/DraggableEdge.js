@@ -148,7 +148,7 @@ const DraggableEdge = ({
           updateData: {
             controlPoint1,
             controlPoint2,
-            labelPosition
+            labelPosition: 0.5  // Always keep labels centered
           }
         }
       }));
