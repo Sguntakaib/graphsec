@@ -172,7 +172,7 @@ const DraggableEdge = ({
     
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  }, [id, controlPoint1, controlPoint2, labelPosition, onEdgeUpdate, labelPos]);
+  }, [id, controlPoint1, controlPoint2, labelPosition, labelPos]);
 
   // Styles
   const controlPointStyle = {
