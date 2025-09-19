@@ -760,29 +760,50 @@ function AppContent() {
       const loadedNodes = diagram.nodes.map(node => ({
         id: node.id,
         type: 'custom',
-        position: node.position,
+        position: node.position || { x: 0, y: 0 },
         data: {
-          type: node.type,
+          ...node.data,
           subtype: node.subtype,
           label: node.label,
+          type: node.type || node.subtype,
           mitre_ids: node.mitre_ids || [],
           cve_ids: node.cve_ids || [],
-          ...node.data
-        }
+        },
+        subtype: node.subtype,
+        mitre_ids: node.mitre_ids || [],
+        cve_ids: node.cve_ids || []
       }));
 
+      // Initialize control point data for template edges that don't have it
       const loadedEdges = diagram.edges.map(edge => ({
         id: edge.id,
         source: edge.source,
         target: edge.target,
-        type: edge.type || 'default',
+        type: edge.type === 'default' ? 'draggable' : (edge.type || 'draggable'), // Convert default to draggable
         label: edge.label || '',
-        data: edge.data || {}
+        style: edge.style || {},
+        markerEnd: edge.markerEnd || {},
+        labelStyle: edge.labelStyle || {},
+        labelBgStyle: edge.labelBgStyle || {},
+        labelShowBg: edge.labelShowBg !== false, // Default to true
+        labelBgBorderRadius: edge.labelBgBorderRadius || 4,
+        labelBgPadding: edge.labelBgPadding || [4, 8],
+        data: {
+          // Initialize control point data if missing
+          controlPoint1: { x: 0, y: 0 },
+          controlPoint2: { x: 0, y: 0 },
+          labelPosition: 0.5,
+          // Preserve any existing data
+          ...edge.data
+        }
       }));
 
       setNodes(loadedNodes);
       setEdges(loadedEdges);
       setSimulationResult(null);
+      
+      console.log(`✅ Loaded diagram with ${loadedNodes.length} nodes and ${loadedEdges.length} edges`);
+      console.log('🔧 Initialized control points for', loadedEdges.length, 'edges');
     } catch (error) {
       console.error('Failed to load diagram:', error);
     }
