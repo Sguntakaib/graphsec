@@ -2982,6 +2982,22 @@ function AppContent() {
         <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
           {viewMode === 'modeling' && (
             <>
+              {/* Node Information Panel - Show immediately when node is selected */}
+              {selectedNode ? (
+                <div className="border-b border-gray-700">
+                  <NodeInfoPanel 
+                    node={selectedNode}
+                    onEditQuestionnaire={handleEditQuestionnaireFromInfo}
+                  />
+                </div>
+              ) : (
+                <div className="p-4 text-center border-b border-gray-700">
+                  <div className="text-gray-400 text-sm">
+                    Click on a node to view its information and security configuration
+                  </div>
+                </div>
+              )}
+
               {/* Advanced Layout Controls */}
               <div className="p-4 border-b border-gray-700">
                 <AdvancedLayoutControls 
@@ -3005,21 +3021,17 @@ function AppContent() {
                 isLoading={isLoading}
               />
               
-              {selectedNode && (
-                <>
-                  <PropertiesPanel node={selectedNode} />
-                  
-                  {/* Security Branches Visualizer */}
-                  {selectedNode.data?.intelligentNode && (
-                    <NodeBranchVisualizer
-                      nodeId={selectedNode.id}
-                      nodeSubtype={selectedNode.data.subtype}
-                      branches={nodeBranches[selectedNode.id] || []}
-                      onBranchUpdate={handleNodeBranchUpdate}
-                      isExpanded={true}
-                    />
-                  )}
-                </>
+              {/* Security Branches Visualizer - Only show if node has intelligent features */}
+              {selectedNode?.data?.intelligentNode && (
+                <div className="border-t border-gray-700">
+                  <NodeBranchVisualizer
+                    nodeId={selectedNode.id}
+                    nodeSubtype={selectedNode.data.subtype}
+                    branches={nodeBranches[selectedNode.id] || []}
+                    onBranchUpdate={handleNodeBranchUpdate}
+                    isExpanded={true}
+                  />
+                </div>
               )}
             </>
           )}
@@ -3030,13 +3042,10 @@ function AppContent() {
               onClearHighlights={clearAttackPathHighlighting}
             />
           )}
-          {!selectedNode && !simulationResult && (
+          {viewMode === 'analysis' && !simulationResult && (
             <div className="p-4 text-center">
               <div className="text-gray-400 text-sm">
-                {viewMode === 'modeling' 
-                  ? 'Select a node to view properties'
-                  : 'Run a simulation to see analysis results'
-                }
+                Run a simulation to see analysis results
               </div>
             </div>
           )}
