@@ -529,7 +529,7 @@ function AppContent() {
     [nodes, setEdges],
   );
 
-  const onNodeClick = useCallback((event, node) => {
+  const onNodeClick = useCallback(async (event, node) => {
     // Handle vulnerability node clicks
     if (node.type === 'vulnerability') {
       handleVulnerabilityNodeClick(node.data);
@@ -539,7 +539,10 @@ function AppContent() {
     // For custom nodes (WebApp, API, Database, etc.), let the CustomNode component
     // handle the click events including double-tap detection for questionnaires
     if (node.type === 'custom') {
-      // Don't handle the click here - let CustomNode's handleNodeClick take over
+      // Set the selected node immediately to show information in right panel
+      setSelectedNode(node);
+      
+      // Don't handle the click here for double-tap - let CustomNode's handleNodeClick take over
       // This allows the double-tap detection logic in CustomNode.js to work properly
       return;
     }
