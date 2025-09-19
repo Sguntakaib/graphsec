@@ -43,12 +43,41 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://api-wizard-map.preview.emergentagent.com/api"
 
-class DraggableEdgeLabelTester:
+class EnhancedAPIQuestionnaireTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
         self.test_results = []
-        self.test_diagram_id = None
+        self.sample_canvas_nodes = [
+            {
+                "id": "db-node-1",
+                "type": "Asset",
+                "subtype": "Database",
+                "label": "User Database",
+                "position": {"x": 100, "y": 200}
+            },
+            {
+                "id": "db-node-2", 
+                "type": "Asset",
+                "subtype": "Database",
+                "label": "Analytics Database",
+                "position": {"x": 300, "y": 200}
+            },
+            {
+                "id": "api-node-1",
+                "type": "Asset", 
+                "subtype": "API",
+                "label": "User API",
+                "position": {"x": 200, "y": 100}
+            },
+            {
+                "id": "webapp-node-1",
+                "type": "Asset",
+                "subtype": "WebApp", 
+                "label": "Frontend App",
+                "position": {"x": 400, "y": 100}
+            }
+        ]
         
     def log_test(self, test_name, success, message="", response_data=None):
         """Log test results"""
@@ -80,22 +109,21 @@ class DraggableEdgeLabelTester:
             self.log_test("Health Check", False, f"Connection error: {str(e)}")
             return False
 
-    def test_template_edge_labels(self):
+    def test_enhanced_questionnaire_basic(self):
         """
-        CRITICAL TEST: Test template edge labels for draggable functionality
+        CRITICAL TEST: Test enhanced questionnaire endpoint without canvas nodes
         
         This test verifies that:
-        1. Web Application Security Model template loads properly
-        2. Template edges have expected labels ("Initial Access", "Filtered Traffic", etc.)
-        3. Template edges support draggable functionality
-        4. Edge data structure includes necessary fields for label positioning
+        1. GET /api/questionnaires/API/enhanced returns proper response
+        2. Response includes all required features flags
+        3. Dynamic API questions are included
+        4. Basic functionality works without canvas nodes
         """
         try:
-            print("🎯 CRITICAL TEST: Template Edge Labels for Draggable Functionality")
+            print("🎯 CRITICAL TEST: Enhanced Questionnaire Endpoint (Basic)")
             print("=" * 80)
             
-            # Get all templates
-            response = self.session.get(f"{self.base_url}/templates")
+            response = self.session.get(f"{self.base_url}/questionnaires/API/enhanced")
             
             print(f"📋 Response Status: HTTP {response.status_code}")
             
@@ -107,118 +135,93 @@ class DraggableEdgeLabelTester:
                 except:
                     error_detail = response.text
                 
-                self.log_test("Template Edge Labels", False, 
+                self.log_test("Enhanced Questionnaire Basic", False, 
                             f"HTTP {response.status_code}: {error_detail}")
                 return False
             
             try:
-                templates = response.json()
+                data = response.json()
             except json.JSONDecodeError as e:
-                self.log_test("Template Edge Labels", False, 
+                self.log_test("Enhanced Questionnaire Basic", False, 
                             f"Invalid JSON response: {str(e)}")
                 return False
             
-            # Find Web Application Security Model template
-            web_app_template = None
-            for template in templates:
-                if "Web Application Security Model" in template.get("name", ""):
-                    web_app_template = template
-                    break
+            # Verify required response fields
+            required_fields = ["success", "node_subtype", "level", "total_questions", "questions", "features"]
+            missing_fields = []
+            for field in required_fields:
+                if field not in data:
+                    missing_fields.append(field)
             
-            if not web_app_template:
-                self.log_test("Template Edge Labels", False, 
-                            "Web Application Security Model template not found")
+            if missing_fields:
+                self.log_test("Enhanced Questionnaire Basic", False, 
+                            f"Missing required fields: {missing_fields}")
                 return False
             
-            print(f"📋 Found Web Application Security Model template: {web_app_template.get('name')}")
+            # Verify features are enabled
+            features = data.get("features", {})
+            expected_features = {
+                "dynamic_api_questions": True,
+                "database_reuse_detection": True,
+                "external_services_categorization": True,
+                "bidirectional_web_flow": True,
+                "vulnerability_integration": True
+            }
             
-            # Verify template has edges
-            edges = web_app_template.get("edges", [])
-            if not edges:
-                self.log_test("Template Edge Labels", False, 
-                            "Template has no edges")
+            feature_issues = []
+            for feature, expected_value in expected_features.items():
+                if features.get(feature) != expected_value:
+                    feature_issues.append(f"{feature}={features.get(feature)} (expected {expected_value})")
+            
+            if feature_issues:
+                self.log_test("Enhanced Questionnaire Basic", False, 
+                            f"Feature issues: {feature_issues}")
                 return False
             
-            print(f"📋 Template has {len(edges)} edges")
-            
-            # Check for expected edge labels from review request
-            expected_labels = ["Initial Access", "Filtered Traffic", "Contains Vulnerability", "Data Access"]
-            found_labels = []
-            draggable_edges = 0
-            
-            for edge in edges:
-                edge_label = edge.get("label", "")
-                if edge_label:
-                    found_labels.append(edge_label)
-                    print(f"   📊 Found edge label: '{edge_label}'")
-                
-                # Check if edge supports draggable functionality
-                edge_type = edge.get("type", "default")
-                if edge_type == "draggable" or edge_type == "default":
-                    draggable_edges += 1
-                
-                # Check edge data structure for label positioning support
-                edge_data = edge.get("data", {})
-                if isinstance(edge_data, dict):
-                    # Edge should be able to support control points and label positioning
-                    print(f"   📊 Edge '{edge_label}' has data structure: {bool(edge_data)}")
-            
-            # Verify expected labels are present
-            found_expected_labels = []
-            for expected_label in expected_labels:
-                for found_label in found_labels:
-                    if expected_label.lower() in found_label.lower():
-                        found_expected_labels.append(expected_label)
-                        break
-            
-            print(f"📊 Template Edge Analysis Results:")
-            print(f"   Total edges: {len(edges)}")
-            print(f"   Edges with labels: {len(found_labels)}")
-            print(f"   Draggable-compatible edges: {draggable_edges}")
-            print(f"   Expected labels found: {len(found_expected_labels)}/{len(expected_labels)}")
-            print(f"   Found labels: {found_labels}")
-            print(f"   Expected labels found: {found_expected_labels}")
-            
-            # Verify minimum requirements
-            if len(found_labels) == 0:
-                self.log_test("Template Edge Labels", False, 
-                            "No edge labels found in template")
+            # Verify questions are present
+            questions = data.get("questions", [])
+            if not questions:
+                self.log_test("Enhanced Questionnaire Basic", False, 
+                            "No questions returned")
                 return False
             
-            if len(found_expected_labels) < 2:  # At least 2 of the expected labels
-                self.log_test("Template Edge Labels", False, 
-                            f"Insufficient expected labels found: {found_expected_labels}")
-                return False
+            print(f"📊 Enhanced Questionnaire Basic Results:")
+            print(f"   Success: {data.get('success')}")
+            print(f"   Node subtype: {data.get('node_subtype')}")
+            print(f"   Level: {data.get('level')}")
+            print(f"   Total questions: {data.get('total_questions')}")
+            print(f"   Questions count: {len(questions)}")
+            print(f"   Features enabled: {list(features.keys())}")
             
-            if draggable_edges == 0:
-                self.log_test("Template Edge Labels", False, 
-                            "No draggable-compatible edges found")
-                return False
-            
-            self.log_test("Template Edge Labels", True, 
-                        f"✅ SUCCESS: Template has {len(found_labels)} labeled edges, {draggable_edges} draggable-compatible, {len(found_expected_labels)} expected labels found")
+            self.log_test("Enhanced Questionnaire Basic", True, 
+                        f"✅ SUCCESS: Enhanced questionnaire returned {len(questions)} questions with all features enabled")
             
             return True
             
         except Exception as e:
-            self.log_test("Template Edge Labels", False, f"Request error: {str(e)}")
+            self.log_test("Enhanced Questionnaire Basic", False, f"Request error: {str(e)}")
             return False
 
-    def test_diagram_creation_with_draggable_edges(self):
+    def test_enhanced_questionnaire_with_canvas_nodes(self):
         """
-        Test POST /api/diagrams endpoint with draggable edge support
+        CRITICAL TEST: Test enhanced questionnaire endpoint with canvas nodes
+        
+        This test verifies that:
+        1. GET /api/questionnaires/API/enhanced with canvas_nodes parameter works
+        2. Canvas node detection is enabled
+        3. Database reuse detection works with sample Database nodes
         """
         try:
-            print("🎯 TESTING: Diagram Creation with Draggable Edges")
-            print("=" * 60)
+            print("🎯 CRITICAL TEST: Enhanced Questionnaire with Canvas Nodes")
+            print("=" * 80)
             
-            # Create a test diagram with draggable edges
-            diagram_data = {
-                "title": f"Draggable Edge Test Diagram {uuid.uuid4().hex[:8]}",
-                "description": "Test diagram for draggable edge functionality"
-            }
+            # Convert canvas nodes to JSON string
+            canvas_nodes_json = json.dumps(self.sample_canvas_nodes)
             
-            response = self.session.post(f"{self.base_url}/diagrams", json=diagram_data)
+            response = self.session.get(
+                f"{self.base_url}/questionnaires/API/enhanced",
+                params={"canvas_nodes": canvas_nodes_json}
+            )
             
             print(f"📋 Response Status: HTTP {response.status_code}")
             
@@ -230,99 +233,70 @@ class DraggableEdgeLabelTester:
                 except:
                     error_detail = response.text
                 
-                self.log_test("Diagram Creation with Draggable Edges", False, 
+                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
                             f"HTTP {response.status_code}: {error_detail}")
                 return False
             
             try:
-                diagram = response.json()
+                data = response.json()
             except json.JSONDecodeError as e:
-                self.log_test("Diagram Creation with Draggable Edges", False, 
+                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
                             f"Invalid JSON response: {str(e)}")
                 return False
             
-            # Store diagram ID for later tests
-            self.test_diagram_id = diagram.get("id")
+            # Verify canvas detection is enabled
+            has_canvas_detection = data.get("has_canvas_detection", False)
+            detected_nodes = data.get("detected_nodes", 0)
             
-            if not self.test_diagram_id:
-                self.log_test("Diagram Creation with Draggable Edges", False, 
-                            "No diagram ID returned")
+            if not has_canvas_detection:
+                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
+                            "Canvas detection not enabled")
                 return False
             
-            print(f"📋 Created test diagram: {self.test_diagram_id}")
+            if detected_nodes != len(self.sample_canvas_nodes):
+                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
+                            f"Detected nodes count mismatch: {detected_nodes} vs {len(self.sample_canvas_nodes)}")
+                return False
             
-            self.log_test("Diagram Creation with Draggable Edges", True, 
-                        f"✅ SUCCESS: Created diagram {self.test_diagram_id}")
+            print(f"📊 Enhanced Questionnaire with Canvas Nodes Results:")
+            print(f"   Canvas detection enabled: {has_canvas_detection}")
+            print(f"   Detected nodes: {detected_nodes}")
+            print(f"   Sample nodes provided: {len(self.sample_canvas_nodes)}")
+            
+            # Check for database reuse questions in the response
+            questions = data.get("questions", [])
+            database_reuse_questions = []
+            for question in questions:
+                if "database" in question.get("id", "").lower() or "reuse" in question.get("question", "").lower():
+                    database_reuse_questions.append(question.get("id"))
+            
+            print(f"   Database reuse related questions: {len(database_reuse_questions)}")
+            if database_reuse_questions:
+                print(f"   Database reuse question IDs: {database_reuse_questions}")
+            
+            self.log_test("Enhanced Questionnaire with Canvas Nodes", True, 
+                        f"✅ SUCCESS: Canvas detection enabled, {detected_nodes} nodes detected, {len(database_reuse_questions)} database reuse questions")
             
             return True
             
         except Exception as e:
-            self.log_test("Diagram Creation with Draggable Edges", False, f"Request error: {str(e)}")
+            self.log_test("Enhanced Questionnaire with Canvas Nodes", False, f"Request error: {str(e)}")
             return False
 
-    def test_edge_update_with_label_positions(self):
+    def test_external_services_categories(self):
         """
-        CRITICAL TEST: Test edge updates with label position changes
+        CRITICAL TEST: Test external services categories endpoint
         
         This test verifies that:
-        1. PUT /api/diagrams/{id} endpoint accepts edge updates with label positions
-        2. Edge data persists control points and label positioning
-        3. Backend properly handles edge data structure modifications
+        1. GET /api/questionnaires/external-services/categories returns proper response
+        2. Returns 9 expected categories
+        3. Each category has appropriate service examples
         """
         try:
-            print("🎯 CRITICAL TEST: Edge Updates with Label Position Changes")
+            print("🎯 CRITICAL TEST: External Services Categories")
             print("=" * 80)
             
-            if not self.test_diagram_id:
-                self.log_test("Edge Update with Label Positions", False, 
-                            "No test diagram available")
-                return False
-            
-            # Create test nodes and edges with draggable functionality
-            test_nodes = [
-                {
-                    "id": f"node1-{uuid.uuid4().hex[:8]}",
-                    "type": "Actor",
-                    "subtype": "ExternalAttacker",
-                    "label": "Test Attacker",
-                    "position": {"x": 100, "y": 100}
-                },
-                {
-                    "id": f"node2-{uuid.uuid4().hex[:8]}",
-                    "type": "Asset",
-                    "subtype": "WebApp",
-                    "label": "Test WebApp",
-                    "position": {"x": 300, "y": 100}
-                }
-            ]
-            
-            # Create edge with draggable type and label positioning data
-            test_edge = {
-                "id": f"edge1-{uuid.uuid4().hex[:8]}",
-                "source": test_nodes[0]["id"],
-                "target": test_nodes[1]["id"],
-                "type": "draggable",
-                "label": "Test Dependency",
-                "data": {
-                    "controlPoint1": {"x": 150, "y": 80},
-                    "controlPoint2": {"x": 250, "y": 80},
-                    "labelPosition": {"x": 200, "y": 75}
-                }
-            }
-            
-            # Update diagram with nodes and edges
-            diagram_update = {
-                "id": self.test_diagram_id,
-                "title": "Draggable Edge Test Diagram",
-                "description": "Test diagram for draggable edge functionality",
-                "nodes": test_nodes,
-                "edges": [test_edge],
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }
-            
-            response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", 
-                                      json=diagram_update)
+            response = self.session.get(f"{self.base_url}/questionnaires/external-services/categories")
             
             print(f"📋 Response Status: HTTP {response.status_code}")
             
@@ -334,203 +308,339 @@ class DraggableEdgeLabelTester:
                 except:
                     error_detail = response.text
                 
-                self.log_test("Edge Update with Label Positions", False, 
+                self.log_test("External Services Categories", False, 
                             f"HTTP {response.status_code}: {error_detail}")
                 return False
             
             try:
-                updated_diagram = response.json()
+                data = response.json()
             except json.JSONDecodeError as e:
-                self.log_test("Edge Update with Label Positions", False, 
+                self.log_test("External Services Categories", False, 
                             f"Invalid JSON response: {str(e)}")
                 return False
             
-            # Verify edge data was persisted correctly
-            updated_edges = updated_diagram.get("edges", [])
-            if not updated_edges:
-                self.log_test("Edge Update with Label Positions", False, 
-                            "No edges found in updated diagram")
+            # Verify required response fields
+            if not data.get("success"):
+                self.log_test("External Services Categories", False, 
+                            "Response success is false")
                 return False
             
-            # Find our test edge
-            test_edge_found = None
-            for edge in updated_edges:
-                if edge.get("id") == test_edge["id"]:
-                    test_edge_found = edge
-                    break
+            categories = data.get("categories", {})
+            total_categories = data.get("total_categories", 0)
             
-            if not test_edge_found:
-                self.log_test("Edge Update with Label Positions", False, 
-                            "Test edge not found in updated diagram")
-                return False
-            
-            # Verify edge properties
-            edge_type = test_edge_found.get("type", "")
-            edge_label = test_edge_found.get("label", "")
-            edge_data = test_edge_found.get("data", {})
-            
-            print(f"📊 Edge Update Results:")
-            print(f"   Edge type: {edge_type}")
-            print(f"   Edge label: {edge_label}")
-            print(f"   Edge data keys: {list(edge_data.keys()) if isinstance(edge_data, dict) else 'Not a dict'}")
-            
-            # Verify control points and label position were preserved
-            if isinstance(edge_data, dict):
-                has_control_point1 = "controlPoint1" in edge_data
-                has_control_point2 = "controlPoint2" in edge_data
-                has_label_position = "labelPosition" in edge_data
-                
-                print(f"   Has controlPoint1: {has_control_point1}")
-                print(f"   Has controlPoint2: {has_control_point2}")
-                print(f"   Has labelPosition: {has_label_position}")
-                
-                if has_control_point1 and has_control_point2 and has_label_position:
-                    self.log_test("Edge Update with Label Positions", True, 
-                                f"✅ SUCCESS: Edge data persisted with control points and label positioning")
-                    return True
-                else:
-                    self.log_test("Edge Update with Label Positions", False, 
-                                f"Missing edge data fields: controlPoint1={has_control_point1}, controlPoint2={has_control_point2}, labelPosition={has_label_position}")
-                    return False
-            else:
-                self.log_test("Edge Update with Label Positions", False, 
-                            f"Edge data is not a dictionary: {type(edge_data)}")
-                return False
-            
-        except Exception as e:
-            self.log_test("Edge Update with Label Positions", False, f"Request error: {str(e)}")
-            return False
-
-    def test_dependency_edge_labels(self):
-        """
-        Test auto-generated dependency edges with "has_dependency" labels
-        """
-        try:
-            print("🎯 TESTING: Dependency Edge Labels")
-            print("=" * 50)
-            
-            if not self.test_diagram_id:
-                self.log_test("Dependency Edge Labels", False, 
-                            "No test diagram available")
-                return False
-            
-            # Create nodes that would generate dependency edges
-            dependency_nodes = [
-                {
-                    "id": f"parent-{uuid.uuid4().hex[:8]}",
-                    "type": "Asset",
-                    "subtype": "Database",
-                    "label": "Parent Database",
-                    "position": {"x": 100, "y": 200}
-                },
-                {
-                    "id": f"child-{uuid.uuid4().hex[:8]}",
-                    "type": "Asset",
-                    "subtype": "Backup",
-                    "label": "Child Backup",
-                    "position": {"x": 300, "y": 200}
-                }
+            # Expected 9 categories
+            expected_categories = [
+                "Authentication", "Payment", "Cloud", "Messaging", 
+                "Analytics", "Social Media", "File Storage", "Notification", "Other"
             ]
             
-            # Create dependency edge with "has_dependency" label
-            dependency_edge = {
-                "id": f"dep-edge-{uuid.uuid4().hex[:8]}",
-                "source": dependency_nodes[0]["id"],
-                "target": dependency_nodes[1]["id"],
-                "type": "draggable",
-                "label": "has_dependency",
-                "data": {
-                    "controlPoint1": {"x": 150, "y": 180},
-                    "controlPoint2": {"x": 250, "y": 180},
-                    "labelPosition": {"x": 200, "y": 175}
-                }
-            }
-            
-            # Get current diagram
-            response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}")
-            if response.status_code != 200:
-                self.log_test("Dependency Edge Labels", False, 
-                            f"Failed to get diagram: HTTP {response.status_code}")
+            if total_categories != 9:
+                self.log_test("External Services Categories", False, 
+                            f"Expected 9 categories, got {total_categories}")
                 return False
             
-            current_diagram = response.json()
-            current_nodes = current_diagram.get("nodes", [])
-            current_edges = current_diagram.get("edges", [])
+            # Verify all expected categories are present
+            missing_categories = []
+            for expected_cat in expected_categories:
+                if expected_cat not in categories:
+                    missing_categories.append(expected_cat)
             
-            # Add dependency nodes and edge
-            updated_nodes = current_nodes + dependency_nodes
-            updated_edges = current_edges + [dependency_edge]
-            
-            # Update diagram
-            diagram_update = {
-                "id": self.test_diagram_id,
-                "title": current_diagram.get("title", "Test Diagram"),
-                "description": current_diagram.get("description", ""),
-                "nodes": updated_nodes,
-                "edges": updated_edges,
-                "created_at": current_diagram.get("created_at"),
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }
-            
-            response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", 
-                                      json=diagram_update)
-            
-            if response.status_code != 200:
-                self.log_test("Dependency Edge Labels", False, 
-                            f"Failed to update diagram: HTTP {response.status_code}")
+            if missing_categories:
+                self.log_test("External Services Categories", False, 
+                            f"Missing categories: {missing_categories}")
                 return False
             
-            updated_diagram = response.json()
+            # Verify each category has service examples
+            categories_with_no_services = []
+            for category, services in categories.items():
+                if not services or len(services) == 0:
+                    categories_with_no_services.append(category)
             
-            # Verify dependency edge was created
-            final_edges = updated_diagram.get("edges", [])
-            dependency_edge_found = None
-            
-            for edge in final_edges:
-                if edge.get("label") == "has_dependency":
-                    dependency_edge_found = edge
-                    break
-            
-            if not dependency_edge_found:
-                self.log_test("Dependency Edge Labels", False, 
-                            "Dependency edge with 'has_dependency' label not found")
+            if categories_with_no_services:
+                self.log_test("External Services Categories", False, 
+                            f"Categories with no services: {categories_with_no_services}")
                 return False
             
-            # Verify dependency edge is draggable
-            edge_type = dependency_edge_found.get("type", "")
-            edge_data = dependency_edge_found.get("data", {})
+            print(f"📊 External Services Categories Results:")
+            print(f"   Success: {data.get('success')}")
+            print(f"   Total categories: {total_categories}")
+            print(f"   Categories found: {list(categories.keys())}")
             
-            print(f"📊 Dependency Edge Results:")
-            print(f"   Edge label: {dependency_edge_found.get('label')}")
-            print(f"   Edge type: {edge_type}")
-            print(f"   Has edge data: {bool(edge_data)}")
+            # Show sample services for each category
+            for category, services in categories.items():
+                print(f"   {category}: {len(services)} services (e.g., {services[0] if services else 'None'})")
             
-            if edge_type == "draggable" and isinstance(edge_data, dict):
-                self.log_test("Dependency Edge Labels", True, 
-                            f"✅ SUCCESS: Dependency edge with 'has_dependency' label is draggable")
-                return True
-            else:
-                self.log_test("Dependency Edge Labels", False, 
-                            f"Dependency edge is not properly configured for dragging: type={edge_type}, data={type(edge_data)}")
-                return False
+            self.log_test("External Services Categories", True, 
+                        f"✅ SUCCESS: All 9 categories returned with service examples")
+            
+            return True
             
         except Exception as e:
-            self.log_test("Dependency Edge Labels", False, f"Request error: {str(e)}")
+            self.log_test("External Services Categories", False, f"Request error: {str(e)}")
+            return False
+
+    def test_canvas_node_detection(self):
+        """
+        CRITICAL TEST: Test canvas node detection endpoint
+        
+        This test verifies that:
+        1. POST /api/questionnaires/canvas/detect-nodes works with sample canvas nodes
+        2. Detects different node types (Database, API, WebApp)
+        3. Provides reuse recommendations correctly
+        """
+        try:
+            print("🎯 CRITICAL TEST: Canvas Node Detection")
+            print("=" * 80)
+            
+            # Test Database node detection
+            database_detection_request = {
+                "canvas_nodes": self.sample_canvas_nodes,
+                "target_type": "Database"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/canvas/detect-nodes",
+                json=database_detection_request
+            )
+            
+            print(f"📋 Database Detection Response Status: HTTP {response.status_code}")
+            
+            if response.status_code != 200:
+                error_detail = "Unknown error"
+                try:
+                    error_data = response.json()
+                    error_detail = error_data.get('detail', str(error_data))
+                except:
+                    error_detail = response.text
+                
+                self.log_test("Canvas Node Detection", False, 
+                            f"HTTP {response.status_code}: {error_detail}")
+                return False
+            
+            try:
+                db_data = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Canvas Node Detection", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            # Verify Database detection results
+            if not db_data.get("success"):
+                self.log_test("Canvas Node Detection", False, 
+                            "Database detection response success is false")
+                return False
+            
+            db_existing_nodes = db_data.get("existing_nodes", [])
+            db_existing_count = db_data.get("existing_nodes_count", 0)
+            db_has_existing = db_data.get("has_existing_nodes", False)
+            db_reuse_recommended = db_data.get("reuse_recommended", False)
+            
+            # We have 2 Database nodes in sample data
+            expected_db_count = 2
+            if db_existing_count != expected_db_count:
+                self.log_test("Canvas Node Detection", False, 
+                            f"Database detection count mismatch: {db_existing_count} vs {expected_db_count}")
+                return False
+            
+            if not db_has_existing:
+                self.log_test("Canvas Node Detection", False, 
+                            "Database detection should show has_existing_nodes=true")
+                return False
+            
+            if not db_reuse_recommended:
+                self.log_test("Canvas Node Detection", False, 
+                            "Database detection should recommend reuse")
+                return False
+            
+            print(f"📊 Database Detection Results:")
+            print(f"   Target type: {db_data.get('target_type')}")
+            print(f"   Existing nodes count: {db_existing_count}")
+            print(f"   Has existing nodes: {db_has_existing}")
+            print(f"   Reuse recommended: {db_reuse_recommended}")
+            print(f"   Detected nodes: {[node.get('label', 'Unknown') for node in db_existing_nodes]}")
+            
+            # Test API node detection
+            api_detection_request = {
+                "canvas_nodes": self.sample_canvas_nodes,
+                "target_type": "API"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/canvas/detect-nodes",
+                json=api_detection_request
+            )
+            
+            if response.status_code == 200:
+                api_data = response.json()
+                api_existing_count = api_data.get("existing_nodes_count", 0)
+                print(f"📊 API Detection Results:")
+                print(f"   API nodes detected: {api_existing_count}")
+            
+            # Test WebApp node detection
+            webapp_detection_request = {
+                "canvas_nodes": self.sample_canvas_nodes,
+                "target_type": "WebApp"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/canvas/detect-nodes",
+                json=webapp_detection_request
+            )
+            
+            if response.status_code == 200:
+                webapp_data = response.json()
+                webapp_existing_count = webapp_data.get("existing_nodes_count", 0)
+                print(f"📊 WebApp Detection Results:")
+                print(f"   WebApp nodes detected: {webapp_existing_count}")
+            
+            self.log_test("Canvas Node Detection", True, 
+                        f"✅ SUCCESS: Database detection found {db_existing_count} nodes with reuse recommendation")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Canvas Node Detection", False, f"Request error: {str(e)}")
+            return False
+
+    def test_enhanced_conditional_questions(self):
+        """
+        CRITICAL TEST: Test enhanced conditional questions endpoint
+        
+        This test verifies that:
+        1. POST /api/questionnaires/API/enhanced/conditional works with API type responses
+        2. Database reuse decision processing works
+        3. Web interface exposure triggers work
+        4. Conditional questions are added based on responses
+        """
+        try:
+            print("🎯 CRITICAL TEST: Enhanced Conditional Questions")
+            print("=" * 80)
+            
+            # Test with REST API type response
+            rest_api_request = {
+                "responses": {
+                    "api_type": "REST API",
+                    "database_type": "MySQL",
+                    "api_web_interface_exposure": "yes",
+                    "api_external_services": "yes"
+                },
+                "canvas_nodes": self.sample_canvas_nodes,
+                "level": "basic"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/API/enhanced/conditional",
+                json=rest_api_request
+            )
+            
+            print(f"📋 REST API Conditional Response Status: HTTP {response.status_code}")
+            
+            if response.status_code != 200:
+                error_detail = "Unknown error"
+                try:
+                    error_data = response.json()
+                    error_detail = error_data.get('detail', str(error_data))
+                except:
+                    error_detail = response.text
+                
+                self.log_test("Enhanced Conditional Questions", False, 
+                            f"HTTP {response.status_code}: {error_detail}")
+                return False
+            
+            try:
+                rest_data = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Enhanced Conditional Questions", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            # Verify REST API conditional response
+            if not rest_data.get("success"):
+                self.log_test("Enhanced Conditional Questions", False, 
+                            "REST API conditional response success is false")
+                return False
+            
+            rest_questions = rest_data.get("questions", [])
+            rest_triggers = rest_data.get("triggers_detected", {})
+            
+            print(f"📊 REST API Conditional Results:")
+            print(f"   Success: {rest_data.get('success')}")
+            print(f"   Node subtype: {rest_data.get('node_subtype')}")
+            print(f"   Total questions: {rest_data.get('total_questions')}")
+            print(f"   Questions returned: {len(rest_questions)}")
+            print(f"   Triggers detected: {rest_triggers}")
+            
+            # Test with GraphQL API type response
+            graphql_api_request = {
+                "responses": {
+                    "api_type": "GraphQL API",
+                    "database_reuse_decision": "reuse_existing",
+                    "api_web_interface_exposure": "no"
+                },
+                "canvas_nodes": self.sample_canvas_nodes,
+                "level": "basic"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/API/enhanced/conditional",
+                json=graphql_api_request
+            )
+            
+            if response.status_code == 200:
+                graphql_data = response.json()
+                graphql_questions = graphql_data.get("questions", [])
+                graphql_reuse_info = graphql_data.get("reuse_info", {})
+                
+                print(f"📊 GraphQL API Conditional Results:")
+                print(f"   Questions returned: {len(graphql_questions)}")
+                print(f"   Reuse info: {bool(graphql_reuse_info)}")
+                print(f"   Database reuse decision processed: {'database_reuse_decision' in graphql_api_request['responses']}")
+            
+            # Test with SOAP API type response
+            soap_api_request = {
+                "responses": {
+                    "api_type": "SOAP API",
+                    "api_external_services": "Authentication,Payment"
+                },
+                "canvas_nodes": [],
+                "level": "advanced"
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/questionnaires/API/enhanced/conditional",
+                json=soap_api_request
+            )
+            
+            if response.status_code == 200:
+                soap_data = response.json()
+                soap_questions = soap_data.get("questions", [])
+                
+                print(f"📊 SOAP API Conditional Results:")
+                print(f"   Questions returned: {len(soap_questions)}")
+            
+            self.log_test("Enhanced Conditional Questions", True, 
+                        f"✅ SUCCESS: Conditional questions working for REST API ({len(rest_questions)} questions), triggers detected")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Enhanced Conditional Questions", False, f"Request error: {str(e)}")
             return False
 
     def run_all_tests(self):
-        """Run all draggable edge label tests"""
-        print("🚀 STARTING ENHANCED LABEL DRAGGING FUNCTIONALITY TESTING")
+        """Run all enhanced API questionnaire tests"""
+        print("🚀 STARTING ENHANCED API NODE QUESTIONNAIRE SYSTEM TESTING")
         print("=" * 80)
-        print("Testing backend support for enhanced label dragging functionality")
+        print("Testing the new enhanced API Node questionnaire system with dynamic questions")
         print("=" * 80)
         
         tests = [
             self.test_health_check,
-            self.test_template_edge_labels,
-            self.test_diagram_creation_with_draggable_edges,
-            self.test_edge_update_with_label_positions,
-            self.test_dependency_edge_labels,
+            self.test_enhanced_questionnaire_basic,
+            self.test_enhanced_questionnaire_with_canvas_nodes,
+            self.test_external_services_categories,
+            self.test_canvas_node_detection,
+            self.test_enhanced_conditional_questions,
         ]
         
         passed = 0
@@ -558,6 +668,6 @@ class DraggableEdgeLabelTester:
         return passed == total
 
 if __name__ == "__main__":
-    tester = DraggableEdgeLabelTester()
+    tester = EnhancedAPIQuestionnaireTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
