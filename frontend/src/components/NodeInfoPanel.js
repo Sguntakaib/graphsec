@@ -334,16 +334,16 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
 
   // Show nodes list view by default
   return (
-    <div className="bg-white h-full">
+    <div className="bg-gray-900 h-full">
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+      <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-white rounded-lg shadow-sm">
-            <User className="h-5 w-5 text-blue-600" />
+          <div className="p-2 bg-gray-800 rounded-lg shadow-sm border border-gray-600">
+            <User className="h-5 w-5 text-blue-400" />
           </div>
           <div>
-            <h3 className="font-medium text-gray-900">Canvas Nodes</h3>
-            <p className="text-sm text-gray-600">{availableNodes.length} nodes available</p>
+            <h3 className="font-medium text-white">Canvas Nodes</h3>
+            <p className="text-sm text-gray-300">{availableNodes.length} nodes available</p>
           </div>
         </div>
       </div>
@@ -351,10 +351,10 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
       {/* Nodes List */}
       <div className="flex-1 overflow-y-auto">
         {availableNodes.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <User className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+          <div className="text-center py-8 text-gray-400">
+            <User className="h-8 w-8 mx-auto mb-3 text-gray-500" />
             <p className="text-sm">No nodes on canvas</p>
-            <p className="text-xs text-gray-400 mt-1">Add nodes to see their details here</p>
+            <p className="text-xs text-gray-500 mt-1">Add nodes to see their details here</p>
           </div>
         ) : (
           <div className="p-4 space-y-3">
@@ -366,17 +366,17 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
                 <div
                   key={node.id}
                   onClick={() => handleNodeClick(node)}
-                  className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                  className="p-4 bg-gray-800 border border-gray-700 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer group"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gray-50 group-hover:bg-blue-50 rounded-lg transition-colors">
-                      <NodeIcon className="h-5 w-5 text-gray-600 group-hover:text-blue-600" />
+                    <div className="p-2 bg-gray-700 group-hover:bg-blue-900 rounded-lg transition-colors">
+                      <NodeIcon className="h-5 w-5 text-gray-300 group-hover:text-blue-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate">
+                      <h4 className="font-medium text-white truncate">
                         {node.data?.label || node.id}
                       </h4>
-                      <p className="text-sm text-gray-600">{node.data?.subtype}</p>
+                      <p className="text-sm text-gray-300">{node.data?.subtype}</p>
                     </div>
                     {status && (
                       <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${status.bg}`}>
