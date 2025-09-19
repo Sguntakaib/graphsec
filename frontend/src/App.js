@@ -492,8 +492,27 @@ function AppContent() {
 
   const onPaneClick = () => {
     setSelectedNode(null);
+    setSelectedEdge(null);  // Clear selected edge when clicking pane
     setContextMenu(null);
   };
+
+  // Handler for edge updates (when dragging control points or labels)
+  const handleEdgeUpdate = useCallback((edgeId, updateData) => {
+    setEdges((edges) =>
+      edges.map((edge) => {
+        if (edge.id === edgeId) {
+          return {
+            ...edge,
+            data: {
+              ...edge.data,
+              ...updateData
+            }
+          };
+        }
+        return edge;
+      })
+    );
+  }, [setEdges]);
 
   // Context menu handlers
   const handleContextMenu = (event, node = null) => {
