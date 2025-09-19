@@ -1375,15 +1375,28 @@ function AppContent() {
         id: `template-edge-${edge.id}-${Date.now()}`,
         source: `template-${edge.source}-${Date.now()}`,
         target: `template-${edge.target}-${Date.now()}`,
+        type: 'draggable',  // Use draggable type for all template edges
         label: edge.label || '',
-        type: 'smoothstep',
-        markerEnd: {
+        style: edge.style || {
+          strokeWidth: 2,
+          stroke: '#9CA3AF',
+        },
+        markerEnd: edge.markerEnd || {
           type: 'arrowclosed',
           color: '#9CA3AF',
         },
-        style: {
-          strokeWidth: 2,
-          stroke: '#9CA3AF',
+        labelStyle: edge.labelStyle || {},
+        labelBgStyle: edge.labelBgStyle || {},
+        labelShowBg: edge.labelShowBg !== false, // Default to true
+        labelBgBorderRadius: edge.labelBgBorderRadius || 4,
+        labelBgPadding: edge.labelBgPadding || [4, 8],
+        data: {
+          // Initialize control point data for draggable functionality
+          controlPoint1: { x: 0, y: 0 },
+          controlPoint2: { x: 0, y: 0 },
+          labelPosition: 0.5,
+          // Preserve any existing data from template
+          ...edge.data
         }
       }));
       
