@@ -221,10 +221,23 @@ const DraggableEdge = ({
           stroke: style.stroke || '#9CA3AF',
           strokeWidth: style.strokeWidth || 2,
           strokeDasharray: style.strokeDasharray,
+          cursor: 'pointer',
           ...style
         }}
         markerEnd={markerEnd}
         className="react-flow__edge-path"
+      />
+      
+      {/* Invisible wider path for easier clicking */}
+      <path
+        d={customPath}
+        style={{
+          fill: 'none',
+          stroke: 'transparent',
+          strokeWidth: Math.max(12, (style.strokeWidth || 2) + 8),
+          cursor: 'pointer'
+        }}
+        className="react-flow__edge-interaction"
       />
       
       {/* Control point 1 */}
