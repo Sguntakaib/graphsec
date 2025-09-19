@@ -37,6 +37,11 @@ const DraggableEdge = ({
   const [recentlyInteracted, setRecentlyInteracted] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, initialLabelPos: null });
   
+  // Label editing state
+  const [isEditingLabel, setIsEditingLabel] = useState(false);
+  const [editingLabelValue, setEditingLabelValue] = useState(label || '');
+  const inputRef = useRef(null);
+  
   // Refs to track current control point values for use in event handlers
   const controlPoint1Ref = useRef(controlPoint1);
   const controlPoint2Ref = useRef(controlPoint2);
