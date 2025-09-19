@@ -102,6 +102,9 @@ function AppContent() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, defaultOnEdgesChange] = useEdgesState(initialEdges);
+  // Enhanced questionnaire system disabled - using legacy system only
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedEdge, setSelectedEdge] = useState(null);  // Add selected edge state
   
   // Custom onEdgesChange to maintain selectedEdge state
   const onEdgesChange = useCallback((changes) => {
@@ -114,10 +117,6 @@ function AppContent() {
       setSelectedEdge(null);
     }
   }, [defaultOnEdgesChange, selectedEdge]);
-  
-  // Enhanced questionnaire system disabled - using legacy system only
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [selectedEdge, setSelectedEdge] = useState(null);  // Add selected edge state
   const [currentDiagram, setCurrentDiagram] = useState(null);
   const [simulationResult, setSimulationResult] = useState(null);
   const [diagrams, setDiagrams] = useState([]);
