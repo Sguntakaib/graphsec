@@ -66,7 +66,7 @@ const CanvasSynchronizer = ({
           id: `${edgeCreation.from}-${edgeCreation.to}`,
           source: edgeCreation.from,
           target: edgeCreation.to,
-          type: 'smoothstep',
+          type: 'draggable',  // Use draggable type for label positioning
           animated: true,
           style: {
             stroke: edgeCreation.type === 'dependency' ? '#3B82F6' : '#6B7280',
