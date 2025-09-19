@@ -46,8 +46,30 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
         const questionsData = await questionsResponse.json();
         const questions = questionsData.prompts || [];
         
-        // Get user answers from node data
-        const userAnswers = activeNode.data?.questionnaireResponses || {};
+        // Get user answers from node data - try multiple possible sources
+        let userAnswers = activeNode.data?.questionnaireResponses || {};
+        
+        // If no questionnaire responses in node data, try to fetch from backend
+        if (Object.keys(userAnswers).length === 0 && activeNode.data?.subtype) {
+          try {
+            const diagramId = window.location.pathname.includes('/diagram/') ? 
+              window.location.pathname.split('/diagram/')[1] : null;
+            
+            if (diagramId) {
+              const answersResponse = await fetch(
+                `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${diagramId}/nodes/${activeNode.id}/questionnaire`
+              );
+              
+              if (answersResponse.ok) {
+                const answersData = await answersResponse.json();
+                userAnswers = answersData.questionnaire_responses || {};
+                console.log('📊 Fetched questionnaire responses from backend:', userAnswers);
+              }
+            }
+          } catch (error) {
+            console.log('ℹ️ Could not fetch backend questionnaire responses:', error.message);
+          }
+        }
         
         // Combine questions with answers
         const combinedData = questions.map(question => ({
