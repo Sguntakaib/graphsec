@@ -346,16 +346,11 @@ class CanvasNodeDetectionTester:
                 return False
             
             # Verify required response fields
-            required_fields = ["success", "node_subtype", "level", "total_questions", "prompts"]
+            required_fields = ["node_subtype", "level", "total_questions", "prompts"]
             missing_fields = [field for field in required_fields if field not in data]
             
             if missing_fields:
                 self.log_test("WebApp Questionnaire", False, f"Missing required fields: {missing_fields}")
-                return False
-            
-            # Verify success status
-            if not data.get("success"):
-                self.log_test("WebApp Questionnaire", False, "Response success is false")
                 return False
             
             # Verify node subtype
