@@ -486,6 +486,7 @@ function AppContent() {
 
   const onEdgeClick = (event, edge) => {
     setSelectedNode(null);
+    setSelectedEdge(edge);  // Set selected edge for showing control points
     setContextMenu(null);
   };
 
