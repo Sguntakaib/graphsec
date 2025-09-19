@@ -191,25 +191,10 @@ const DraggableEdge = ({
   }, [recentlyInteracted]);
 
   // Styles
-  const controlPointStyle = {
-    r: 6,
-    fill: '#3B82F6',
-    stroke: '#1E40AF',
-    strokeWidth: 2,
-    cursor: 'grab',
-    opacity: selected || isDragging ? 1 : 0.3  // Show with low opacity when not selected for discoverability
-  };
-
-  const controlPointHoverStyle = {
-    ...controlPointStyle,
-    r: 8,
-    fill: '#60A5FA'
-  };
-
   const labelBoxStyle = {
     fill: labelBgStyle.fill || '#374151',
-    stroke: '#6B7280',  // Fixed stroke color since no dragging
-    strokeWidth: 1,     // Fixed stroke width
+    stroke: '#6B7280',
+    strokeWidth: 1,
     rx: labelBgBorderRadius,
     ry: labelBgBorderRadius,
     opacity: labelBgStyle.fillOpacity || 0.9
