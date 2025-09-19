@@ -165,6 +165,17 @@ const DraggableEdge = ({
     document.addEventListener('mouseup', handleMouseUp);
   }, [id, controlPoint1, controlPoint2, labelPos]);
 
+  // Effect to manage temporary control point visibility after interaction
+  useEffect(() => {
+    if (recentlyInteracted) {
+      const timer = setTimeout(() => {
+        setRecentlyInteracted(false);
+      }, 3000); // Keep control points visible for 3 seconds after interaction
+      
+      return () => clearTimeout(timer);
+    }
+  }, [recentlyInteracted]);
+
   // Styles
   const controlPointStyle = {
     r: 6,
