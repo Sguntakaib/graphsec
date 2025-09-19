@@ -131,54 +131,9 @@ const DraggableEdge = ({
         };
         setControlPoint2(newCp2);
       } else if (type === 'label') {
-        // Enhanced label dragging: Allow more flexible positioning
-        const mouseX = dragStartRef.current.initialValue.x + dx;
-        const mouseY = dragStartRef.current.initialValue.y + dy;
-        
-        // Find the parameter t that gives the closest point on the curve
-        let closestT = labelPosition;
-        let minDistance = Infinity;
-        
-        // Use finer granularity for smoother dragging
-        for (let t = 0; t <= 1; t += 0.005) {
-          const point = getLabelPositionOnPath(t);
-          const distance = Math.sqrt(
-            Math.pow(point.x - mouseX, 2) + Math.pow(point.y - mouseY, 2)
-          );
-          
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestT = t;
-          }
-        }
-        
-        // If the user drags significantly away from the curve, adjust control points
-        // to bring the curve closer to the mouse position
-        const currentPoint = getLabelPositionOnPath(closestT);
-        const distanceFromCurve = Math.sqrt(
-          Math.pow(currentPoint.x - mouseX, 2) + Math.pow(currentPoint.y - mouseY, 2)
-        );
-        
-        // If dragged more than 30px away from curve, adjust control points
-        if (distanceFromCurve > 30) {
-          const offsetX = (mouseX - currentPoint.x) * 0.3;
-          const offsetY = (mouseY - currentPoint.y) * 0.3;
-          
-          // Adjust control points to bend the curve toward the mouse
-          setControlPoint1({
-            ...controlPoint1,
-            x: controlPoint1.x + offsetX * (1 - closestT),
-            y: controlPoint1.y + offsetY * (1 - closestT)
-          });
-          
-          setControlPoint2({
-            ...controlPoint2,
-            x: controlPoint2.x + offsetX * closestT,
-            y: controlPoint2.y + offsetY * closestT
-          });
-        }
-        
-        setLabelPosition(closestT);
+        // Labels are no longer draggable - they stay centered at position 0.5
+        // This prevents labels from being positioned awkwardly along edges
+        console.log('🚫 Label dragging disabled - labels stay centered');
       }
     };
     
