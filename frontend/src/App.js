@@ -101,7 +101,20 @@ function AppContent() {
   }, []);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [edges, setEdges, defaultOnEdgesChange] = useEdgesState(initialEdges);
+  
+  // Custom onEdgesChange to maintain selectedEdge state
+  const onEdgesChange = useCallback((changes) => {
+    // Apply the default edge changes
+    defaultOnEdgesChange(changes);
+    
+    // If the selected edge is being removed, clear the selection
+    const removeChanges = changes.filter(change => change.type === 'remove');
+    if (selectedEdge && removeChanges.some(change => change.id === selectedEdge.id)) {
+      setSelectedEdge(null);
+    }
+  }, [defaultOnEdgesChange, selectedEdge]);
+  
   // Enhanced questionnaire system disabled - using legacy system only
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedEdge, setSelectedEdge] = useState(null);  // Add selected edge state
