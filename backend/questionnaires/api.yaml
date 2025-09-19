@@ -402,6 +402,7 @@ dependencies:
   api_database_access: "Database"
   api_external_services: "ExternalService"
   api_authentication_provider: "SSO"
+  api_web_interface_exposure: "WebApp"
 
 threat_intelligence:
   cve_count: 120
