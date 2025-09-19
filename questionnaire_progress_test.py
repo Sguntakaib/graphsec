@@ -270,16 +270,14 @@ class QuestionnaireProgressTester:
                             f"Response is not a dictionary: {type(data)}")
                 return False
             
-            # Check for expected fields
-            success = data.get('success', False)
+            # Check for expected fields - WebApp endpoint has different structure
             total_questions = data.get('total_questions', 0)
-            prompts_count = data.get('prompts_count', 0)
+            prompts = data.get('prompts', [])
             level = data.get('level', '')
             
             print(f"📊 WebApp Node Questionnaire Results:")
-            print(f"   Success: {success}")
             print(f"   Total questions: {total_questions}")
-            print(f"   Prompts count: {prompts_count}")
+            print(f"   Prompts array length: {len(prompts)}")
             print(f"   Level: {level}")
             
             # Verify expected question count (10 questions for WebApp)
@@ -288,14 +286,9 @@ class QuestionnaireProgressTester:
                             f"Expected 10 questions, got {total_questions}")
                 return False
             
-            if prompts_count != 10:
+            if len(prompts) != 10:
                 self.log_test("WebApp Node Questionnaire (10 questions)", False, 
-                            f"Expected 10 prompts, got {prompts_count}")
-                return False
-            
-            if not success:
-                self.log_test("WebApp Node Questionnaire (10 questions)", False, 
-                            f"API returned success=false")
+                            f"Expected 10 prompts in array, got {len(prompts)}")
                 return False
             
             if level != 'basic':
