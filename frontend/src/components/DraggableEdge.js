@@ -153,14 +153,18 @@ const DraggableEdge = ({
     const handleMouseUp = () => {
       setIsDragging(null);
       
-      // Notify parent component of edge update
-      if (onEdgeUpdate) {
-        onEdgeUpdate(id, {
-          controlPoint1,
-          controlPoint2,
-          labelPosition
-        });
-      }
+      // Instead of calling onEdgeUpdate, we'll trigger a custom event
+      // that the parent App component can listen to
+      window.dispatchEvent(new CustomEvent('edgeUpdate', {
+        detail: {
+          edgeId: id,
+          updateData: {
+            controlPoint1,
+            controlPoint2,
+            labelPosition
+          }
+        }
+      }));
       
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
