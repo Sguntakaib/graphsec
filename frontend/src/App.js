@@ -321,6 +321,8 @@ function AppContent() {
           if (edge.id === edgeId) {
             const updatedEdge = {
               ...edge,
+              // Update top-level properties like label
+              ...(updateData.label !== undefined && { label: updateData.label }),
               data: {
                 ...edge.data,
                 ...updateData
