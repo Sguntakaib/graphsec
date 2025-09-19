@@ -1665,15 +1665,18 @@ agent_communication:
 
   - task: "Historical Analysis APIs"
     implemented: true
-    working: "NA"
+    working: false
     file: "backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Phase 3 Probabilistic Simulation Engine - GET /api/diagrams/{id}/probabilistic-simulations and GET /api/diagrams/{id}/scenario-analyses endpoints for historical analysis and trend tracking"
+      - working: false
+        agent: "testing"
+        comment: "❌ HISTORICAL ANALYSIS APIS FAILING: Both GET /api/diagrams/{id}/probabilistic-simulations and GET /api/diagrams/{id}/scenario-analyses endpoints return HTTP 500 errors. While the main simulation and scenario APIs work correctly, the historical analysis endpoints have implementation issues preventing retrieval of past simulation and scenario analysis results. This affects trend tracking and historical analysis capabilities."
 
   - task: "Threat Modeling Wizard Recommendations API"
     implemented: true
