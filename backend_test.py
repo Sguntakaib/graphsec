@@ -570,17 +570,18 @@ class VulnerabilityAnalysisTester:
             return False
 
     def run_all_tests(self):
-        """Run all vulnerability analysis tests"""
-        print("🚀 STARTING VULNERABILITY ANALYSIS TESTING")
+        """Run all enhanced vulnerability coverage tests"""
+        print("🚀 STARTING ENHANCED VULNERABILITY COVERAGE TESTING")
         print("=" * 80)
-        print("Testing vulnerability analysis for Backup and Monitoring nodes with INFORMATIONAL severity")
+        print("Testing enhanced vulnerability coverage for Backup and Monitoring nodes with Critical/High severity")
         print("=" * 80)
         
         tests = [
             self.test_health_check,
-            self.test_vulnerability_category_enum_completeness,
+            self.test_vulnerability_rules_api,
             self.test_backup_node_vulnerability_analysis,
             self.test_monitoring_node_vulnerability_analysis,
+            self.test_monthly_backup_frequency_vulnerability,
         ]
         
         passed = 0
