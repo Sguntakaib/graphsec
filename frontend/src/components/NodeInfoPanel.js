@@ -20,19 +20,21 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
   const [activeNode, setActiveNode] = useState(null);
 
   useEffect(() => {
-    if (node && node.data?.subtype) {
+    if (activeNode && activeNode.data?.subtype) {
       fetchNodeQuestionsAndAnswers();
+    } else {
+      setQuestionsData(null);
     }
-  }, [node]);
+  }, [activeNode]);
 
   const fetchNodeQuestionsAndAnswers = async () => {
-    if (!node?.data?.subtype) return;
+    if (!activeNode?.data?.subtype) return;
     
     setLoading(true);
     try {
       // First, try to get questions for this node type
       let questionsResponse;
-      const nodeSubtype = node.data.subtype;
+      const nodeSubtype = activeNode.data.subtype;
       
       if (nodeSubtype === 'WebApp') {
         questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`);
@@ -45,7 +47,7 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
         const questions = questionsData.prompts || [];
         
         // Get user answers from node data
-        const userAnswers = node.data?.questionnaireResponses || {};
+        const userAnswers = activeNode.data?.questionnaireResponses || {};
         
         // Combine questions with answers
         const combinedData = questions.map(question => ({
