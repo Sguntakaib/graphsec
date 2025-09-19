@@ -157,6 +157,10 @@ const DraggableEdge = ({
       
       setControlPoint1(newCp1);
       setControlPoint2(newCp2);
+      
+      // Update refs to track current values for use in handleMouseUp
+      controlPoint1Ref.current = newCp1;
+      controlPoint2Ref.current = newCp2;
     };
     
     const handleMouseUp = () => {
