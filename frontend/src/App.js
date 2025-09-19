@@ -2471,24 +2471,6 @@ function AppContent() {
             </button>
             
             <button
-              onClick={() => setShowThreatModelingWizard(true)}
-              className="px-3 py-2 bg-purple-700 text-white rounded hover:bg-purple-600 flex items-center space-x-2 text-sm"
-              title="Guided Threat Modeling - Step-by-step security assessment wizard"
-            >
-              <Shield className="h-4 w-4" />
-              <span>Wizard</span>
-            </button>
-            
-            <button
-              onClick={() => setShowCoreLoopDashboard(true)}
-              className="px-3 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded hover:from-green-700 hover:to-blue-700 flex items-center space-x-2 text-sm"
-              title="Core Loop Dashboard - Test Phase 1 Critical Endpoints"
-            >
-              <Zap className="h-4 w-4" />
-              <span>Core Loop</span>
-            </button>
-            
-            <button
               onClick={analyzeAllNodeVulnerabilities}
               disabled={isLoading || nodes.filter(n => n.data?.questionnaireResponses).length === 0}
               className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
