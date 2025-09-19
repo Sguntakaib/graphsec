@@ -69,7 +69,12 @@ import {
   Network,
   AlertTriangle,
   Filter,
-  X
+  X,
+  Menu,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const nodeTypes = {
