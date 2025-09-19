@@ -265,8 +265,20 @@ const DraggableEdge = ({
       {label && (
         <g 
           transform={`translate(${labelPos.x}, ${labelPos.y})`}
-          style={{ cursor: 'grab' }}
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
           onMouseDown={handleLabelMouseDown}
+          onMouseMove={(e) => {
+            // Prevent event bubbling during mouse move
+            if (isDragging) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+          onContextMenu={(e) => {
+            // Prevent context menu when dragging
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           {labelShowBg && (
             <rect
