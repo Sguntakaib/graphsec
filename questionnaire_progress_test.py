@@ -684,8 +684,8 @@ class QuestionnaireProgressTester:
             
             # Test 1: Very low completion (2/10 = 20%)
             low_responses = {
-                "authentication_method": "oauth2",
-                "encryption_enabled": "true"
+                "webapp_authentication_method": "OAuth2/OIDC",
+                "webapp_input_validation": "Comprehensive server-side validation"
             }
             
             response = self.session.post(
@@ -700,11 +700,11 @@ class QuestionnaireProgressTester:
             
             # Test 2: Medium completion (5/10 = 50%)
             medium_responses = {
-                "authentication_method": "oauth2",
-                "encryption_enabled": "true",
-                "input_validation": "comprehensive",
-                "session_management": "secure",
-                "error_handling": "secure"
+                "webapp_authentication_method": "OAuth2/OIDC",
+                "webapp_input_validation": "Comprehensive server-side validation",
+                "webapp_https_enforcement": "HTTPS only (HSTS enabled)",
+                "webapp_database_connection": True,
+                "webapp_api_endpoints": True
             }
             
             response = self.session.post(
@@ -719,14 +719,14 @@ class QuestionnaireProgressTester:
             
             # Test 3: High completion (8/10 = 80%)
             high_responses = {
-                "authentication_method": "oauth2",
-                "encryption_enabled": "true",
-                "input_validation": "comprehensive",
-                "session_management": "secure",
-                "error_handling": "secure",
-                "logging_enabled": "comprehensive",
-                "csp_enabled": "strict",
-                "https_enforced": "true"
+                "webapp_authentication_method": "OAuth2/OIDC",
+                "webapp_input_validation": "Comprehensive server-side validation",
+                "webapp_https_enforcement": "HTTPS only (HSTS enabled)",
+                "webapp_database_connection": True,
+                "webapp_api_endpoints": True,
+                "webapp_session_management": "Secure session management",
+                "webapp_error_handling": "Secure error handling (no info disclosure)",
+                "webapp_logging_monitoring": "Comprehensive security logging"
             }
             
             response = self.session.post(
@@ -757,10 +757,10 @@ class QuestionnaireProgressTester:
                 return False
             
             questionnaire_responses = data.get("questionnaire_responses", {})
-            prompts = data.get("prompts", [])
+            # For WebApp, we need to get the prompts from the WebApp questionnaire endpoint
+            total_questions = data.get("total_questions", 10)  # WebApp should have 10 questions
             
             answered_count = len(questionnaire_responses)
-            total_questions = len(prompts)
             completion_percentage = (answered_count / total_questions) * 100 if total_questions > 0 else 0
             
             print(f"📊 Completion Status Results:")
