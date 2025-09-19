@@ -2388,20 +2388,20 @@ function AppContent() {
       setEdges(prevEdges => [...prevEdges, ...newEdges]);
     }
 
-    // Queue questionnaires for ALL dependent nodes (existing + new)
-    if (allDependentNodes.length > 0) {
-      console.log(`🎯 Queueing questionnaires for ${allDependentNodes.length} dependent nodes:`, allDependentNodes.map(n => n.data.subtype));
-      setQuestionnaireQueue(allDependentNodes);
+    // Queue questionnaires ONLY for newly created nodes (not reused ones)
+    if (newNodes.length > 0) {
+      console.log(`🎯 Queueing questionnaires for ${newNodes.length} newly created dependent nodes:`, newNodes.map(n => n.data.subtype));
+      setQuestionnaireQueue(newNodes);
       setCurrentQueueIndex(0);
       
-      // Start questionnaire for the first dependent node using legacy system
-      console.log(`🚀 Starting legacy questionnaire for dependent node:`, {
-        nodeId: allDependentNodes[0].id,
-        nodeSubtype: allDependentNodes[0].subtype || allDependentNodes[0].data?.subtype,
+      // Start questionnaire for the first newly created dependent node
+      console.log(`🚀 Starting legacy questionnaire for newly created dependent node:`, {
+        nodeId: newNodes[0].id,
+        nodeSubtype: newNodes[0].subtype || newNodes[0].data?.subtype,
         parentId: currentQuestionnaireNode?.id
       });
       
-      const firstNode = allDependentNodes[0];
+      const firstNode = newNodes[0];
       const nodeSubtype = firstNode.subtype || firstNode.data?.subtype;
       
       // Set the first questionnaire in the queue as current
@@ -2413,6 +2413,10 @@ function AppContent() {
       
       // Keep the modal open for the first dependent questionnaire
       setShowSecurityQuestionnaire(true);
+    } else {
+      console.log('✅ All dependencies resolved by reusing existing nodes - no new questionnaires needed');
+      // All dependencies were satisfied by reusing existing nodes, so we can continue with parent questionnaire
+      // The parent questionnaire should continue automatically
     }
   };
 
