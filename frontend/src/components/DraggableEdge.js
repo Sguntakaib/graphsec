@@ -102,57 +102,71 @@ const DraggableEdge = ({
 
   const labelPos = getLabelPositionOnPath(labelPosition);
 
-  // Mouse event handlers
-  const handleMouseDown = useCallback((e, type, initialValue) => {
+  // Mouse event handlers for label-based curve reshaping
+  const handleLabelMouseDown = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     
-    setIsDragging(type);
+    console.log('🎯 Starting label drag for curve reshaping');
+    setIsDragging(true);
+    setRecentlyInteracted(true);
+    
+    const labelPos = getLabelPositionOnPath(labelPosition);
     dragStartRef.current = {
       x: e.clientX,
       y: e.clientY,
-      initialValue: initialValue || { ...labelPos }
+      initialLabelPos: { ...labelPos }
     };
     
-    // Add global mouse handlers
     const handleMouseMove = (e) => {
-      const dx = e.clientX - dragStartRef.current.x;
-      const dy = e.clientY - dragStartRef.current.y;
+      const currentMouseX = e.clientX;
+      const currentMouseY = e.clientY;
       
-      if (type === 'cp1') {
-        const newCp1 = {
-          x: controlPoint1.x + dx,
-          y: controlPoint1.y + dy
-        };
-        setControlPoint1(newCp1);
-      } else if (type === 'cp2') {
-        const newCp2 = {
-          x: controlPoint2.x + dx,
-          y: controlPoint2.y + dy
-        };
-        setControlPoint2(newCp2);
-      } else if (type === 'label') {
-        // Labels are no longer draggable - they stay centered at position 0.5
-        // This prevents labels from being positioned awkwardly along edges
-        console.log('🚫 Label dragging disabled - labels stay centered');
-      }
+      // Calculate how much the mouse has moved from the label's initial position
+      const dx = currentMouseX - dragStartRef.current.x;
+      const dy = currentMouseY - dragStartRef.current.y;
+      
+      // Calculate new target position for the label (where user is dragging to)
+      const newLabelPosX = dragStartRef.current.initialLabelPos.x + dx;
+      const newLabelPosY = dragStartRef.current.initialLabelPos.y + dy;
+      
+      // Calculate control points that would make the curve pass through this point
+      // Using simple symmetric control point adjustment
+      const curvatureFactor = 0.3;
+      const midX = (sourceX + targetX) / 2;
+      const midY = (sourceY + targetY) / 2;
+      
+      // How far is the new label position from the straight line?
+      const offsetFromMidX = newLabelPosX - midX;
+      const offsetFromMidY = newLabelPosY - midY;
+      
+      // Adjust control points to create curve that passes through the dragged position
+      const newCp1 = {
+        x: offsetFromMidX * curvatureFactor,
+        y: offsetFromMidY * curvatureFactor
+      };
+      
+      const newCp2 = {
+        x: offsetFromMidX * curvatureFactor,
+        y: offsetFromMidY * curvatureFactor
+      };
+      
+      setControlPoint1(newCp1);
+      setControlPoint2(newCp2);
     };
     
     const handleMouseUp = () => {
-      setIsDragging(null);
+      console.log('🎯 Completing label drag - curve reshaped');
+      setIsDragging(false);
       
-      // Set recently interacted flag to keep control points visible for a brief period
-      setRecentlyInteracted(true);
-      
-      // Instead of calling onEdgeUpdate, we'll trigger a custom event
-      // that the parent App component can listen to
+      // Trigger edge update event
       window.dispatchEvent(new CustomEvent('edgeUpdate', {
         detail: {
           edgeId: id,
           updateData: {
             controlPoint1,
             controlPoint2,
-            labelPosition: 0.5  // Always keep labels centered
+            labelPosition: 0.5
           }
         }
       }));
@@ -163,7 +177,7 @@ const DraggableEdge = ({
     
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  }, [id, controlPoint1, controlPoint2, labelPos]);
+  }, [id, controlPoint1, controlPoint2, sourceX, sourceY, targetX, targetY, labelPosition]);
 
   // Effect to manage temporary control point visibility after interaction
   useEffect(() => {
