@@ -58,33 +58,33 @@ class ConditionalQuestionnaireEngine:
                     "id": "graphql_query_depth_limiting",
                     "question": "Is GraphQL query depth limiting implemented?",
                     "type": "single_choice",
-                    "options": ["Configurable depth limits", "Fixed depth limits", "No depth limiting", "Unknown"],
+                    "options": ["Configurable depth limits with monitoring", "Fixed depth limits", "Basic depth checking", "No depth limiting", "Unknown"],
                     "help_text": "Query depth limiting prevents denial of service attacks on GraphQL APIs.",
                     "related_branch": "ApiSecurity"
                 },
                 {
-                    "id": "graphql_query_complexity",
+                    "id": "graphql_query_complexity_analysis",
                     "question": "How is GraphQL query complexity analysis implemented?",
                     "type": "single_choice", 
-                    "options": ["Advanced complexity analysis", "Basic complexity scoring", "Query timeout only", "No complexity analysis", "Unknown"],
+                    "options": ["Advanced complexity analysis with cost calculation", "Basic complexity scoring", "Query timeout only", "No complexity analysis", "Unknown"],
                     "help_text": "Query complexity analysis prevents resource exhaustion attacks.",
                     "related_branch": "ApiSecurity"
                 },
                 {
-                    "id": "graphql_introspection",
-                    "question": "Is GraphQL introspection disabled in production?",
+                    "id": "graphql_batch_query_security",
+                    "question": "How are GraphQL batch queries secured?",
                     "type": "single_choice",
-                    "options": ["Disabled in production", "Authenticated introspection only", "Enabled for all users", "Unknown"],
-                    "help_text": "GraphQL introspection can expose sensitive schema information.",
-                    "related_branch": "InformationDisclosure"
+                    "options": ["Batch size limits with complexity scoring", "Basic batch limits", "Query count restrictions", "No batch protection", "Unknown"],
+                    "help_text": "Batch query attacks can amplify GraphQL resource consumption.",
+                    "related_branch": "RateLimiting"
                 },
                 {
-                    "id": "graphql_query_allowlisting",
-                    "question": "Is GraphQL query allowlisting (persisted queries) implemented?",
+                    "id": "graphql_introspection_security",
+                    "question": "How is GraphQL introspection secured in production?",
                     "type": "single_choice",
-                    "options": ["Persisted queries only", "Hybrid approach", "Dynamic queries allowed", "Unknown"],
-                    "help_text": "Query allowlisting provides strong protection against malicious queries.",
-                    "related_branch": "ApiSecurity"
+                    "options": ["Introspection disabled with schema allowlisting", "Authenticated introspection only", "Filtered introspection", "Public introspection enabled", "Unknown"],
+                    "help_text": "GraphQL introspection can expose sensitive schema information to attackers.",
+                    "related_branch": "InformationDisclosure"
                 }
             ],
             "SOAP API": [
