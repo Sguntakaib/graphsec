@@ -691,6 +691,30 @@ class ConditionalQuestionnaireEngine:
                         if db_access_index > 0:
                             base_questions.insert(db_access_index, db_reuse_question)
                             logger.info(f"Added database reuse question with {len(existing_db_nodes)} existing databases")
+            
+            # Check for web interface exposure and add web security questions
+            if previous_responses and previous_responses.get('api_web_interface_exposure'):
+                web_exposure = previous_responses.get('api_web_interface_exposure')
+                if web_exposure and web_exposure.startswith('Yes'):
+                    # Add web interface security questions
+                    web_questions = self.api_web_interface_questions.copy()
+                    for question in web_questions:
+                        question['is_conditional'] = True
+                        question['conditional_trigger'] = 'api_web_interface_exposure'
+                    
+                    # Find insertion point after web interface exposure question
+                    web_exposure_index = -1
+                    for i, question in enumerate(base_questions):
+                        if question.get('id') == 'api_web_interface_exposure':
+                            web_exposure_index = i + 1
+                            break
+                    
+                    if web_exposure_index > 0:
+                        # Insert web security questions after the web interface exposure question
+                        for j, web_q in enumerate(web_questions):
+                            base_questions.insert(web_exposure_index + j, web_q)
+                        logger.info(f"Added {len(web_questions)} web interface security questions")
+                        has_conditional = True
         
         return base_questions, has_conditional
     
