@@ -1638,15 +1638,18 @@ agent_communication:
 
   - task: "Defense Effectiveness Modeling API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/probabilistic_simulation.py, backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Phase 3 Probabilistic Simulation Engine - POST /api/diagrams/{diagram_id}/defense-effectiveness endpoint with control interaction effects, defense-in-depth analysis, and coverage overlap detection"
+      - working: true
+        agent: "testing"
+        comment: "✅ DEFENSE EFFECTIVENESS MODELING WORKING: POST /api/diagrams/{diagram_id}/defense-effectiveness endpoint tested successfully. API returns proper response structure with diagram_id, defense_models, analysis_summary, and analysis_timestamp fields. Defense effectiveness analysis processes control nodes (tested with WAF control) and provides comprehensive defense modeling with control interaction effects and coverage analysis."
 
   - task: "Probabilistic Graph Traversal"
     implemented: true
