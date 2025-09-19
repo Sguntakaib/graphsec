@@ -225,6 +225,50 @@ class ConditionalQuestionnaireEngine:
             ]
         }
         
+        # Web interface subset questions for APIs that expose web interfaces
+        self.api_web_interface_questions = [
+            {
+                "id": "api_web_xss_protection",
+                "question": "How is Cross-Site Scripting (XSS) prevention implemented in the web interface?",
+                "type": "single_choice",
+                "options": ["Content Security Policy + output encoding", "Output encoding only", "Input sanitization only", "No XSS protection", "Unknown"],
+                "help_text": "XSS protection prevents malicious script injection in web interfaces.",
+                "related_branch": "WebSecurity"
+            },
+            {
+                "id": "api_web_csrf_protection", 
+                "question": "How is Cross-Site Request Forgery (CSRF) prevented?",
+                "type": "single_choice",
+                "options": ["CSRF tokens + SameSite cookies", "CSRF tokens only", "Referer validation", "No CSRF protection", "Unknown"],
+                "help_text": "CSRF protection prevents unauthorized actions from malicious websites.",
+                "related_branch": "WebSecurity"
+            },
+            {
+                "id": "api_web_session_security",
+                "question": "How are web sessions secured?",
+                "type": "single_choice",
+                "options": ["Secure session management with httpOnly/secure flags", "Basic session management", "Cookie-based sessions only", "No session security", "Unknown"],
+                "help_text": "Secure session management prevents session hijacking and fixation attacks.",
+                "related_branch": "SessionManagement"
+            },
+            {
+                "id": "api_web_input_validation",
+                "question": "How is user input validated in web forms?",
+                "type": "single_choice",
+                "options": ["Server-side validation + client-side enhancement", "Server-side validation only", "Client-side validation only", "No input validation", "Unknown"],
+                "help_text": "Web form validation prevents injection attacks and ensures data integrity.",
+                "related_branch": "InputValidation"
+            },
+            {
+                "id": "api_web_security_headers",
+                "question": "What web security headers are implemented?",
+                "type": "multiple_choice",
+                "options": ["X-Frame-Options", "X-Content-Type-Options", "Strict-Transport-Security", "Content-Security-Policy", "Referrer-Policy", "None"],
+                "help_text": "Security headers provide defense-in-depth against various web attacks.",
+                "related_branch": "WebSecurity"
+            }
+        ]
+        
         # Enhanced external services categories based on real-world development
         self.external_services_categories = {
             "Authentication": [
