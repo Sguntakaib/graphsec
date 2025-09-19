@@ -315,12 +315,13 @@ const DraggableEdge = ({
         className="react-flow__edge-interaction"
       />
       
-      {/* Draggable label for curve reshaping */}
+      {/* Draggable label for curve reshaping and editing */}
       {label && (
         <g 
           transform={`translate(${labelPos.x}, ${labelPos.y})`}
           style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-          onMouseDown={handleLabelMouseDown}
+          onMouseDown={!isEditingLabel ? handleLabelMouseDown : undefined}
+          onDoubleClick={!isDragging ? handleLabelDoubleClick : undefined}
           onMouseMove={(e) => {
             // Prevent event bubbling during mouse move
             if (isDragging) {
@@ -343,28 +344,55 @@ const DraggableEdge = ({
               {...labelBoxStyle}
               style={{ 
                 ...labelBoxStyle, 
-                cursor: isDragging ? 'grabbing' : 'grab',
+                cursor: isEditingLabel ? 'text' : (isDragging ? 'grabbing' : 'grab'),
                 stroke: isDragging ? '#3B82F6' : (selected ? '#60A5FA' : '#6B7280'),
                 strokeWidth: isDragging || selected ? 2 : 1,
-                fill: isDragging ? '#1E3A8A' : labelBgStyle.fill || '#374151',
+                fill: isDragging ? '#1E3A8A' : (isEditingLabel ? '#1F2937' : labelBgStyle.fill || '#374151'),
                 pointerEvents: 'all' // Ensure the rect can receive mouse events
               }}
             />
           )}
-          <text
-            {...labelTextStyle}
-            style={{ 
-              ...labelTextStyle, 
-              cursor: isDragging ? 'grabbing' : 'grab',
-              pointerEvents: 'none',
-              fill: isDragging ? '#60A5FA' : (labelStyle.fill || '#FFFFFF')
-            }}
-          >
-            {label}
-          </text>
+          
+          {/* Show input field when editing, text when not editing */}
+          {isEditingLabel ? (
+            <foreignObject x={-38} y={-10} width={76} height={20}>
+              <input
+                ref={inputRef}
+                type="text"
+                value={editingLabelValue}
+                onChange={(e) => setEditingLabelValue(e.target.value)}
+                onKeyDown={handleLabelKeyDown}
+                onBlur={handleLabelSave}
+                style={{
+                  width: '100%',
+                  height: '18px',
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </foreignObject>
+          ) : (
+            <text
+              {...labelTextStyle}
+              style={{ 
+                ...labelTextStyle, 
+                cursor: isDragging ? 'grabbing' : 'pointer',
+                pointerEvents: 'none',
+                fill: isDragging ? '#60A5FA' : (labelStyle.fill || '#FFFFFF')
+              }}
+            >
+              {label}
+            </text>
+          )}
           
           {/* Visual hint when selected or recently interacted */}
-          {(selected || recentlyInteracted) && (
+          {(selected || recentlyInteracted) && !isEditingLabel && (
             <text
               x={0}
               y={30}
@@ -376,7 +404,7 @@ const DraggableEdge = ({
                 pointerEvents: 'none'
               }}
             >
-              ← Drag to reshape →
+              ← Drag to reshape → | Double-click to edit
             </text>
           )}
         </g>
