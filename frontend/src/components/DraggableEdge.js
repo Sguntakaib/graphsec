@@ -167,13 +167,13 @@ const DraggableEdge = ({
       console.log('🎯 Completing label drag - curve reshaped');
       setIsDragging(false);
       
-      // Trigger edge update event
+      // Trigger edge update event with current ref values (not stale closure values)
       window.dispatchEvent(new CustomEvent('edgeUpdate', {
         detail: {
           edgeId: id,
           updateData: {
-            controlPoint1,
-            controlPoint2,
+            controlPoint1: controlPoint1Ref.current,
+            controlPoint2: controlPoint2Ref.current,
             labelPosition: 0.5
           }
         }
