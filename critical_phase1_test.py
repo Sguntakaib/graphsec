@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://canvas-explorer-1.preview.emergentagent.com/api"
+BASE_URL = "https://query-tracker-3.preview.emergentagent.com/api"
 
 def test_endpoint_1_questionnaire_complete():
     """
