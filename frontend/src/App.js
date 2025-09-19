@@ -407,7 +407,7 @@ function AppContent() {
   }), []);
 
   const attackPathEdgeOptions = useMemo(() => ({
-    type: 'smoothstep',
+    type: 'draggable',  // Use draggable type for attack path edges
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#EF4444',
