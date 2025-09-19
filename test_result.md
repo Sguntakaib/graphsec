@@ -1581,15 +1581,18 @@ agent_communication:
 
   - task: "Probabilistic Attack Path Analysis"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/probabilistic_simulation.py, backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Phase 3 Probabilistic Simulation Engine - Weighted attack path analysis with edge weights based on vulnerability likelihood and control coverage. Implements P(success) = Vulnerability × (1 - ControlCoverage) formula with complexity factors"
+      - working: true
+        agent: "testing"
+        comment: "✅ PROBABILISTIC ATTACK PATH ANALYSIS WORKING: POST /api/diagrams/{diagram_id}/probabilistic-simulation endpoint tested successfully. Returns proper response structure with diagram_id, probabilistic_paths, simulation_summary, and simulation_timestamp fields. API processes test diagram with 4 nodes (External Attacker, Web Application, Database, WAF) and 3 edges correctly. Weighted attack path analysis functional with alternative response structure."
 
   - task: "Dynamic Risk Calculation API"
     implemented: true
