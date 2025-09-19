@@ -449,7 +449,7 @@ function AppContent() {
       const newEdge = {
         ...params,
         id: `edge-${params.source}-${params.target}-${Date.now()}`,
-        type: 'smoothstep',
+        type: 'draggable',  // Use draggable edge type
         label: connectionInfo.label,
         style: connectionInfo.style,
         markerEnd: connectionInfo.markerEnd,
@@ -458,6 +458,12 @@ function AppContent() {
         labelShowBg: true,
         labelBgBorderRadius: 4,
         labelBgPadding: [4, 8],
+        data: {
+          // Store initial control points and label position
+          controlPoint1: { x: 0, y: 0 },
+          controlPoint2: { x: 0, y: 0 },
+          labelPosition: 0.5
+        }
       };
       
       setEdges((eds) => addEdge(newEdge, eds));
