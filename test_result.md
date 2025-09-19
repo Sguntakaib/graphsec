@@ -286,7 +286,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "NodeInfoPanel Enhanced Functionality"
+    - "Enhanced API Node Questionnaire System with Dynamic Questions"
   stuck_tasks: 
     - "Phase 1 Core Loop Completion - Findings Management System"
     - "Phase 1 Core Loop Completion - Questionnaire Completion Processor"
