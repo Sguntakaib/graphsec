@@ -225,10 +225,32 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     
     if (answeredCount === 0) {
       return { icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-800', text: 'Not Started' };
-    } else if (answeredCount >= 3) { // More reasonable threshold
+    }
+    
+    // Check if node has completionStatus from intelligent questionnaire system
+    if (node.data?.completionStatus?.is_complete) {
       return { icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-900', text: 'Complete' };
-    } else {
+    }
+    
+    // Use a more intelligent threshold based on node type or reasonable defaults
+    const nodeSubtype = node.data?.subtype;
+    let expectedQuestions = 5; // default
+    
+    // Set expected question counts based on node type
+    if (nodeSubtype === 'WebApp') expectedQuestions = 10;
+    else if (nodeSubtype === 'API') expectedQuestions = 7;
+    else if (nodeSubtype === 'Database') expectedQuestions = 5;
+    else if (nodeSubtype === 'Backup') expectedQuestions = 5;
+    else if (nodeSubtype === 'Monitoring') expectedQuestions = 5;
+    
+    const completionPercentage = (answeredCount / expectedQuestions) * 100;
+    
+    if (completionPercentage >= 80) { // 80% or more is considered complete
+      return { icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-900', text: 'Complete' };
+    } else if (completionPercentage >= 30) { // 30% or more is partial
       return { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-900', text: 'Partial' };
+    } else {
+      return { icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-800', text: 'Not Started' };
     }
   };
 
