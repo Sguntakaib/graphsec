@@ -46,7 +46,7 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://vulnfix-nodes.preview.emergentagent.com/api"
 
-class VulnerabilityAnalysisTester:
+class EnhancedVulnerabilityCoverageTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
@@ -609,6 +609,6 @@ class VulnerabilityAnalysisTester:
         return passed == total
 
 if __name__ == "__main__":
-    tester = VulnerabilityAnalysisTester()
+    tester = EnhancedVulnerabilityCoverageTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
