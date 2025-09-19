@@ -806,6 +806,18 @@ test_plan:
         agent: "testing"
         comment: "✅ WEBAPP DEPENDENCY QUESTIONS VERIFICATION COMPLETE: All tests passed with 100% success rate (5/5)! CRITICAL VERIFICATION CONFIRMED: ✅ WebApp questionnaire now has 10 questions (up from 8) including both dependency questions ✅ API dependency question: 'Does this web application expose API endpoints?' (ID: webapp_api_endpoints, type: boolean) ✅ Database dependency question: 'Does this application connect to a database?' (ID: webapp_database_connection, type: boolean) ✅ Both questions have proper structure with required fields (id, question, type, help_text, required) ✅ Conditional questionnaire system properly enabled with dependency mappings (webapp_api_enabled→API, webapp_database_connection→Database) ✅ Question count successfully increased from 8 to 10 as expected ✅ Both dependency questions are boolean type for conditional logic triggering. The WebApp questionnaire dependency questions have been successfully added and the conditional questionnaire system is fully operational. Backend dependencies resolved (attrs, yarl, aiosignal, frozenlist, aiohappyeyeballs installed)."
 
+  - task: "Canvas Node Detection System Backend API Support"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CANVAS NODE DETECTION SYSTEM BACKEND TESTING COMPLETED: Comprehensive testing of all critical API endpoints that support the enhanced canvas node detection functionality as specified in review request. TESTING RESULTS: 1) ✅ GET /api/diagrams: Successfully retrieves diagram listings with proper structure (id, title, nodes, edges, created_at) - supports canvas node detection by providing existing diagram data 2) ✅ POST /api/diagrams: Successfully creates new diagrams with proper ID generation and structure - enables canvas node detection system to work with new diagrams 3) ✅ PUT /api/diagrams/{id}: Successfully updates diagrams with nodes and edges including WebApp, API, and Database node types with has_dependency edge relationships - core functionality for canvas node detection and dependency handling 4) ✅ GET /api/questionnaires/WebApp?level=basic: Returns comprehensive questionnaire with 10 prompts, 8 security branches, proper option_descriptions for tooltips, and dependency mappings (webapp_api_enabled→API, webapp_database_connection→Database) 5) ✅ GET /api/questionnaires/API?level=basic: Returns comprehensive questionnaire with 11 prompts, 7 security branches, proper structure for canvas node detection integration 6) ✅ GET /api/questionnaires/Database?level=basic: Returns comprehensive questionnaire with 10 prompts, 8 security branches, complete structure for dependency handling. SUCCESS RATE: 100% (7/7 tests passed). All backend APIs are fully operational and ready to support the enhanced frontend canvas node detection system. The backend provides complete support for diagram management, node/edge updates, and questionnaire systems with proper dependency mappings."
+
 frontend:
   - task: "WebApp Questionnaire Dependency Flow System"
     implemented: true
