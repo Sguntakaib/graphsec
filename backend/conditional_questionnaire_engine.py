@@ -155,6 +155,40 @@ class ConditionalQuestionnaireEngine:
                     "related_branch": "InformationDisclosure"
                 }
             ],
+            "WebSocket API": [
+                {
+                    "id": "websocket_origin_validation",
+                    "question": "How is WebSocket origin validation implemented?",
+                    "type": "single_choice",
+                    "options": ["Strict origin validation with allowlist", "Flexible origin checking", "Basic origin validation", "No origin validation", "Unknown"],
+                    "help_text": "Origin validation prevents unauthorized cross-origin WebSocket connections.",
+                    "related_branch": "ApiSecurity"
+                },
+                {
+                    "id": "websocket_auth_method",
+                    "question": "How is WebSocket authentication handled?",
+                    "type": "single_choice",
+                    "options": ["Token-based with expiration", "Session-based authentication", "Certificate authentication", "Connection-based auth", "No authentication"],
+                    "help_text": "WebSocket authentication secures real-time connections against unauthorized access.",
+                    "related_branch": "Authentication"
+                },
+                {
+                    "id": "websocket_message_validation",
+                    "question": "How are WebSocket messages validated for security?",
+                    "type": "single_choice",
+                    "options": ["JSON schema validation with sanitization", "Custom message validation", "Basic format checking", "No message validation", "Unknown"],
+                    "help_text": "Message validation prevents malicious WebSocket payloads and injection attacks.",
+                    "related_branch": "InputValidation"
+                },
+                {
+                    "id": "websocket_rate_limiting",
+                    "question": "How is WebSocket message rate limiting implemented?",
+                    "type": "single_choice",
+                    "options": ["Per-connection rate limiting with burst control", "Global rate limiting", "Basic throttling", "No rate limiting", "Unknown"],
+                    "help_text": "Rate limiting prevents WebSocket abuse and denial-of-service attacks.",
+                    "related_branch": "RateLimiting"
+                }
+            ],
             "Other": [
                 {
                     "id": "other_api_protocol",
