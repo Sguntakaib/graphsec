@@ -250,11 +250,10 @@ const DraggableEdge = ({
         />
       )}
       
-      {/* Draggable label */}
+      {/* Fixed centered label - no longer draggable */}
       {label && (
         <g 
           transform={`translate(${labelPos.x}, ${labelPos.y})`}
-          style={{ cursor: isDragging === 'label' ? 'grabbing' : 'grab' }}
         >
           {labelShowBg && (
             <rect
@@ -263,46 +262,19 @@ const DraggableEdge = ({
               width={80}
               height={24}
               {...labelBoxStyle}
-              onMouseDown={(e) => handleMouseDown(e, 'label')}
-              onMouseEnter={(e) => {
-                if (isDragging !== 'label') {
-                  e.target.setAttribute('stroke', '#3B82F6');
-                  e.target.setAttribute('stroke-width', '2');
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (isDragging !== 'label') {
-                  e.target.setAttribute('stroke', '#6B7280');
-                  e.target.setAttribute('stroke-width', '1');
-                }
-              }}
+              style={{ cursor: 'default' }}  {/* Default cursor since not draggable */}
             />
           )}
           <text
             {...labelTextStyle}
-            onMouseDown={(e) => handleMouseDown(e, 'label')}
             style={{ 
               ...labelTextStyle, 
-              cursor: isDragging === 'label' ? 'grabbing' : 'grab',
-              pointerEvents: 'all'  // Allow text to receive mouse events
+              cursor: 'default',  {/* Default cursor since not draggable */}
+              pointerEvents: 'none'  {/* Disable pointer events */}
             }}
           >
             {label}
           </text>
-          
-          {/* Visual indicator when dragging */}
-          {isDragging === 'label' && (
-            <circle
-              cx={0}
-              cy={0}
-              r={50}
-              fill="none"
-              stroke="#3B82F6"
-              strokeWidth={2}
-              strokeDasharray="4,4"
-              opacity={0.3}
-            />
-          )}
         </g>
       )}
       
