@@ -206,8 +206,7 @@ const DraggableEdge = ({
     fontWeight: labelStyle.fontWeight || 'bold',
     textAnchor: 'middle',
     dominantBaseline: 'central',
-    pointerEvents: 'none',
-    userSelect: 'none'
+    pointerEvents: 'none'
   };
 
   return (
