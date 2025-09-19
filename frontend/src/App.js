@@ -568,8 +568,19 @@ function AppContent() {
           ...connectionInfo.markerEnd,
           color: '#10B981'  // Use same green color as auto-connected dependency edges
         },
-        labelStyle: connectionInfo.labelStyle,
-        labelBgStyle: connectionInfo.labelBgStyle,
+        labelStyle: {
+          ...connectionInfo.labelStyle,
+          fill: '#ffffff',  // White text like auto-connected edges
+          fontWeight: 600,
+          fontSize: '12px'
+        },
+        labelBgStyle: {
+          ...connectionInfo.labelBgStyle,
+          fill: 'rgba(17, 24, 39, 0.9)',  // Dark background like auto-connected edges
+          stroke: '#10B981',  // Green border like auto-connected edges
+          strokeWidth: 1,
+          fillOpacity: 0.9
+        },
         labelShowBg: true,
         labelBgBorderRadius: 4,
         labelBgPadding: [4, 8],
