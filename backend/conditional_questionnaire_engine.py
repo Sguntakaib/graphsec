@@ -536,6 +536,160 @@ class ConditionalQuestionnaireEngine:
             return self.database_type_questions.get(response, [])
         
         return []
+    
+    def detect_existing_nodes_on_canvas(self, canvas_nodes: List[Dict], node_type: str) -> List[Dict]:
+        """
+        Detect existing nodes of a specific type on the canvas
+        
+        Args:
+            canvas_nodes: List of nodes currently on the canvas
+            node_type: Type of node to detect (e.g., 'Database', 'API', 'WebApp')
+            
+        Returns:
+            List of existing nodes of the specified type
+        """
+        existing_nodes = []
+        
+        for node in canvas_nodes:
+            # Check both 'subtype' and 'type' fields for compatibility
+            node_subtype = node.get('subtype', '').lower()
+            node_type_field = node.get('type', '').lower()
+            
+            target_type = node_type.lower()
+            
+            if node_subtype == target_type or node_type_field == target_type:
+                existing_nodes.append({
+                    'id': node.get('id'),
+                    'label': node.get('label', f"{node_type} Node"),
+                    'subtype': node.get('subtype'),
+                    'position': node.get('position', {}),
+                    'data': node.get('data', {})
+                })
+        
+        return existing_nodes
+    
+    def create_database_reuse_question(self, existing_db_nodes: List[Dict]) -> Dict:
+        """
+        Create a question for database node reuse when existing databases are detected
+        
+        Args:
+            existing_db_nodes: List of existing database nodes on canvas
+            
+        Returns:
+            Question dictionary for database reuse decision
+        """
+        if not existing_db_nodes:
+            return None
+            
+        # Create options for each existing database plus "Create new"
+        options = []
+        option_descriptions = {}
+        
+        for db_node in existing_db_nodes:
+            node_label = db_node.get('label', f"Database {db_node.get('id', '')}")
+            node_id = db_node.get('id')
+            options.append(f"Use existing: {node_label}")
+            option_descriptions[f"Use existing: {node_label}"] = f"Connect to existing database node ({node_id}) - reduces complexity and maintains data consistency."
+        
+        options.append("Create new dedicated database")
+        option_descriptions["Create new dedicated database"] = "Create a separate database node - provides isolation but increases infrastructure complexity."
+        
+        return {
+            "id": "database_reuse_decision",
+            "question": f"A Database node already exists on the canvas. Should this API use the same database or create a new one?",
+            "type": "single_choice", 
+            "options": options,
+            "option_descriptions": option_descriptions,
+            "help_text": "Database reuse reduces complexity but may create dependencies. New databases provide isolation.",
+            "related_branch": "Database",
+            "is_reuse_question": True,
+            "existing_nodes": existing_db_nodes
+        }
+    
+    def get_enhanced_conditional_questionnaire(self, node_subtype: str, level: QuestionnaireLevel,
+                                             previous_responses: Dict[str, Any] = None,
+                                             canvas_nodes: List[Dict] = None) -> Tuple[List[Dict], bool]:
+        """
+        Enhanced version that includes canvas node detection for reuse logic
+        
+        Args:
+            node_subtype: Type of node (API, Database, etc.)
+            level: Questionnaire complexity level
+            previous_responses: Previous user responses
+            canvas_nodes: Current nodes on the canvas for reuse detection
+            
+        Returns:
+            Tuple of (questions_list, has_conditional_questions)
+        """
+        logger.info(f"Getting enhanced conditional questionnaire for {node_subtype} with canvas detection")
+        
+        # Get base questionnaire with conditional questions
+        base_questions, has_conditional = self.get_conditional_questionnaire(
+            node_subtype, level, previous_responses
+        )
+        
+        # Add reuse logic for specific node types
+        if canvas_nodes and node_subtype.upper() == "API":
+            # Check for database dependency and existing database nodes
+            if previous_responses and previous_responses.get('api_database_access') is True:
+                existing_db_nodes = self.detect_existing_nodes_on_canvas(canvas_nodes, 'Database')
+                
+                if existing_db_nodes:
+                    db_reuse_question = self.create_database_reuse_question(existing_db_nodes)
+                    if db_reuse_question:
+                        # Insert reuse question after the database access question
+                        db_access_index = -1
+                        for i, question in enumerate(base_questions):
+                            if question.get('id') == 'api_database_access':
+                                db_access_index = i + 1
+                                break
+                        
+                        if db_access_index > 0:
+                            base_questions.insert(db_access_index, db_reuse_question)
+                            logger.info(f"Added database reuse question with {len(existing_db_nodes)} existing databases")
+        
+        return base_questions, has_conditional
+    
+    def process_reuse_decision(self, reuse_response: str, existing_nodes: List[Dict]) -> Dict:
+        """
+        Process the user's reuse decision and return connection information
+        
+        Args:
+            reuse_response: User's choice from the reuse question
+            existing_nodes: List of existing nodes that could be reused
+            
+        Returns:
+            Dictionary with reuse decision details
+        """
+        if reuse_response.startswith("Use existing:"):
+            # Extract node identifier from response
+            for node in existing_nodes:
+                node_label = node.get('label', f"Database {node.get('id', '')}")
+                if node_label in reuse_response:
+                    return {
+                        "action": "reuse",
+                        "target_node_id": node.get('id'),
+                        "target_node": node,
+                        "create_connection": True,
+                        "message": f"Will connect to existing database: {node_label}"
+                    }
+        
+        elif "Create new" in reuse_response:
+            return {
+                "action": "create_new",
+                "target_node_id": None,
+                "target_node": None,
+                "create_connection": False,
+                "message": "Will create a new dedicated database node"
+            }
+        
+        return {
+            "action": "unknown",
+            "target_node_id": None,
+            "target_node": None,
+            "create_connection": False,
+            "message": "Invalid reuse decision"
+        }
 
 # Global instance
 conditional_questionnaire_engine = None
