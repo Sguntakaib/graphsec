@@ -230,22 +230,22 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     const status = getCompletionStatus(activeNode);
 
     return (
-      <div className="bg-white h-full">
+      <div className="bg-gray-900 h-full">
         {/* Header with Back Button */}
-        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+        <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600">
           <div className="flex items-center space-x-3">
             <button
               onClick={handleBackToList}
-              className="p-2 hover:bg-white rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
             >
-              <ArrowLeft className="h-4 w-4 text-blue-600" />
+              <ArrowLeft className="h-4 w-4 text-blue-400" />
             </button>
-            <div className="p-2 bg-white rounded-lg shadow-sm">
-              <NodeIcon className="h-5 w-5 text-blue-600" />
+            <div className="p-2 bg-gray-800 rounded-lg shadow-sm border border-gray-600">
+              <NodeIcon className="h-5 w-5 text-blue-400" />
             </div>
             <div className="flex-1">
-              <h3 className="font-medium text-gray-900">{activeNode.data?.label || activeNode.id}</h3>
-              <p className="text-sm text-gray-600">{activeNode.data?.subtype}</p>
+              <h3 className="font-medium text-white">{activeNode.data?.label || activeNode.id}</h3>
+              <p className="text-sm text-gray-300">{activeNode.data?.subtype}</p>
             </div>
             {status && (
               <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${status.bg}`}>
