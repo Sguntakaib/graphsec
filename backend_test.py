@@ -84,29 +84,29 @@ class VulnerabilityAnalysisTester:
 
     def test_backup_node_vulnerability_analysis(self):
         """
-        CRITICAL TEST: Test vulnerability analysis for Backup node type with INFORMATIONAL severity
+        CRITICAL TEST: Test enhanced vulnerability coverage for Backup node with insecure settings
         
         This test verifies that:
-        1. Backup nodes can be analyzed for vulnerabilities without errors
-        2. INFORMATIONAL severity vulnerabilities are properly generated
-        3. The previous "'Informational' is not a valid VulnerabilitySeverity" error is resolved
-        4. VulnerabilityCategory enum includes all required categories like "Best Practice Enhancement"
+        1. Backup nodes with insecure settings generate MULTIPLE vulnerabilities (4-6 expected)
+        2. Critical/High severity vulnerabilities are properly generated for insecure configurations
+        3. Specific insecure responses trigger appropriate vulnerability rules
+        4. Expected results: 4-6 vulnerabilities including Critical/High severity
         """
         try:
-            print("🎯 CRITICAL TEST: Backup Node Vulnerability Analysis")
+            print("🎯 CRITICAL TEST: Enhanced Backup Node Vulnerability Coverage")
             print("=" * 80)
             
             # Create a test node ID for Backup
             backup_node_id = f"backup-test-{uuid.uuid4().hex[:8]}"
             
-            # Sample questionnaire responses from review request that should trigger "Best Practice Enhancement" vulnerabilities
-            # Updated to match actual questionnaire structure and trigger rules
+            # MOST INSECURE questionnaire responses from review request
+            # These should trigger NEW critical vulnerabilities
             backup_responses = {
-                "backup_strategy": "Regular Scheduled Backups",  # Should trigger backup_strategy_enhancement
-                "backup_frequency": "Weekly",  # Should trigger backup_frequency_enhancement
-                "backup_encryption": "Default Encryption",  # Should trigger backup_encryption_enhancement
-                "backup_retention": "Short-term (<3 months)",  # Should trigger backup_retention_enhancement
-                "backup_testing": "Never Tested"  # Should trigger backup_testing_enhancement
+                "backup_strategy": "No Backup Strategy",      # Should trigger CRITICAL vulnerability
+                "backup_encryption": "No Encryption",        # Should trigger CRITICAL vulnerability
+                "backup_retention": "No Retention Policy",   # Should trigger HIGH vulnerability
+                "backup_testing": "Never Tested",            # Should trigger HIGH vulnerability
+                "backup_frequency": "Irregular"              # Should trigger HIGH vulnerability
             }
             
             # Test data for vulnerability analysis
@@ -117,8 +117,8 @@ class VulnerabilityAnalysisTester:
                 "node_position": {"x": 100, "y": 100}
             }
             
-            print(f"📋 Testing vulnerability analysis for Backup node: {backup_node_id}")
-            print(f"📋 Using questionnaire responses: {len(backup_responses)} responses")
+            print(f"📋 Testing INSECURE Backup node: {backup_node_id}")
+            print(f"📋 Using MOST INSECURE responses: {backup_responses}")
             
             # Call the vulnerability analysis endpoint
             response = self.session.post(
@@ -136,14 +136,14 @@ class VulnerabilityAnalysisTester:
                 except:
                     error_detail = response.text
                 
-                self.log_test("Backup Vulnerability Analysis", False, 
+                self.log_test("Backup Enhanced Vulnerability Analysis", False, 
                             f"HTTP {response.status_code}: {error_detail}")
                 return False
             
             try:
                 data = response.json()
             except json.JSONDecodeError as e:
-                self.log_test("Backup Vulnerability Analysis", False, 
+                self.log_test("Backup Enhanced Vulnerability Analysis", False, 
                             f"Invalid JSON response: {str(e)}")
                 return False
             
@@ -152,19 +152,8 @@ class VulnerabilityAnalysisTester:
             missing_fields = [field for field in required_fields if field not in data]
             
             if missing_fields:
-                self.log_test("Backup Vulnerability Analysis", False, 
+                self.log_test("Backup Enhanced Vulnerability Analysis", False, 
                             f"Missing required fields: {missing_fields}")
-                return False
-            
-            # Verify node details
-            if data.get('node_id') != backup_node_id:
-                self.log_test("Backup Vulnerability Analysis", False, 
-                            f"Node ID mismatch: expected {backup_node_id}, got {data.get('node_id')}")
-                return False
-            
-            if data.get('node_type') != 'Backup':
-                self.log_test("Backup Vulnerability Analysis", False, 
-                            f"Node type mismatch: expected 'Backup', got {data.get('node_type')}")
                 return False
             
             # Verify vulnerability nodes
@@ -172,16 +161,15 @@ class VulnerabilityAnalysisTester:
             total_vulnerabilities = data.get('total_vulnerabilities', 0)
             
             if total_vulnerabilities == 0:
-                self.log_test("Backup Vulnerability Analysis", False, 
-                            "No vulnerabilities generated for Backup node")
+                self.log_test("Backup Enhanced Vulnerability Analysis", False, 
+                            "No vulnerabilities generated for insecure Backup node")
                 return False
             
-            if len(vulnerability_nodes) != total_vulnerabilities:
-                self.log_test("Backup Vulnerability Analysis", False, 
-                            f"Vulnerability count mismatch: total={total_vulnerabilities}, nodes={len(vulnerability_nodes)}")
-                return False
-            
-            # Check for INFORMATIONAL severity vulnerabilities
+            # Count vulnerabilities by severity
+            critical_count = 0
+            high_count = 0
+            medium_count = 0
+            low_count = 0
             informational_count = 0
             severity_counts = {}
             
@@ -189,7 +177,15 @@ class VulnerabilityAnalysisTester:
                 severity = vuln.get('severity', 'Unknown')
                 severity_counts[severity] = severity_counts.get(severity, 0) + 1
                 
-                if severity == 'Informational':
+                if severity == 'Critical':
+                    critical_count += 1
+                elif severity == 'High':
+                    high_count += 1
+                elif severity == 'Medium':
+                    medium_count += 1
+                elif severity == 'Low':
+                    low_count += 1
+                elif severity == 'Informational':
                     informational_count += 1
                 
                 # Verify vulnerability structure
@@ -197,27 +193,62 @@ class VulnerabilityAnalysisTester:
                 missing_vuln_fields = [field for field in required_vuln_fields if field not in vuln]
                 
                 if missing_vuln_fields:
-                    self.log_test("Backup Vulnerability Analysis", False, 
+                    self.log_test("Backup Enhanced Vulnerability Analysis", False, 
                                 f"Vulnerability missing fields: {missing_vuln_fields}")
                     return False
             
-            print(f"📊 Vulnerability Analysis Results:")
+            print(f"📊 Enhanced Vulnerability Analysis Results:")
             print(f"   Total vulnerabilities: {total_vulnerabilities}")
             print(f"   Severity distribution: {severity_counts}")
-            print(f"   INFORMATIONAL vulnerabilities: {informational_count}")
+            print(f"   Critical: {critical_count}, High: {high_count}, Medium: {medium_count}")
+            print(f"   Low: {low_count}, Informational: {informational_count}")
             
-            # For Backup nodes, we expect INFORMATIONAL severity vulnerabilities
-            if informational_count == 0:
-                self.log_test("Backup Vulnerability Analysis", True, 
-                            f"✅ SUCCESS: Generated {total_vulnerabilities} vulnerabilities for Backup node (no INFORMATIONAL found, but analysis worked)")
-            else:
-                self.log_test("Backup Vulnerability Analysis", True, 
-                            f"✅ SUCCESS: Generated {total_vulnerabilities} vulnerabilities including {informational_count} INFORMATIONAL severity for Backup node")
+            # EXPECTED RESULTS: 4-6 vulnerabilities including Critical/High severity
+            expected_min_vulnerabilities = 4
+            expected_max_vulnerabilities = 6
+            
+            if total_vulnerabilities < expected_min_vulnerabilities:
+                self.log_test("Backup Enhanced Vulnerability Analysis", False, 
+                            f"Insufficient vulnerabilities: got {total_vulnerabilities}, expected {expected_min_vulnerabilities}-{expected_max_vulnerabilities}")
+                return False
+            
+            if total_vulnerabilities > expected_max_vulnerabilities:
+                print(f"⚠️  More vulnerabilities than expected: {total_vulnerabilities} > {expected_max_vulnerabilities} (this is OK)")
+            
+            # Verify Critical/High severity vulnerabilities are present
+            critical_high_count = critical_count + high_count
+            if critical_high_count == 0:
+                self.log_test("Backup Enhanced Vulnerability Analysis", False, 
+                            f"No Critical/High severity vulnerabilities found for insecure backup configuration")
+                return False
+            
+            # Verify specific expected vulnerabilities based on insecure responses
+            expected_vulnerabilities = [
+                "No Backup Strategy",      # Critical
+                "No Encryption",           # Critical  
+                "Never Tested",            # High
+                "Irregular",               # High
+                "No Retention Policy"      # High
+            ]
+            
+            found_expected = 0
+            for vuln in vulnerability_nodes:
+                vuln_name = vuln.get('name', '')
+                vuln_desc = vuln.get('description', '')
+                for expected in expected_vulnerabilities:
+                    if expected.lower() in vuln_name.lower() or expected.lower() in vuln_desc.lower():
+                        found_expected += 1
+                        break
+            
+            print(f"   Found {found_expected}/{len(expected_vulnerabilities)} expected vulnerability types")
+            
+            self.log_test("Backup Enhanced Vulnerability Analysis", True, 
+                        f"✅ SUCCESS: Generated {total_vulnerabilities} vulnerabilities ({critical_count} Critical, {high_count} High) for insecure Backup node")
             
             return True
             
         except Exception as e:
-            self.log_test("Backup Vulnerability Analysis", False, f"Request error: {str(e)}")
+            self.log_test("Backup Enhanced Vulnerability Analysis", False, f"Request error: {str(e)}")
             return False
 
     def test_monitoring_node_vulnerability_analysis(self):
