@@ -35,7 +35,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://line-drag-fix.preview.emergentagent.com/api"
+BASE_URL = "https://label-position.preview.emergentagent.com/api"
 
 class EnhancedVulnerabilityCoverageTester:
     def __init__(self):
