@@ -316,7 +316,7 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
               <div className="space-y-4">
                 <h4 className="font-medium text-white mb-3">Questions & Answers</h4>
                 {questionsData.questions.map((question, index) => (
-                  <div key={question.id || index} className="bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-sm">
+                  <div key={`question-${activeNode.id}-${question.id || index}-${index}`} className="bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-sm">
                     <div className="text-sm font-medium text-white mb-3">
                       {index + 1}. {question.question}
                     </div>
