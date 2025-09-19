@@ -2990,12 +2990,6 @@ function AppContent() {
                   onEditQuestionnaire={handleEditQuestionnaireFromInfo}
                 />
               </div>
-                <div className="p-4 text-center border-b border-gray-700">
-                  <div className="text-gray-400 text-sm">
-                    Click on a node to view its information and security configuration
-                  </div>
-                </div>
-              )}
 
               {/* Advanced Layout Controls */}
               <div className="p-4 border-b border-gray-700">
