@@ -301,7 +301,7 @@ const DraggableEdge = ({
             {...labelTextStyle}
             style={{ 
               ...labelTextStyle, 
-              cursor: 'grab',
+              cursor: isDragging ? 'grabbing' : 'grab',
               pointerEvents: 'none',
               fill: isDragging ? '#60A5FA' : (labelStyle.fill || '#FFFFFF')
             }}
