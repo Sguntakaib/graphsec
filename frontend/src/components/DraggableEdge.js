@@ -33,9 +33,9 @@ const DraggableEdge = ({
   const labelPosition = 0.5; // Fixed at center, no longer draggable
 
   // Drag state
-  const [isDragging, setIsDragging] = useState(null); // 'cp1', 'cp2', 'label', or null
+  const [isDragging, setIsDragging] = useState(false);
   const [recentlyInteracted, setRecentlyInteracted] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0, initialValue: null });
+  const dragStartRef = useRef({ x: 0, y: 0, initialLabelPos: null });
 
   // Calculate default control points for smooth bezier curve
   const getDefaultControlPoints = () => {
