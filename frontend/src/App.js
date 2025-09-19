@@ -561,7 +561,8 @@ function AppContent() {
         animated: true,  // Add animation like auto-connected edges
         style: {
           ...connectionInfo.style,
-          strokeDasharray: '3,3'  // Add dotted pattern like auto-connected edges
+          strokeDasharray: '3,3',  // Add dotted pattern like auto-connected edges
+          stroke: '#10B981'  // Use same green color as auto-connected dependency edges
         },
         markerEnd: connectionInfo.markerEnd,
         labelStyle: connectionInfo.labelStyle,
