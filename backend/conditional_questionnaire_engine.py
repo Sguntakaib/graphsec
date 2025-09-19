@@ -90,27 +90,35 @@ class ConditionalQuestionnaireEngine:
             "SOAP API": [
                 {
                     "id": "soap_wsdl_security",
-                    "question": "How is WSDL access controlled?",
+                    "question": "How is WSDL access controlled to prevent information disclosure?",
                     "type": "single_choice",
-                    "options": ["Authenticated WSDL access", "Public WSDL", "No WSDL provided", "Unknown"],
-                    "help_text": "WSDL can expose service structure and should be properly secured.",
+                    "options": ["Authenticated WSDL with sanitized schemas", "Role-based WSDL access", "Public WSDL with security filtering", "Public detailed WSDL", "Unknown"],
+                    "help_text": "WSDL can expose service structure and should be properly secured against reconnaissance.",
                     "related_branch": "InformationDisclosure"
                 },
                 {
-                    "id": "soap_xml_security",
-                    "question": "What XML security measures are implemented?",
+                    "id": "soap_xml_injection_prevention",
+                    "question": "What XML injection prevention measures are implemented?",
                     "type": "multiple_choice",
-                    "options": ["XML signature", "XML encryption", "XML schema validation", "XXE prevention", "None"],
-                    "help_text": "XML security prevents various XML-based attacks on SOAP services.",
+                    "options": ["XML schema validation", "XML external entity (XXE) prevention", "XML bomb protection", "XSLT injection prevention", "None"],
+                    "help_text": "XML-based attacks are common in SOAP services and require comprehensive prevention.",
                     "related_branch": "InputValidation"
                 },
                 {
-                    "id": "soap_ws_security",
-                    "question": "Is WS-Security implemented for message-level security?",
-                    "type": "single_choice",
-                    "options": ["Full WS-Security implementation", "Basic token authentication", "Transport security only", "No message security", "Unknown"],
-                    "help_text": "WS-Security provides message-level authentication and encryption for SOAP.",
+                    "id": "soap_ws_security_implementation",
+                    "question": "What WS-Security features are implemented?",
+                    "type": "multiple_choice",
+                    "options": ["Message-level encryption", "Digital signatures", "Timestamp validation", "Username tokens", "None"],
+                    "help_text": "WS-Security provides comprehensive message-level security for SOAP.",
                     "related_branch": "Encryption"
+                },
+                {
+                    "id": "soap_fault_information_disclosure",
+                    "question": "How are SOAP faults handled to prevent information disclosure?",
+                    "type": "single_choice",
+                    "options": ["Sanitized SOAP faults with logging", "Generic fault messages", "Detailed fault information", "No fault handling", "Unknown"],
+                    "help_text": "SOAP faults can reveal internal system details and should be carefully managed.",
+                    "related_branch": "InformationDisclosure"
                 }
             ],
             "gRPC API": [
