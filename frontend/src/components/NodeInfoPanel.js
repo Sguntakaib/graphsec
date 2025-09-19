@@ -55,11 +55,17 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
           userAnswer: userAnswers[question.id] || null
         }));
         
+        // Calculate answered questions based on actual questions, not all userAnswers keys
+        const answeredCount = combinedData.filter(q => {
+          const answer = userAnswers[q.id];
+          return answer !== null && answer !== undefined && answer !== '';
+        }).length;
+        
         setQuestionsData({
           questions: combinedData,
           totalQuestions: questions.length,
-          answeredQuestions: Object.keys(userAnswers).filter(key => userAnswers[key] !== null && userAnswers[key] !== undefined).length,
-          completionPercentage: questions.length > 0 ? Math.round((Object.keys(userAnswers).filter(key => userAnswers[key] !== null && userAnswers[key] !== undefined).length / questions.length) * 100) : 0
+          answeredQuestions: answeredCount,
+          completionPercentage: questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0
         });
       }
     } catch (error) {
