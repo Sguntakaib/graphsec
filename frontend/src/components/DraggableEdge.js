@@ -254,46 +254,12 @@ const DraggableEdge = ({
         className="react-flow__edge-interaction"
       />
       
-      {/* Control point 1 */}
-      {(selected || isDragging || recentlyInteracted) && (
-        <circle
-          cx={cp1.x}
-          cy={cp1.y}
-          {...controlPointStyle}
-          onMouseDown={(e) => handleMouseDown(e, 'cp1')}
-          onMouseEnter={(e) => {
-            e.target.setAttribute('r', controlPointHoverStyle.r);
-            e.target.setAttribute('fill', controlPointHoverStyle.fill);
-          }}
-          onMouseLeave={(e) => {
-            e.target.setAttribute('r', controlPointStyle.r);
-            e.target.setAttribute('fill', controlPointStyle.fill);
-          }}
-        />
-      )}
-      
-      {/* Control point 2 */}
-      {(selected || isDragging || recentlyInteracted) && (
-        <circle
-          cx={cp2.x}
-          cy={cp2.y}
-          {...controlPointStyle}
-          onMouseDown={(e) => handleMouseDown(e, 'cp2')}
-          onMouseEnter={(e) => {
-            e.target.setAttribute('r', controlPointHoverStyle.r);
-            e.target.setAttribute('fill', controlPointHoverStyle.fill);
-          }}
-          onMouseLeave={(e) => {
-            e.target.setAttribute('r', controlPointStyle.r);
-            e.target.setAttribute('fill', controlPointStyle.fill);
-          }}
-        />
-      )}
-      
-      {/* Fixed centered label - no longer draggable */}
+      {/* Draggable label for curve reshaping */}
       {label && (
         <g 
           transform={`translate(${labelPos.x}, ${labelPos.y})`}
+          style={{ cursor: 'grab' }}
+          onMouseDown={handleLabelMouseDown}
         >
           {labelShowBg && (
             <rect
@@ -302,20 +268,86 @@ const DraggableEdge = ({
               width={80}
               height={24}
               {...labelBoxStyle}
-              style={{ cursor: 'default' }}
+              style={{ 
+                ...labelBoxStyle, 
+                cursor: 'grab',
+                stroke: isDragging ? '#3B82F6' : (selected ? '#60A5FA' : '#6B7280'),
+                strokeWidth: isDragging || selected ? 2 : 1,
+                fill: isDragging ? '#1E3A8A' : labelBgStyle.fill || '#374151'
+              }}
             />
           )}
           <text
             {...labelTextStyle}
             style={{ 
               ...labelTextStyle, 
-              cursor: 'default',
-              pointerEvents: 'none'
+              cursor: 'grab',
+              pointerEvents: 'none',
+              fill: isDragging ? '#60A5FA' : (labelStyle.fill || '#FFFFFF')
             }}
           >
             {label}
           </text>
+          
+          {/* Visual hint when selected or recently interacted */}
+          {(selected || recentlyInteracted) && (
+            <text
+              x={0}
+              y={30}
+              textAnchor="middle"
+              style={{
+                fill: '#3B82F6',
+                fontSize: '10px',
+                opacity: 0.7,
+                pointerEvents: 'none'
+              }}
+            >
+              ← Drag to reshape →
+            </text>
+          )}
         </g>
+      )}
+      
+      {/* Visual indicators when dragging */}
+      {isDragging && (
+        <>
+          {/* Show control points when dragging for visual feedback */}
+          <circle
+            cx={cp1.x}
+            cy={cp1.y}
+            r={4}
+            fill="#3B82F6"
+            opacity={0.6}
+          />
+          <circle
+            cx={cp2.x}
+            cy={cp2.y}
+            r={4}
+            fill="#3B82F6"
+            opacity={0.6}
+          />
+          {/* Helper lines */}
+          <line
+            x1={sourceX}
+            y1={sourceY}
+            x2={cp1.x}
+            y2={cp1.y}
+            stroke="#3B82F6"
+            strokeWidth={1}
+            strokeDasharray="3,3"
+            opacity={0.4}
+          />
+          <line
+            x1={cp2.x}
+            y1={cp2.y}
+            x2={targetX}
+            y2={targetY}
+            stroke="#3B82F6"
+            strokeWidth={1}
+            strokeDasharray="3,3"
+            opacity={0.4}
+          />
+        </>
       )}
       
       {/* Helper lines (when control points are visible) */}
