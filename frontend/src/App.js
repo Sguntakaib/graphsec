@@ -138,8 +138,6 @@ function AppContent() {
   const [contextMenu, setContextMenu] = useState(null);
   const [showTemplateLibrary, setShowTemplateLibrary] = useState(false);
   const [showSecurityQuestionnaire, setShowSecurityQuestionnaire] = useState(false);
-  const [showThreatModelingWizard, setShowThreatModelingWizard] = useState(false);
-  const [showCoreLoopDashboard, setShowCoreLoopDashboard] = useState(false);
   const [currentQuestionnaireNode, setCurrentQuestionnaireNode] = useState(null);
   const [currentQuestionnaireAnswers, setCurrentQuestionnaireAnswers] = useState({});
   const [nodeBranches, setNodeBranches] = useState({}); // Store security branches for each node
