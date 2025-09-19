@@ -81,16 +81,87 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     return iconMap[subtype] || Server;
   };
 
-  const formatAnswer = (answer, question) => {
-    if (answer === null || answer === undefined) {
-      return <span className="text-gray-500 italic">Not answered</span>;
+  const isGoodSecurityPractice = (answer, question) => {
+    // Define good security practices based on question context and answers
+    const questionId = question.id?.toLowerCase() || '';
+    const questionText = question.question?.toLowerCase() || '';
+    
+    // Boolean questions - determine if true/false represents good security
+    if (typeof answer === 'boolean') {
+      // These questions are good when answered 'true'
+      if (questionId.includes('encryption') || 
+          questionId.includes('mfa') || 
+          questionId.includes('backup') ||
+          questionId.includes('monitoring') ||
+          questionId.includes('logging') ||
+          questionId.includes('validation') ||
+          questionText.includes('encryption') ||
+          questionText.includes('multi-factor') ||
+          questionText.includes('backup') ||
+          questionText.includes('monitor')) {
+        return answer === true;
+      }
+      
+      // These questions are good when answered 'false' 
+      if (questionId.includes('anonymous') || 
+          questionId.includes('public') ||
+          questionText.includes('anonymous') ||
+          questionText.includes('public access')) {
+        return answer === false;
+      }
+      
+      // Default: true is generally better for security questions
+      return answer === true;
     }
     
+    // Single choice questions - evaluate based on answer content
+    if (question.type === 'single_choice' && typeof answer === 'string') {
+      const answerLower = answer.toLowerCase();
+      
+      // Good security practices
+      if (answerLower.includes('oauth') || 
+          answerLower.includes('saml') ||
+          answerLower.includes('mfa') ||
+          answerLower.includes('aes') ||
+          answerLower.includes('encrypted') ||
+          answerLower.includes('comprehensive') ||
+          answerLower.includes('strict') ||
+          answerLower.includes('https') ||
+          answerLower.includes('tls') ||
+          answerLower.includes('regular')) {
+        return true;
+      }
+      
+      // Bad security practices
+      if (answerLower.includes('none') ||
+          answerLower.includes('basic') ||
+          answerLower.includes('no encryption') ||
+          answerLower.includes('never') ||
+          answerLower.includes('minimal') ||
+          answerLower.includes('http') ||
+          answerLower.includes('plain')) {
+        return false;
+      }
+    }
+    
+    // Default to neutral if we can't determine
+    return null;
+  };
+
+  const formatAnswer = (answer, question) => {
+    if (answer === null || answer === undefined) {
+      return <span className="text-gray-400 italic">Not answered</span>;
+    }
+    
+    const isGoodPractice = isGoodSecurityPractice(answer, question);
+    
     if (typeof answer === 'boolean') {
+      const bgColor = isGoodPractice === true ? 'bg-green-900 text-green-300 border border-green-700' : 
+                     isGoodPractice === false ? 'bg-red-900 text-red-300 border border-red-700' : 
+                     'bg-gray-700 text-gray-300 border border-gray-600';
+      
       return (
-        <span className={`px-2 py-1 rounded text-xs font-medium ${
-          answer ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-        }`}>
+        <span className={`px-2 py-1 rounded text-xs font-medium ${bgColor}`}>
           {answer ? 'Yes' : 'No'}
         </span>
       );
@@ -98,14 +169,20 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     
     if (question.type === 'single_choice' && question.options) {
       const option = question.options.find(opt => opt.value === answer);
+      const displayText = option ? option.label : answer;
+      
+      const bgColor = isGoodPractice === true ? 'bg-green-900 text-green-300 border border-green-700' : 
+                     isGoodPractice === false ? 'bg-red-900 text-red-300 border border-red-700' : 
+                     'bg-blue-900 text-blue-300 border border-blue-700';
+      
       return (
-        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-          {option ? option.label : answer}
+        <span className={`px-2 py-1 rounded text-xs font-medium ${bgColor}`}>
+          {displayText}
         </span>
       );
     }
     
-    return <span className="text-gray-700">{String(answer)}</span>;
+    return <span className="text-gray-300">{String(answer)}</span>;
   };
 
   const getCompletionStatus = (node) => {
