@@ -4379,6 +4379,181 @@ async def get_phase2_questionnaire(node_subtype: str, level: str = "basic"):
         logger.error(f"Error getting merged questionnaire prompts: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Enhanced API Node Questionnaire with Dynamic Questions
+@api_router.get("/questionnaires/{node_subtype}/enhanced")
+async def get_enhanced_questionnaire(
+    node_subtype: str, 
+    level: str = "basic",
+    canvas_nodes: str = None  # JSON string of canvas nodes for reuse detection
+):
+    """
+    Get enhanced questionnaire with dynamic questions, canvas node detection, and reuse logic
+    
+    Features:
+    - API type-specific dynamic questions
+    - Database reuse detection and questions
+    - External services categorization
+    - Bidirectional API ↔ Web flow logic
+    """
+    try:
+        from conditional_questionnaire_engine import get_conditional_questionnaire_engine
+        
+        engine = get_conditional_questionnaire_engine()
+        level_enum = QuestionnaireLevel(level.lower())
+        
+        # Parse canvas nodes if provided
+        canvas_nodes_list = []
+        if canvas_nodes:
+            try:
+                import json
+                canvas_nodes_list = json.loads(canvas_nodes)
+            except Exception as e:
+                logger.warning(f"Failed to parse canvas_nodes: {e}")
+        
+        # Get enhanced questionnaire with canvas detection
+        questions, has_conditional = engine.get_enhanced_conditional_questionnaire(
+            node_subtype, level_enum, canvas_nodes=canvas_nodes_list
+        )
+        
+        if not questions:
+            raise HTTPException(status_code=404, detail=f"No enhanced questionnaire found for {node_subtype}")
+        
+        return {
+            "success": True,
+            "node_subtype": node_subtype,
+            "level": level,
+            "total_questions": len(questions),
+            "has_conditional_questions": has_conditional,
+            "has_canvas_detection": len(canvas_nodes_list) > 0,
+            "detected_nodes": len(canvas_nodes_list),
+            "questions": questions,
+            "features": {
+                "dynamic_api_questions": node_subtype.upper() == "API",
+                "database_reuse_detection": True,
+                "external_services_categorization": True,
+                "bidirectional_web_flow": node_subtype.upper() == "API",
+                "vulnerability_integration": True
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting enhanced questionnaire for {node_subtype}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get enhanced questionnaire: {str(e)}")
+
+@api_router.post("/questionnaires/{node_subtype}/enhanced/conditional")
+async def get_conditional_questions_enhanced(
+    node_subtype: str,
+    request: Dict[str, Any]
+):
+    """
+    Get conditional questions based on previous responses with enhanced features
+    
+    Request body should contain:
+    - responses: Previous user responses
+    - canvas_nodes: Current canvas nodes for reuse detection
+    - level: Questionnaire level (basic/advanced/expert)
+    """
+    try:
+        from conditional_questionnaire_engine import get_conditional_questionnaire_engine
+        
+        engine = get_conditional_questionnaire_engine()
+        
+        responses = request.get("responses", {})
+        canvas_nodes = request.get("canvas_nodes", [])
+        level = request.get("level", "basic")
+        level_enum = QuestionnaireLevel(level.lower())
+        
+        # Get enhanced questionnaire with responses and canvas detection
+        questions, has_conditional = engine.get_enhanced_conditional_questionnaire(
+            node_subtype, level_enum, responses, canvas_nodes
+        )
+        
+        # Process reuse decisions if present
+        reuse_info = {}
+        if "database_reuse_decision" in responses:
+            existing_db_nodes = []
+            for question in questions:
+                if question.get("id") == "database_reuse_decision":
+                    existing_db_nodes = question.get("existing_nodes", [])
+                    break
+            
+            if existing_db_nodes:
+                reuse_info = engine.process_reuse_decision(
+                    responses["database_reuse_decision"], 
+                    existing_db_nodes
+                )
+        
+        return {
+            "success": True,
+            "node_subtype": node_subtype,
+            "level": level,
+            "total_questions": len(questions),
+            "has_conditional_questions": has_conditional,
+            "questions": questions,
+            "reuse_info": reuse_info,
+            "triggers_detected": {
+                "api_type": responses.get("api_type"),
+                "database_type": responses.get("database_type"),
+                "web_interface_exposure": responses.get("api_web_interface_exposure"),
+                "external_services": responses.get("api_external_services")
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting conditional questions for {node_subtype}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get conditional questions: {str(e)}")
+
+@api_router.get("/questionnaires/external-services/categories")
+async def get_external_services_categories():
+    """Get available external services categories for enhanced API questionnaires"""
+    try:
+        from conditional_questionnaire_engine import get_conditional_questionnaire_engine
+        
+        engine = get_conditional_questionnaire_engine()
+        
+        return {
+            "success": True,
+            "categories": engine.external_services_categories,
+            "total_categories": len(engine.external_services_categories),
+            "description": "Enhanced categorization of external services for API security assessment"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting external services categories: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get external services categories: {str(e)}")
+
+@api_router.post("/questionnaires/canvas/detect-nodes")
+async def detect_canvas_nodes(request: Dict[str, Any]):
+    """
+    Detect existing nodes on canvas for reuse logic
+    
+    Request body should contain:
+    - canvas_nodes: List of current canvas nodes
+    - target_type: Type of node to detect (Database, API, WebApp, etc.)
+    """
+    try:
+        from conditional_questionnaire_engine import get_conditional_questionnaire_engine
+        
+        engine = get_conditional_questionnaire_engine()
+        
+        canvas_nodes = request.get("canvas_nodes", [])
+        target_type = request.get("target_type", "Database")
+        
+        existing_nodes = engine.detect_existing_nodes_on_canvas(canvas_nodes, target_type)
+        
+        return {
+            "success": True,
+            "target_type": target_type,
+            "existing_nodes_count": len(existing_nodes),
+            "existing_nodes": existing_nodes,
+            "has_existing_nodes": len(existing_nodes) > 0,
+            "reuse_recommended": len(existing_nodes) > 0 and target_type.lower() == "database"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error detecting canvas nodes: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to detect canvas nodes: {str(e)}")
+
 # Helper functions for enhanced simulation
 
 async def get_mitre_analysis_for_diagram(diagram_id: str) -> dict:
