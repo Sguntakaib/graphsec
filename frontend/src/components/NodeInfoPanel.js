@@ -6,22 +6,18 @@ import {
   Server, 
   Monitor,
   HardDrive,
-  ChevronDown,
-  ChevronRight,
   CheckCircle,
   XCircle,
   AlertCircle,
-  Info
+  Info,
+  ArrowLeft,
+  User
 } from 'lucide-react';
 
-const NodeInfoPanel = ({ node, onEditQuestionnaire }) => {
+const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
   const [questionsData, setQuestionsData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [expandedSections, setExpandedSections] = useState({
-    basic: true,
-    questionnaire: true,
-    security: false
-  });
+  const [loading, setLoading] = useState(false);
+  const [activeNode, setActiveNode] = useState(null);
 
   useEffect(() => {
     if (node && node.data?.subtype) {
