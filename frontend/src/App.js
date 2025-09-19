@@ -2714,7 +2714,6 @@ function AppContent() {
             nodesConnectable={true}
             elementsSelectable={true}
             selectNodesOnDrag={false}
-            onEdgeUpdate={handleEdgeUpdate}
           >
             <Controls 
               className="bg-gray-800 border-gray-700"
