@@ -270,13 +270,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 2 VulnerabilityNode Component"
-    - "Phase 2 VulnerabilityEdge Component"
-    - "Phase 2 VulnerabilityFilter Component"
-    - "Phase 2 VulnerabilityLegend Component"
-    - "Phase 2 VulnerabilityReport Component"
-    - "Phase 2 Real-time Integration"
-    - "Phase 2 Vulnerability System UI Controls"
+    - "NodeInfoPanel Enhanced Functionality"
   stuck_tasks: 
     - "Phase 1 Core Loop Completion - Findings Management System"
     - "Phase 1 Core Loop Completion - Questionnaire Completion Processor"
