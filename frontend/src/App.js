@@ -2422,7 +2422,9 @@ function AppContent() {
   return (
     <div className="h-screen flex flex-col bg-gray-900">
       {/* Enhanced Header */}
-      <div className="bg-gray-800 border-b border-gray-700 p-4">
+      <div className={`bg-gray-800 border-b border-gray-700 transition-all duration-300 ease-in-out ${
+        isTopToolbarCollapsed ? 'h-0 overflow-hidden' : 'p-4'
+      }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Shield className="h-8 w-8 text-blue-400" />
