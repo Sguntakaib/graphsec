@@ -3050,40 +3050,6 @@ function AppContent() {
         />
       )}
 
-      {/* Threat Modeling Wizard Modal */}
-      {showThreatModelingWizard && (
-        <ThreatModelingWizard
-          isVisible={showThreatModelingWizard}
-          onClose={handleThreatModelingWizardCancel}
-          onComplete={handleThreatModelingWizardComplete}
-          currentDiagram={currentDiagram}
-          existingNodes={nodes}
-          existingEdges={edges}
-        />
-      )}
-
-      {/* Core Loop Dashboard Modal */}
-      {showCoreLoopDashboard && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-7xl w-full max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Phase 1 Core Loop Dashboard</h2>
-              <button
-                onClick={() => setShowCoreLoopDashboard(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
-              <CoreLoopDashboard />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Questionnaire Overview Modal */}
       {showQuestionnaireOverview && overviewNode && (
         <QuestionnaireOverview
