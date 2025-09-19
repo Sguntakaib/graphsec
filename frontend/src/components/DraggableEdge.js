@@ -110,6 +110,7 @@ const DraggableEdge = ({
   const handleLabelMouseDown = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation(); // Stop React Flow from handling this
     
     console.log('🎯 Starting label drag for curve reshaping');
     setIsDragging(true);
@@ -123,6 +124,9 @@ const DraggableEdge = ({
     };
     
     const handleMouseMove = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
       const currentMouseX = e.clientX;
       const currentMouseY = e.clientY;
       
@@ -163,7 +167,10 @@ const DraggableEdge = ({
       controlPoint2Ref.current = newCp2;
     };
     
-    const handleMouseUp = () => {
+    const handleMouseUp = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
       console.log('🎯 Completing label drag - curve reshaped');
       setIsDragging(false);
       
@@ -179,12 +186,13 @@ const DraggableEdge = ({
         }
       }));
       
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove, true);
+      document.removeEventListener('mouseup', handleMouseUp, true);
     };
     
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    // Use capture phase to intercept events before React Flow can handle them
+    document.addEventListener('mousemove', handleMouseMove, true);
+    document.addEventListener('mouseup', handleMouseUp, true);
   }, [id, controlPoint1, controlPoint2, sourceX, sourceY, targetX, targetY, labelPosition]);
 
   // Effect to manage temporary control point visibility after interaction
