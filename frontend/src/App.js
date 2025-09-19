@@ -564,7 +564,10 @@ function AppContent() {
           strokeDasharray: '3,3',  // Add dotted pattern like auto-connected edges
           stroke: '#10B981'  // Use same green color as auto-connected dependency edges
         },
-        markerEnd: connectionInfo.markerEnd,
+        markerEnd: {
+          ...connectionInfo.markerEnd,
+          color: '#10B981'  // Use same green color as auto-connected dependency edges
+        },
         labelStyle: connectionInfo.labelStyle,
         labelBgStyle: connectionInfo.labelBgStyle,
         labelShowBg: true,
