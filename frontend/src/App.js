@@ -258,8 +258,8 @@ function AppContent() {
       const { edgeId, updateData } = event.detail;
       console.log('🔧 Received edge update:', edgeId, updateData);
       
-      setEdges((edges) =>
-        edges.map((edge) => {
+      setEdges((currentEdges) => {
+        const updatedEdges = currentEdges.map((edge) => {
           if (edge.id === edgeId) {
             const updatedEdge = {
               ...edge,
@@ -268,18 +268,22 @@ function AppContent() {
                 ...updateData
               }
             };
-            
-            // If this is the currently selected edge, update the selectedEdge state
-            // to maintain selection after the edge object changes
-            if (selectedEdge?.id === edgeId) {
-              setSelectedEdge(updatedEdge);
-            }
-            
             return updatedEdge;
           }
           return edge;
-        })
-      );
+        });
+        
+        // If the updated edge is currently selected, update the selectedEdge state with the new edge object
+        // Use a callback-based update to ensure we get the latest edge from the updated edges array
+        if (selectedEdge?.id === edgeId) {
+          const newSelectedEdge = updatedEdges.find(edge => edge.id === edgeId);
+          if (newSelectedEdge) {
+            setSelectedEdge(newSelectedEdge);
+          }
+        }
+        
+        return updatedEdges;
+      });
     };
 
     window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
