@@ -108,41 +108,36 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     return <span className="text-gray-700">{String(answer)}</span>;
   };
 
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
-
-  const getCompletionStatus = () => {
-    if (!questionsData) return null;
+  const getCompletionStatus = (node) => {
+    if (!node.data?.questionnaireResponses) return null;
     
-    const { answeredQuestions, totalQuestions, completionPercentage } = questionsData;
+    const userAnswers = node.data.questionnaireResponses;
+    const answeredCount = Object.keys(userAnswers).filter(key => 
+      userAnswers[key] !== null && userAnswers[key] !== undefined
+    ).length;
     
-    if (completionPercentage === 100) {
-      return { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', text: 'Complete' };
-    } else if (completionPercentage >= 50) {
-      return { icon: AlertCircle, color: 'text-yellow-600', bg: 'bg-yellow-50', text: 'Partial' };
-    } else if (completionPercentage > 0) {
-      return { icon: AlertCircle, color: 'text-orange-600', bg: 'bg-orange-50', text: 'Started' };
-    } else {
+    if (answeredCount === 0) {
       return { icon: XCircle, color: 'text-gray-500', bg: 'bg-gray-50', text: 'Not Started' };
+    } else if (answeredCount >= 5) { // Assuming most questionnaires have around 5-10 questions
+      return { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', text: 'Complete' };
+    } else {
+      return { icon: AlertCircle, color: 'text-yellow-600', bg: 'bg-yellow-50', text: 'Partial' };
     }
   };
 
-  if (!node) {
-    return (
-      <div className="p-4 text-center">
-        <div className="text-gray-400 text-sm">
-          Select a node to view its information
-        </div>
-      </div>
-    );
-  }
+  const handleNodeClick = (node) => {
+    setActiveNode(node);
+  };
 
-  const NodeIcon = getNodeIcon(node.data?.subtype);
-  const status = getCompletionStatus();
+  const handleBackToList = () => {
+    setActiveNode(null);
+    setQuestionsData(null);
+  };
+
+  // Filter nodes to only show non-vulnerability nodes with subtypes
+  const availableNodes = (nodes || []).filter(node => 
+    node.type !== 'vulnerability' && node.data?.subtype
+  );
 
   return (
     <div className="bg-white border-b border-gray-200">
