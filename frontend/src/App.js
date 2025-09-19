@@ -26,8 +26,7 @@ import QuestionnaireOverview from './components/QuestionnaireOverview';
 import SmartNodeConnector from './components/SmartNodeConnector';
 import SimulationDebugger from './components/SimulationDebugger';
 import NodeBranchVisualizer from './components/NodeBranchVisualizer';
-import ThreatModelingWizard from './components/ThreatModelingWizard';
-import CoreLoopDashboard from './components/CoreLoopDashboard';
+
 import { QuestionnaireProvider, useQuestionnaire } from './contexts/QuestionnaireContext';
 // import QuestionnaireManager from './components/QuestionnaireManager'; // DISABLED: Using legacy system only
 import CanvasSynchronizer from './components/CanvasSynchronizer';
