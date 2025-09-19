@@ -2982,15 +2982,14 @@ function AppContent() {
         <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
           {viewMode === 'modeling' && (
             <>
-              {/* Node Information Panel - Show immediately when node is selected */}
-              {selectedNode ? (
-                <div className="border-b border-gray-700">
-                  <NodeInfoPanel 
-                    node={selectedNode}
-                    onEditQuestionnaire={handleEditQuestionnaireFromInfo}
-                  />
-                </div>
-              ) : (
+              {/* Node Information Panel - Always show with nodes list */}
+              <div className="border-b border-gray-700">
+                <NodeInfoPanel 
+                  nodes={nodes}
+                  selectedNode={selectedNode}
+                  onEditQuestionnaire={handleEditQuestionnaireFromInfo}
+                />
+              </div>
                 <div className="p-4 text-center border-b border-gray-700">
                   <div className="text-gray-400 text-sm">
                     Click on a node to view its information and security configuration
