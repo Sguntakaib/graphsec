@@ -535,13 +535,14 @@ class CanvasNodeDetectionTester:
                 return False
             
             print(f"📊 Database Questionnaire Results:")
-            print(f"   Success: {data.get('success')}")
             print(f"   Node subtype: {data.get('node_subtype')}")
             print(f"   Level: {data.get('level')}")
             print(f"   Total questions: {data.get('total_questions')}")
             print(f"   Prompts count: {len(prompts)}")
             print(f"   Sample question: {first_prompt.get('question', 'N/A')[:50]}...")
             print(f"   Sample question type: {first_prompt.get('type')}")
+            print(f"   Questionnaire type: {data.get('questionnaire_type', 'N/A')}")
+            print(f"   Security branches: {len(data.get('security_branches', []))}")
             
             self.log_test("Database Questionnaire", True, f"✅ SUCCESS: Database questionnaire returned {len(prompts)} prompts")
             return True
