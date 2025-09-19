@@ -238,37 +238,41 @@ const DraggableEdge = ({
         className="react-flow__edge-path"
       />
       
-      {/* Control point 1 - Always show for debugging */}
-      <circle
-        cx={cp1.x}
-        cy={cp1.y}
-        {...controlPointStyle}
-        onMouseDown={(e) => handleMouseDown(e, 'cp1')}
-        onMouseEnter={(e) => {
-          e.target.setAttribute('r', controlPointHoverStyle.r);
-          e.target.setAttribute('fill', controlPointHoverStyle.fill);
-        }}
-        onMouseLeave={(e) => {
-          e.target.setAttribute('r', controlPointStyle.r);
-          e.target.setAttribute('fill', controlPointStyle.fill);
-        }}
-      />
+      {/* Control point 1 */}
+      {(selected || isDragging) && (
+        <circle
+          cx={cp1.x}
+          cy={cp1.y}
+          {...controlPointStyle}
+          onMouseDown={(e) => handleMouseDown(e, 'cp1')}
+          onMouseEnter={(e) => {
+            e.target.setAttribute('r', controlPointHoverStyle.r);
+            e.target.setAttribute('fill', controlPointHoverStyle.fill);
+          }}
+          onMouseLeave={(e) => {
+            e.target.setAttribute('r', controlPointStyle.r);
+            e.target.setAttribute('fill', controlPointStyle.fill);
+          }}
+        />
+      )}
       
-      {/* Control point 2 - Always show for debugging */}
-      <circle
-        cx={cp2.x}
-        cy={cp2.y}
-        {...controlPointStyle}
-        onMouseDown={(e) => handleMouseDown(e, 'cp2')}
-        onMouseEnter={(e) => {
-          e.target.setAttribute('r', controlPointHoverStyle.r);
-          e.target.setAttribute('fill', controlPointHoverStyle.fill);
-        }}
-        onMouseLeave={(e) => {
-          e.target.setAttribute('r', controlPointStyle.r);
-          e.target.setAttribute('fill', controlPointStyle.fill);
-        }}
-      />
+      {/* Control point 2 */}
+      {(selected || isDragging) && (
+        <circle
+          cx={cp2.x}
+          cy={cp2.y}
+          {...controlPointStyle}
+          onMouseDown={(e) => handleMouseDown(e, 'cp2')}
+          onMouseEnter={(e) => {
+            e.target.setAttribute('r', controlPointHoverStyle.r);
+            e.target.setAttribute('fill', controlPointHoverStyle.fill);
+          }}
+          onMouseLeave={(e) => {
+            e.target.setAttribute('r', controlPointStyle.r);
+            e.target.setAttribute('fill', controlPointStyle.fill);
+          }}
+        />
+      )}
       
       {/* Draggable label */}
       {label && (
