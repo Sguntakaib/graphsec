@@ -162,6 +162,10 @@ function AppContent() {
   });
   const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]);
   const [autoVulnerabilityAnalysis, setAutoVulnerabilityAnalysis] = useState(false); // Disabled by default - require manual trigger after complete questionnaire
+  
+  // Collapsible menu states
+  const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
+  const [isTopToolbarCollapsed, setIsTopToolbarCollapsed] = useState(false);
 
   // Track zoom level changes
   const onMoveEnd = useCallback((event, viewport) => {
