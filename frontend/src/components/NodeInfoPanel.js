@@ -25,7 +25,7 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     } else {
       setQuestionsData(null);
     }
-  }, [activeNode]);
+  }, [activeNode, activeNode?.data?.questionnaireResponses, activeNode?.data?.lastQuestionnaireUpdate]);
 
   const fetchNodeQuestionsAndAnswers = async () => {
     if (!activeNode?.data?.subtype) return;
