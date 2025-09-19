@@ -241,9 +241,34 @@ function AppContent() {
       }
     };
 
+    // Edge update handler for draggable edges
+    const handleEdgeUpdate = (event) => {
+      const { edgeId, updateData } = event.detail;
+      console.log('🔧 Received edge update:', edgeId, updateData);
+      
+      setEdges((edges) =>
+        edges.map((edge) => {
+          if (edge.id === edgeId) {
+            return {
+              ...edge,
+              data: {
+                ...edge.data,
+                ...updateData
+              }
+            };
+          }
+          return edge;
+        })
+      );
+    };
+
     window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
-    return () => window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
-  }, [nodes, currentDiagram]);
+    window.addEventListener('edgeUpdate', handleEdgeUpdate);
+    return () => {
+      window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
+      window.removeEventListener('edgeUpdate', handleEdgeUpdate);
+    };
+  }, [nodes, currentDiagram, setEdges]);
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
