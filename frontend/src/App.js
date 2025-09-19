@@ -2351,36 +2351,6 @@ function AppContent() {
     }));
   };
 
-  // Threat Modeling Wizard Handlers
-  const handleThreatModelingWizardComplete = async (result) => {
-    try {
-      // Process wizard results and generate threat model
-      console.log('Threat Modeling Wizard completed:', result);
-      
-      // Generate nodes and edges based on wizard results
-      if (result.generatedNodes && result.generatedEdges) {
-        setNodes(prevNodes => [...prevNodes, ...result.generatedNodes]);
-        setEdges(prevEdges => [...prevEdges, ...result.generatedEdges]);
-      }
-      
-      // If we have a current diagram, save the updates
-      if (currentDiagram) {
-        await handleSaveDiagram();
-      }
-      
-      alert('Threat model generated successfully!');
-    } catch (error) {
-      console.error('Error processing wizard results:', error);
-      alert('Threat model completed, but some features may need manual configuration.');
-    } finally {
-      setShowThreatModelingWizard(false);
-    }
-  };
-
-  const handleThreatModelingWizardCancel = () => {
-    setShowThreatModelingWizard(false);
-  };
-
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event) => {
