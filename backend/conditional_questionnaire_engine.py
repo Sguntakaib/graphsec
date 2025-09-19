@@ -578,6 +578,14 @@ class ConditionalQuestionnaireEngine:
             return self.api_type_questions.get(response, [])
         elif question_id == "database_type" and node_subtype.upper() == "DATABASE":
             return self.database_type_questions.get(response, [])
+        elif question_id == "api_web_interface_exposure" and node_subtype.upper() == "API":
+            if response and response.startswith('Yes'):
+                # Return web interface security questions
+                web_questions = self.api_web_interface_questions.copy()
+                for question in web_questions:
+                    question['is_conditional'] = True
+                    question['conditional_trigger'] = 'api_web_interface_exposure'
+                return web_questions
         
         return []
     
