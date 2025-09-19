@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://query-tracker-3.preview.emergentagent.com/api"
+BASE_URL = "https://line-animator.preview.emergentagent.com/api"
 
 class Phase1CriticalEndpointTester:
     def __init__(self):
