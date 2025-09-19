@@ -18,8 +18,7 @@ const DraggableEdge = ({
   labelBgPadding = [4, 8],
   markerEnd,
   style = {},
-  selected = false,
-  onEdgeUpdate
+  selected = false
 }) => {
   // Control points for bezier curve (stored as offset from default position)
   const [controlPoint1, setControlPoint1] = useState(data.controlPoint1 || { x: 0, y: 0 });
