@@ -289,10 +289,11 @@ const DraggableEdge = ({
               {...labelBoxStyle}
               style={{ 
                 ...labelBoxStyle, 
-                cursor: 'grab',
+                cursor: isDragging ? 'grabbing' : 'grab',
                 stroke: isDragging ? '#3B82F6' : (selected ? '#60A5FA' : '#6B7280'),
                 strokeWidth: isDragging || selected ? 2 : 1,
-                fill: isDragging ? '#1E3A8A' : labelBgStyle.fill || '#374151'
+                fill: isDragging ? '#1E3A8A' : labelBgStyle.fill || '#374151',
+                pointerEvents: 'all' // Ensure the rect can receive mouse events
               }}
             />
           )}
