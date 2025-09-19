@@ -558,7 +558,11 @@ function AppContent() {
         id: `edge-${params.source}-${params.target}-${Date.now()}`,
         type: 'draggable',  // Use draggable edge type
         label: connectionInfo.label,
-        style: connectionInfo.style,
+        animated: true,  // Add animation like auto-connected edges
+        style: {
+          ...connectionInfo.style,
+          strokeDasharray: '3,3'  // Add dotted pattern like auto-connected edges
+        },
         markerEnd: connectionInfo.markerEnd,
         labelStyle: connectionInfo.labelStyle,
         labelBgStyle: connectionInfo.labelBgStyle,
