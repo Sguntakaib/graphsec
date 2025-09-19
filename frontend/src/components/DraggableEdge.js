@@ -21,11 +21,23 @@ const DraggableEdge = ({
   selected = false
 }) => {
   // Control points for bezier curve (stored as offset from default position)
-  const [controlPoint1, setControlPoint1] = useState(data.controlPoint1 || { x: 0, y: 0 });
-  const [controlPoint2, setControlPoint2] = useState(data.controlPoint2 || { x: 0, y: 0 });
+  // Initialize with defaults if data is missing
+  const [controlPoint1, setControlPoint1] = useState(() => {
+    return data?.controlPoint1 || { x: 0, y: 0 };
+  });
+  const [controlPoint2, setControlPoint2] = useState(() => {
+    return data?.controlPoint2 || { x: 0, y: 0 };
+  });
   
   // Label position along the path (0 to 1, where 0.5 is center)
-  const [labelPosition, setLabelPosition] = useState(data.labelPosition || 0.5);
+  const [labelPosition, setLabelPosition] = useState(() => {
+    return data?.labelPosition || 0.5;
+  });
+
+  // Debug log to track edge selection
+  useEffect(() => {
+    console.log(`🔧 DraggableEdge ${id}: selected=${selected}, isDragging=${isDragging}, data:`, data);
+  }, [id, selected, isDragging, data]);
   
   // Drag state
   const [isDragging, setIsDragging] = useState(null); // 'cp1', 'cp2', 'label', or null
