@@ -8,7 +8,7 @@ import requests
 import json
 
 # Use the production URL from review request
-BASE_URL = "https://line-animator.preview.emergentagent.com/api"
+BASE_URL = "https://sidepane-update.preview.emergentagent.com/api"
 
 class ReviewRequestTester:
     def __init__(self):

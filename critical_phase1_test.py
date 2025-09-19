@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://line-animator.preview.emergentagent.com/api"
+BASE_URL = "https://sidepane-update.preview.emergentagent.com/api"
 
 def test_endpoint_1_questionnaire_complete():
     """

@@ -10,7 +10,7 @@ import uuid
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://line-animator.preview.emergentagent.com/api"
+BASE_URL = "https://sidepane-update.preview.emergentagent.com/api"
 
 class RoutingFixTester:
     def __init__(self):
