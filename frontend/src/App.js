@@ -249,13 +249,21 @@ function AppContent() {
       setEdges((edges) =>
         edges.map((edge) => {
           if (edge.id === edgeId) {
-            return {
+            const updatedEdge = {
               ...edge,
               data: {
                 ...edge.data,
                 ...updateData
               }
             };
+            
+            // If this is the currently selected edge, update the selectedEdge state
+            // to maintain selection after the edge object changes
+            if (selectedEdge?.id === edgeId) {
+              setSelectedEdge(updatedEdge);
+            }
+            
+            return updatedEdge;
           }
           return edge;
         })
