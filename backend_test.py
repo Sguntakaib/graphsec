@@ -1,36 +1,37 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - ENHANCED LABEL DRAGGING FUNCTIONALITY
-Tests the backend support for enhanced label dragging functionality as specified in the review request.
+Backend API Testing - ENHANCED API NODE QUESTIONNAIRE SYSTEM
+Tests the new enhanced API Node questionnaire system with dynamic questions as specified in the review request.
 
 TESTING FOCUS:
-🎯 PRIMARY TEST: ENHANCED LABEL DRAGGING BACKEND SUPPORT
+🎯 PRIMARY TEST: ENHANCED API NODE QUESTIONNAIRE SYSTEM WITH DYNAMIC QUESTIONS
 
-1. **Template Edge Labels Testing:**
-   - Load Web Application Security Model template via GET /api/templates
-   - Verify template edges have labels like "Initial Access", "Filtered Traffic", "Contains Vulnerability", "Data Access"
-   - Check that template edges support draggable functionality (type 'draggable' or default)
-   - Verify edge data structure supports label positioning
+1. **Enhanced Questionnaire Endpoint Testing:**
+   - Test GET /api/questionnaires/API/enhanced without canvas nodes
+   - Test GET /api/questionnaires/API/enhanced with canvas_nodes parameter containing sample Database nodes
+   - Verify response includes dynamic_api_questions, database_reuse_detection, external_services_categorization features
 
-2. **Dependency Edge Labels Testing:**
-   - Create nodes that generate dependency edges with "has_dependency" labels
-   - Test auto-generated dependency labels are draggable
-   - Verify dependency edge creation and label support
+2. **External Services Categories Testing:**
+   - Test GET /api/questionnaires/external-services/categories
+   - Verify returns 9 categories (Authentication, Payment, Cloud, Messaging, Analytics, Social Media, File Storage, Notification, Other)
+   - Check each category has appropriate service examples
 
-3. **Edge Update Events Testing:**
-   - Test PUT /api/diagrams/{id} endpoint for edge updates with label positions
-   - Verify that label position changes are properly persisted
-   - Test edge data structure with controlPoint1, controlPoint2, labelPosition fields
+3. **Canvas Node Detection Testing:**
+   - Test POST /api/questionnaires/canvas/detect-nodes with sample canvas nodes containing Database nodes
+   - Test detection of different node types (Database, API, WebApp)
+   - Verify reuse recommendations work correctly
 
-4. **Diagram Creation with Draggable Edges:**
-   - Test POST /api/diagrams endpoint with draggable edge support
-   - Verify new diagrams support draggable edge functionality
+4. **Enhanced Conditional Questions Testing:**
+   - Test POST /api/questionnaires/API/enhanced/conditional with API type responses (REST API, GraphQL API, etc.)
+   - Test database reuse decision processing
+   - Test web interface exposure triggers
+   - Verify conditional questions are added based on responses
 
 **EXPECTED RESULTS:** 
-- Template edges should have proper labels and support draggable functionality
-- Edge updates should persist label position changes
-- Dependency edges should be created with draggable labels
-- All backend APIs should handle edge data with control points and label positioning
+- Enhanced questionnaire endpoint should return dynamic questions with all features enabled
+- External services categories should return 9 categories with proper service examples
+- Canvas node detection should identify existing nodes and provide reuse recommendations
+- Conditional questions should be dynamically added based on API type and other responses
 """
 
 import requests
