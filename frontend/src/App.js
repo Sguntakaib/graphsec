@@ -106,6 +106,54 @@ function AppContent() {
     return () => window.removeEventListener('error', resizeObserverErrHandler, true);
   }, []);
 
+  // Handle editing questionnaire from node info panel
+  const handleEditQuestionnaireFromInfo = useCallback(async (node) => {
+    console.log('🎯 Edit questionnaire triggered from info panel for node:', node.id);
+    
+    // Get existing answers from node data
+    let existingAnswers = {};
+    
+    if (node.data?.questionnaireResponses && Object.keys(node.data.questionnaireResponses).length > 0) {
+      existingAnswers = node.data.questionnaireResponses;
+      console.log('📝 Found existing questionnaire answers in node data:', existingAnswers);
+    } else if (currentDiagram) {
+      // Fallback to backend API if no data in node
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          existingAnswers = data.questionnaire_responses || {};
+          console.log('📝 Fetched existing questionnaire answers from backend:', existingAnswers);
+        }
+      } catch (error) {
+        console.error('⚠️ Error fetching existing questionnaire answers from backend:', error);
+      }
+    }
+    
+    // Set up questionnaire state
+    const nodeSubtype = node.subtype || node.data?.subtype;
+    console.log('🚀 Opening Security Questionnaire for editing');
+    
+    // Clear any existing questionnaire state
+    setQuestionnaireQueue([]);
+    setCurrentQueueIndex(0);
+    setParentQuestionnaireStack([]);
+    
+    // Set the state to open questionnaire
+    const questionnaireNode = {
+      id: node.id,
+      subtype: nodeSubtype,
+      data: { subtype: nodeSubtype }
+    };
+    
+    setCurrentQuestionnaireNode(questionnaireNode);
+    setCurrentQuestionnaireAnswers(existingAnswers);
+    setShowSecurityQuestionnaire(true);
+  }, [currentDiagram]);
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, defaultOnEdgesChange] = useEdgesState(initialEdges);
   // Enhanced questionnaire system disabled - using legacy system only
