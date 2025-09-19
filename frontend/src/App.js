@@ -2789,9 +2789,26 @@ function AppContent() {
         </button>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Left Sidebar Toggle Button */}
+        <div className="absolute top-1/2 left-0 transform -translate-y-1/2 z-50">
+          <button
+            onClick={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
+            className="px-1 py-3 bg-gray-700 text-white rounded-r hover:bg-gray-600 transition-colors flex items-center justify-center shadow-lg"
+            title={isLeftSidebarCollapsed ? "Show Security Nodes Menu" : "Hide Security Nodes Menu"}
+          >
+            {isLeftSidebarCollapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+
         {/* Left Sidebar - Advanced Node Library */}
-        <div className="w-80 bg-gray-800 border-r border-gray-700 overflow-y-auto">
+        <div className={`bg-gray-800 border-r border-gray-700 overflow-y-auto transition-all duration-300 ease-in-out ${
+          isLeftSidebarCollapsed ? 'w-0 overflow-hidden' : 'w-80'
+        }`}>
           <AdvancedNodeLibrary />
           
           {/* Diagram List */}
