@@ -168,7 +168,7 @@ const DraggableEdge = ({
     stroke: '#1E40AF',
     strokeWidth: 2,
     cursor: 'grab',
-    opacity: selected || isDragging ? 1 : 0  // Only show when selected or dragging
+    opacity: selected || isDragging ? 1 : 0.3  // Show with low opacity when not selected for discoverability
   };
 
   const controlPointHoverStyle = {
