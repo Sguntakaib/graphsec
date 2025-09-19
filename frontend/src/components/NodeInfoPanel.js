@@ -260,24 +260,24 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-              <span className="ml-3 text-gray-600">Loading questions...</span>
+              <div className="animate-spin h-6 w-6 border-2 border-blue-400 border-t-transparent rounded-full"></div>
+              <span className="ml-3 text-gray-300">Loading questions...</span>
             </div>
           ) : questionsData ? (
             <div className="p-4">
               {/* Progress Info */}
-              <div className="mb-6 bg-gray-50 rounded-lg p-4">
+              <div className="mb-6 bg-gray-800 rounded-lg p-4 border border-gray-700">
                 <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="font-medium text-gray-700">Progress</span>
-                  <span className="font-bold text-gray-900">{questionsData.completionPercentage}%</span>
+                  <span className="font-medium text-gray-300">Progress</span>
+                  <span className="font-bold text-white">{questionsData.completionPercentage}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-700 rounded-full h-2">
                   <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${questionsData.completionPercentage}%` }}
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${Math.min(questionsData.completionPercentage, 100)}%` }}
                   ></div>
                 </div>
-                <div className="mt-2 text-xs text-gray-600">
+                <div className="mt-2 text-xs text-gray-400">
                   {questionsData.answeredQuestions} of {questionsData.totalQuestions} questions answered
                 </div>
               </div>
@@ -292,21 +292,21 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
 
               {/* Questions List */}
               <div className="space-y-4">
-                <h4 className="font-medium text-gray-900 mb-3">Questions & Answers</h4>
+                <h4 className="font-medium text-white mb-3">Questions & Answers</h4>
                 {questionsData.questions.map((question, index) => (
-                  <div key={question.id || index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                    <div className="text-sm font-medium text-gray-900 mb-3">
+                  <div key={question.id || index} className="bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-sm">
+                    <div className="text-sm font-medium text-white mb-3">
                       {index + 1}. {question.question}
                     </div>
                     <div className="text-sm mb-2">
-                      <span className="text-gray-600 font-medium">Answer: </span>
+                      <span className="text-gray-300 font-medium">Answer: </span>
                       {formatAnswer(question.userAnswer, question)}
                     </div>
                     {question.help_text && (
-                      <div className="mt-3 p-3 bg-blue-50 rounded-md">
+                      <div className="mt-3 p-3 bg-green-900 rounded-md border border-green-700">
                         <div className="flex items-start space-x-2">
-                          <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                          <span className="text-xs text-blue-800">{question.help_text}</span>
+                          <Info className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-xs text-green-300">{question.help_text}</span>
                         </div>
                       </div>
                     )}
@@ -314,16 +314,16 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
                 ))}
                 
                 {questionsData.questions.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <Info className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+                  <div className="text-center py-8 text-gray-400">
+                    <Info className="h-8 w-8 mx-auto mb-3 text-gray-500" />
                     <p>No configuration questions available for this node type.</p>
                   </div>
                 )}
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
-              <Info className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-8 text-gray-400">
+              <Info className="h-8 w-8 mx-auto mb-3 text-gray-500" />
               <p>Unable to load questions for this node.</p>
             </div>
           )}
