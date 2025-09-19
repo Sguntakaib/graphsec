@@ -29,10 +29,8 @@ const DraggableEdge = ({
     return data?.controlPoint2 || { x: 0, y: 0 };
   });
   
-  // Label position along the path (0 to 1, where 0.5 is center)
-  const [labelPosition, setLabelPosition] = useState(() => {
-    return data?.labelPosition || 0.5;
-  });
+  // Label position along the path (always centered at 0.5)
+  const labelPosition = 0.5; // Fixed at center, no longer draggable
 
   // Drag state
   const [isDragging, setIsDragging] = useState(null); // 'cp1', 'cp2', 'label', or null
