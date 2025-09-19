@@ -18,7 +18,7 @@ import './styles/vulnerability.css';
 import { AdvancedNodeLibrary } from './components/AdvancedNodeLibrary';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { EnhancedSimulationPanel } from './components/EnhancedSimulationPanel';
-import NodeInfoPanel from './components/NodeInfoPanel';
+// import NodeInfoPanel from './components/NodeInfoPanel';
 import { TemplateLibrary } from './components/TemplateLibrary';
 import { CustomNode } from './components/CustomNode';
 import SecurityQuestionnaire from './components/SecurityQuestionnaire';
