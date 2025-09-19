@@ -141,6 +141,9 @@ const DraggableEdge = ({
     const handleMouseUp = () => {
       setIsDragging(null);
       
+      // Set recently interacted flag to keep control points visible for a brief period
+      setRecentlyInteracted(true);
+      
       // Instead of calling onEdgeUpdate, we'll trigger a custom event
       // that the parent App component can listen to
       window.dispatchEvent(new CustomEvent('edgeUpdate', {
