@@ -1,29 +1,40 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - VULNERABILITY ANALYSIS FOR BACKUP AND MONITORING NODES
-Tests vulnerability analysis specifically for Backup and Monitoring node types after adding INFORMATIONAL severity level.
+Backend API Testing - ENHANCED VULNERABILITY COVERAGE FOR BACKUP AND MONITORING NODES
+Tests the enhanced vulnerability coverage for Backup and Monitoring nodes with NEW critical vulnerabilities.
 
 TESTING FOCUS:
-🎯 PRIMARY TEST: VULNERABILITY ANALYSIS WITH INFORMATIONAL SEVERITY
-1. **Test POST /vulnerabilities/analyze/{node_id} endpoint with Backup node type**
-2. **Test POST /vulnerabilities/analyze/{node_id} endpoint with Monitoring node type**
-3. **Use sample questionnaire responses that should trigger Informational severity vulnerabilities**
-4. **Verify vulnerability nodes are generated with proper structure including INFORMATIONAL severity**
-5. **Confirm the fix resolves the previous "'Informational' is not a valid VulnerabilitySeverity" error**
+🎯 PRIMARY TEST: ENHANCED VULNERABILITY COVERAGE WITH CRITICAL/HIGH SEVERITY
+1. **Test Backup Node Vulnerability Coverage:**
+   - Create test backup node with most insecure questionnaire responses
+   - Test responses that should trigger NEW critical vulnerabilities:
+     - backup_strategy: "No Backup Strategy" 
+     - backup_encryption: "No Encryption"
+     - backup_retention: "No Retention Policy"
+     - backup_testing: "Never Tested"
+     - backup_frequency: "Irregular"
+     - backup_frequency: "Monthly"
+   - Verify these responses generate multiple HIGH SEVERITY vulnerabilities (not just 1 informational)
 
-**CONTEXT:**
-- Frontend vulnerability analysis filtering has been fixed to include Backup and Monitoring nodes
-- Backend VulnerabilitySeverity enum now includes INFORMATIONAL = "Informational"
-- Color mapping added for INFORMATIONAL severity (#6B7280, lightbulb icon)
-- Backup and Monitoring vulnerability rules use "Informational" severity level for best practice recommendations
+2. **Test Monitoring Node Vulnerability Coverage:**
+   - Create test monitoring node with insecure questionnaire responses
+   - Test responses that should trigger NEW critical vulnerabilities:
+     - monitoring_alerting: "No Alerting"
+     - monitoring_access_control: "No Access Control"
+     - monitoring_access_control: "Shared Access"
+     - monitoring_data_retention: "No Defined Policy"
+     - monitoring_coverage: "Basic Monitoring"
+   - Verify these responses generate multiple HIGH SEVERITY vulnerabilities
 
-**TEST SCENARIOS:**
-- Backup node with basic backup strategy → should generate informational backup enhancement vulnerabilities
-- Monitoring node with basic monitoring setup → should generate informational monitoring enhancement vulnerabilities
-- Verify both return HTTP 200 with vulnerability nodes array containing INFORMATIONAL severity vulnerabilities
+3. **Verify API Endpoints:**
+   - Test GET /api/vulnerabilities/rules to confirm new rules are loaded
+   - Test POST /api/vulnerabilities/analyze/{node_id} for both Backup and Monitoring nodes
+   - Confirm that weak questionnaire responses now trigger MULTIPLE vulnerabilities per node (not just 1)
 
-**EXPECTED SUCCESS:**
-Both Backup and Monitoring nodes should now successfully generate vulnerability nodes with INFORMATIONAL severity without the previous 500 error.
+**EXPECTED RESULTS:** 
+- Backup nodes with insecure settings should generate 4-6 vulnerabilities (including Critical/High severity)
+- Monitoring nodes with insecure settings should generate 4-5 vulnerabilities (including Critical/High severity)
+- The vulnerability severity should match the risk level (Critical for no backup strategy, no encryption, etc.)
 """
 
 import requests
