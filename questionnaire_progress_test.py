@@ -411,11 +411,11 @@ class QuestionnaireProgressTester:
             
             api_node_id = self.test_nodes["API"]
             
-            # Test partial responses (3/7 questions answered)
+            # Test partial responses (3/7 questions answered) using real API question IDs
             partial_responses = {
-                "api_authentication": "oauth2",
-                "api_rate_limiting": "yes", 
-                "api_input_validation": "comprehensive"
+                "api_type": "REST API",
+                "api_protocol": "HTTPS", 
+                "api_auth_method": "JWT"
             }
             
             response = self.session.post(
@@ -463,7 +463,7 @@ class QuestionnaireProgressTester:
             print(f"   Stored keys: {list(questionnaire_responses.keys())}")
             
             # Check if partial responses were stored correctly
-            expected_keys = ["api_authentication", "api_rate_limiting", "api_input_validation"]
+            expected_keys = ["api_type", "api_protocol", "api_auth_method"]
             stored_keys = list(questionnaire_responses.keys())
             
             missing_keys = [key for key in expected_keys if key not in stored_keys]
@@ -474,13 +474,13 @@ class QuestionnaireProgressTester:
             
             # Test full responses (7/7 questions answered)
             full_responses = {
-                "api_authentication": "oauth2",
-                "api_rate_limiting": "yes",
-                "api_input_validation": "comprehensive",
-                "api_encryption": "tls_1_3",
-                "api_logging": "comprehensive",
-                "api_error_handling": "secure",
-                "api_versioning": "semantic"
+                "api_type": "REST API",
+                "api_protocol": "HTTPS",
+                "api_auth_method": "JWT",
+                "api_authorization": "RBAC (Role-Based)",
+                "api_rate_limiting": "Per User",
+                "api_input_validation": "Schema Validation",
+                "api_cors_policy": "Restrictive (Specific Origins)"
             }
             
             response = self.session.post(
