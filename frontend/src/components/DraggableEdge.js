@@ -228,7 +228,7 @@ const DraggableEdge = ({
       />
       
       {/* Control point 1 */}
-      {(selected || isDragging) && (
+      {(selected || isDragging || recentlyInteracted) && (
         <circle
           cx={cp1.x}
           cy={cp1.y}
@@ -246,7 +246,7 @@ const DraggableEdge = ({
       )}
       
       {/* Control point 2 */}
-      {(selected || isDragging) && (
+      {(selected || isDragging || recentlyInteracted) && (
         <circle
           cx={cp2.x}
           cy={cp2.y}
