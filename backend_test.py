@@ -450,18 +450,19 @@ class EnhancedVulnerabilityCoverageTester:
                             f"Invalid JSON response: {str(e)}")
                 return False
             
-            # Check if response contains rules
-            if not isinstance(data, list):
+            # Check if response contains rules (API returns dict with 'rules' key)
+            if not isinstance(data, dict) or 'rules' not in data:
                 self.log_test("Vulnerability Rules API", False, 
-                            f"Expected list of rules, got: {type(data)}")
+                            f"Expected dict with 'rules' key, got: {type(data)}")
                 return False
             
-            total_rules = len(data)
+            rules = data['rules']
+            total_rules = data.get('total_rules', len(rules))
             print(f"   📊 Total vulnerability rules loaded: {total_rules}")
             
             # Count rules by node type
-            backup_rules = [rule for rule in data if 'Backup' in rule.get('node_types', [])]
-            monitoring_rules = [rule for rule in data if 'Monitoring' in rule.get('node_types', [])]
+            backup_rules = [rule for rule in rules if 'Backup' in rule.get('node_types', [])]
+            monitoring_rules = [rule for rule in rules if 'Monitoring' in rule.get('node_types', [])]
             
             print(f"   📊 Backup rules: {len(backup_rules)}")
             print(f"   📊 Monitoring rules: {len(monitoring_rules)}")
