@@ -104,6 +104,7 @@ function AppContent() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   // Enhanced questionnaire system disabled - using legacy system only
   const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedEdge, setSelectedEdge] = useState(null);  // Add selected edge state
   const [currentDiagram, setCurrentDiagram] = useState(null);
   const [simulationResult, setSimulationResult] = useState(null);
   const [diagrams, setDiagrams] = useState([]);
