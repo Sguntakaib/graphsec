@@ -903,6 +903,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ BACKEND DRAGGABLE EDGE SUPPORT VERIFIED: All backend tests passed (5/5). Template edges structure confirmed - 19 template edges analyzed with draggable support. Diagram creation with draggable edges successful - edges persist control point data (controlPoint1, controlPoint2, labelPosition). Complex edge data structure validation passed - edge updates preserve all data fields including custom properties and metadata. New edge creation with draggable type working - onConnect-style edges properly initialized with draggable type and control points. Backend fully supports draggable edge functionality."
+      - working: true
+        agent: "testing"
+        comment: "✅ DRAGGABLE EDGE BACKEND RE-VERIFICATION COMPLETE: Comprehensive testing of backend APIs supporting draggable edge functionality after frontend fixes. DETAILED RESULTS: ✅ POST /api/diagrams: Successfully creates diagrams that support edge data structure with control points ✅ PUT /api/diagrams/{id}: Edge data persistence working correctly - edges with controlPoint1, controlPoint2, and labelPosition data are saved and retrieved properly ✅ GET /api/diagrams/{id}: Loading diagrams with edge data working - control point modifications persist across updates ✅ GET /api/templates: Template structure verified - 19 template edges across 4 templates, all compatible with draggable functionality ✅ Complex Edge Data Handling: Backend properly handles extensive edge data structures including custom properties, metadata, and animation settings. SUCCESS RATE: 100% (5/5 tests passed). The backend APIs are fully ready to support the draggable edge functionality and properly handle all edge data structure requirements including control points and label positioning."
 
   - task: "Draggable Edge Functionality - Frontend Implementation"
     implemented: true
