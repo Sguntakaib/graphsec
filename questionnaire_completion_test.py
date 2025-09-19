@@ -36,7 +36,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://sidepane-update.preview.emergentagent.com/api"
+BASE_URL = "https://api-wizard-map.preview.emergentagent.com/api"
 
 class QuestionnaireCompletionTester:
     def __init__(self):
