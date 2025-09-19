@@ -198,6 +198,12 @@ const DraggableEdge = ({
     }
   }, [recentlyInteracted]);
 
+  // Effect to keep refs in sync with state
+  useEffect(() => {
+    controlPoint1Ref.current = controlPoint1;
+    controlPoint2Ref.current = controlPoint2;
+  }, [controlPoint1, controlPoint2]);
+
   // Styles
   const labelBoxStyle = {
     fill: labelBgStyle.fill || '#374151',
