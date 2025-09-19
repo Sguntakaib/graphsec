@@ -2684,11 +2684,16 @@ function AppContent() {
         <div className="flex-1 relative">
           <ReactFlow
             nodes={nodes}
-            edges={edges}
+            edges={edges.map(edge => ({
+              ...edge,
+              selected: selectedEdge?.id === edge.id
+            }))}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={onNodeClick}
+            onEdgeClick={onEdgeClick}
+            onPaneClick={onPaneClick}
             onDrop={onDrop}
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
@@ -2702,6 +2707,7 @@ function AppContent() {
             nodesConnectable={true}
             elementsSelectable={true}
             selectNodesOnDrag={false}
+            onEdgeUpdate={handleEdgeUpdate}
           >
             <Controls 
               className="bg-gray-800 border-gray-700"
