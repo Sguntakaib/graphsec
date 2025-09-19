@@ -891,6 +891,30 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "Phase 2 Vulnerability System UI Controls ready for testing - 'Vulnerabilities' button to analyze all nodes, 'Filter', 'Dashboard', 'Report', 'Clear' buttons appear when vulnerabilities exist, visibility toggles and state management for vulnerability system components"
+
+  - task: "Draggable Edge Functionality - Backend Support"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ BACKEND DRAGGABLE EDGE SUPPORT VERIFIED: All backend tests passed (5/5). Template edges structure confirmed - 19 template edges analyzed with draggable support. Diagram creation with draggable edges successful - edges persist control point data (controlPoint1, controlPoint2, labelPosition). Complex edge data structure validation passed - edge updates preserve all data fields including custom properties and metadata. New edge creation with draggable type working - onConnect-style edges properly initialized with draggable type and control points. Backend fully supports draggable edge functionality."
+
+  - task: "Draggable Edge Functionality - Frontend Implementation"
+    implemented: true
+    working: false
+    file: "frontend/src/components/DraggableEdge.js, frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ FRONTEND DRAGGABLE EDGE ISSUE IDENTIFIED: Backend support is complete and working correctly, but frontend control points are not appearing when edges are clicked. ANALYSIS: 1) ✅ DraggableEdge component correctly implemented with control point rendering logic 2) ✅ Edge selection mechanism in App.js properly sets selectedEdge state 3) ✅ Edge types configuration maps both 'draggable' and 'default' to DraggableEdge component 4) ❌ ISSUE: Template edges have type='default' and empty data={} - missing control point initialization. ROOT CAUSE: Template edges from /api/templates have no control point data (controlPoint1, controlPoint2, labelPosition). When these edges are loaded and selected, DraggableEdge component has no control points to display. SOLUTION NEEDED: Initialize control point data for existing template edges when they are first selected or loaded."
     implemented: true
     working: true
     file: "backend/server.py"
