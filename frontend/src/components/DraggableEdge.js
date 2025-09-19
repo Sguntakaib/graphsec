@@ -258,6 +258,14 @@ const DraggableEdge = ({
     controlPoint2Ref.current = controlPoint2;
   }, [controlPoint1, controlPoint2]);
 
+  // Effect to focus input when editing starts
+  useEffect(() => {
+    if (isEditingLabel && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditingLabel]);
+
   // Styles
   const labelBoxStyle = {
     fill: labelBgStyle.fill || '#374151',
