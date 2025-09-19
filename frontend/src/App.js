@@ -2113,7 +2113,7 @@ function AppContent() {
           source: sourceNode.id,
           target: newNode.id,
           label: 'has_dependency',
-          type: 'smoothstep',
+          type: 'draggable',  // Use draggable type for label positioning
           animated: true,
           style: {
             strokeWidth: 2,
