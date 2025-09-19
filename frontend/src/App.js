@@ -2985,14 +2985,10 @@ function AppContent() {
               {/* Node Information Panel - Show immediately when node is selected */}
               {selectedNode ? (
                 <div className="border-b border-gray-700">
-                  <div className="p-4">
-                    <h3 className="text-white font-medium mb-2">Node Information</h3>
-                    <div className="text-gray-300 text-sm">
-                      <div>Type: {selectedNode.data?.type}</div>
-                      <div>Subtype: {selectedNode.data?.subtype}</div>
-                      <div>Label: {selectedNode.data?.label}</div>
-                    </div>
-                  </div>
+                  <NodeInfoPanel 
+                    node={selectedNode}
+                    onEditQuestionnaire={handleEditQuestionnaireFromInfo}
+                  />
                 </div>
               ) : (
                 <div className="p-4 text-center border-b border-gray-700">
