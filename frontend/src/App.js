@@ -79,6 +79,8 @@ const nodeTypes = {
 
 const edgeTypes = {
   'vulnerability-edge': VulnerabilityEdge,
+  'draggable': DraggableEdge,
+  'default': DraggableEdge,  // Make all edges draggable by default
 };
 
 const initialNodes = [];
