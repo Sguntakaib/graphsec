@@ -1,40 +1,31 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - ENHANCED VULNERABILITY COVERAGE FOR BACKUP AND MONITORING NODES
-Tests the enhanced vulnerability coverage for Backup and Monitoring nodes with NEW critical vulnerabilities.
+Backend API Testing - DRAGGABLE EDGE FUNCTIONALITY
+Tests the backend support for draggable edge functionality and edge data structure handling.
 
 TESTING FOCUS:
-🎯 PRIMARY TEST: ENHANCED VULNERABILITY COVERAGE WITH CRITICAL/HIGH SEVERITY
-1. **Test Backup Node Vulnerability Coverage:**
-   - Create test backup node with most insecure questionnaire responses
-   - Test responses that should trigger NEW critical vulnerabilities:
-     - backup_strategy: "No Backup Strategy" 
-     - backup_encryption: "No Encryption"
-     - backup_retention: "No Retention Policy"
-     - backup_testing: "Never Tested"
-     - backup_frequency: "Irregular"
-     - backup_frequency: "Monthly"
-   - Verify these responses generate multiple HIGH SEVERITY vulnerabilities (not just 1 informational)
+🎯 PRIMARY TEST: DRAGGABLE EDGE BACKEND SUPPORT
+1. **Test Template Edges Structure:**
+   - Check GET /api/templates endpoint to verify template edges have correct type
+   - Verify template edges include 'draggable' type or default to draggable
+   - Check edge data structure includes control points and label positioning
 
-2. **Test Monitoring Node Vulnerability Coverage:**
-   - Create test monitoring node with insecure questionnaire responses
-   - Test responses that should trigger NEW critical vulnerabilities:
-     - monitoring_alerting: "No Alerting"
-     - monitoring_access_control: "No Access Control"
-     - monitoring_access_control: "Shared Access"
-     - monitoring_data_retention: "No Defined Policy"
-     - monitoring_coverage: "Basic Monitoring"
-   - Verify these responses generate multiple HIGH SEVERITY vulnerabilities
+2. **Test Diagram Edge Management:**
+   - Create test diagram with draggable edges
+   - Test edge creation via onConnect with draggable type
+   - Verify edge data persistence includes control points and label position
+   - Test edge updates with new control point data
 
-3. **Verify API Endpoints:**
-   - Test GET /api/vulnerabilities/rules to confirm new rules are loaded
-   - Test POST /api/vulnerabilities/analyze/{node_id} for both Backup and Monitoring nodes
-   - Confirm that weak questionnaire responses now trigger MULTIPLE vulnerabilities per node (not just 1)
+3. **Test Edge Data Structure:**
+   - Verify edges support data field for control points
+   - Test edge type handling (draggable vs default)
+   - Check edge serialization/deserialization with control point data
 
 **EXPECTED RESULTS:** 
-- Backup nodes with insecure settings should generate 4-6 vulnerabilities (including Critical/High severity)
-- Monitoring nodes with insecure settings should generate 4-5 vulnerabilities (including Critical/High severity)
-- The vulnerability severity should match the risk level (Critical for no backup strategy, no encryption, etc.)
+- Template edges should use 'draggable' type or default to draggable behavior
+- New edges created via onConnect should have type 'draggable'
+- Edge data should persist control points and label positioning
+- Backend should handle edge updates with control point modifications
 """
 
 import requests
