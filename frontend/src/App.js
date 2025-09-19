@@ -2131,7 +2131,7 @@ function AppContent() {
     if (!currentDiagram) return;
     
     try {
-      await fetch(
+      const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${nodeId}/questionnaire`,
         {
           method: 'POST',
@@ -2141,6 +2141,25 @@ function AppContent() {
           body: JSON.stringify({ responses })
         }
       );
+      
+      if (response.ok) {
+        // Update local node data with questionnaire responses for immediate UI refresh
+        setNodes(nds => nds.map(node => {
+          if (node.id === nodeId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                questionnaireResponses: responses,
+                lastQuestionnaireUpdate: new Date().toISOString()
+              }
+            };
+          }
+          return node;
+        }));
+        
+        console.log('✅ Questionnaire responses saved and node data updated:', { nodeId, responses });
+      }
     } catch (error) {
       console.error('Error saving questionnaire responses:', error);
     }
