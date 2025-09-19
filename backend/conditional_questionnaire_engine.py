@@ -155,31 +155,106 @@ class ConditionalQuestionnaireEngine:
                     "related_branch": "InformationDisclosure"
                 }
             ],
-            "WebSocket API": [
+            "Other": [
                 {
-                    "id": "websocket_origin_validation",
-                    "question": "How is WebSocket origin validation implemented?",
+                    "id": "other_api_protocol",
+                    "question": "What protocol does this API use?",
                     "type": "single_choice",
-                    "options": ["Strict origin validation", "Flexible origin checking", "No origin validation", "Unknown"],
-                    "help_text": "Origin validation prevents unauthorized WebSocket connections.",
-                    "related_branch": "ApiSecurity"
+                    "options": ["Custom TCP protocol", "UDP-based protocol", "Message queue (AMQP/MQTT)", "Custom HTTP-based", "Binary protocol", "Unknown"],
+                    "help_text": "Understanding the protocol helps identify appropriate security measures.",
+                    "related_branch": "ApiSecurity"  
                 },
                 {
-                    "id": "websocket_auth_method",
-                    "question": "How is WebSocket authentication handled?",
+                    "id": "other_api_authentication",
+                    "question": "How is authentication handled for this custom API?",
                     "type": "single_choice",
-                    "options": ["Token-based authentication", "Session-based authentication", "Certificate authentication", "No authentication", "Unknown"],
-                    "help_text": "WebSocket authentication secures real-time connections.",
+                    "options": ["Custom token-based authentication", "Certificate-based authentication", "Pre-shared keys", "IP allowlisting", "No authentication", "Unknown"],
+                    "help_text": "Custom APIs require tailored authentication approaches.",
                     "related_branch": "Authentication"
                 },
                 {
-                    "id": "websocket_message_validation",
-                    "question": "How are WebSocket messages validated?",
+                    "id": "other_api_data_validation",
+                    "question": "How is input data validated in this API?",
                     "type": "single_choice",
-                    "options": ["JSON schema validation", "Custom message validation", "Basic format checking", "No message validation", "Unknown"],
-                    "help_text": "Message validation prevents malicious WebSocket payloads.",
+                    "options": ["Custom schema validation", "Serialization format validation", "Basic type checking", "No validation", "Unknown"],
+                    "help_text": "Custom APIs need robust input validation to prevent injection attacks.",
                     "related_branch": "InputValidation"
+                },
+                {
+                    "id": "other_api_error_handling",
+                    "question": "How does the API handle errors securely?",
+                    "type": "single_choice",
+                    "options": ["Structured error responses without details", "Generic error codes", "Detailed error information", "No error handling", "Unknown"],
+                    "help_text": "Error handling in custom APIs can reveal implementation details.",
+                    "related_branch": "InformationDisclosure"
                 }
+            ]
+        }
+        
+        # Enhanced external services categories based on real-world development
+        self.external_services_categories = {
+            "Authentication": [
+                "OAuth2 providers (Google, Facebook, GitHub)",
+                "Identity providers (Auth0, Okta, Azure AD)",
+                "SAML providers",
+                "LDAP/Active Directory",
+                "Social login providers"
+            ],
+            "Payment": [
+                "Payment processors (Stripe, PayPal, Square)",
+                "Cryptocurrency payment gateways",
+                "Banking APIs",
+                "Digital wallet APIs",
+                "Billing and subscription services"
+            ],
+            "Cloud": [
+                "Cloud storage (AWS S3, Google Cloud Storage)",
+                "Cloud databases (AWS RDS, Azure SQL)",
+                "Serverless functions (AWS Lambda, Azure Functions)",
+                "CDN services (CloudFlare, AWS CloudFront)",
+                "Container registries"
+            ],
+            "Messaging": [
+                "Email services (SendGrid, Mailgun, Amazon SES)",
+                "SMS/MMS providers (Twilio, Vonage)",
+                "Push notification services",
+                "Chat/messaging APIs (Slack, Microsoft Teams)",
+                "Communication platforms"
+            ],
+            "Analytics": [
+                "Web analytics (Google Analytics, Adobe Analytics)",
+                "Application monitoring (Datadog, New Relic)",
+                "Error tracking (Sentry, Rollbar)",
+                "Business intelligence platforms",
+                "A/B testing services"
+            ],
+            "Social Media": [
+                "Social media APIs (Twitter, LinkedIn, Instagram)",
+                "Social sharing services",
+                "Social authentication",
+                "Social media management platforms",
+                "Content syndication services"
+            ],
+            "File Storage": [
+                "File storage services (Dropbox, Box)",
+                "Image/video processing (Cloudinary, ImageKit)",
+                "Document management systems",
+                "Backup services",
+                "File sharing platforms"
+            ],
+            "Notification": [
+                "Push notification services (Firebase, OneSignal)",
+                "Email notification platforms",
+                "SMS notification services",
+                "In-app notification systems",
+                "Alert management platforms"
+            ],
+            "Other": [
+                "Custom third-party APIs",
+                "Legacy system integrations",
+                "Industry-specific services",
+                "Government APIs",
+                "IoT device integrations"
             ]
         }
         
