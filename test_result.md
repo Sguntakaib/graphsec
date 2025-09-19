@@ -1596,15 +1596,18 @@ agent_communication:
 
   - task: "Dynamic Risk Calculation API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/probabilistic_simulation.py, backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Phase 3 Probabilistic Simulation Engine - POST /api/diagrams/{diagram_id}/probabilistic-simulation endpoint with real-time risk scores, uncertainty bands, and impact assessment based on asset criticality"
+      - working: true
+        agent: "testing"
+        comment: "✅ DYNAMIC RISK CALCULATION WORKING: Verified through probabilistic simulation API testing. The POST /api/diagrams/{diagram_id}/probabilistic-simulation endpoint includes dynamic risk calculation capabilities with real-time risk assessment. API successfully processes asset criticality (High for WebApp, Critical for Database) and provides simulation summary with risk analysis. Dynamic risk calculation integrated into probabilistic simulation engine."
 
   - task: "What-If Scenario Engine API"
     implemented: true
