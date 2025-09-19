@@ -36,6 +36,10 @@ const DraggableEdge = ({
   const [isDragging, setIsDragging] = useState(false);
   const [recentlyInteracted, setRecentlyInteracted] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, initialLabelPos: null });
+  
+  // Refs to track current control point values for use in event handlers
+  const controlPoint1Ref = useRef(controlPoint1);
+  const controlPoint2Ref = useRef(controlPoint2);
 
   // Calculate default control points for smooth bezier curve
   const getDefaultControlPoints = () => {
