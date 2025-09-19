@@ -200,6 +200,47 @@ const DraggableEdge = ({
     document.addEventListener('mouseup', handleMouseUp, true);
   }, [id, controlPoint1, controlPoint2, sourceX, sourceY, targetX, targetY, labelPosition]);
 
+  // Label editing handlers
+  const handleLabelDoubleClick = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🏷️ Starting label edit mode');
+    setIsEditingLabel(true);
+    setEditingLabelValue(label || '');
+  }, [label]);
+
+  const handleLabelSave = useCallback(() => {
+    console.log('💾 Saving label:', editingLabelValue);
+    setIsEditingLabel(false);
+    
+    // Trigger edge update event with new label
+    window.dispatchEvent(new CustomEvent('edgeUpdate', {
+      detail: {
+        edgeId: id,
+        updateData: {
+          label: editingLabelValue,
+          controlPoint1: controlPoint1Ref.current,
+          controlPoint2: controlPoint2Ref.current,
+          labelPosition: 0.5
+        }
+      }
+    }));
+  }, [id, editingLabelValue]);
+
+  const handleLabelCancel = useCallback(() => {
+    console.log('❌ Canceling label edit');
+    setIsEditingLabel(false);
+    setEditingLabelValue(label || '');
+  }, [label]);
+
+  const handleLabelKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      handleLabelSave();
+    } else if (e.key === 'Escape') {
+      handleLabelCancel();
+    }
+  }, [handleLabelSave, handleLabelCancel]);
+
   // Effect to manage temporary control point visibility after interaction
   useEffect(() => {
     if (recentlyInteracted) {
