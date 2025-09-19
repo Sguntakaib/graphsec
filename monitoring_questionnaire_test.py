@@ -31,7 +31,7 @@ import json
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://connector-edit-fix.preview.emergentagent.com/api"
+BASE_URL = "https://canvas-explorer-1.preview.emergentagent.com/api"
 
 class MonitoringQuestionnaireFixTester:
     def __init__(self):
