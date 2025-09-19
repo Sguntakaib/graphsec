@@ -539,11 +539,11 @@ class QuestionnaireProgressTester:
             
             db_node_id = self.test_nodes["Database"]
             
-            # Test partial completion (3/5 questions for Database)
+            # Test partial completion (3/5 questions for Database) using real question IDs
             partial_responses = {
-                "db_encryption": "aes_256",
-                "db_access_control": "rbac",
-                "db_backup_strategy": "automated_daily"
+                "db_type": "PostgreSQL",
+                "db_encryption_at_rest": "AES-256",
+                "db_encryption_in_transit": True
             }
             
             response = self.session.post(
@@ -605,11 +605,11 @@ class QuestionnaireProgressTester:
             
             # Test full completion (5/5 questions)
             full_responses = {
-                "db_encryption": "aes_256",
-                "db_access_control": "rbac", 
-                "db_backup_strategy": "automated_daily",
-                "db_monitoring": "comprehensive",
-                "db_patch_management": "automated"
+                "db_type": "PostgreSQL",
+                "db_encryption_at_rest": "AES-256", 
+                "db_encryption_in_transit": True,
+                "db_access_control": ["Role-Based Access", "User Authentication"],
+                "db_data_classification": "Confidential"
             }
             
             response = self.session.post(
