@@ -262,15 +262,15 @@ const DraggableEdge = ({
               width={80}
               height={24}
               {...labelBoxStyle}
-              style={{ cursor: 'default' }}  {/* Default cursor since not draggable */}
+              style={{ cursor: 'default' }}
             />
           )}
           <text
             {...labelTextStyle}
             style={{ 
               ...labelTextStyle, 
-              cursor: 'default',  {/* Default cursor since not draggable */}
-              pointerEvents: 'none'  {/* Disable pointer events */}
+              cursor: 'default',
+              pointerEvents: 'none'
             }}
           >
             {label}
