@@ -395,7 +395,7 @@ function AppContent() {
 
   // Enhanced edge styles for attack paths
   const defaultEdgeOptions = useMemo(() => ({
-    type: 'smoothstep',
+    type: 'draggable',  // Use draggable type for all edges
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#9CA3AF',
