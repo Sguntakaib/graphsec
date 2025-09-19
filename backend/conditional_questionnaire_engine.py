@@ -118,25 +118,33 @@ class ConditionalQuestionnaireEngine:
                     "id": "grpc_tls_config",
                     "question": "How is gRPC TLS configured?",
                     "type": "single_choice",
-                    "options": ["mTLS (mutual TLS)", "Server-side TLS only", "Insecure connections", "Unknown"],
-                    "help_text": "gRPC TLS configuration secures communication channels.",
+                    "options": ["mTLS (mutual TLS) with certificate validation", "Server-side TLS only", "TLS with custom verification", "Insecure connections", "Unknown"],
+                    "help_text": "gRPC TLS configuration secures communication channels against eavesdropping.",
                     "related_branch": "Encryption"
                 },
                 {
                     "id": "grpc_auth_method",
                     "question": "What gRPC authentication method is used?",
                     "type": "single_choice",
-                    "options": ["OAuth2 tokens", "JWT tokens", "API keys in metadata", "Certificate-based", "No authentication"],
-                    "help_text": "gRPC authentication secures service access.",
+                    "options": ["OAuth2 tokens with scope validation", "JWT tokens with claims verification", "API keys in metadata", "Certificate-based authentication", "No authentication"],
+                    "help_text": "gRPC authentication secures service access and prevents unauthorized calls.",
                     "related_branch": "Authentication"
                 },
                 {
-                    "id": "grpc_interceptors",
-                    "question": "Are gRPC interceptors used for security?",
-                    "type": "multiple_choice",
-                    "options": ["Authentication interceptor", "Authorization interceptor", "Logging interceptor", "Rate limiting interceptor", "None"],
-                    "help_text": "gRPC interceptors provide cross-cutting security concerns.",
+                    "id": "grpc_streaming_security",
+                    "question": "How are gRPC streaming connections secured?",
+                    "type": "single_choice",
+                    "options": ["Per-stream authentication with timeout controls", "Connection-level authentication", "Basic streaming validation", "No stream security", "Unknown"],
+                    "help_text": "gRPC streaming requires additional security for long-lived connections.",
                     "related_branch": "ApiSecurity"
+                },
+                {
+                    "id": "grpc_error_handling_security",
+                    "question": "How does gRPC error handling prevent information disclosure?",
+                    "type": "single_choice",
+                    "options": ["Sanitized error responses with logging", "Generic error messages", "Detailed error responses", "No error handling", "Unknown"],
+                    "help_text": "gRPC error responses can leak sensitive system information.",
+                    "related_branch": "InformationDisclosure"
                 }
             ],
             "WebSocket API": [
