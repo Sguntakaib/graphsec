@@ -263,7 +263,7 @@ class SmartNodeConnector {
       source: sourceId,
       target: targetId,
       label: label,
-      type: 'smoothstep',
+      type: 'draggable',  // Use draggable type for label positioning
       animated: true,
       style: {
         strokeWidth: 2,
