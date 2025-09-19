@@ -906,15 +906,18 @@ frontend:
 
   - task: "Draggable Edge Functionality - Frontend Implementation"
     implemented: true
-    working: false
+    working: true
     file: "frontend/src/components/DraggableEdge.js, frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "❌ FRONTEND DRAGGABLE EDGE ISSUE IDENTIFIED: Backend support is complete and working correctly, but frontend control points are not appearing when edges are clicked. ANALYSIS: 1) ✅ DraggableEdge component correctly implemented with control point rendering logic 2) ✅ Edge selection mechanism in App.js properly sets selectedEdge state 3) ✅ Edge types configuration maps both 'draggable' and 'default' to DraggableEdge component 4) ❌ ISSUE: Template edges have type='default' and empty data={} - missing control point initialization. ROOT CAUSE: Template edges from /api/templates have no control point data (controlPoint1, controlPoint2, labelPosition). When these edges are loaded and selected, DraggableEdge component has no control points to display. SOLUTION NEEDED: Initialize control point data for existing template edges when they are first selected or loaded."
+      - working: true
+        agent: "testing"
+        comment: "✅ DRAGGABLE EDGE FUNCTIONALITY FULLY WORKING: Comprehensive testing confirms all draggable edge features are operational after fixing the isDragging initialization error. DETAILED RESULTS: ✅ Template Loading: Successfully applied Web Application Security Model template with 6 nodes and 4 edges ✅ Edge Selection: Clicking on edges properly selects them and shows visual feedback ✅ Control Points Visible: Found 8 control points (2 per edge) with blue circles (#3B82F6) at 30% opacity for debugging ✅ Helper Lines Displayed: Found 8 helper lines with dashed stroke pattern showing bezier curve control structure ✅ Control Point Dragging: Successfully tested dragging both control points - CP1 moved +80x,+60y and CP2 moved -60x,+80y, curves reshaped correctly ✅ Edge Label Dragging: Successfully dragged 'Data Access' label along the curve path ✅ Visual Feedback: Control points show hover effects (size increase, color change) and proper cursor styling ✅ Debug Features: Control points always visible at 30% opacity as intended for debugging, debug logging functional. CRITICAL FIX APPLIED: Resolved 'Cannot access isDragging before initialization' error by moving useState declaration before useEffect. All draggable edge functionality working as designed - users can reshape bezier curves by dragging blue control points and reposition labels along edge paths."
     implemented: true
     working: true
     file: "backend/server.py"
