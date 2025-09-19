@@ -179,12 +179,11 @@ const DraggableEdge = ({
 
   const labelBoxStyle = {
     fill: labelBgStyle.fill || '#374151',
-    stroke: isDragging === 'label' ? '#3B82F6' : '#6B7280',
-    strokeWidth: isDragging === 'label' ? 2 : 1,
+    stroke: '#6B7280',  // Fixed stroke color since no dragging
+    strokeWidth: 1,     // Fixed stroke width
     rx: labelBgBorderRadius,
     ry: labelBgBorderRadius,
-    opacity: labelBgStyle.fillOpacity || 0.9,
-    cursor: 'grab'
+    opacity: labelBgStyle.fillOpacity || 0.9
   };
 
   const labelTextStyle = {
@@ -193,8 +192,7 @@ const DraggableEdge = ({
     fontWeight: labelStyle.fontWeight || 'bold',
     textAnchor: 'middle',
     dominantBaseline: 'central',
-    pointerEvents: 'none',
-    cursor: 'grab'
+    pointerEvents: 'none'
   };
 
   return (
