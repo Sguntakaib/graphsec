@@ -17,7 +17,7 @@ class ConditionalQuestionnaireEngine:
     def __init__(self, questionnaire_loader: QuestionnaireLoader):
         self.questionnaire_loader = questionnaire_loader
         
-        # Define conditional question mappings
+        # Define conditional question mappings - Enhanced with security focus
         self.api_type_questions = {
             "REST API": [
                 {
@@ -29,20 +29,28 @@ class ConditionalQuestionnaireEngine:
                     "related_branch": "ApiSecurity"
                 },
                 {
-                    "id": "rest_http_methods",
-                    "question": "Which HTTP methods are supported and how are they secured?",
-                    "type": "multiple_choice",
-                    "options": ["GET (read-only)", "POST (create)", "PUT (update)", "DELETE (remove)", "PATCH (partial update)", "OPTIONS (preflight)", "HEAD (metadata)"],
-                    "help_text": "HTTP method security prevents unauthorized operations.",
-                    "related_branch": "ApiSecurity"
+                    "id": "rest_http_methods_security",
+                    "question": "How are REST HTTP methods secured against unauthorized operations?",
+                    "type": "single_choice",
+                    "options": ["Method-specific RBAC with scope validation", "Basic method authorization", "HTTP method filtering only", "No method-level security", "Unknown"],
+                    "help_text": "REST method security prevents unauthorized CRUD operations and privilege escalation.",
+                    "related_branch": "Authorization"
                 },
                 {
-                    "id": "rest_content_type_validation",
-                    "question": "How is Content-Type validation implemented?",
+                    "id": "rest_parameter_pollution",
+                    "question": "How does the REST API prevent HTTP Parameter Pollution attacks?",
                     "type": "single_choice",
-                    "options": ["Strict Content-Type validation", "Flexible validation", "No validation", "Unknown"],
-                    "help_text": "Content-Type validation prevents content confusion attacks.",
+                    "options": ["Parameter validation with duplicate detection", "Basic parameter parsing", "Framework default handling", "No protection", "Unknown"],
+                    "help_text": "Parameter pollution attacks can bypass security controls in REST APIs.",
                     "related_branch": "InputValidation"
+                },
+                {
+                    "id": "rest_bola_protection",
+                    "question": "What protection exists against BOLA (Broken Object Level Authorization)?",
+                    "type": "single_choice",
+                    "options": ["Object-level ACL with ownership validation", "Basic ID validation", "User context checking", "No BOLA protection", "Unknown"],
+                    "help_text": "BOLA is a critical REST API vulnerability allowing unauthorized object access.",
+                    "related_branch": "Authorization"
                 }
             ],
             "GraphQL API": [
