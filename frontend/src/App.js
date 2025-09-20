@@ -2212,6 +2212,14 @@ function AppContent() {
         (node.data?.subtype === nodeType || node.subtype === nodeType) &&
         node.id !== sourceNode.id // Don't include the source node itself
       );
+      
+      console.log(`🔍 Enhanced Canvas Detection for ${nodeType}:`, {
+        sourceNodeType: sourceNode.data?.subtype,
+        lookingForNodeType: nodeType,
+        existingNodesFound: existingNodesOfType.length,
+        existingNodeIds: existingNodesOfType.map(n => ({ id: n.id, subtype: n.data?.subtype || n.subtype })),
+        allNodesOnCanvas: nodes.map(n => ({ id: n.id, subtype: n.data?.subtype || n.subtype }))
+      });
 
       if (existingNodesOfType.length > 0) {
         console.log(`🔍 Found ${existingNodesOfType.length} existing ${nodeType} node(s) on canvas:`, existingNodesOfType.map(n => n.id));
