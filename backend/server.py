@@ -1668,10 +1668,19 @@ async def validate_node_completeness(
         branch_type = branch_data.get("type", "LOGIN")
         logger.info(f"   Branch {i+1}: {branch_data.get('id')} -> type='{branch_type}', completed={completed}, value='{branch_data.get('value')}'")
         
+        # Convert string type to SecurityBranchType enum
+        try:
+            branch_type_str = branch_data.get("type", "LOGIN")
+            branch_type_enum = SecurityBranchType(branch_type_str)
+        except ValueError:
+            # Fallback to LOGIN if the type is not recognized
+            logger.warning(f"Unknown branch type '{branch_type_str}', defaulting to LOGIN")
+            branch_type_enum = SecurityBranchType.LOGIN
+        
         branch = SecurityBranch(
             id=branch_data.get("id", ""),
             name=branch_data.get("name", ""),
-            type=branch_data.get("type", "LOGIN"),
+            type=branch_type_enum,
             required=branch_data.get("required", True),
             completed=completed,
             value=branch_data.get("value"),
