@@ -266,13 +266,16 @@ frontend:
     implemented: true
     working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL FINDING: Enhanced canvas node detection system does NOT work for WebApp nodes as intended. COMPREHENSIVE TESTING RESULTS: 1) ✅ WebApp Node Creation: Successfully created WebApp nodes on canvas with proper questionnaire flow 2) ❌ WebApp Reuse Detection: NO reuse dialog appeared when creating second WebApp node - system does not detect existing WebApp nodes for reuse 3) ❌ Generic Detection Missing: Tested multiple scenarios (WebApp→WebApp, WebApp→API, WebApp→Database) - no reuse dialogs detected 4) ❌ System Limitation: The enhanced canvas detection appears to work ONLY for Database nodes, not for WebApp/Website nodes as requested in review 5) ❌ Not Truly Generic: The system is NOT truly generic as claimed - it's limited to specific node types. ROOT CAUSE: The enhanced canvas node detection system implementation is incomplete for WebApp nodes. While the system works for Database node reuse scenarios (as confirmed in previous tests), it does not extend to WebApp/Website node reuse scenarios. IMPACT: This means the review request goal is NOT met - the system cannot demonstrate WebApp node reuse functionality. RECOMMENDATION: Main agent needs to extend the canvas detection logic to support WebApp nodes, making the system truly generic for all node types as originally intended."
+      - working: false
+        agent: "main"
+        comment: "🐛 DEBUGGING WEBAPP DEPENDENCY DETECTION: Added enhanced debugging to both handleSecurityQuestionnaireComplete and handleDependentNodeCreation functions. KEY FINDINGS from investigation: 1) ✅ Backend dependency detection WORKS: curl test shows `/api/intelligent-nodes/WebApp/check-dependencies` correctly returns dependent nodes when webapp_api_endpoints=true 2) ✅ WebApp template has correct dependencies: webapp_api_endpoints→API, webapp_database_connection→Database 3) ✅ WebApp questionnaires use same completion flow as other nodes via handleSecurityQuestionnaireComplete 4) ❓ SUSPECTED ISSUE: Frontend SecurityQuestionnaire component calls dependency endpoint correctly, but canvas reuse dialog may not be triggering. Added comprehensive console logging to trace: a) Dependency detection results from backend b) Canvas detection logic execution c) Node filtering and matching logic d) Dialog creation and display. NEXT: Need to test with enhanced debugging to see exact failure point in WebApp→dependency scenarios."
 
   - task: "NodeInfoPanel Enhanced Functionality"
     implemented: true
