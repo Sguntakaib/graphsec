@@ -19,7 +19,7 @@ from dataclasses import asdict
 # Import advanced simulation modules
 from advanced_simulation import AdvancedSimulationEngine
 from mitre_integration import MitreAttackDatabase
-from intelligent_nodes import intelligent_node_engine, SecurityBranch, SecurityPrompt, IntelligentNodeTemplate
+from intelligent_nodes import intelligent_node_engine, SecurityBranch, SecurityPrompt, IntelligentNodeTemplate, SecurityBranchType
 from expanded_intelligent_nodes import ExpandedIntelligentNodeEngine, QuestionnaireLevel
 from questionnaire_loader import get_questionnaire_loader, QuestionnaireLevel as LoaderQuestionnaireLevel
 from threat_intelligence import threat_intelligence_engine, ThreatIntelligenceEngine
