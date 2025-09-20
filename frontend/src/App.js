@@ -1653,9 +1653,11 @@ function AppContent() {
 
         // Handle dependent node questionnaires
         console.log('🔍 Checking for dependent questionnaires:', {
+          nodeSubtype: currentQuestionnaireNode.subtype,
           triggerDependentQuestionnaires: result.triggerDependentQuestionnaires,
           dependentNodesLength: result.dependentNodes?.length,
-          dependentNodes: result.dependentNodes
+          dependentNodes: result.dependentNodes,
+          resultAnswers: result.answers
         });
         
         if (result.triggerDependentQuestionnaires && result.dependentNodes?.length > 0) {
