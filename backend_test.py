@@ -208,26 +208,50 @@ class APIQuestionnaireLoopingTester:
             print("🎯 TEST SCENARIO 3: Test API Questionnaire Validation")
             print("=" * 80)
             
-            # Sample API questionnaire responses
-            validation_data = {
-                "responses": {
-                    "api_type": "REST API",
-                    "authentication_method": "oauth2",
-                    "encryption_enabled": True,
-                    "input_validation": "comprehensive",
-                    "rate_limiting": True,
-                    "logging_enabled": True,
-                    "cors_enabled": True,
-                    "csrf_protection": True,
-                    "api_versioning": "semantic",
-                    "error_handling": "structured"
+            # The validate-completeness endpoint expects a list of SecurityBranch objects
+            # Let me create sample branches based on the API template structure
+            validation_data = [
+                {
+                    "name": "api_authentication_method",
+                    "type": "Authentication",
+                    "required": True,
+                    "completed": True,
+                    "value": "OAuth 2.0",
+                    "description": "API authentication method"
                 },
-                "business_context": {
-                    "criticality": "high",
-                    "data_classification": "confidential",
-                    "compliance_requirements": ["GDPR", "SOX", "PCI-DSS"]
+                {
+                    "name": "api_authorization_model",
+                    "type": "Authorization", 
+                    "required": True,
+                    "completed": True,
+                    "value": "Role-based access control",
+                    "description": "API authorization model"
+                },
+                {
+                    "name": "api_rate_limiting",
+                    "type": "RateLimiting",
+                    "required": True,
+                    "completed": True,
+                    "value": "Implemented",
+                    "description": "API rate limiting configuration"
+                },
+                {
+                    "name": "api_input_validation",
+                    "type": "InputValidation",
+                    "required": True,
+                    "completed": True,
+                    "value": "Comprehensive validation",
+                    "description": "API input validation"
+                },
+                {
+                    "name": "api_encryption",
+                    "type": "Encryption",
+                    "required": True,
+                    "completed": True,
+                    "value": "TLS 1.3 enabled",
+                    "description": "API encryption configuration"
                 }
-            }
+            ]
             
             response = self.session.post(
                 f"{self.base_url}/intelligent-nodes/API/validate-completeness",
