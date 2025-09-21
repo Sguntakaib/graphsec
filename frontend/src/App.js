@@ -2171,7 +2171,7 @@ function AppContent() {
       if (incompleteNodes.length > 0) {
         resultMessage += `\n\n⚠️ ${incompleteNodes.length} nodes skipped due to incomplete questionnaires.`;
       }
-      alert(resultMessage);
+      notification.showInfo('Vulnerability Analysis Complete', resultMessage);
       
     } catch (error) {
       console.error('Error in bulk vulnerability analysis:', error);
