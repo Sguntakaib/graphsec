@@ -74,6 +74,9 @@ const SecurityQuestionnaire = ({
     if (isVisible && resumeFromPromptIndex === null) {
       // Only reset to 0 if we're not resuming from a specific index
       setCurrentPromptIndex(0);
+      // Reset triggered dependencies for new questionnaire session
+      setTriggeredDependencies(new Set());
+      console.log('🔄 Reset triggered dependencies for new questionnaire session');
     }
   }, [isVisible, resumeFromPromptIndex]);
 
