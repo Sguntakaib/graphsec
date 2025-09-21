@@ -1821,16 +1821,24 @@ function AppContent() {
             const parentState = newStack[newStack.length - 1];
             console.log('🔄 Resuming parent questionnaire:', parentState);
             
-            // Resume the parent questionnaire
-            const actualParentNode = nodes.find(n => n.id === parentState.nodeId);
-            setCurrentQuestionnaireNode({
-              id: parentState.nodeId,
-              subtype: parentState.nodeSubtype,
-              data: { 
+            // Only resume if parentState exists and has required properties
+            if (parentState && parentState.nodeId && parentState.nodeSubtype) {
+              // Resume the parent questionnaire
+              const actualParentNode = nodes.find(n => n.id === parentState.nodeId);
+              setCurrentQuestionnaireNode({
+                id: parentState.nodeId,
                 subtype: parentState.nodeSubtype,
-                parentNode: actualParentNode?.data?.parentNode
-              }
-            });
+                data: { 
+                  subtype: parentState.nodeSubtype,
+                  parentNode: actualParentNode?.data?.parentNode
+                }
+              });
+            } else {
+              console.log('✅ No more parent questionnaires to resume - closing modal');
+              // No valid parent state, close questionnaire
+              setShowSecurityQuestionnaire(false);
+              setCurrentQuestionnaireNode(null);
+            }
             
             return newStack;
           });
