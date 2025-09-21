@@ -44,7 +44,7 @@ import sys
 import time
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://graph-tools.preview.emergentagent.com/api"
+BASE_URL = "https://statuschange-notify.preview.emergentagent.com/api"
 
 class ParentChildQuestionnaireTester:
     def __init__(self):

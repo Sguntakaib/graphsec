@@ -8,7 +8,7 @@ import requests
 import json
 
 # Use the production URL from review request
-BASE_URL = "https://graph-tools.preview.emergentagent.com/api"
+BASE_URL = "https://statuschange-notify.preview.emergentagent.com/api"
 
 class ReviewRequestTester:
     def __init__(self):
