@@ -1621,10 +1621,13 @@ function AppContent() {
 
         // Mark dependency as COMPLETED if this node is a dependency of another node
         const completedNode = currentQuestionnaireNode;
-        let parentNodeId = completedNode.data?.parentNode;
         const dependencyType = completedNode.subtype || completedNode.data?.subtype;
         
-        // If parentNodeId is not in data, check if this is a dependent questionnaire scenario
+        // Find the actual React Flow node to get the complete data including parentNode
+        const actualNode = nodes.find(n => n.id === completedNode.id);
+        let parentNodeId = actualNode?.data?.parentNode;
+        
+        // If parentNodeId is not found, check if this is a dependent questionnaire scenario
         if (!parentNodeId && questionnaireQueue.length > 0) {
           // This might be a dependent questionnaire - try to find parent from queue context
           const parentFromQueue = nodes.find(n => 
