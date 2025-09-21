@@ -269,7 +269,7 @@ class CriticalIssuesTester:
                     print(f"     {i+1}. {vuln.get('title', 'Unknown')} - {vuln.get('category', 'Unknown')} - {vuln.get('severity', 'Unknown')}")
             
             self.log_test("Vulnerability Analysis API Nodes", True, 
-                        f"✅ SUCCESS: Vulnerability analysis completed for API node, {len(vulnerabilities)} vulnerabilities found, no enum validation errors")
+                        f"✅ SUCCESS: Vulnerability analysis completed for API node, {total_vulnerabilities} vulnerabilities found, no Cross-Site Request Forgery enum validation errors")
             
             return True
             
