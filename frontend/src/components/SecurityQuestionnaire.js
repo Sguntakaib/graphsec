@@ -206,15 +206,17 @@ const SecurityQuestionnaire = ({
     if (promptId.includes('authentication')) return 'Authentication';
     if (promptId.includes('authorization')) return 'Authorization';
     if (promptId.includes('input_validation')) return 'InputValidation';
-    if (promptId.includes('https') || promptId.includes('data_encryption')) return 'SSL/TLS';
+    if (promptId.includes('https') || promptId.includes('data_encryption') || promptId.includes('ssl') || promptId.includes('tls')) return 'Encryption';
     if (promptId.includes('database')) return 'Database';
-    if (promptId.includes('api_endpoints')) return 'API';
+    if (promptId.includes('api_endpoints') || promptId.includes('api_security')) return 'ApiSecurity';
     if (promptId.includes('session_management')) return 'SessionManagement';
     if (promptId.includes('error_handling')) return 'ErrorHandling';
     if (promptId.includes('logging')) return 'Logging';
     if (promptId.includes('security_headers')) return 'CSP';
     if (promptId.includes('rate_limiting')) return 'RateLimiting';
     if (promptId.includes('monitoring')) return 'Monitoring';
+    if (promptId.includes('backup')) return 'Backup';
+    if (promptId.includes('compliance')) return 'Compliance';
 
     // Default fallback - use related_branch as PascalCase if available
     if (relatedBranch) {
