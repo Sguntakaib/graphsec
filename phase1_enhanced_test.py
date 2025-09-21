@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://recursive-loop-fix.preview.emergentagent.com/api"
+BASE_URL = "https://security-mapper-1.preview.emergentagent.com/api"
 
 class Phase1EnhancedAPITester:
     def __init__(self):

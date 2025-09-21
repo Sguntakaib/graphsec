@@ -15,7 +15,7 @@ import json
 import sys
 
 # Backend URL from the review request
-BASE_URL = "https://recursive-loop-fix.preview.emergentagent.com/api"
+BASE_URL = "https://security-mapper-1.preview.emergentagent.com/api"
 
 class ValidateCompletenessVerificationTester:
     def __init__(self):
