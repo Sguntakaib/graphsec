@@ -214,14 +214,13 @@ class CriticalIssuesTester:
                             f"Invalid JSON response: {str(e)}")
                 return False
             
-            # Verify response structure
-            print(f"📊 Full Response Data: {json.dumps(data, indent=2)}")
-            
-            if not data.get("success"):
+            # Check if this is a valid vulnerability analysis response
+            # The response should have node_id, node_type, and vulnerability_nodes
+            if not data.get("node_id") or not data.get("node_type") or "vulnerability_nodes" not in data:
                 error_message = data.get('message', 'Unknown error')
                 error_details = data.get('error', '')
                 self.log_test("Vulnerability Analysis API Nodes", False, 
-                            f"Analysis failed: {error_message} - {error_details}")
+                            f"Invalid response structure: {error_message} - {error_details}")
                 return False
             
             vulnerabilities = data.get("vulnerabilities", [])
