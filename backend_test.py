@@ -165,7 +165,27 @@ class CriticalIssuesTester:
                 self.log_test("Vulnerability Analysis API Nodes", False, "No test node ID available")
                 return False
             
-            response = self.session.post(f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}")
+            # Create vulnerability analysis request with proper format
+            vulnerability_request = {
+                "node_id": self.test_node_id,
+                "node_type": "API",
+                "questionnaire_responses": {
+                    "api_type": "REST API",
+                    "authentication_method": "oauth2",
+                    "encryption_enabled": True,
+                    "input_validation": "comprehensive",
+                    "rate_limiting": True,
+                    "logging_enabled": True,
+                    "cors_enabled": True,
+                    "csrf_protection": True
+                },
+                "node_position": {"x": 200, "y": 100}
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}",
+                json=vulnerability_request
+            )
             
             print(f"📋 Vulnerability Analysis Response Status: HTTP {response.status_code}")
             
