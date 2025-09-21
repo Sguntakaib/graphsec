@@ -1,37 +1,22 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - ENHANCED API NODE QUESTIONNAIRE SYSTEM
-Tests the new enhanced API Node questionnaire system with dynamic questions as specified in the review request.
+Backend API Testing - CRITICAL ISSUES TESTING
+Tests the two critical issues reported in the continuation request:
 
 TESTING FOCUS:
-🎯 PRIMARY TEST: ENHANCED API NODE QUESTIONNAIRE SYSTEM WITH DYNAMIC QUESTIONS
+🎯 CRITICAL ISSUE 1: VULNERABILITY ANALYSIS FOR API NODES
+- Test POST /api/vulnerabilities/analyze/{node_id} with API node data
+- Verify no "Cross-Site Request Forgery is not a valid VulnerabilityCategory" error
+- Verify that all vulnerability categories are valid enum values
 
-1. **Enhanced Questionnaire Endpoint Testing:**
-   - Test GET /api/questionnaires/API/enhanced without canvas nodes
-   - Test GET /api/questionnaires/API/enhanced with canvas_nodes parameter containing sample Database nodes
-   - Verify response includes dynamic_api_questions, database_reuse_detection, external_services_categorization features
-
-2. **External Services Categories Testing:**
-   - Test GET /api/questionnaires/external-services/categories
-   - Verify returns 9 categories (Authentication, Payment, Cloud, Messaging, Analytics, Social Media, File Storage, Notification, Other)
-   - Check each category has appropriate service examples
-
-3. **Canvas Node Detection Testing:**
-   - Test POST /api/questionnaires/canvas/detect-nodes with sample canvas nodes containing Database nodes
-   - Test detection of different node types (Database, API, WebApp)
-   - Verify reuse recommendations work correctly
-
-4. **Enhanced Conditional Questions Testing:**
-   - Test POST /api/questionnaires/API/enhanced/conditional with API type responses (REST API, GraphQL API, etc.)
-   - Test database reuse decision processing
-   - Test web interface exposure triggers
-   - Verify conditional questions are added based on responses
+🎯 CRITICAL ISSUE 2: QUESTIONNAIRE SAVE ENDPOINTS
+- GET /api/diagrams to get existing diagram
+- POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire with sample questionnaire responses
+- Verify HTTP 200 response instead of 500 errors
 
 **EXPECTED RESULTS:** 
-- Enhanced questionnaire endpoint should return dynamic questions with all features enabled
-- External services categories should return 9 categories with proper service examples
-- Canvas node detection should identify existing nodes and provide reuse recommendations
-- Conditional questions should be dynamically added based on API type and other responses
+- Vulnerability analysis should work for API nodes without enum validation errors
+- Questionnaire save endpoints should return HTTP 200 without 500 errors
 """
 
 import requests
