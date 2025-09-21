@@ -1726,7 +1726,24 @@ function AppContent() {
           statusMessage += `\n\n💡 Tip: Use "Vulnerabilities" button to analyze security risks after completing all questions`;
         }
         
-        alert(statusMessage);
+        // Parse vulnerability analysis results
+        let vulnerabilityData = null;
+        if (result.vulnerabilityAnalysis && result.vulnerabilityAnalysis.total_vulnerabilities > 0) {
+          vulnerabilityData = {
+            total: result.vulnerabilityAnalysis.total_vulnerabilities,
+            riskScore: result.vulnerabilityAnalysis.overall_risk_score.toFixed(1)
+          };
+        }
+
+        // Show enhanced notification instead of alert
+        notification.showSecurityConfigurationComplete({
+          completion: result.validation?.completion_percentage || 0,
+          recommendations: result.recommendations?.length || 0,
+          dependentNodes: result.dependentNodes?.length || 0,
+          vulnerabilities: vulnerabilityData,
+          smartNodeResult: result.smartNodeResult,
+          autoVulnerabilityAnalysis: autoVulnerabilityAnalysis
+        });
       }
 
     } catch (error) {
