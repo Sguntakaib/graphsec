@@ -1804,10 +1804,14 @@ function AppContent() {
           setParentQuestionnaireStack(prev => prev.slice(0, -1));
           
           // Resume the grandparent questionnaire
+          const actualGrandparentNode = nodes.find(n => n.id === grandparentState.nodeId);
           setCurrentQuestionnaireNode({
             id: grandparentState.nodeId,
             subtype: grandparentState.nodeSubtype,
-            data: { subtype: grandparentState.nodeSubtype }
+            data: { 
+              subtype: grandparentState.nodeSubtype,
+              parentNode: actualGrandparentNode?.data?.parentNode
+            }
           });
           
           // Clear the queue
