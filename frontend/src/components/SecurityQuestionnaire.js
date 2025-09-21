@@ -284,10 +284,25 @@ const SecurityQuestionnaire = ({
     
     // If current question triggers a dependency and answer is Yes/True
     if (dependencyTriggers[currentPrompt.id] && (currentAnswer === true || currentAnswer === 'Yes')) {
-      console.log(`🎯 Dependency trigger detected for ${currentPrompt.id} → ${dependencyTriggers[currentPrompt.id]}`);
+      const specificDependency = dependencyTriggers[currentPrompt.id];
+      const dependencyKey = `${currentPrompt.id}-${specificDependency}`;
+      
+      // Check if this dependency has already been triggered to prevent duplicates
+      if (triggeredDependencies.has(dependencyKey)) {
+        console.log(`⚠️ Dependency ${currentPrompt.id} → ${specificDependency} already triggered, skipping duplicate`);
+        // Continue to next question without triggering dependency again
+        if (currentPromptIndex < prompts.length - 1) {
+          setCurrentPromptIndex(currentPromptIndex + 1);
+        }
+        return;
+      }
+      
+      console.log(`🎯 Dependency trigger detected for ${currentPrompt.id} → ${specificDependency}`);
+      
+      // Mark this dependency as triggered to prevent duplicates
+      setTriggeredDependencies(prev => new Set([...prev, dependencyKey]));
       
       // Only trigger the SPECIFIC dependency that was just answered, not all dependencies
-      const specificDependency = dependencyTriggers[currentPrompt.id];
       console.log(`🎯 Triggering only specific dependency: ${specificDependency}`);
       
       const allAnswersWithCurrent = {
