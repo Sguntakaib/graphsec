@@ -21,47 +21,61 @@ const EnhancedSecurityQuestionnaire = ({
 
   // Map questionnaire prompt types to correct SecurityBranch enum values based on webapp.yaml and api.yaml
   const mapPromptTypeToSecurityBranch = (promptId, relatedBranch) => {
-    // Direct mappings based on YAML files' related_branch values
+    // Updated mapping to match backend SecurityBranchType enum values exactly
     const branchMappings = {
-      // WebApp.yaml branch mappings
-      'Authentication': 'Authentication',
-      'InputValidation': 'InputValidation', 
-      'Encryption': 'SSL/TLS',  // For HTTPS and data encryption questions
+      // Direct branch mappings (primary)
+      'Login': 'Login',
+      'API': 'ApiSecurity',  // Map to API_SECURITY enum value
       'Database': 'Database',
-      'API': 'API',
-      'SessionManagement': 'SessionManagement',
-      'ErrorHandling': 'ErrorHandling',
-      'Logging': 'Logging',
-      'CSP': 'CSP',
-      
-      // API.yaml branch mappings
-      'ApiSecurity': 'ApiSecurity',
+      'InputValidation': 'InputValidation',
+      'WAF': 'WAF',
+      'Encryption': 'Encryption',
+      'AccessControl': 'AccessControl',
+      'Authentication': 'Authentication',
       'Authorization': 'Authorization',
       'RateLimiting': 'RateLimiting',
+      'CORS': 'CORS',
+      'DataClassification': 'DataClassification',
+      'Backup': 'Backup',
       'Monitoring': 'Monitoring',
+      'Logging': 'Logging',
+      'Deployment': 'Deployment',
+      'CloudSecurity': 'CloudSecurity',
+      'NetworkSecurity': 'NetworkSecurity',
+      'Infrastructure': 'Infrastructure',
+      'ErrorHandling': 'ErrorHandling',
+      'Compliance': 'Compliance',
+      'SessionManagement': 'SessionManagement',
+      'CSP': 'CSP',
       'ExternalService': 'ExternalService',
       
-      // Legacy mappings
+      // Legacy mappings for YAML prompt IDs
       'login': 'Authentication',
       'authentication': 'Authentication',
       'input_validation': 'InputValidation',
       'validation': 'InputValidation',
-      'https': 'SSL/TLS',
-      'ssl': 'SSL/TLS',
-      'tls': 'SSL/TLS',
+      'https': 'Encryption',  // Map SSL/TLS to Encryption
+      'ssl': 'Encryption',
+      'tls': 'Encryption',
+      'data_encryption': 'Encryption',
       'database_connection': 'Database',
       'database': 'Database',
-      'api_endpoints': 'API',
-      'api': 'API',
+      'api_endpoints': 'ApiSecurity',  // Map to correct API_SECURITY value
+      'api': 'ApiSecurity',
+      'api_security': 'ApiSecurity',
       'session_management': 'SessionManagement',
       'sessionmanagement': 'SessionManagement',
       'error_handling': 'ErrorHandling',
       'errorhandling': 'ErrorHandling',
       'logging': 'Logging',
+      'audit_logging': 'AuditLogging',
       'csp': 'CSP',
       'authorization': 'Authorization',
       'rate_limiting': 'RateLimiting',
-      'monitoring': 'Monitoring'
+      'monitoring': 'Monitoring',
+      'compliance': 'Compliance',
+      'backup': 'Backup',
+      'encryption': 'Encryption'
     };
 
     // First try direct related_branch mapping (most reliable)
