@@ -28,6 +28,7 @@ const SecurityQuestionnaire = ({
   const [prompts, setPrompts] = useState([]);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [answers, setAnswers] = useState(existingValues);
+  const [triggeredDependencies, setTriggeredDependencies] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validation, setValidation] = useState(null);
