@@ -2457,6 +2457,49 @@ function AppContent() {
       setEdges(prevEdges => [...prevEdges, ...newEdges]);
     }
 
+    // CRITICAL FIX: Save newly created nodes to database
+    if (newNodes.length > 0 && currentDiagram) {
+      try {
+        console.log('💾 Saving newly created dependent nodes to database:', newNodes.map(n => n.id));
+        
+        // Format nodes for backend
+        const backendNodes = newNodes.map(node => ({
+          id: node.id,
+          type: node.data.type || "Asset",
+          subtype: node.data.subtype || node.subtype,
+          label: node.data.label || `${node.data.subtype} (Auto-created)`,
+          position: node.position,
+          data: node.data,
+          mitre_ids: [],
+          cve_ids: [],
+          created_at: new Date().toISOString()
+        }));
+
+        // Format edges for backend
+        const backendEdges = newEdges.map(edge => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          label: edge.label || "",
+          type: edge.type,
+          data: edge.data || {}
+        }));
+
+        // Update diagram with new nodes and edges
+        const updatedDiagram = {
+          ...currentDiagram,
+          nodes: [...(currentDiagram.nodes || []), ...backendNodes],
+          edges: [...(currentDiagram.edges || []), ...backendEdges]
+        };
+
+        await updateDiagram(currentDiagram.id, updatedDiagram);
+        setCurrentDiagram(updatedDiagram);
+        console.log('✅ Dependent nodes saved to database successfully');
+      } catch (error) {
+        console.error('❌ Error saving dependent nodes to database:', error);
+      }
+    }
+
     // Queue questionnaires ONLY for newly created nodes (not reused ones)
     if (newNodes.length > 0) {
       console.log(`🎯 Queueing questionnaires for ${newNodes.length} newly created dependent nodes:`, newNodes.map(n => n.data.subtype));
