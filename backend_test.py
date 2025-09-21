@@ -372,19 +372,19 @@ class CriticalIssuesTester:
             print(f"   ⚠️ Cleanup error: {str(e)}")
 
     def run_all_tests(self):
-        """Run all enhanced API questionnaire tests"""
-        print("🚀 STARTING ENHANCED API NODE QUESTIONNAIRE SYSTEM TESTING")
+        """Run all critical issues tests"""
+        print("🚀 STARTING CRITICAL ISSUES TESTING")
         print("=" * 80)
-        print("Testing the new enhanced API Node questionnaire system with dynamic questions")
+        print("Testing the two critical issues reported in the continuation request:")
+        print("1. Vulnerability Analysis for API Nodes")
+        print("2. Questionnaire Save Endpoints")
         print("=" * 80)
         
         tests = [
             self.test_health_check,
-            self.test_enhanced_questionnaire_basic,
-            self.test_enhanced_questionnaire_with_canvas_nodes,
-            self.test_external_services_categories,
-            self.test_canvas_node_detection,
-            self.test_enhanced_conditional_questions,
+            self.create_test_diagram,
+            self.test_vulnerability_analysis_api_nodes,
+            self.test_questionnaire_save_endpoints,
         ]
         
         passed = 0
@@ -398,6 +398,9 @@ class CriticalIssuesTester:
             except Exception as e:
                 print(f"❌ Test {test.__name__} failed with exception: {str(e)}")
                 print()
+        
+        # Cleanup
+        self.cleanup_test_data()
         
         print("=" * 80)
         print(f"🏁 TESTING COMPLETE: {passed}/{total} tests passed")
