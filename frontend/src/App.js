@@ -2414,39 +2414,47 @@ function AppContent() {
       setDependencyState(sourceNode.id, nodeType, 'CREATED');
 
       // Create edge connecting parent to dependent node
-      const newEdge = {
-        id: `edge-${sourceNode.id}-${newNode.id}`,
-        source: sourceNode.id,
-        target: newNode.id,
-        label: 'has_dependency',
-        type: 'draggable',
-        animated: true,
-        style: {
-          strokeWidth: 2,
-          stroke: '#10B981',
-          strokeDasharray: '3,3'
-        },
-        labelStyle: {
-          fill: '#ffffff',
-          fontWeight: 600,
-          fontSize: '12px',
-          backgroundColor: 'rgba(17, 24, 39, 0.9)',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          border: '1px solid #10B981'
-        },
-        labelBgStyle: {
-          fill: 'rgba(17, 24, 39, 0.9)',
-          stroke: '#10B981',
-          strokeWidth: 1,
-          fillOpacity: 0.9
-        },
-        markerEnd: {
-          type: 'arrowclosed',
-          color: '#10B981',
-        }
-      };
-      newEdges.push(newEdge);
+      const edgeId = `edge-${sourceNode.id}-${newNode.id}`;
+      
+      // Check if edge already exists to prevent duplicates
+      const edgeExists = edges.some(edge => edge.id === edgeId) || 
+                        newEdges.some(edge => edge.id === edgeId);
+      
+      if (!edgeExists) {
+        const newEdge = {
+          id: edgeId,
+          source: sourceNode.id,
+          target: newNode.id,
+          label: 'has_dependency',
+          type: 'draggable',
+          animated: true,
+          style: {
+            strokeWidth: 2,
+            stroke: '#10B981',
+            strokeDasharray: '3,3'
+          },
+          labelStyle: {
+            fill: '#ffffff',
+            fontWeight: 600,
+            fontSize: '12px',
+            backgroundColor: 'rgba(17, 24, 39, 0.9)',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            border: '1px solid #10B981'
+          },
+          labelBgStyle: {
+            fill: 'rgba(17, 24, 39, 0.9)',
+            stroke: '#10B981',
+            strokeWidth: 1,
+            fillOpacity: 0.9
+          },
+          markerEnd: {
+            type: 'arrowclosed',
+            color: '#10B981',
+          }
+        };
+        newEdges.push(newEdge);
+      }
     }
 
     // Add new nodes and edges to canvas if any were created
