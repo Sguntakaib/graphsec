@@ -3430,6 +3430,7 @@ function App() {
     <QuestionnaireProvider>
       <ReactFlowProvider>
         <AppContent />
+        <Toaster />
       </ReactFlowProvider>
     </QuestionnaireProvider>
   );
