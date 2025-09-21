@@ -327,6 +327,8 @@ test_plan:
     - "Phase 1 Core Loop Completion - Enhanced API Endpoints"
   test_all: false
   test_priority: "high_first"
+  current_focus:
+    - "Parent-Child Relationship Bug Fixes"
 
   - task: "MITRE Technique Lookup API"
     implemented: true
