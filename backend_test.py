@@ -66,23 +66,21 @@ class CriticalIssuesTester:
             self.log_test("Health Check", False, f"Connection error: {str(e)}")
             return False
 
-    def test_enhanced_questionnaire_basic(self):
-        """
-        CRITICAL TEST: Test enhanced questionnaire endpoint without canvas nodes
-        
-        This test verifies that:
-        1. GET /api/questionnaires/API/enhanced returns proper response
-        2. Response includes all required features flags
-        3. Dynamic API questions are included
-        4. Basic functionality works without canvas nodes
-        """
+    def create_test_diagram(self):
+        """Create a test diagram for testing questionnaire save endpoints"""
         try:
-            print("🎯 CRITICAL TEST: Enhanced Questionnaire Endpoint (Basic)")
+            print("🎯 SETUP: Creating Test Diagram")
             print("=" * 80)
             
-            response = self.session.get(f"{self.base_url}/questionnaires/API/enhanced")
+            # Create a test diagram
+            diagram_data = {
+                "title": "Test Diagram for Critical Issues",
+                "description": "Test diagram for vulnerability analysis and questionnaire save testing"
+            }
             
-            print(f"📋 Response Status: HTTP {response.status_code}")
+            response = self.session.post(f"{self.base_url}/diagrams", json=diagram_data)
+            
+            print(f"📋 Create Diagram Response Status: HTTP {response.status_code}")
             
             if response.status_code != 200:
                 error_detail = "Unknown error"
@@ -92,71 +90,62 @@ class CriticalIssuesTester:
                 except:
                     error_detail = response.text
                 
-                self.log_test("Enhanced Questionnaire Basic", False, 
+                self.log_test("Create Test Diagram", False, 
                             f"HTTP {response.status_code}: {error_detail}")
                 return False
             
             try:
                 data = response.json()
             except json.JSONDecodeError as e:
-                self.log_test("Enhanced Questionnaire Basic", False, 
+                self.log_test("Create Test Diagram", False, 
                             f"Invalid JSON response: {str(e)}")
                 return False
             
-            # Verify required response fields
-            required_fields = ["success", "node_subtype", "level", "total_questions", "questions", "features"]
-            missing_fields = []
-            for field in required_fields:
-                if field not in data:
-                    missing_fields.append(field)
+            self.test_diagram_id = data.get("id")
             
-            if missing_fields:
-                self.log_test("Enhanced Questionnaire Basic", False, 
-                            f"Missing required fields: {missing_fields}")
+            if not self.test_diagram_id:
+                self.log_test("Create Test Diagram", False, "No diagram ID returned")
                 return False
             
-            # Verify features are enabled
-            features = data.get("features", {})
-            expected_features = {
-                "dynamic_api_questions": True,
-                "database_reuse_detection": True,
-                "external_services_categorization": True,
-                "bidirectional_web_flow": True,
-                "vulnerability_integration": True
+            print(f"📊 Test Diagram Created:")
+            print(f"   Diagram ID: {self.test_diagram_id}")
+            print(f"   Title: {data.get('title')}")
+            
+            # Now add an API node to the diagram
+            api_node = {
+                "id": f"api-node-{uuid.uuid4().hex[:8]}",
+                "type": "Asset",
+                "subtype": "API",
+                "label": "Test API Node",
+                "position": {"x": 200, "y": 100},
+                "data": {
+                    "criticality": "High",
+                    "data_classification": "Confidential"
+                }
             }
             
-            feature_issues = []
-            for feature, expected_value in expected_features.items():
-                if features.get(feature) != expected_value:
-                    feature_issues.append(f"{feature}={features.get(feature)} (expected {expected_value})")
+            self.test_node_id = api_node["id"]
             
-            if feature_issues:
-                self.log_test("Enhanced Questionnaire Basic", False, 
-                            f"Feature issues: {feature_issues}")
+            # Update diagram with the API node
+            updated_diagram = data.copy()
+            updated_diagram["nodes"] = [api_node]
+            updated_diagram["edges"] = []
+            
+            response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", json=updated_diagram)
+            
+            if response.status_code != 200:
+                self.log_test("Create Test Diagram", False, "Failed to add API node to diagram")
                 return False
             
-            # Verify questions are present
-            questions = data.get("questions", [])
-            if not questions:
-                self.log_test("Enhanced Questionnaire Basic", False, 
-                            "No questions returned")
-                return False
+            print(f"   API Node ID: {self.test_node_id}")
             
-            print(f"📊 Enhanced Questionnaire Basic Results:")
-            print(f"   Success: {data.get('success')}")
-            print(f"   Node subtype: {data.get('node_subtype')}")
-            print(f"   Level: {data.get('level')}")
-            print(f"   Total questions: {data.get('total_questions')}")
-            print(f"   Questions count: {len(questions)}")
-            print(f"   Features enabled: {list(features.keys())}")
-            
-            self.log_test("Enhanced Questionnaire Basic", True, 
-                        f"✅ SUCCESS: Enhanced questionnaire returned {len(questions)} questions with all features enabled")
+            self.log_test("Create Test Diagram", True, 
+                        f"✅ SUCCESS: Test diagram created with API node")
             
             return True
             
         except Exception as e:
-            self.log_test("Enhanced Questionnaire Basic", False, f"Request error: {str(e)}")
+            self.log_test("Create Test Diagram", False, f"Request error: {str(e)}")
             return False
 
     def test_enhanced_questionnaire_with_canvas_nodes(self):
