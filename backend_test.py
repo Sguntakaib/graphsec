@@ -223,8 +223,9 @@ class CriticalIssuesTester:
                             f"Invalid response structure: {error_message} - {error_details}")
                 return False
             
-            vulnerabilities = data.get("vulnerabilities", [])
-            analysis_summary = data.get("analysis_summary", {})
+            vulnerabilities = data.get("vulnerability_nodes", [])
+            total_vulnerabilities = data.get("total_vulnerabilities", 0)
+            vulnerabilities_by_severity = data.get("vulnerabilities_by_severity", {})
             
             print(f"📊 Vulnerability Analysis Results:")
             print(f"   Success: {data.get('success')}")
