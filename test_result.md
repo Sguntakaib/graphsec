@@ -118,6 +118,18 @@
 
 user_problem_statement: "Security Modeling Platform - A web application for creating and analyzing security threat models with attack path simulation capabilities"
 
+  - task: "Parent-Child Relationship Bug Fixes"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 PARENT-CHILD RELATIONSHIP FIXES IMPLEMENTED: Fixed critical issues where Database questionnaire was looping back to 5th question after completion and dependency marking failures. ROOT CAUSE: When setCurrentQuestionnaireNode was called, it created minimal objects that didn't preserve parentNode information from actual React Flow nodes. FIXES: 1) Updated handleSecurityQuestionnaireComplete to find actual node and get complete data including parentNode 2) Fixed handleDependentNodeCreation to preserve parent relationships when creating questionnaire nodes 3) Fixed parent/grandparent questionnaire restoration to maintain parent node data 4) Updated startLegacyQuestionnaire to preserve parentNode from actual nodes. Also installed missing networkx dependency and restarted backend. NEED TESTING: Verify that WebApp→Database→Backup dependency chain completes without loops and 500 API errors are resolved."
+
 backend:
   - task: "Health Check Endpoint"
     implemented: true
