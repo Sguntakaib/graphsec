@@ -237,16 +237,29 @@ class CriticalIssuesTester:
             
             # Check for any vulnerability category validation errors in the vulnerabilities
             category_errors = []
+            csrf_errors = []
             for vuln in vulnerabilities:
                 category = vuln.get("category")
+                owasp_category = vuln.get("owasp_category", "")
+                name = vuln.get("name", "")
+                
                 if not category:
                     category_errors.append("Missing category")
                 elif "not a valid" in str(category):
                     category_errors.append(f"Invalid category: {category}")
+                
+                # Check specifically for Cross-Site Request Forgery errors
+                if "Cross-Site Request Forgery is not a valid VulnerabilityCategory" in str(vuln):
+                    csrf_errors.append(f"CSRF validation error in vulnerability: {name}")
             
             if category_errors:
                 self.log_test("Vulnerability Analysis API Nodes", False, 
                             f"Vulnerability category errors: {category_errors}")
+                return False
+                
+            if csrf_errors:
+                self.log_test("Vulnerability Analysis API Nodes", False, 
+                            f"❌ CRITICAL: Cross-Site Request Forgery validation errors still present: {csrf_errors}")
                 return False
             
             # Show sample vulnerabilities
