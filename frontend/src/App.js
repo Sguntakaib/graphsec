@@ -803,10 +803,15 @@ function AppContent() {
     // Use legacy questionnaire system only
     console.log('🎯 Using legacy questionnaire system');
     
+    // Find the actual node to get complete data
+    const actualNode = nodes.find(n => n.id === nodeId);
     setCurrentQuestionnaireNode({
       id: nodeId,
       subtype: nodeSubtype,
-      data: { subtype: nodeSubtype }
+      data: { 
+        subtype: nodeSubtype,
+        parentNode: actualNode?.data?.parentNode || parentNodeId
+      }
     });
     
     // Store existing answers for the questionnaire
