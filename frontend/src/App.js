@@ -1777,16 +1777,26 @@ function AppContent() {
         const parentState = parentQuestionnaireStack[parentQuestionnaireStack.length - 1];
         console.log('🔄 All dependencies completed, resuming parent questionnaire from stack:', parentState);
         
-        // Find the actual parent node to get complete data
-        const actualParentNode = nodes.find(n => n.id === parentState.nodeId);
-        setCurrentQuestionnaireNode({
-          id: parentState.nodeId,
-          subtype: parentState.nodeSubtype,
-          data: { 
+        // Ensure parentState exists and has required properties
+        if (parentState && parentState.nodeId && parentState.nodeSubtype) {
+          // Find the actual parent node to get complete data
+          const actualParentNode = nodes.find(n => n.id === parentState.nodeId);
+          setCurrentQuestionnaireNode({
+            id: parentState.nodeId,
             subtype: parentState.nodeSubtype,
-            parentNode: actualParentNode?.data?.parentNode
-          }
-        });
+            data: { 
+              subtype: parentState.nodeSubtype,
+              parentNode: actualParentNode?.data?.parentNode
+            }
+          });
+        } else {
+          console.error('⚠️ Invalid parent state found in stack:', parentState);
+          // Fallback: close questionnaire if parent state is invalid
+          setShowSecurityQuestionnaire(false);
+          setCurrentQuestionnaireNode(null);
+          setParentQuestionnaireStack([]);
+          return;
+        }
         
         // Clear the queue but keep parent stack for the SecurityQuestionnaire component
         setQuestionnaireQueue([]);
