@@ -2118,7 +2118,7 @@ function AppContent() {
     );
     
     if (securityNodes.length === 0) {
-      alert('No nodes with questionnaire responses found for vulnerability analysis.');
+      notification.showInfo('No Nodes Found', 'No nodes with questionnaire responses found for vulnerability analysis.');
       return;
     }
 
