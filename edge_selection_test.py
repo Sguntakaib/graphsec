@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://security-mapper-1.preview.emergentagent.com/api"
+BASE_URL = "https://devops-posture-scan.preview.emergentagent.com/api"
 
 class EdgeSelectionTester:
     def __init__(self):
