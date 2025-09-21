@@ -228,11 +228,12 @@ class CriticalIssuesTester:
             vulnerabilities_by_severity = data.get("vulnerabilities_by_severity", {})
             
             print(f"📊 Vulnerability Analysis Results:")
-            print(f"   Success: {data.get('success')}")
             print(f"   Node ID: {data.get('node_id')}")
             print(f"   Node Type: {data.get('node_type')}")
+            print(f"   Total vulnerabilities: {total_vulnerabilities}")
             print(f"   Vulnerabilities found: {len(vulnerabilities)}")
-            print(f"   Analysis summary: {analysis_summary}")
+            print(f"   Vulnerabilities by severity: {vulnerabilities_by_severity}")
+            print(f"   Overall risk score: {data.get('overall_risk_score', 'N/A')}")
             
             # Check for any vulnerability category validation errors in the vulnerabilities
             category_errors = []
