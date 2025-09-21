@@ -1523,7 +1523,7 @@ function AppContent() {
       // Save state for undo functionality
       saveStateToUndoStack();
       
-      alert(`Template "${template.name}" applied successfully! Added ${result.nodes_added} nodes and ${result.edges_added} edges.`);
+      notification.showInfo('Template Applied', `Template "${template.name}" applied successfully! Added ${result.nodes_added} nodes and ${result.edges_added} edges.`);
       
     } catch (error) {
       console.error('Error applying template:', error);
