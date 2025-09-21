@@ -148,28 +148,26 @@ class CriticalIssuesTester:
             self.log_test("Create Test Diagram", False, f"Request error: {str(e)}")
             return False
 
-    def test_enhanced_questionnaire_with_canvas_nodes(self):
+    def test_vulnerability_analysis_api_nodes(self):
         """
-        CRITICAL TEST: Test enhanced questionnaire endpoint with canvas nodes
+        CRITICAL TEST: Test vulnerability analysis for API nodes
         
         This test verifies that:
-        1. GET /api/questionnaires/API/enhanced with canvas_nodes parameter works
-        2. Canvas node detection is enabled
-        3. Database reuse detection works with sample Database nodes
+        1. POST /api/vulnerabilities/analyze/{node_id} works with API node data
+        2. No "Cross-Site Request Forgery is not a valid VulnerabilityCategory" error occurs
+        3. All vulnerability categories are valid enum values
         """
         try:
-            print("🎯 CRITICAL TEST: Enhanced Questionnaire with Canvas Nodes")
+            print("🎯 CRITICAL TEST: Vulnerability Analysis for API Nodes")
             print("=" * 80)
             
-            # Convert canvas nodes to JSON string
-            canvas_nodes_json = json.dumps(self.sample_canvas_nodes)
+            if not self.test_node_id:
+                self.log_test("Vulnerability Analysis API Nodes", False, "No test node ID available")
+                return False
             
-            response = self.session.get(
-                f"{self.base_url}/questionnaires/API/enhanced",
-                params={"canvas_nodes": canvas_nodes_json}
-            )
+            response = self.session.post(f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}")
             
-            print(f"📋 Response Status: HTTP {response.status_code}")
+            print(f"📋 Vulnerability Analysis Response Status: HTTP {response.status_code}")
             
             if response.status_code != 200:
                 error_detail = "Unknown error"
@@ -179,54 +177,66 @@ class CriticalIssuesTester:
                 except:
                     error_detail = response.text
                 
-                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
+                # Check specifically for the Cross-Site Request Forgery error
+                if "Cross-Site Request Forgery is not a valid VulnerabilityCategory" in str(error_detail):
+                    self.log_test("Vulnerability Analysis API Nodes", False, 
+                                f"❌ CRITICAL ERROR: Cross-Site Request Forgery enum validation error still present: {error_detail}")
+                    return False
+                
+                self.log_test("Vulnerability Analysis API Nodes", False, 
                             f"HTTP {response.status_code}: {error_detail}")
                 return False
             
             try:
                 data = response.json()
             except json.JSONDecodeError as e:
-                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
+                self.log_test("Vulnerability Analysis API Nodes", False, 
                             f"Invalid JSON response: {str(e)}")
                 return False
             
-            # Verify canvas detection is enabled
-            has_canvas_detection = data.get("has_canvas_detection", False)
-            detected_nodes = data.get("detected_nodes", 0)
-            
-            if not has_canvas_detection:
-                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
-                            "Canvas detection not enabled")
+            # Verify response structure
+            if not data.get("success"):
+                self.log_test("Vulnerability Analysis API Nodes", False, 
+                            f"Analysis failed: {data.get('message', 'Unknown error')}")
                 return False
             
-            if detected_nodes != len(self.sample_canvas_nodes):
-                self.log_test("Enhanced Questionnaire with Canvas Nodes", False, 
-                            f"Detected nodes count mismatch: {detected_nodes} vs {len(self.sample_canvas_nodes)}")
+            vulnerabilities = data.get("vulnerabilities", [])
+            analysis_summary = data.get("analysis_summary", {})
+            
+            print(f"📊 Vulnerability Analysis Results:")
+            print(f"   Success: {data.get('success')}")
+            print(f"   Node ID: {data.get('node_id')}")
+            print(f"   Node Type: {data.get('node_type')}")
+            print(f"   Vulnerabilities found: {len(vulnerabilities)}")
+            print(f"   Analysis summary: {analysis_summary}")
+            
+            # Check for any vulnerability category validation errors in the vulnerabilities
+            category_errors = []
+            for vuln in vulnerabilities:
+                category = vuln.get("category")
+                if not category:
+                    category_errors.append("Missing category")
+                elif "not a valid" in str(category):
+                    category_errors.append(f"Invalid category: {category}")
+            
+            if category_errors:
+                self.log_test("Vulnerability Analysis API Nodes", False, 
+                            f"Vulnerability category errors: {category_errors}")
                 return False
             
-            print(f"📊 Enhanced Questionnaire with Canvas Nodes Results:")
-            print(f"   Canvas detection enabled: {has_canvas_detection}")
-            print(f"   Detected nodes: {detected_nodes}")
-            print(f"   Sample nodes provided: {len(self.sample_canvas_nodes)}")
+            # Show sample vulnerabilities
+            if vulnerabilities:
+                print(f"   Sample vulnerabilities:")
+                for i, vuln in enumerate(vulnerabilities[:3]):  # Show first 3
+                    print(f"     {i+1}. {vuln.get('title', 'Unknown')} - {vuln.get('category', 'Unknown')} - {vuln.get('severity', 'Unknown')}")
             
-            # Check for database reuse questions in the response
-            questions = data.get("questions", [])
-            database_reuse_questions = []
-            for question in questions:
-                if "database" in question.get("id", "").lower() or "reuse" in question.get("question", "").lower():
-                    database_reuse_questions.append(question.get("id"))
-            
-            print(f"   Database reuse related questions: {len(database_reuse_questions)}")
-            if database_reuse_questions:
-                print(f"   Database reuse question IDs: {database_reuse_questions}")
-            
-            self.log_test("Enhanced Questionnaire with Canvas Nodes", True, 
-                        f"✅ SUCCESS: Canvas detection enabled, {detected_nodes} nodes detected, {len(database_reuse_questions)} database reuse questions")
+            self.log_test("Vulnerability Analysis API Nodes", True, 
+                        f"✅ SUCCESS: Vulnerability analysis completed for API node, {len(vulnerabilities)} vulnerabilities found, no enum validation errors")
             
             return True
             
         except Exception as e:
-            self.log_test("Enhanced Questionnaire with Canvas Nodes", False, f"Request error: {str(e)}")
+            self.log_test("Vulnerability Analysis API Nodes", False, f"Request error: {str(e)}")
             return False
 
     def test_external_services_categories(self):
