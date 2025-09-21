@@ -1,26 +1,28 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - API QUESTIONNAIRE LOOPING ISSUE FIX VERIFICATION
-Tests the API questionnaire looping issue fix as requested in the review:
+Backend API Testing - COMPLETION CALCULATION FIXES VERIFICATION
+Tests the completion calculation fixes as requested in the review:
 
 TESTING FOCUS:
-🎯 API QUESTIONNAIRE ENDPOINTS VERIFICATION
-- GET /api/intelligent-nodes/API/prompts (should return API questions)
-- POST /api/intelligent-nodes/API/validate-completeness (should validate API responses)
-- POST /api/diagrams (should create new diagram)
-- POST /api/diagrams/{id}/nodes/{node_id}/questionnaire (should handle 404 gracefully)
+🎯 COMPLETION CALCULATION FIXES VERIFICATION
+- Frontend-Backend mapping fixes: 'API' → 'ApiSecurity', 'SSL/TLS' → 'Encryption'
+- Backend validation API should properly match frontend branch types
+- Completion percentage calculation should work correctly
+- No HTTP 500 errors from validation endpoints
+- SecurityBranchType enum matching should work
 
 TEST SCENARIOS:
-1. Create a new diagram and verify it exists
-2. Get API questionnaire prompts and verify question count
-3. Test questionnaire validation with sample API responses
-4. Test saving questionnaire to non-existent diagram (should return 404)
+1. Test API node questionnaire validation with new branch mappings
+2. Test completion percentage calculation accuracy
+3. Test that backend recognizes all completed branches properly
+4. Test no HTTP 500 errors from validation endpoints
+5. Test SecurityBranchType enum matching with frontend mappings
 
 **EXPECTED RESULTS:** 
-- Basic API endpoints should work correctly for questionnaire data
-- Intelligent-nodes API endpoints should work for API questionnaires
-- Diagram/node creation and questionnaire saving should work correctly
-- POST questionnaire endpoint should properly handle missing diagrams/nodes with 404
+- API nodes should show correct completion % (not 71.4% when 5/7 done)
+- Backend validation should properly match frontend branch types
+- Notifications should show accurate completion percentages
+- No HTTP 500 errors from validation endpoints
 """
 
 import requests
