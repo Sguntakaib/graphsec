@@ -2175,7 +2175,7 @@ function AppContent() {
       
     } catch (error) {
       console.error('Error in bulk vulnerability analysis:', error);
-      alert('Error occurred during bulk vulnerability analysis.');
+      notification.showError('Analysis Error', 'Error occurred during bulk vulnerability analysis.');
     } finally {
       setIsLoading(false);
     }
