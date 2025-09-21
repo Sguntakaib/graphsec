@@ -1801,25 +1801,28 @@ function AppContent() {
           !result?.partialCompletion && result?.isActualCompletion;
         
         if (isCompletingCurrentFromStack && parentQuestionnaireStack.length > 1) {
-          // This questionnaire is completed and there's a grandparent to resume
-          console.log('✅ Current questionnaire completed, popping from stack and resuming grandparent');
+          // This questionnaire is completed and there's a parent to resume
+          console.log('✅ Current questionnaire completed, popping from stack and resuming parent');
           
-          // Get the grandparent before popping the current questionnaire
-          const grandparentState = parentQuestionnaireStack[parentQuestionnaireStack.length - 2]; // Second to last item
-          console.log('🔄 Resuming grandparent questionnaire:', grandparentState);
-          
-          // Pop the completed questionnaire from stack
-          setParentQuestionnaireStack(prev => prev.slice(0, -1));
-          
-          // Resume the grandparent questionnaire
-          const actualGrandparentNode = nodes.find(n => n.id === grandparentState.nodeId);
-          setCurrentQuestionnaireNode({
-            id: grandparentState.nodeId,
-            subtype: grandparentState.nodeSubtype,
-            data: { 
-              subtype: grandparentState.nodeSubtype,
-              parentNode: actualGrandparentNode?.data?.parentNode
-            }
+          // Pop the completed questionnaire from stack first
+          setParentQuestionnaireStack(prev => {
+            const newStack = prev.slice(0, -1);
+            // Get the parent (now the last item after popping)
+            const parentState = newStack[newStack.length - 1];
+            console.log('🔄 Resuming parent questionnaire:', parentState);
+            
+            // Resume the parent questionnaire
+            const actualParentNode = nodes.find(n => n.id === parentState.nodeId);
+            setCurrentQuestionnaireNode({
+              id: parentState.nodeId,
+              subtype: parentState.nodeSubtype,
+              data: { 
+                subtype: parentState.nodeSubtype,
+                parentNode: actualParentNode?.data?.parentNode
+              }
+            });
+            
+            return newStack;
           });
           
           // Clear the queue
