@@ -113,6 +113,9 @@ function AppContent() {
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedEdge, setSelectedEdge] = useState(null);  // Add selected edge state
   
+  // Notification service
+  const notification = useNotification();
+  
   // Custom onEdgesChange to maintain selectedEdge state
   const onEdgesChange = useCallback((changes) => {
     // Apply the default edge changes
