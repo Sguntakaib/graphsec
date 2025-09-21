@@ -2346,13 +2346,13 @@ function AppContent() {
           setDependencyState(sourceNode.id, nodeType, 'CREATED');
 
           // Create edge connecting parent to the reused node if it doesn't exist
-          const edgeExists = edges.some(edge => 
-            edge.source === sourceNode.id && edge.target === selectedNode.id
-          );
+          const edgeId = `edge-${sourceNode.id}-${selectedNode.id}`;
+          const edgeExists = edges.some(edge => edge.id === edgeId) || 
+                            newEdges.some(edge => edge.id === edgeId);
 
           if (!edgeExists) {
             const reuseEdge = {
-              id: `edge-${sourceNode.id}-${selectedNode.id}`,
+              id: edgeId,
               source: sourceNode.id,
               target: selectedNode.id,
               label: 'reuses',
