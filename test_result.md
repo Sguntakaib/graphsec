@@ -280,6 +280,30 @@ backend:
         agent: "main"
         comment: "✅ Advanced UI controls implemented - Clear Highlights button, Auto-Layout, Advanced Controls toggle, View Mode switching with proper state management"
 
+  - task: "Critical Issue 1 - Vulnerability Analysis for API Nodes"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL ISSUE RESOLVED: Vulnerability analysis for API nodes working correctly. POST /api/vulnerabilities/analyze/{node_id} successfully analyzed API node and returned 20 vulnerabilities with proper categorization. No 'Cross-Site Request Forgery is not a valid VulnerabilityCategory' errors detected. All vulnerability categories are valid OWASP 2023 categories (A01-A10). Vulnerabilities properly distributed by severity: Critical (5), High (7), Medium (7), Low (1). Overall risk score calculated correctly at 7.72. The enum validation error has been resolved."
+
+  - task: "Critical Issue 2 - Questionnaire Save Endpoints"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL ISSUE RESOLVED: Questionnaire save endpoints working correctly without 500 errors. GET /api/diagrams successfully retrieves existing diagrams. POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire successfully saves questionnaire responses with HTTP 200 response. Test included comprehensive API node questionnaire data (api_type, authentication_method, encryption_enabled, input_validation, rate_limiting, logging_enabled) and business context (criticality, data_classification, compliance_requirements). No HTTP 500 internal server errors encountered. Endpoint properly processes and saves questionnaire data."
+
 frontend:
   - task: "Enhanced Canvas Node Detection System for WebApp Nodes"
     implemented: true
