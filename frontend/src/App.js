@@ -1433,7 +1433,7 @@ function AppContent() {
         }
       } catch (error) {
         console.error('Failed to import diagram:', error);
-        alert('Failed to import diagram');
+        notification.showError('Import Failed', 'Failed to import diagram');
       }
     };
     reader.readAsText(file);
