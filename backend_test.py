@@ -239,22 +239,23 @@ class CriticalIssuesTester:
             self.log_test("Vulnerability Analysis API Nodes", False, f"Request error: {str(e)}")
             return False
 
-    def test_external_services_categories(self):
+    def test_questionnaire_save_endpoints(self):
         """
-        CRITICAL TEST: Test external services categories endpoint
+        CRITICAL TEST: Test questionnaire save endpoints
         
         This test verifies that:
-        1. GET /api/questionnaires/external-services/categories returns proper response
-        2. Returns 9 expected categories
-        3. Each category has appropriate service examples
+        1. GET /api/diagrams works to get existing diagram
+        2. POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire works without 500 errors
+        3. Questionnaire responses are properly saved
         """
         try:
-            print("🎯 CRITICAL TEST: External Services Categories")
+            print("🎯 CRITICAL TEST: Questionnaire Save Endpoints")
             print("=" * 80)
             
-            response = self.session.get(f"{self.base_url}/questionnaires/external-services/categories")
+            # First, verify we can get diagrams
+            response = self.session.get(f"{self.base_url}/diagrams")
             
-            print(f"📋 Response Status: HTTP {response.status_code}")
+            print(f"📋 Get Diagrams Response Status: HTTP {response.status_code}")
             
             if response.status_code != 200:
                 error_detail = "Unknown error"
@@ -264,75 +265,97 @@ class CriticalIssuesTester:
                 except:
                     error_detail = response.text
                 
-                self.log_test("External Services Categories", False, 
+                self.log_test("Questionnaire Save Endpoints", False, 
+                            f"Failed to get diagrams - HTTP {response.status_code}: {error_detail}")
+                return False
+            
+            try:
+                diagrams_data = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Questionnaire Save Endpoints", False, 
+                            f"Invalid JSON response from diagrams endpoint: {str(e)}")
+                return False
+            
+            print(f"📊 Diagrams Retrieved: {len(diagrams_data)} diagrams found")
+            
+            if not self.test_diagram_id or not self.test_node_id:
+                self.log_test("Questionnaire Save Endpoints", False, 
+                            "No test diagram or node ID available")
+                return False
+            
+            # Now test the questionnaire save endpoint
+            questionnaire_data = {
+                "responses": {
+                    "api_type": "REST API",
+                    "authentication_method": "oauth2",
+                    "encryption_enabled": True,
+                    "input_validation": "comprehensive",
+                    "rate_limiting": True,
+                    "logging_enabled": True
+                },
+                "business_context": {
+                    "criticality": "high",
+                    "data_classification": "confidential",
+                    "compliance_requirements": ["GDPR", "SOX"]
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/diagrams/{self.test_diagram_id}/nodes/{self.test_node_id}/questionnaire",
+                json=questionnaire_data
+            )
+            
+            print(f"📋 Questionnaire Save Response Status: HTTP {response.status_code}")
+            
+            if response.status_code == 500:
+                error_detail = "Unknown error"
+                try:
+                    error_data = response.json()
+                    error_detail = error_data.get('detail', str(error_data))
+                except:
+                    error_detail = response.text
+                
+                self.log_test("Questionnaire Save Endpoints", False, 
+                            f"❌ CRITICAL ERROR: HTTP 500 error still present: {error_detail}")
+                return False
+            
+            if response.status_code != 200:
+                error_detail = "Unknown error"
+                try:
+                    error_data = response.json()
+                    error_detail = error_data.get('detail', str(error_data))
+                except:
+                    error_detail = response.text
+                
+                self.log_test("Questionnaire Save Endpoints", False, 
                             f"HTTP {response.status_code}: {error_detail}")
                 return False
             
             try:
-                data = response.json()
+                save_data = response.json()
             except json.JSONDecodeError as e:
-                self.log_test("External Services Categories", False, 
-                            f"Invalid JSON response: {str(e)}")
+                self.log_test("Questionnaire Save Endpoints", False, 
+                            f"Invalid JSON response from questionnaire save: {str(e)}")
                 return False
             
-            # Verify required response fields
-            if not data.get("success"):
-                self.log_test("External Services Categories", False, 
-                            "Response success is false")
+            print(f"📊 Questionnaire Save Results:")
+            print(f"   Success: {save_data.get('success', False)}")
+            print(f"   Message: {save_data.get('message', 'No message')}")
+            print(f"   Diagram ID: {self.test_diagram_id}")
+            print(f"   Node ID: {self.test_node_id}")
+            
+            if not save_data.get("success"):
+                self.log_test("Questionnaire Save Endpoints", False, 
+                            f"Questionnaire save failed: {save_data.get('message', 'Unknown error')}")
                 return False
             
-            categories = data.get("categories", {})
-            total_categories = data.get("total_categories", 0)
-            
-            # Expected 9 categories
-            expected_categories = [
-                "Authentication", "Payment", "Cloud", "Messaging", 
-                "Analytics", "Social Media", "File Storage", "Notification", "Other"
-            ]
-            
-            if total_categories != 9:
-                self.log_test("External Services Categories", False, 
-                            f"Expected 9 categories, got {total_categories}")
-                return False
-            
-            # Verify all expected categories are present
-            missing_categories = []
-            for expected_cat in expected_categories:
-                if expected_cat not in categories:
-                    missing_categories.append(expected_cat)
-            
-            if missing_categories:
-                self.log_test("External Services Categories", False, 
-                            f"Missing categories: {missing_categories}")
-                return False
-            
-            # Verify each category has service examples
-            categories_with_no_services = []
-            for category, services in categories.items():
-                if not services or len(services) == 0:
-                    categories_with_no_services.append(category)
-            
-            if categories_with_no_services:
-                self.log_test("External Services Categories", False, 
-                            f"Categories with no services: {categories_with_no_services}")
-                return False
-            
-            print(f"📊 External Services Categories Results:")
-            print(f"   Success: {data.get('success')}")
-            print(f"   Total categories: {total_categories}")
-            print(f"   Categories found: {list(categories.keys())}")
-            
-            # Show sample services for each category
-            for category, services in categories.items():
-                print(f"   {category}: {len(services)} services (e.g., {services[0] if services else 'None'})")
-            
-            self.log_test("External Services Categories", True, 
-                        f"✅ SUCCESS: All 9 categories returned with service examples")
+            self.log_test("Questionnaire Save Endpoints", True, 
+                        f"✅ SUCCESS: Questionnaire save endpoint working, no 500 errors")
             
             return True
             
         except Exception as e:
-            self.log_test("External Services Categories", False, f"Request error: {str(e)}")
+            self.log_test("Questionnaire Save Endpoints", False, f"Request error: {str(e)}")
             return False
 
     def test_canvas_node_detection(self):
