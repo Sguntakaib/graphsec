@@ -1429,7 +1429,7 @@ function AppContent() {
             setSimulationResult(importData.simulation);
           }
         } else {
-          alert('Invalid diagram file format');
+          notification.showError('Invalid File Format', 'Invalid diagram file format');
         }
       } catch (error) {
         console.error('Failed to import diagram:', error);
