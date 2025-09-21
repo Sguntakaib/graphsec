@@ -775,7 +775,10 @@ function AppContent() {
             setCurrentQuestionnaireNode({
               id: newNode.id,
               subtype: nodeData.subtype,
-              data: { subtype: nodeData.subtype }
+              data: { 
+                subtype: nodeData.subtype,
+                parentNode: nodeData.parentNode
+              }
             });
             setShowSecurityQuestionnaire(true);
           }
