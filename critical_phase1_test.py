@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://devops-posture-scan.preview.emergentagent.com/api"
+BASE_URL = "https://graph-tools.preview.emergentagent.com/api"
 
 def test_endpoint_1_questionnaire_complete():
     """
