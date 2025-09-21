@@ -2421,7 +2421,10 @@ function AppContent() {
       setCurrentQuestionnaireNode({
         id: firstNode.id,
         subtype: nodeSubtype,
-        data: { subtype: nodeSubtype }
+        data: { 
+          subtype: nodeSubtype,
+          parentNode: firstNode.data?.parentNode 
+        }
       });
       
       // Keep the modal open for the first dependent questionnaire
