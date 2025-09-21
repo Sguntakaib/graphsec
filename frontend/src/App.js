@@ -1769,10 +1769,15 @@ function AppContent() {
         const parentState = parentQuestionnaireStack[parentQuestionnaireStack.length - 1];
         console.log('🔄 All dependencies completed, resuming parent questionnaire from stack:', parentState);
         
+        // Find the actual parent node to get complete data
+        const actualParentNode = nodes.find(n => n.id === parentState.nodeId);
         setCurrentQuestionnaireNode({
           id: parentState.nodeId,
           subtype: parentState.nodeSubtype,
-          data: { subtype: parentState.nodeSubtype }
+          data: { 
+            subtype: parentState.nodeSubtype,
+            parentNode: actualParentNode?.data?.parentNode
+          }
         });
         
         // Clear the queue but keep parent stack for the SecurityQuestionnaire component
