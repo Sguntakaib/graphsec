@@ -15,15 +15,20 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
+          <Toast key={id} {...props} className="bg-transparent border-none shadow-none p-0">
+            {/* If description is a React component, render it directly */}
+            {React.isValidElement(description) ? (
+              description
+            ) : (
+              <div className="grid gap-1">
+                {title && <ToastTitle>{title}</ToastTitle>}
+                {description && (
+                  <ToastDescription>{description}</ToastDescription>
+                )}
+              </div>
+            )}
             {action}
-            <ToastClose />
+            <ToastClose className="absolute -top-2 -right-2 bg-gray-700 hover:bg-gray-600 rounded-full p-1 h-6 w-6" />
           </Toast>
         );
       })}
