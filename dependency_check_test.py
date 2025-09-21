@@ -87,11 +87,11 @@ class DependencyCheckTester:
             # Test Database dependency check with backup enabled
             request_data = {
                 "answers": {
-                    "database_type": "postgresql",
-                    "database_encryption": True,
-                    "database_backup_enabled": True,  # This should trigger Backup dependency
-                    "database_access_control": "rbac",
-                    "database_monitoring": True
+                    "db_type": "PostgreSQL",
+                    "db_encryption_at_rest": "AES-256",
+                    "db_backup_enabled": True,  # This should trigger Backup dependency
+                    "db_access_control": ["Role-Based Access", "User Authentication"],
+                    "db_monitoring_enabled": True  # This should trigger Monitoring dependency
                 }
             }
             
