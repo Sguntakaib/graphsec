@@ -33,36 +33,8 @@ class CriticalIssuesTester:
         self.base_url = BASE_URL
         self.session = requests.Session()
         self.test_results = []
-        self.sample_canvas_nodes = [
-            {
-                "id": "db-node-1",
-                "type": "Asset",
-                "subtype": "Database",
-                "label": "User Database",
-                "position": {"x": 100, "y": 200}
-            },
-            {
-                "id": "db-node-2", 
-                "type": "Asset",
-                "subtype": "Database",
-                "label": "Analytics Database",
-                "position": {"x": 300, "y": 200}
-            },
-            {
-                "id": "api-node-1",
-                "type": "Asset", 
-                "subtype": "API",
-                "label": "User API",
-                "position": {"x": 200, "y": 100}
-            },
-            {
-                "id": "webapp-node-1",
-                "type": "Asset",
-                "subtype": "WebApp", 
-                "label": "Frontend App",
-                "position": {"x": 400, "y": 100}
-            }
-        ]
+        self.test_diagram_id = None
+        self.test_node_id = None
         
     def log_test(self, test_name, success, message="", response_data=None):
         """Log test results"""
