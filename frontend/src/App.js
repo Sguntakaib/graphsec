@@ -2145,7 +2145,7 @@ function AppContent() {
       }
       
       if (completeNodes.length === 0) {
-        alert(message + 'No nodes are ready for vulnerability analysis. Complete questionnaires first.');
+        notification.showInfo('No Ready Nodes', message + 'No nodes are ready for vulnerability analysis. Complete questionnaires first.');
         return;
       }
       
