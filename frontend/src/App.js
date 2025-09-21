@@ -2184,6 +2184,24 @@ function AppContent() {
         }));
         
         console.log('✅ Questionnaire responses saved and node data updated:', { nodeId, responses });
+      } else if (response.status === 404) {
+        console.warn('⚠️ Diagram or node not found in database - continuing with local state only');
+        // Still update local node data even if backend save fails
+        setNodes(nds => nds.map(node => {
+          if (node.id === nodeId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                questionnaireResponses: responses,
+                lastQuestionnaireUpdate: new Date().toISOString()
+              }
+            };
+          }
+          return node;
+        }));
+      } else {
+        console.error('Failed to save questionnaire responses:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error saving questionnaire responses:', error);
