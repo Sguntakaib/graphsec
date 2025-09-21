@@ -1527,7 +1527,7 @@ function AppContent() {
       
     } catch (error) {
       console.error('Error applying template:', error);
-      alert('Failed to apply template. Please try again.');
+      notification.showError('Template Failed', 'Failed to apply template. Please try again.');
     } finally {
       setIsLoading(false);
     }
