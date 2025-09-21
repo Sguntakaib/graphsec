@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - CRITICAL ISSUES TESTING
-Tests the two critical issues reported in the continuation request:
+Backend API Testing - API QUESTIONNAIRE LOOPING ISSUE FIX VERIFICATION
+Tests the API questionnaire looping issue fix as requested in the review:
 
 TESTING FOCUS:
-🎯 CRITICAL ISSUE 1: VULNERABILITY ANALYSIS FOR API NODES
-- Test POST /api/vulnerabilities/analyze/{node_id} with API node data
-- Verify no "Cross-Site Request Forgery is not a valid VulnerabilityCategory" error
-- Verify that all vulnerability categories are valid enum values
+🎯 API QUESTIONNAIRE ENDPOINTS VERIFICATION
+- GET /api/intelligent-nodes/API/prompts (should return API questions)
+- POST /api/intelligent-nodes/API/validate-completeness (should validate API responses)
+- POST /api/diagrams (should create new diagram)
+- POST /api/diagrams/{id}/nodes/{node_id}/questionnaire (should handle 404 gracefully)
 
-🎯 CRITICAL ISSUE 2: QUESTIONNAIRE SAVE ENDPOINTS
-- GET /api/diagrams to get existing diagram
-- POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire with sample questionnaire responses
-- Verify HTTP 200 response instead of 500 errors
+TEST SCENARIOS:
+1. Create a new diagram and verify it exists
+2. Get API questionnaire prompts and verify question count
+3. Test questionnaire validation with sample API responses
+4. Test saving questionnaire to non-existent diagram (should return 404)
 
 **EXPECTED RESULTS:** 
-- Vulnerability analysis should work for API nodes without enum validation errors
-- Questionnaire save endpoints should return HTTP 200 without 500 errors
+- Basic API endpoints should work correctly for questionnaire data
+- Intelligent-nodes API endpoints should work for API questionnaires
+- Diagram/node creation and questionnaire saving should work correctly
+- POST questionnaire endpoint should properly handle missing diagrams/nodes with 404
 """
 
 import requests
