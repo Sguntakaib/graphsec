@@ -196,28 +196,43 @@ class Phase2BackendTester:
                 return False
             
             # Verify dependency data structure for trigger badges
-            dependencies = data.get("dependencies", [])
+            dependent_nodes = data.get("dependent_nodes", [])
+            dependencies_found = data.get("dependencies_found", 0)
             
             print(f"📊 Dependency Detection Results:")
-            print(f"   Dependencies Found: {len(dependencies)}")
+            print(f"   Success: {data.get('success', False)}")
+            print(f"   Node Subtype: {data.get('node_subtype', 'Unknown')}")
+            print(f"   Dependencies Found: {dependencies_found}")
+            print(f"   Dependent Nodes: {len(dependent_nodes)}")
             
-            if dependencies:
-                print(f"   Sample dependencies:")
-                for i, dep in enumerate(dependencies[:3]):
-                    dep_type = dep.get("type", "Unknown")
-                    trigger = dep.get("trigger_condition", "Unknown")
-                    print(f"     {i+1}. Type: {dep_type}, Trigger: {trigger}")
+            if dependent_nodes:
+                print(f"   Sample dependent nodes:")
+                for i, node in enumerate(dependent_nodes[:3]):
+                    node_type = node.get("type", "Unknown")
+                    condition = node.get("condition", "Unknown")
+                    print(f"     {i+1}. Type: {node_type}, Condition: {condition}")
             
             # Test API dependency detection
-            api_response = self.session.post(f"{self.base_url}/intelligent-nodes/API/check-dependencies")
+            api_request = {
+                "answers": {
+                    "api_database_connection": True,
+                    "api_rate_limiting": True,
+                    "api_authentication_method": "oauth2"
+                }
+            }
+            
+            api_response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/API/check-dependencies",
+                json=api_request
+            )
             
             if api_response.status_code == 200:
                 api_data = api_response.json()
-                api_dependencies = api_data.get("dependencies", [])
-                print(f"   API Dependencies Found: {len(api_dependencies)}")
+                api_dependencies = api_data.get("dependencies_found", 0)
+                print(f"   API Dependencies Found: {api_dependencies}")
             
             self.log_test("Questionnaire Dependency Detection", True, 
-                        f"✅ SUCCESS: Dependency detection working, found {len(dependencies)} WebApp dependencies")
+                        f"✅ SUCCESS: Dependency detection working, found {dependencies_found} WebApp dependencies")
             
             return True
             
