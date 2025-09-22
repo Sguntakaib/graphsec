@@ -688,8 +688,12 @@ class Phase2BackendTester:
                 )
                 validation_ok = validation_response.status_code == 200
                 
-                # Test dependency check
-                dependency_response = self.session.post(f"{self.base_url}/intelligent-nodes/{qtype}/check-dependencies")
+                # Test dependency check with required request body
+                dependency_request = {"answers": {"test_answer": True}}
+                dependency_response = self.session.post(
+                    f"{self.base_url}/intelligent-nodes/{qtype}/check-dependencies",
+                    json=dependency_request
+                )
                 dependency_ok = dependency_response.status_code == 200
                 
                 compatibility_results[qtype] = {
