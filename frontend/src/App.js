@@ -166,6 +166,10 @@ function AppContent() {
   const [dependencyStates, setDependencyStates] = useState({}); // Track dependency states per parent node: {parentNodeId: {API: 'COMPLETED', Database: 'CREATED'}}
   const [activeQuestionnaires, setActiveQuestionnaires] = useState(new Set()); // Track which questionnaires are currently active to prevent duplicates
   
+  // QW-3: Save status tracking - MOVED BEFORE CALLBACK
+  const [lastSavedAt, setLastSavedAt] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  
   // QW-3: Clear All confirmation dialog state
   const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
   
