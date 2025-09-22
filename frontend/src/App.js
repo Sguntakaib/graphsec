@@ -183,6 +183,7 @@ function AppContent() {
   
   // Vulnerability dropdown menu state
   const [showVulnMenu, setShowVulnMenu] = useState(false);
+  const [showClearConfirmation, setShowClearConfirmation] = useState(false);
   
   // Collapsible menu states
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
