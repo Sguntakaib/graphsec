@@ -71,7 +71,11 @@ const AdvancedLayoutControls = ({
   // Persist selected algorithm per diagram
   useEffect(() => {
     if (storageKey && selectedAlgorithm) {
-      try { window.localStorage.setItem(storageKey, selectedAlgorithm); } catch {}
+      try {
+        window.localStorage.setItem(storageKey, selectedAlgorithm);
+      } catch (e) {
+        // ignore storage errors
+      }
     }
   }, [storageKey, selectedAlgorithm]);
 
