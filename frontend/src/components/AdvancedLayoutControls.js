@@ -327,11 +327,11 @@ const AdvancedLayoutControls = ({
         {isExpanded && algorithms.length > 0 && (
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 About selected algorithm
               </label>
               {selectedAlgorithm && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   {algorithms.find(a => a.id === selectedAlgorithm)?.description}
                 </p>
               )}
@@ -350,7 +350,7 @@ const AdvancedLayoutControls = ({
               <button
                 onClick={handleGetMetrics}
                 disabled={isLoading}
-                className="px-3 py-1.5 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 flex items-center space-x-1 text-sm"
+                className="px-3 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 flex items-center space-x-1 text-sm"
               >
                 <BarChart3 className="h-4 w-4" />
                 <span>Metrics</span>
