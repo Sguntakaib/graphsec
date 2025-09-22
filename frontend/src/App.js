@@ -3140,7 +3140,7 @@ function AppContent() {
         )}
       </div>
 
-      {/* Top Toolbar Toggle Button */}
+      
       <div className="absolute top-0 right-1/2 transform translate-x-1/2 z-50">
         <button
           onClick={() => setIsTopToolbarCollapsed(!isTopToolbarCollapsed)}
