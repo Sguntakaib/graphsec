@@ -3548,6 +3548,32 @@ function AppContent() {
           console.log('Canvas sync: Edge created', newEdge);
         }}
       /> */}
+      
+      {/* QW-3: Clear All Confirmation Modal */}
+      {showClearAllConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-6 max-w-md">
+            <h3 className="text-lg font-semibold text-white mb-4">Clear All Nodes and Edges?</h3>
+            <p className="text-gray-300 mb-6">
+              This will remove all nodes and edges from the canvas. This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={cancelClearAll}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeClearAll}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
