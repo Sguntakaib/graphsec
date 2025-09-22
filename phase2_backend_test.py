@@ -508,7 +508,7 @@ class Phase2BackendTester:
                 return False
             
             # Extract vulnerabilities from response
-            vulnerabilities = data.get("vulnerabilities", [])
+            vulnerabilities = data.get("vulnerability_nodes", [])
             
             if not vulnerabilities:
                 self.log_test("Vulnerability Filtering Support", False, 
