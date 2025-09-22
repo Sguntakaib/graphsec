@@ -36,8 +36,8 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
       let questionsResponse;
       const nodeSubtype = activeNode.data.subtype;
       
-      if (nodeSubtype === 'WebApp') {
-        questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`);
+      if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
+        questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`);
       } else {
         questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
       }
