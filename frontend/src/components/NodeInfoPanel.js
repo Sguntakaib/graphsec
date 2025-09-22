@@ -18,6 +18,31 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
   const [questionsData, setQuestionsData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeNode, setActiveNode] = useState(null);
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [completionFilter, setCompletionFilter] = useState('All'); // All | Complete | Partial | Not Started
+  const [searchText, setSearchText] = useState('');
+  const [sortBy, setSortBy] = useState('Type'); // Type | Completion | Recently Updated
+
+  const getCompletionPercent = (node) => {
+    const answers = node.data?.questionnaireResponses || {};
+    const answered = Object.keys(answers).filter(k => answers[k] !== null && answers[k] !== undefined && answers[k] !== '').length;
+    const subtype = node.data?.subtype;
+    const comprehensiveTypes = ['WebApp','API','Database','Backup','Monitoring'];
+    let total = 0;
+    if (comprehensiveTypes.includes(subtype) && node.data?.questionnaireMeta?.total_questions) {
+      total = node.data.questionnaireMeta.total_questions;
+    } else {
+      // heuristic fallbacks
+      if (subtype === 'WebApp') total = 10;
+      else if (subtype === 'API') total = 7;
+      else if (subtype === 'Database') total = 10;
+      else if (subtype === 'Backup') total = 5;
+      else if (subtype === 'Monitoring') total = 5;
+      else total = Math.max(5, Object.keys(answers).length || 5);
+    }
+    if (total === 0) return 0;
+    return Math.min(100, Math.round((answered / total) * 100));
+  };
 
   useEffect(() => {
     if (activeNode && (activeNode.data?.subtype || activeNode.subtype)) {
