@@ -29,7 +29,7 @@ import NodeBranchVisualizer from './components/NodeBranchVisualizer';
 
 import { QuestionnaireProvider, useQuestionnaire } from './contexts/QuestionnaireContext';
 // import QuestionnaireManager from './components/QuestionnaireManager'; // DISABLED: Using legacy system only
-import CanvasSynchronizer from './components/CanvasSynchronizer';
+// import CanvasSynchronizer from './components/CanvasSynchronizer'; // DISABLED: Causing infinite re-render loops
 import VulnerabilityNode from './components/VulnerabilityNode';
 import VulnerabilityPanel from './components/VulnerabilityPanel';
 import VulnerabilityEdge from './components/VulnerabilityEdge';
