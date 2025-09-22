@@ -419,7 +419,7 @@ function AppContent() {
       window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
       window.removeEventListener('edgeUpdate', handleEdgeUpdate);
     };
-  }, [currentDiagram]); // Remove nodes and setEdges dependencies
+  }, [currentDiagram, nodes]); // Add nodes to dependencies to prevent infinite loop
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
