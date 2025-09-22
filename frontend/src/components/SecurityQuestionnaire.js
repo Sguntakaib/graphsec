@@ -66,6 +66,13 @@ const SecurityQuestionnaire = ({
         setError(null);
         fetchSecurityPrompts();
       }
+      
+      // Phase 2: Initialize tracking
+      initialAnswersRef.current = { ...existingValues };
+      setHasUnsavedChanges(false);
+      setMarkedForLater(new Set());
+      setCreatedDependencies([]);
+      setCompletionSummary(null);
     }
   }, [isVisible, nodeSubtype, resumeFromPromptIndex, partialAnswers]);
 
