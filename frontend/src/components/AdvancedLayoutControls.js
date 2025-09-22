@@ -294,11 +294,11 @@ const AdvancedLayoutControls = ({
         <div className="flex flex-col gap-3">
           {/* Dropdown selection */}
           {algorithms.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2">
               <select
                 value={selectedAlgorithm}
                 onChange={(e) => setSelectedAlgorithm(e.target.value)}
-                className="flex-1 px-2 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-2 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 title={algorithms.find(a => a.id === selectedAlgorithm)?.description || 'Select a layout algorithm'}
               >
                 {algorithms.map((alg) => (
@@ -311,7 +311,7 @@ const AdvancedLayoutControls = ({
               <button
                 onClick={() => handleAutoLayout(selectedAlgorithm)}
                 disabled={isLoading || !selectedAlgorithm}
-                className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-1 text-sm"
+                className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center space-x-2 text-sm"
                 title="Apply selected layout"
               >
                 <Settings className="h-4 w-4" />
