@@ -1,0 +1,169 @@
+UI/UX Enhancement Plan
+Version: 1.0
+Owner: Frontend/Design
+Date: 2025-09-22
+
+1) Overview and Goals
+- Improve clarity, discoverability, and consistency of the modeling experience.
+- Reduce cognitive load by grouping actions by intent.
+- Make auto-layout powerful yet predictable with visible algorithm choices.
+- Support efficient review via better node browsing (filters/sort/search) and clear progress signals.
+- Unify theming (dark) for all utility panels to match the canvas.
+
+2) Current Posture (observed)
+- Advanced Layout panel existed but algorithm selection was hidden; now dropdown + Apply is visible.
+- NodeInfoPanel shows questions/answers and progress; now correctly aligned with backend prompts.
+- Mixed theming across panels (some light, some dark).
+- Top toolbar is crowded; actions are not grouped by user intent.
+
+3) Design Principles
+- Make primary actions 1-click and visible (layout, save, simulate, vulnerabilities).
+- Use developer language (how it’s implemented) rather than vulnerability jargon.
+- Avoid surprise: visualize side-effects (e.g., dependency triggers) and confirm destructive actions (Clear All).
+- Keep consistent visual language: dark panels, unified paddings, borders, icon tooltips.
+- Progressive disclosure: keep basic controls visible; expand for advanced.
+
+4) Enhancements (by area)
+A. Canvas and Layout
+  - Add Reset View (fitView) near layout controls (no recalculation).
+  - Remember last-used layout algorithm per diagram.
+  - Ensure smart auto always fits the diagram to visible area.
+  - Edge routing toggle (standard vs orthogonal/bezier) to lower crossings on dense maps (phase 2).
+
+B. Top Toolbar and Primary Actions
+  - Group actions by intent:
+    • Modeling: New, Templates, Save, Import, Export
+    • Analyze: Simulate, Vulnerabilities, Diagnostics
+    • View: Auto-Layout (smart), Fit View, Clear Highlights
+  - Add confirm dialog for Clear All.
+  - Show "Saved hh:mm" status with checkpoint indicator next to Save.
+  - Disable unavailable actions contextually (no diagram, no nodes, etc.).
+
+C. NodeInfoPanel (Right Sidebar)
+  - Add filters: Type (WebApp/API/Database/Backup/Monitoring), Completion (Complete/Partial/Not Started), search by label.
+  - Sort by: Type, Completion %, Recently updated.
+  - Show completion % badge per item (uses questionnaireMeta.total_questions when available).
+
+D. SecurityQuestionnaire
+  - Stepper header: "Question X of Y" with persistent progress pill.
+  - Inline dependency trigger badges (e.g., “Will create Database node”).
+  - Unsaved-changes guard when closing.
+  - "Mark for later" to defer a question; track pending.
+  - Completion mini-summary: dependencies created, key controls set, recommended next steps.
+
+E. Node Creation and Library
+  - "+ Quick Add" mini-launcher (Cmd/Ctrl+K): quick search and top 6 types.
+  - Template library: add short category descriptions and preview thumbnails.
+
+F. Vulnerabilities Workflow
+  - Tabs: All, By Severity, By Node.
+  - Persistent filters until cleared.
+  - One-click "Create Findings" (if Findings module is in scope).
+
+G. Visual Consistency and Theming
+  - Convert all side panels to dark: bg-gray-900, border-gray-700, text-gray-100/300.
+  - Standardize card spacing (p-3), radius (rounded-lg), section headers (border-b), and icon colors.
+
+H. Accessibility and Shortcuts
+  - Keyboard shortcuts overlay (Shift + ?), listing existing shortcuts: Ctrl+S (Save), Ctrl+N (New), Ctrl+R (Simulate), Esc (Clear Highlights).
+  - Strong focus states (ring classes) on interactive elements.
+
+I. Performance and Polish
+  - Debounce panel fetches; lazy-load vulnerability UI.
+  - Throttle noisy console logs; trim in production.
+  - Virtualize node lists for very large diagrams.
+
+5) Detailed Specs for Quick Wins (Phase 1)
+
+QW-1 Remember Layout per Diagram + Reset View Button
+  Objective: Make layout predictable and navigation easy.
+  Implementation:
+  - Frontend (AdvancedLayoutControls):
+    • Persist selected algorithm per diagramId using localStorage key: ui.layoutAlgo.{diagramId}.
+    • On load, initialize selectedAlgorithm from storage; fallback to first algorithm returned by /layout-algorithms.
+    • Add a full-width "Reset View" button under Apply that calls fitView({ padding: 0.1, minZoom: 0.1, maxZoom: 1.5 }).
+    • Keep smart auto applying auto-pick and fit view.
+  - Acceptance:
+    • After selecting algorithm X on Diagram A, revisiting Diagram A shows X preselected.
+    • Reset View reframes all nodes without recomputing layout.
+    • Smart Auto results are fully visible (no nodes off-screen).
+
+QW-2 NodeInfoPanel Filters/Search/Sort
+  Objective: Make node browsing scale for large diagrams.
+  Implementation:
+  - UI additions above the node list:
+    • Type filter (multi-select or dropdown) with options from present subtypes.
+    • Completion filter (Complete, Partial, Not Started).
+    • Search field (by node label, case-insensitive).
+    • Sort dropdown: Type, Completion %, Recently Updated.
+  - Logic:
+    • Completion % uses node.data.questionnaireMeta.total_questions when present; fallback to existing heuristic.
+  - Acceptance:
+    • Filtering narrows the list correctly.
+    • Sorting updates list order immediately.
+    • Searching highlights or filters as you type (debounced).
+
+QW-3 Toolbar Grouping + Save Status + Confirm on Clear All
+  Objective: Lower cognitive load and prevent accidents.
+  Implementation:
+  - Group controls visually into 3 clusters (Modeling, Analyze, View) with small labels or segmented controls.
+  - Save status: show "Saved hh:mm" or "Unsaved changes" badge.
+  - Clear All: confirmation dialog (Are you sure? This removes all nodes and edges.)
+  - Acceptance:
+    • Users can quickly locate desired actions.
+    • Accidental clears are blocked by confirmation.
+    • Save status updates after Save completes.
+
+QW-4 Dark Theme Alignment for PropertiesPanel and SimulationPanel
+  Objective: Consistency and readability with canvas.
+  Implementation:
+  - Update classes: bg-gray-900, border-gray-700, text-gray-100/300, header gradient optional.
+  - Acceptance:
+    • Panels visually match NodeInfoPanel & AdvancedLayoutControls.
+    • Contrast verified (AA minimum) for text and icons.
+
+6) Medium Next Steps (Phase 2)
+- SecurityQuestionnaire UX:
+  • Stepper, mark-for-later, dependency badges, completion mini-summary.
+- Quick Add launcher (Cmd/Ctrl+K) with typeahead and frequent items.
+- VulnerabilityPanel: tabs + persistent filters.
+- Edge routing toggle and minor spacing heuristics.
+
+7) Longer-Term (Phase 3)
+- Diagram quick-switcher (recent diagrams list).
+- Role-based presets (Modeler vs Analyst), tailored toolbars.
+- Smart onboarding tips for first-time users (guided overlays).
+
+8) Rollout Plan
+- Phase 1 quick wins (low risk, high impact): release behind minor version, default ON.
+- Phase 2 features: staged rollout with a settings toggle per user.
+- Phase 3: gated by feedback and usage analytics.
+
+9) Risks & Mitigations
+- Risk: Persisting layout preferences may conflict with future backend persistence.
+  • Mitigation: v1 localStorage; optional v2 server persistence via diagram.ui_prefs when approved.
+- Risk: Dark theme contrast inconsistencies.
+  • Mitigation: Use standardized palette; test AA contrast on headings/buttons.
+- Risk: Performance on very large diagrams.
+  • Mitigation: Virtualize lists; debounce searches; progressive render already present in backend.
+
+10) Success Metrics
+- Time-to-usable-layout (avg seconds) after apply (target: < 1.5s typical).
+- Reduction in layout re-tries per session (target: -30%).
+- NodeInfoPanel filter usage and dwell time (target: > 40% users engage in large diagrams).
+- Fewer support mentions of "can’t find layout options" / "cluttered toolbar".
+
+11) Implementation Checklist (Phase 1)
+- [ ] Persist layout selection per diagram (localStorage) in AdvancedLayoutControls
+- [ ] Add Reset View button (fitView) under Apply Layout
+- [ ] NodeInfoPanel: add filters, search, sort
+- [ ] Toolbar: group actions, add Save status, confirm Clear All
+- [ ] Convert PropertiesPanel & SimulationPanel to dark theme
+
+12) Testing Notes
+- Layout: switch algorithms back and forth; ensure positions update and the view fits; Reset View works without changing positions.
+- NodeInfoPanel: filtering combined with search and sorting; ensure completion % never exceeds 100; answered ≤ total.
+- Toolbar: Clear All confirmation; Save status timestamps update; disabled states when no diagram.
+- Theming: Visual pass on dark theme (no unreadable text/icons).
+
+End of document.
