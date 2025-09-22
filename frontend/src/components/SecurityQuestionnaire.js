@@ -707,36 +707,67 @@ const SecurityQuestionnaire = ({
     <TooltipProvider>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
+        {/* Enhanced Header with Phase 2 improvements */}
         <div className="border-b border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <Shield className="h-6 w-6 text-blue-400" />
-              <h2 className="text-xl font-bold text-white">Security Configuration</h2>
+              <div>
+                <h2 className="text-xl font-bold text-white">Security Configuration</h2>
+                <div className="text-sm text-gray-300">
+                  Configuring: <span className="font-semibold text-blue-400">{nodeSubtype}</span>
+                </div>
+              </div>
             </div>
             <button
-              onClick={onCancel}
+              onClick={handleClose}
               className="text-gray-400 hover:text-white transition-colors"
             >
               <XCircle className="h-6 w-6" />
             </button>
           </div>
           
-          <div className="text-sm text-gray-300 mb-3">
-            Configuring: <span className="font-semibold text-blue-400">{nodeSubtype}</span>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="relative">
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
+          {/* Enhanced Progress with Pills */}
+          <div className="space-y-3">
+            {/* Stepper Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="bg-blue-900 text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
+                  Question {currentPromptIndex + 1} of {prompts.length}
+                </div>
+                {markedForLater.size > 0 && (
+                  <div className="bg-yellow-900 text-yellow-300 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {markedForLater.size} for later
+                  </div>
+                )}
+                {hasUnsavedChanges && (
+                  <div className="bg-orange-900 text-orange-300 px-3 py-1 rounded-full text-sm font-medium">
+                    Unsaved changes
+                  </div>
+                )}
+              </div>
+              <div className="text-sm text-gray-400">
+                {answeredCount} answered
+              </div>
             </div>
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>Question {currentPromptIndex + 1} of {prompts.length}</span>
-              <span>{answeredCount} answered</span>
+            
+            {/* Progress Bar */}
+            <div className="relative">
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercentage}%` }}
+                ></div>
+              </div>
+              {/* Progress indicators for marked questions */}
+              {Array.from(markedForLater).map(index => (
+                <div
+                  key={index}
+                  className="absolute top-0 w-1 h-2 bg-yellow-500 rounded-full"
+                  style={{ left: `${((index + 1) / prompts.length) * 100}%` }}
+                />
+              ))}
             </div>
           </div>
         </div>
