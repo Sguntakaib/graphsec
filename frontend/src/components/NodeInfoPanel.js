@@ -42,9 +42,19 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
         questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
       }
       
+      if (!questionsResponse.ok && ['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
+        // Fallback to intelligent-nodes prompts if comprehensive endpoint is unavailable
+        try {
+          const fallback = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
+          questionsResponse = fallback;
+        } catch (e) {
+          console.warn('Fallback fetch failed:', e);
+        }
+      }
+
       if (questionsResponse.ok) {
-        const questionsData = await questionsResponse.json();
-        const questions = questionsData.prompts || [];
+        const questionsDataJson = await questionsResponse.json();
+        const questions = questionsDataJson.prompts || [];
         
         // Get user answers from node data - try multiple possible sources
         let userAnswers = activeNode.data?.questionnaireResponses || {};
