@@ -3138,6 +3138,7 @@ function AppContent() {
             </div>
           </div>
         )}
+      </div>
       
 
       <div className="flex flex-1 overflow-hidden relative">
