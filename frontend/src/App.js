@@ -3189,7 +3189,7 @@ function AppContent() {
               ...edge,
               selected: selectedEdge?.id === edge.id
             }))}
-            onNodesChange={onNodesChange}
+            onNodesChange={defaultOnNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={onNodeClick}
