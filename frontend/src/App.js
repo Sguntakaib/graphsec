@@ -2778,8 +2778,12 @@ function AppContent() {
             break;
         }
       } else if (event.key === 'Escape') {
+        // Close vulnerability dropdown menu
+        if (showVulnMenu) {
+          setShowVulnMenu(false);
+        }
         // Clear attack path highlighting or close context menu
-        if (contextMenu) {
+        else if (contextMenu) {
           setContextMenu(null);
         } else if (highlightedPaths.length > 0) {
           event.preventDefault();
