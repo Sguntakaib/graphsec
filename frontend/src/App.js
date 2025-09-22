@@ -170,6 +170,9 @@ function AppContent() {
   const [lastSavedAt, setLastSavedAt] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
+  // QW-3: Clear All confirmation dialog state
+  const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
+  
   // Vulnerability system state
   const [vulnerabilityAnalyses, setVulnerabilityAnalyses] = useState({}); // Store vulnerability analyses by node ID
   const [selectedVulnerability, setSelectedVulnerability] = useState(null);
