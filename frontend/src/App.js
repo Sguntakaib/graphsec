@@ -437,7 +437,7 @@ function AppContent() {
       edgeCount: edges.length,
       renderTime: Math.round((performance.now ? performance.now() : Date.now()) - startTime)
     }));
-  }, [nodes, edges]);
+  }, []); // Remove nodes, edges dependencies to prevent infinite loop
   
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
