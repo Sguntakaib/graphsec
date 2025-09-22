@@ -2990,6 +2990,16 @@ function AppContent() {
                 </button>
               </>
             )}
+            
+            {/* Advanced Controls Toggle */}
+            <button
+              onClick={() => setShowAdvancedControls(!showAdvancedControls)}
+              className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm"
+              title="Advanced Controls"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+          </div>
         </div>
         
         {/* Advanced Controls Bar */}
