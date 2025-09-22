@@ -419,34 +419,33 @@ class Phase2BackendTester:
                 return False
             
             # Verify vulnerability data structure for tabbed interface
-            vulnerabilities = data.get("vulnerabilities", [])
-            analysis_summary = data.get("analysis_summary", {})
+            vulnerability_nodes = data.get("vulnerability_nodes", [])
+            total_vulnerabilities = data.get("total_vulnerabilities", 0)
+            vulnerabilities_by_severity = data.get("vulnerabilities_by_severity", {})
             
             print(f"📊 Vulnerability Analysis Results:")
-            print(f"   Total Vulnerabilities: {len(vulnerabilities)}")
-            print(f"   Analysis Summary: {analysis_summary}")
+            print(f"   Node ID: {data.get('node_id', 'N/A')}")
+            print(f"   Node Type: {data.get('node_type', 'N/A')}")
+            print(f"   Total Vulnerabilities: {total_vulnerabilities}")
+            print(f"   Vulnerabilities by Severity: {vulnerabilities_by_severity}")
             
-            if vulnerabilities:
+            if vulnerability_nodes:
                 # Test data structure for tabbed interface
                 severity_counts = {}
-                node_type_counts = {}
                 category_counts = {}
                 
-                for vuln in vulnerabilities:
+                for vuln in vulnerability_nodes:
                     severity = vuln.get("severity", "Unknown")
-                    node_type = vuln.get("node_type", "Unknown")
                     category = vuln.get("category", "Unknown")
                     
                     severity_counts[severity] = severity_counts.get(severity, 0) + 1
-                    node_type_counts[node_type] = node_type_counts.get(node_type, 0) + 1
                     category_counts[category] = category_counts.get(category, 0) + 1
                 
-                print(f"   By Severity: {severity_counts}")
-                print(f"   By Node Type: {node_type_counts}")
-                print(f"   By Category: {category_counts}")
+                print(f"   Detailed Severity Counts: {severity_counts}")
+                print(f"   Category Counts: {category_counts}")
                 
                 # Show sample vulnerability for structure verification
-                sample_vuln = vulnerabilities[0]
+                sample_vuln = vulnerability_nodes[0]
                 print(f"   Sample Vulnerability Structure:")
                 print(f"     ID: {sample_vuln.get('id', 'N/A')}")
                 print(f"     Title: {sample_vuln.get('title', 'N/A')}")
@@ -455,7 +454,7 @@ class Phase2BackendTester:
                 print(f"     Description: {sample_vuln.get('description', 'N/A')[:100]}...")
             
             self.log_test("Vulnerability Analysis Endpoints", True, 
-                        f"✅ SUCCESS: Vulnerability analysis working, found {len(vulnerabilities)} vulnerabilities")
+                        f"✅ SUCCESS: Vulnerability analysis working, found {total_vulnerabilities} vulnerabilities")
             
             return True
             
