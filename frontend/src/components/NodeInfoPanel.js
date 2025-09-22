@@ -20,12 +20,12 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
   const [activeNode, setActiveNode] = useState(null);
 
   useEffect(() => {
-    if (activeNode && activeNode.data?.subtype) {
+    if (activeNode && (activeNode.data?.subtype || activeNode.subtype)) {
       fetchNodeQuestionsAndAnswers();
     } else {
       setQuestionsData(null);
     }
-  }, [activeNode, activeNode?.data?.questionnaireResponses, activeNode?.data?.lastQuestionnaireUpdate]);
+  }, [activeNode, activeNode?.data?.questionnaireResponses, activeNode?.questionnaireResponses, activeNode?.data?.lastQuestionnaireUpdate]);
 
   const fetchNodeQuestionsAndAnswers = async () => {
     if (!activeNode?.data?.subtype) return;
