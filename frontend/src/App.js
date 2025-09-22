@@ -127,6 +127,18 @@ function AppContent() {
       setSelectedEdge(null);
     }
   }, [defaultOnEdgesChange, selectedEdge]);
+  
+  // Custom onNodesChange to track unsaved changes
+  const onNodesChange = useCallback((changes) => {
+    // Apply the default node changes
+    defaultOnNodesChange(changes);
+    
+    // QW-3: Mark as having unsaved changes for non-selection changes
+    if (changes.some(change => change.type !== 'select')) {
+      setHasUnsavedChanges(true);
+    }
+  }, [defaultOnNodesChange, setHasUnsavedChanges]);
+  
   const [currentDiagram, setCurrentDiagram] = useState(null);
   const [simulationResult, setSimulationResult] = useState(null);
   const [diagrams, setDiagrams] = useState([]);
