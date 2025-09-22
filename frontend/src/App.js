@@ -480,7 +480,7 @@ function AppContent() {
         duration: 600
       });
     }
-  }, [nodes, fitView]);
+  }, [fitView]); // Remove nodes dependency to prevent infinite loop
 
   // Auto-check for out-of-bounds nodes when nodes change
   useEffect(() => {
