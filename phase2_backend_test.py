@@ -378,8 +378,24 @@ class Phase2BackendTester:
             print("🎯 TEST SCENARIO 3: Vulnerability Analysis Endpoints for Tabbed UI")
             print("=" * 80)
             
-            # Test vulnerability analysis for a node
-            response = self.session.post(f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}")
+            # Test vulnerability analysis for a node with required request body
+            vulnerability_request = {
+                "node_id": self.test_node_id,
+                "node_type": "WebApp",
+                "questionnaire_responses": {
+                    "authentication_method": "oauth2",
+                    "encryption_enabled": True,
+                    "input_validation": "comprehensive",
+                    "session_management": "secure_tokens",
+                    "error_handling": "secure_logging"
+                },
+                "node_position": {"x": 200, "y": 100}
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}",
+                json=vulnerability_request
+            )
             
             print(f"📋 Vulnerability Analysis Response Status: HTTP {response.status_code}")
             
