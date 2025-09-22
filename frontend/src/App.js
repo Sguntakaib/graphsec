@@ -2831,11 +2831,12 @@ function AppContent() {
             </button>
           </div>
           
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
+          {/* QW-3: Toolbar Grouping - Modeling Actions */}
+          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1">
+            <div className="text-xs text-gray-400 px-2">Modeling</div>
             <button
               onClick={handleNewDiagram}
-              className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm"
+              className="px-3 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm"
               title="New Diagram (Ctrl+N)"
             >
               <span>New</span>
@@ -2843,25 +2844,106 @@ function AppContent() {
             
             <button
               onClick={() => setShowTemplateLibrary(true)}
-              className="px-3 py-2 bg-blue-700 text-white rounded hover:bg-blue-600 flex items-center space-x-2 text-sm"
+              className="px-3 py-1.5 bg-blue-700 text-white rounded hover:bg-blue-600 flex items-center space-x-2 text-sm"
               title="Template Library - Apply pre-built security patterns"
             >
               <BookOpen className="h-4 w-4" />
               <span>Templates</span>
             </button>
             
+            {/* QW-3: Save Status Display */}
+            <div className="flex items-center space-x-2">
+              <div className="text-xs text-gray-400">
+                {hasUnsavedChanges ? (
+                  <span className="text-yellow-400">Unsaved changes</span>
+                ) : lastSavedAt ? (
+                  <span className="text-green-400">
+                    Saved {lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                ) : (
+                  <span>Not saved</span>
+                )}
+              </div>
+              <button
+                onClick={handleSaveDiagram}
+                disabled={isLoading}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                title="Save Diagram (Ctrl+S)"
+              >
+                <Save className="h-4 w-4" />
+                <span>{isLoading ? 'Saving...' : 'Save'}</span>
+              </button>
+            </div>
+            
+            <div className="relative">
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImportDiagram}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                id="import-file"
+              />
+              <label
+                htmlFor="import-file"
+                className="px-3 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm cursor-pointer"
+                title="Import Diagram"
+              >
+                <Upload className="h-4 w-4" />
+                <span>Import</span>
+              </label>
+            </div>
+            
+            <button
+              onClick={handleExportDiagram}
+              disabled={!currentDiagram}
+              className="px-3 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              title="Export Diagram"
+            >
+              <Download className="h-4 w-4" />
+              <span>Export</span>
+            </button>
+          </div>
+          
+          {/* QW-3: Toolbar Grouping - Analysis Actions */}
+          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1">
+            <div className="text-xs text-gray-400 px-2">Analyze</div>
+            <button
+              onClick={handleRunSimulation}
+              disabled={isLoading || nodes.length === 0}
+              className="px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              title="Run Simulation (Ctrl+R)"
+            >
+              <Play className="h-4 w-4" />
+              <span>{isLoading ? 'Analyzing...' : 'Simulate'}</span>
+            </button>
+            
             <button
               onClick={analyzeAllNodeVulnerabilities}
               disabled={isLoading || nodes.filter(n => n.data?.questionnaireResponses).length === 0}
-              className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              className="px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
               title="Analyze Vulnerabilities - Requires COMPLETE questionnaires for all security questions (headers, logging, authentication, etc.)"
             >
               <AlertTriangle className="h-4 w-4" />
               <span>Vulnerabilities</span>
             </button>
-
-            {/* Vulnerability System Controls */}
-            {allVulnerabilities.length > 0 && (
+          </div>
+          
+          {/* QW-3: Toolbar Grouping - View Actions */}
+          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1">
+            <div className="text-xs text-gray-400 px-2">View</div>
+            <button
+              onClick={clearAttackPathHighlighting}
+              disabled={highlightedPaths.length === 0}
+              className="px-3 py-1.5 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              title="Clear Attack Path Highlights (Esc)"
+            >
+              <EyeOff className="h-4 w-4" />
+              <span>Clear Highlights</span>
+            </button>
+          </div>
+          
+          {/* Vulnerability System Controls - remain as separate section */}
+          {allVulnerabilities.length > 0 && (
               <>
                 <button
                   onClick={() => setShowVulnerabilityFilter(!showVulnerabilityFilter)}
