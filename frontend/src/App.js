@@ -183,6 +183,17 @@ function AppContent() {
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
   const [isTopToolbarCollapsed, setIsTopToolbarCollapsed] = useState(false);
 
+  // Custom onNodesChange to track unsaved changes - MOVED AFTER STATE DECLARATIONS
+  const onNodesChange = useCallback((changes) => {
+    // Apply the default node changes
+    defaultOnNodesChange(changes);
+    
+    // QW-3: Mark as having unsaved changes for non-selection changes
+    if (changes.some(change => change.type !== 'select')) {
+      setHasUnsavedChanges(true);
+    }
+  }, [defaultOnNodesChange, setHasUnsavedChanges]);
+
   // Handle editing questionnaire from node info panel
   const handleEditQuestionnaireFromInfo = useCallback(async (node) => {
     console.log('🎯 Edit questionnaire triggered from info panel for node:', node.id);
