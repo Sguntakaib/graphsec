@@ -10,7 +10,7 @@ import uuid
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://react-var-fix.preview.emergentagent.com/api"
+BASE_URL = "https://design-enhance-v2.preview.emergentagent.com/api"
 
 class RoutingFixTester:
     def __init__(self):
