@@ -107,7 +107,7 @@ function AppContent() {
     return () => window.removeEventListener('error', resizeObserverErrHandler, true);
   }, []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, defaultOnNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, defaultOnEdgesChange] = useEdgesState(initialEdges);
   // Enhanced questionnaire system disabled - using legacy system only
   const [selectedNode, setSelectedNode] = useState(null);
