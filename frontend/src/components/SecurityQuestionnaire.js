@@ -772,12 +772,38 @@ const SecurityQuestionnaire = ({
           </div>
         </div>
 
-        {/* Current Question */}
+        {/* Enhanced Current Question with Dependency Badges */}
         <div className="p-6">
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-white mb-2">
-              {currentPrompt.question}
-            </h3>
+            <div className="flex items-start justify-between mb-3">
+              <h3 className="text-lg font-semibold text-white flex-1">
+                {currentPrompt.question}
+              </h3>
+              {markedForLater.has(currentPromptIndex) && (
+                <div className="bg-yellow-900/30 text-yellow-300 px-2 py-1 rounded text-xs flex items-center ml-3">
+                  <Flag className="h-3 w-3 mr-1" />
+                  Marked for later
+                </div>
+              )}
+            </div>
+            
+            {/* Dependency Trigger Badge */}
+            {(() => {
+              const triggerInfo = getDependencyTriggerInfo(currentPrompt);
+              if (triggerInfo) {
+                return (
+                  <div className="mb-3 p-3 bg-green-900/20 border border-green-700/30 rounded-lg">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Plus className="h-4 w-4 text-green-400" />
+                      <span className="text-green-300">
+                        Answering "{triggerInfo.condition}" will create a <strong>{triggerInfo.nodeType}</strong> node
+                      </span>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
             
             {currentPrompt.help_text && (
               <div className="flex items-start space-x-2 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg mb-4">
