@@ -2965,7 +2965,7 @@ function AppContent() {
 
                 <button
                   onClick={() => setShowVulnerabilityFilter(!showVulnerabilityFilter)}
-                  className={`px-3 py-2 rounded flex items-center space-x-2 text-sm transition-colors ${
+                  className={`px-3 py-1.5 rounded flex items-center space-x-2 text-sm transition-colors ${
                     showVulnerabilityFilter
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-600 text-white hover:bg-gray-700'
