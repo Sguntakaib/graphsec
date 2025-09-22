@@ -458,6 +458,25 @@ const SecurityQuestionnaire = ({
         console.error('Error checking dependencies:', error);
       }
 
+      // Phase 2: Generate completion summary
+      const answeredQuestions = Object.keys(answers).length;
+      const securityControls = Object.entries(answers)
+        .filter(([_, value]) => value === true || value === 'Yes' || (typeof value === 'string' && value !== 'No' && value !== 'False'))
+        .map(([key, _]) => prompts.find(p => p.id === key)?.question || key);
+
+      const summary = {
+        nodeType: nodeSubtype,
+        questionsAnswered: answeredQuestions,
+        totalQuestions: prompts.length,
+        completionPercentage: validationResult.validation?.completion_percentage || 0,
+        dependenciesCreated: dependentNodes,
+        securityControlsEnabled: securityControls.slice(0, 5), // Top 5 controls
+        markedForLaterCount: markedForLater.size,
+        recommendations: validationResult.recommendations?.slice(0, 3) || [] // Top 3 recommendations
+      };
+
+      setCompletionSummary(summary);
+
       // Trigger smart node creation if callback is provided
       let smartNodeResult = null;
       if (onCreateLinkedNodes && sourceNode && currentNodes) {
@@ -475,7 +494,8 @@ const SecurityQuestionnaire = ({
         smartNodeResult,
         dependentNodes,
         triggerDependentQuestionnaires: dependentNodes.length > 0,
-        isActualCompletion: true // Flag to indicate this was a real completion button click
+        isActualCompletion: true, // Flag to indicate this was a real completion button click
+        completionSummary: summary // Phase 2: Include completion summary
       });
     }
   };
