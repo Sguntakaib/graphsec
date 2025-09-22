@@ -523,7 +523,7 @@ function AppContent() {
     
     setNodes(previousState.nodes);
     setEdges(previousState.edges);
-  }, [undoStack, nodes, edges, setNodes, setEdges]);
+  }, [undoStack, nodes, edges]); // Remove setNodes, setEdges dependencies
 
   // Redo functionality
   const handleRedo = useCallback(() => {
