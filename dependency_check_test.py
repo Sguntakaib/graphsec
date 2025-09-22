@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://project-rollout.preview.emergentagent.com/api"
+BASE_URL = "https://phase1-review.preview.emergentagent.com/api"
 
 class DependencyCheckTester:
     def __init__(self):
