@@ -446,51 +446,6 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
                 )}
               </div>
             </div>
-      {/* Filters/Search/Sort */}
-      <div className="p-3 border-b border-gray-700 bg-gray-900">
-        <div className="grid grid-cols-2 gap-2">
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-2 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded text-sm"
-          >
-            {['All','WebApp','API','Database','Backup','Monitoring','Surface','Control','Asset'].map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-
-          <select
-            value={completionFilter}
-            onChange={(e) => setCompletionFilter(e.target.value)}
-            className="px-2 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded text-sm"
-          >
-            {['All','Complete','Partial','Not Started'].map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <input
-            type="text"
-            placeholder="Search by label..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="px-2 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded text-sm"
-          />
-
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-2 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded text-sm"
-          >
-            {['Type','Completion','Recently Updated'].map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
           ) : (
             <div className="text-center py-8 text-gray-400">
               <Info className="h-8 w-8 mx-auto mb-3 text-gray-500" />
