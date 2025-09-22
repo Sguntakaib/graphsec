@@ -2910,7 +2910,7 @@ function AppContent() {
           </div>
           
           {/* QW-3: Toolbar Grouping - Analysis Actions */}
-          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1 shrink-0">
+          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1 shrink-0 sticky left-0 z-10">
             <div className="text-xs text-gray-400 px-2">Analyze</div>
             <button
               onClick={handleRunSimulation}
