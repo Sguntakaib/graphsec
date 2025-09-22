@@ -2946,6 +2946,9 @@ function AppContent() {
               <span>Clear Highlights</span>
             </button>
           </div>
+
+          {/* Divider */}
+          <div className="h-6 w-px bg-gray-700 mx-3 shrink-0" />
           
           {/* Vulnerability System Controls - remain as separate section */}
           {allVulnerabilities.length > 0 && (
