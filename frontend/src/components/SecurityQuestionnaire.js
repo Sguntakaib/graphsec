@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Shield, 
   AlertTriangle, 
@@ -8,9 +8,16 @@ import {
   ChevronRight,
   ChevronLeft,
   Save,
-  RefreshCw 
+  RefreshCw,
+  Clock,
+  Plus,
+  Target,
+  Flag,
+  ExternalLink,
+  BookOpen
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 
 const SecurityQuestionnaire = ({ 
   nodeSubtype, 
