@@ -2948,6 +2948,19 @@ function AppContent() {
           {allVulnerabilities.length > 0 && (
             <>
                 <button
+                  onClick={() => setShowVulnerabilityList(!showVulnerabilityList)}
+                  className={`px-3 py-2 rounded flex items-center space-x-2 text-sm transition-colors ${
+                    showVulnerabilityList
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-600 text-white hover:bg-gray-700'
+                  }`}
+                  title="Enhanced Vulnerability Management"
+                >
+                  <Shield className="h-4 w-4" />
+                  <span>Manage</span>
+                </button>
+
+                <button
                   onClick={() => setShowVulnerabilityFilter(!showVulnerabilityFilter)}
                   className={`px-3 py-2 rounded flex items-center space-x-2 text-sm transition-colors ${
                     showVulnerabilityFilter
