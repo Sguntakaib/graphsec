@@ -2009,7 +2009,7 @@ function AppContent() {
     return allVulns;
   };
 
-  const allVulnerabilities = getAllVulnerabilities();
+  const allVulnerabilities = useMemo(() => getAllVulnerabilities(), [vulnerabilityAnalyses]);
 
   // Handle vulnerability filter changes
   const handleVulnerabilityFilterChange = useCallback((filtered, filters) => {
