@@ -274,16 +274,16 @@ const AdvancedLayoutControls = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-200">
+      <div className="flex items-center justify-between p-3 border-b border-gray-700">
         <div className="flex items-center space-x-2">
-          <Sparkles className="h-5 w-5 text-purple-600" />
-          <span className="font-medium text-gray-900">Advanced Layout</span>
+          <Sparkles className="h-5 w-5 text-purple-400" />
+          <span className="font-medium text-gray-100">Advanced Layout</span>
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 hover:bg-gray-100 rounded"
+          className="p-1 text-gray-300 hover:bg-gray-800 rounded"
         >
           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
