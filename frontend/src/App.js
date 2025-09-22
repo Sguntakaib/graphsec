@@ -501,10 +501,13 @@ function AppContent() {
     
     setUndoStack(prev => [...prev.slice(-19), currentState]); // Keep last 20 states
     setRedoStack([]); // Clear redo stack when new action is performed
-  }, []); // Remove nodes, edges dependencies to prevent infinite loop
+  }, [nodes, edges]); // Properly include dependencies
 
-  // Smart Node Connector instance (initialized after saveStateToUndoStack)
-  const smartNodeConnector = new SmartNodeConnector(setNodes, setEdges, saveStateToUndoStack);
+  // Smart Node Connector instance (memoized to prevent recreation on every render)
+  const smartNodeConnector = useMemo(() => 
+    new SmartNodeConnector(setNodes, setEdges, saveStateToUndoStack), 
+    [saveStateToUndoStack]
+  );
 
   // Undo functionality
   const handleUndo = useCallback(() => {
