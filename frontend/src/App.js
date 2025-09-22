@@ -35,6 +35,7 @@ import VulnerabilityPanel from './components/VulnerabilityPanel';
 import VulnerabilityEdge from './components/VulnerabilityEdge';
 import VulnerabilityFilter from './components/VulnerabilityFilter';
 import VulnerabilityLegend from './components/VulnerabilityLegend';
+import VulnerabilityList from './components/VulnerabilityList';
 import VulnerabilityReport from './components/VulnerabilityReport';
 import AdvancedLayoutControls from './components/AdvancedLayoutControls';
 import DraggableEdge from './components/DraggableEdge';
