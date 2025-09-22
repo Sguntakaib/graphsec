@@ -489,7 +489,7 @@ function AppContent() {
     }, 500); // Small delay to avoid constant checking
     
     return () => clearTimeout(timeoutId);
-  }, [nodes, handleFitAllNodes]);
+  }, [handleFitAllNodes]); // Remove nodes dependency to prevent infinite loop
 
   // Save state for undo/redo
   const saveStateToUndoStack = useCallback(() => {
