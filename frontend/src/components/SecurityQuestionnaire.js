@@ -302,10 +302,46 @@ const SecurityQuestionnaire = ({
   };
 
   const handleAnswerChange = (promptId, value) => {
-    setAnswers(prev => ({
-      ...prev,
-      [promptId]: value
-    }));
+    setAnswers(prev => {
+      const newAnswers = { ...prev, [promptId]: value };
+      
+      // Phase 2: Track unsaved changes
+      const hasChanges = JSON.stringify(newAnswers) !== JSON.stringify(initialAnswersRef.current);
+      setHasUnsavedChanges(hasChanges);
+      
+      return newAnswers;
+    });
+  };
+
+  // Phase 2: Get dependency trigger info for current question
+  const getDependencyTriggerInfo = (prompt) => {
+    const dependencyTriggers = {
+      'webapp_api_endpoints': { nodeType: 'API', condition: 'Yes/True' },
+      'webapp_database_connection': { nodeType: 'Database', condition: 'Yes/True' },
+      'database_backup_enabled': { nodeType: 'Backup', condition: 'Yes/True' },
+      'database_monitoring_integration': { nodeType: 'Monitoring', condition: 'Yes/True' },
+      'api_database_access': { nodeType: 'Database', condition: 'Yes/True' },
+      'api_external_services': { nodeType: 'ExternalService', condition: 'Yes/True' }
+    };
+    
+    return dependencyTriggers[prompt.id] || null;
+  };
+
+  // Phase 2: Mark question for later
+  const handleMarkForLater = () => {
+    setMarkedForLater(prev => new Set([...prev, currentPromptIndex]));
+    if (currentPromptIndex < prompts.length - 1) {
+      setCurrentPromptIndex(currentPromptIndex + 1);
+    }
+  };
+
+  // Phase 2: Enhanced close handler with unsaved changes check
+  const handleClose = () => {
+    if (hasUnsavedChanges) {
+      setShowUnsavedDialog(true);
+    } else {
+      onCancel();
+    }
   };
 
   const handleNext = async () => {
