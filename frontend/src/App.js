@@ -2290,6 +2290,15 @@ function AppContent() {
     console.log('✅ All vulnerabilities cleared from graph');
   };
 
+  const handleClearVulnerabilities = () => {
+    setShowClearConfirmation(true);
+  };
+
+  const confirmClearVulnerabilities = () => {
+    clearAllVulnerabilities();
+    setShowClearConfirmation(false);
+  };
+
   const saveQuestionnaireResponses = async (nodeId, responses) => {
     if (!currentDiagram) return;
     
