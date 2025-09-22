@@ -222,6 +222,22 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
     const answeredCount = Object.keys(userAnswers).filter(key => 
       userAnswers[key] !== null && userAnswers[key] !== undefined && userAnswers[key] !== ''
     ).length;
+
+    // For comprehensive node types, compute against actual question count from backend if available on node
+    const subtype = node.data?.subtype;
+    const comprehensiveTypes = ['WebApp','API','Database','Backup','Monitoring'];
+    if (comprehensiveTypes.includes(subtype) && node.data?.questionnaireMeta?.total_questions) {
+      const total = node.data.questionnaireMeta.total_questions;
+      if (total > 0) {
+        const pct = Math.round((answeredCount / total) * 100);
+        if (answeredCount === 0) {
+          return { icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-800', text: 'Not Started' };
+        }
+        if (pct >= 80) return { icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-900', text: 'Complete' };
+        if (pct >= 30) return { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-900', text: 'Partial' };
+        return { icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-800', text: 'Not Started' };
+      }
+    }
     
     if (answeredCount === 0) {
       return { icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-800', text: 'Not Started' };
