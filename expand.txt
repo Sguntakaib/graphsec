@@ -1,0 +1,193 @@
+Security Modeling Platform – Expansion Blueprint (Cloud Infra, Microservices, CI/CD)
+
+Version: July 2025
+Author: Main Agent
+
+Objective
+Extend our questionnaire-driven threat modeling platform to cover:
+- Cloud infrastructure (AWS/Azure/GCP primitives and managed services)
+- Microservices & Kubernetes ecosystems (service mesh, policies, runtime)
+- CI/CD pipelines (SCM, build, artifact, deploy, supply chain)
+
+We will leverage the current architecture: YAML-based questionnaires, conditional questionnaire engine, vulnerability rule engine (legacy + enhanced), DSL rule engine, simulation, and MongoDB persistence. Many cloud YAMLs already exist (kubernetes.yaml, servicemesh.yaml, docker.yaml, vpc.yaml, iam.yaml, securitygroups.yaml, apigateway.yaml, rds.yaml, s3.yaml, kms.yaml, cloudtrail.yaml, loadbalancer.yaml, etc.). We will unify, extend, and wire these into a coherent modeling flow with conditional logic and expanded vulnerability rules.
+
+Guiding Principles
+- Questionnaires first: model what teams actually run (provider/tooling specific), then rules map to findings.
+- Conditional depth: only ask what’s relevant (provider, engine, tool choice drives follow-ups).
+- Explainability: every finding is traceable to specific answers.
+- Composability: intelligent dependencies auto-create linked nodes (e.g., EKS → Worker Node Groups → IAM Roles → ECR → Secrets Manager → CloudWatch).
+- Standards mapping: align to OWASP, CIS Benchmarks (Kubernetes/Cloud), MITRE ATT&amp;CK (Cloud, Containers), NIST SSDF, SLSA, OWASP SAMM.
+
+High-Level Scope by Domain
+1) Cloud Infrastructure (IaaS + Managed Services)
+- Foundational networking: VPC (subnets, routing, IGW/NAT), Security Groups, NACLs, PrivateLink/Endpoints
+- Identity &amp; access: IAM roles/policies, key management (KMS), secrets management (Secrets Manager/Key Vault/SM)
+- Data services: S3/Object storage, RDS/Cloud SQL, DynamoDB/CosmosDB/Bigtable, data lakes
+- Compute: EC2/VMs, Serverless (Lambda/Functions), Containers on EKS/AKS/GKE
+- Edge &amp; delivery: Load Balancers (ALB/NLB), CDN (CloudFront/Azure CDN)
+- Observability &amp; governance: CloudTrail/Activity logs, Config/Policy, Guardrails (SCP/Org Policies)
+
+2) Microservices &amp; Kubernetes
+- Cluster posture: API server security, admission control, RBAC &amp; authn/authz, Pod Security/PSA, audit logging
+- Workload posture: privileged pods, capabilities, host mounts/network, resource limits, probes, secrets, image provenance
+- Mesh &amp; traffic: mTLS, AuthZ, rate limiting, circuit breaking, retry policies, ingress/egress, zero trust
+- Multi-tenant segmentation: Namespaces, NetworkPolicies, service accounts, workload identity
+- Registry &amp; supply chain: ECR/GCR/ACR, signing (Cosign), SBOM, policy enforcement (OPA/Gatekeeper, Kyverno)
+
+3) CI/CD &amp; Software Supply Chain
+- SCM: branch protections, code review, secret scanning, PR policies
+- Build: runners/agents security, least-privilege tokens/OIDC, dependency pinning/lockfiles, SAST/DAST/SCA
+- Artifacts: artifact repo visibility, signing, SBOM generation &amp; storage, provenance (SLSA)
+- Deploy: approvals, environment segregation, progressive delivery (Argo/Flux), policy gates (OPA/Gatekeeper)
+- Pipeline hardening: isolated runners, cache hardening, credentials, minimal permissions
+
+Architecture Alignment
+- Backend
+  - Reuse questionnaire_loader + conditional_questionnaire_engine: add conditional groups for provider selection (aws/azure/gcp), k8s distribution (EKS/AKS/GKE/on-prem), and CI/CD tooling (GitHub Actions, GitLab, Jenkins, ArgoCD, Flux).
+  - Expand enhanced_vulnerability_rules with cloud/k8s/ci-cd rule sets using AND logic across relevant answers; keep legacy rules for basic flags.
+  - Extend DSL rule engine with YAML packs: cis_kubernetes.yaml, cis_cloud.yaml, cicd_security.yaml (rule categories: cloud_security, k8s_security, supply_chain, identity_access, network_security).
+  - Simulation: extend graph traversal for attack paths via IAM abuse, public storage, exposed admin endpoints, poisoned artifacts, lateral movement in clusters (ATT&amp;CK for Cloud/Containers techniques).
+- Frontend
+  - New templates: Cloud Landing Zone, EKS Microservices App, API Gateway + Lambda + DynamoDB, GitOps Pipeline (GitHub → Actions → ECR → ArgoCD → EKS), Service Mesh Zero Trust.
+  - Enhanced dependency creation: selecting EKS auto-suggests NodeGroup, ECR, IAM roles, CloudWatch; selecting Microservice enables Registry, Secrets, ConfigMap, Service, Ingress, NetworkPolicy; selecting Pipeline adds SCM, Build, Artifact, Signing, SBOM, Deploy, Policy Gate.
+  - Conditional questionnaire UI: when provider/tool is selected, dynamically add the relevant follow-up blocks (tooltips included).
+
+Data Model (unchanged)
+- Continue storing diagrams in db.diagrams with nodes/edges and node.data.questionnaireResponses. Add new subtypes (e.g., VPC, SecurityGroup, EKSCluster, KMSKey, S3Bucket, ECR, Namespace, NetworkPolicy, MeshPolicy, Pipeline, SCM, BuildRunner, ArtifactRepo, Signing, SBOM, PolicyGate, DeployController).
+
+Detailed Implementation Plan
+
+Phase 1: Questionnaire Expansion &amp; Conditional Logic (High)
+- Cloud provider gateway questions (new file: cloudlandingzone.yaml or extend vpc.yaml w/ top-level):
+  - cloud_provider: [AWS, Azure, GCP]
+  - environment_scope: [Single-account, Multi-account/org, Landing zone present]
+  - identity_model: [IAM only, IdP federation (SSO), Hybrid]
+- Conditional follow-ups per provider (extend existing YAMLs where present):
+  - AWS: vpc.yaml, iam.yaml, kms.yaml, securitygroups.yaml, s3.yaml, rds.yaml, cloudtrail.yaml, config.yaml, apigateway.yaml, loadbalancer.yaml, secretsmanager.yaml
+  - Azure/GCP: parallel questionnaires (vnet.yaml, iam_azure.yaml/gcp_iam.yaml, key_vault/kms, storage accounts/buckets, sql/databases, activity logs/audit logs, policies/org policies)
+- Kubernetes &amp; microservices conditional sets (kubernetes.yaml, servicemesh.yaml, docker.yaml):
+  - cluster_type: [EKS, AKS, GKE, On-prem]
+  - policy_enforcement: [OPA/Gatekeeper, Kyverno, None]
+  - pod_security: [Enforce, Audit, Warn, Disabled]
+  - workload_identity: [IRSA/Workload Identity, Static secrets]
+  - supply_chain: [Image signing, SBOM, Provenance]
+- CI/CD (cicd.yaml exists): add conditional blocks per toolchain:
+  - scm_tool: [GitHub, GitLab, Bitbucket, Others] → branch protections, PR checks, secret scanning
+  - build_tool: [GitHub Actions, GitLab CI, Jenkins, CircleCI] → runner isolation, token scope, OIDC federation
+  - artifact_repo: [ECR/ACR/GCR/Artifactory/Nexus] → repo visibility, signing, immutability
+  - deployment: [ArgoCD, Flux, Native kubectl] → policy gates, progressive delivery
+  - security_scans: [SAST, DAST, SCA, IaC, container scan]
+- Conditional Engine Updates:
+  - Add triggers: cloud_provider, cluster_type, scm_tool, build_tool, artifact_repo, deployment_tool to inject related questions.
+
+Phase 2: Rule Coverage – Vulnerability &amp; Gap Rules (High)
+- Vulnerability Rules (enhanced_vulnerability_rules.py):
+  - Cloud (node_types: VPC, SecurityGroup, S3Bucket, RDS, KMSKey, IAMRole):
+    - Public S3/object storage without encryption: Data Exposure (A02)
+    - Security Group open to 0.0.0.0/0 on admin ports: Broken Access Control
+    - CloudTrail/Activity logging disabled: Logging/Monitoring Failures (A09)
+    - KMS key rotation disabled / improper key policies: Cryptographic Failures (A02)
+    - Over-permissive IAM roles/policies: Broken Access Control
+  - Kubernetes &amp; Microservices (node_types: EKSCluster, Namespace, Microservice, Ingress, NetworkPolicy, MeshPolicy):
+    - No RBAC/cluster-admin to workloads: Broken Access Control
+    - Pod Security Admission disabled: Insecure Design
+    - Privileged pods / hostPath mounts / NET_ADMIN: Insecure Design
+    - No NetworkPolicies: Lateral Movement risk
+    - Service Mesh without mTLS/AuthZ: Broken Access Control
+    - No resource limits/probes: Availability/DoS (Operational Risk)
+  - CI/CD (node_types: Pipeline, SCM, BuildRunner, ArtifactRepo, Signing, SBOM):
+    - No branch protections / no code review: Insecure Design / Process Gaps
+    - Runners with shared credentials / elevated tokens: Broken Access Control
+    - No image signing / no SBOM / mutable tags: Software &amp; Data Integrity Failures (A08)
+    - Artifact repo public / missing retention: Information Disclosure
+    - No SAST/DAST/SCA / no IaC scanning: Vulnerable Components / Insecure Design
+- DSL Rules (YAML):
+  - Add CIS Kubernetes benchmark checks (represent as gap rules with severities)
+  - Add NIST SSDF and SLSA-aligned supply chain checks (gap/coverage scores)
+
+Phase 3: Intelligent Dependencies &amp; Templates (Medium)
+- Dependency creation upgrades:
+  - Selecting EKSCluster → suggest: NodeGroup, ECR, IAM OIDC provider, CloudWatch, KMS, Secrets Manager
+  - Selecting Microservice → suggest: Service, Ingress, ConfigMap/Secret, NetworkPolicy, Registry, MeshPolicy
+  - Selecting Pipeline → suggest: SCM, BuildRunner, ArtifactRepo, Signing, SBOM, PolicyGate, DeployController
+- Templates:
+  - Cloud Landing Zone (Hub/Spoke VPCs, shared services, guardrails)
+  - EKS Microservices App (Ingress → Service → Deployments + MeshPolicy + NetworkPolicies + Secrets)
+  - Serverless API (API Gateway → Lambda → DynamoDB + KMS + CloudWatch)
+  - GitOps Pipeline (GitHub → Actions → ECR → ArgoCD → EKS)
+
+Phase 4: Simulation Enhancements (Medium)
+- Cloud/Container ATT&amp;CK integration:
+  - Attack paths: compromised CI token → poisoned artifact → deployed workload → lateral movement via open NetworkPolicy → exfiltrate from public bucket
+  - Identity-based paths: over-permissive role → enumerate → escalate → modify buckets or pipelines
+- Scoring adjustments to incorporate supply chain integrity findings and policy gate presence.
+
+Phase 5: Persistence &amp; Reporting (Medium)
+- Persist vulnerability analyses and DSL gap results with diagrams.
+- Coverage dashboards: show CIS K8s coverage, SLSA level attained, SSDF practice coverage across the modeled system.
+- Exportable reports per domain (Cloud, K8s, CI/CD) with framework mappings.
+
+API Contracts (Key Additions)
+- Questionnaires:
+  - GET /api/questionnaires/{NodeSubtype}/conditional?level=basic&amp;responses=JSON (add subtypes: VPC, SecurityGroup, S3Bucket, RDSInstance, KMSKey, EKSCluster, Namespace, NetworkPolicy, MeshPolicy, Pipeline, SCM, BuildRunner, ArtifactRepo, Signing, SBOM, PolicyGate, DeployController)
+  - POST /api/questionnaires/{NodeSubtype}/conditional-trigger { question_id, response }
+- Vulnerability &amp; DSL Rules:
+  - Extend current endpoints; no breaking changes. Add categories and new rule IDs.
+- Simulation:
+  - Reuse existing /api/diagrams/{id}/simulate; enhance engine internals to support new node types and ATT&amp;CK mappings.
+
+Questionnaire Design (Examples)
+- ekscluster.yaml (basic excerpt):
+  - id: cluster_type [EKS, AKS, GKE, On-Prem] (triggers provider-specific)
+  - id: rbac_enabled [Yes/No]
+  - id: pod_security_admission [Enforce/Audit/Warn/Disabled]
+  - id: admission_webhooks_tls [mTLS/One-way TLS/None]
+  - id: workload_identity [Enabled/Disabled]
+  - id: audit_logging [Comprehensive/Basic/None]
+
+- pipeline.yaml (basic excerpt):
+  - id: scm_tool [GitHub/GitLab/Jenkins/Other] (triggers sub-questions: branch_protections, secret_scanning)
+  - id: build_tool [Actions/GitLab CI/Jenkins/CircleCI] (runner_isolation, oidc_workload_identity)
+  - id: artifact_repo [ECR/ACR/GCR/Artifactory/Nexus] (public_visibility, immutable_tags, signing_required)
+  - id: security_scans [SAST/DAST/SCA/IaC/Container] (multiple_choice)
+  - id: signing_sbom [Cosign/Sigstore/None, SBOM enabled]
+
+Mapping to Rules (Illustrative)
+- If s3_public_access: Public → Information Disclosure, severity High, OWASP A01/A02 depending on context.
+- If k8s_rbac_enabled: No → Broken Access Control, severity Critical.
+- If pod_security_admission: Disabled AND privileged_pods: Allowed → Insecure Design, severity High.
+- If pipeline_no_branch_protection AND no_code_review → Software &amp; Data Integrity Failures (A08), severity High.
+- If artifact_repo_public AND no_signing → Data Exposure + Integrity Failures, severity Critical.
+
+UX Additions (Optional)
+- Cluster view: group nodes by Namespace and draw NetworkPolicies visually.
+- Pipeline swimlanes: SCM → Build → Artifact → Sign/SBOM → PolicyGate → Deploy.
+- Quick selectors: provider/tool chips to pre-populate questionnaires.
+
+Testing Plan
+- Backend unit tests for new conditional endpoints and rule triggers per domain (Cloud, K8s, CI/CD).
+- Rule validation suites: feed canonical insecure/secure configs and assert expected findings.
+- Frontend E2E: build Cloud Landing Zone, EKS app, and GitOps pipeline templates; complete questionnaires; verify dependency creation and findings.
+
+Timeline (Indicative)
+- Phase 1 (1–2 weeks): questionnaires + conditional engine wiring; update UI for conditional flows; initial templates.
+- Phase 2 (1–2 weeks): enhanced rule packs for Cloud/K8s/CI-CD; DSL rules; initial mappings to CIS/SSDF/SLSA.
+- Phase 3 (1 week): intelligent dependencies + additional templates.
+- Phase 4 (1 week): simulation enhancements.
+- Phase 5 (1 week): persistence of analyses + dashboards + export.
+
+Risks &amp; Mitigations
+- Questionnaire bloat: use conditional disclosure and levels (basic/advanced/expert).
+- Provider/tool sprawl: start with AWS + GitHub Actions + ArgoCD; add others incrementally.
+- Rule drift vs. questions: maintain a generated rule-to-question mapping and nightly validation.
+- Performance: reuse result caching; throttle bulk analysis.
+
+Deliverables
+- New/extended YAMLs (cloud/k8s/cicd) with tool/provider conditionals
+- Enhanced vulnerability rules for cloud/k8s/ci-cd + DSL packs for CIS/SSDF/SLSA
+- UI conditional flows and intelligent dependency creation
+- New templates for cloud/microservices/pipelines
+- Reporting with framework mappings and persisted analyses
+
+Summary
+By leveraging our existing engine (questionnaires → rules → analysis → visualization), we can bring cloud infra, microservices/Kubernetes, and CI/CD supply chain threat modeling into a single consistent experience. Conditional questionnaires drive depth; expanded rules and DSL packs deliver actionable findings mapped to CIS, ATT&amp;CK, SSDF, and SLSA; intelligent dependencies and templates make modeling faster and clearer. This plan scales feature-by-feature without breaking existing workflows.
