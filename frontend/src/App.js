@@ -3395,6 +3395,7 @@ function AppContent() {
           )}
         </div>
       </div>
+      </div>
 
       {/* Legacy Security Questionnaire - ENABLED: Main questionnaire system */}
       {showSecurityQuestionnaire && currentQuestionnaireNode && (
