@@ -319,9 +319,35 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
   };
 
   // Filter nodes to only show non-vulnerability nodes with subtypes
-  const availableNodes = (nodes || []).filter(node => 
+  let availableNodes = (nodes || []).filter(node => 
     node.type !== 'vulnerability' && node.data?.subtype
   );
+
+  // Apply filters
+  availableNodes = availableNodes.filter(node => {
+    const subtype = node.data?.subtype;
+    const label = (node.data?.label || node.id || '').toLowerCase();
+    const pct = getCompletionPercent(node);
+    const status = pct >= 80 ? 'Complete' : pct >= 30 ? 'Partial' : 'Not Started';
+
+    const typeOk = typeFilter === 'All' || subtype === typeFilter || node.data?.type === typeFilter;
+    const completionOk = completionFilter === 'All' || status === completionFilter;
+    const searchOk = searchText.trim() === '' || label.includes(searchText.toLowerCase().trim());
+    return typeOk && completionOk && searchOk;
+  });
+
+  // Sorting
+  if (sortBy === 'Type') {
+    availableNodes.sort((a, b) => (a.data?.subtype || '').localeCompare(b.data?.subtype || ''));
+  } else if (sortBy === 'Completion') {
+    availableNodes.sort((a, b) => getCompletionPercent(b) - getCompletionPercent(a));
+  } else if (sortBy === 'Recently Updated') {
+    availableNodes.sort((a, b) => {
+      const aTime = new Date(a.data?.lastQuestionnaireUpdate || a.data?.updated_at || 0).getTime();
+      const bTime = new Date(b.data?.lastQuestionnaireUpdate || b.data?.updated_at || 0).getTime();
+      return bTime - aTime;
+    });
+  }
 
   // Show node details view if activeNode is selected
   if (activeNode) {
