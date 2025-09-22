@@ -593,7 +593,7 @@ class Phase2BackendTester:
                 "description": "Test findings created from vulnerability analysis",
                 "severity": "High",
                 "risk_score": 7.5,
-                "source": "VulnerabilityAnalysis",
+                "source": "AutomatedScan",
                 "category": "Authentication",
                 "status": "New",
                 "evidence": {
