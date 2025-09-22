@@ -32,7 +32,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://ui-update-bugfix.preview.emergentagent.com/api"
+BASE_URL = "https://update-depth-fix.preview.emergentagent.com/api"
 
 class APIQuestionnaireLoopingTester:
     def __init__(self):
