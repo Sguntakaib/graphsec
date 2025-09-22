@@ -398,10 +398,25 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ PHASE 2 VULNERABILITYPANEL BACKEND INTEGRATION TESTING COMPLETED: Comprehensive testing confirms all backend endpoints properly support the Phase 2 VulnerabilityPanel enhancements. DETAILED RESULTS: 1) ✅ Vulnerability Analysis Endpoints: POST /api/vulnerabilities/analyze/{node_id} working correctly - 14 vulnerabilities found for WebApp node, proper severity distribution (Critical: 3, High: 6, Medium: 5), comprehensive category breakdown (Injection: 4, DoS: 2, Access Control: 2, etc.), vulnerability data structure supports tabbed interface 2) ✅ Vulnerability Filtering Support: All filtering capabilities verified - severity filtering supported (multiple severity levels), node type filtering supported, category filtering supported (7+ categories), search filtering supported (title/description fields available) 3) ✅ Findings Integration: POST /api/findings endpoint working correctly - findings creation from vulnerabilities successful, proper data model with risk_score, source, category fields, finding retrieval working, integration supports 'Create Findings' functionality 4) ✅ Data Structure Compatibility: Vulnerability response format fully compatible with tabbed interface requirements - vulnerabilities_by_severity data for severity tab, category counts for filtering, node_type information for organization, searchable fields for filtering. BACKEND SUPPORT VERIFIED: All vulnerability analysis endpoints operational, filtering data available in proper format, findings creation integration working, tabbed interface data requirements met. The backend fully supports all Phase 2 VulnerabilityPanel enhancements."
+  - task: "Fix infinite re-render on Vulnerability Filter"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/VulnerabilityFilter.js, frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reports Maximum update depth exceeded when clicking the filter button on vulnerability list page."
+      - working: "NA"
+        agent: "main"
+        comment: "Applied memoization to break render loop: 1) Memoized allVulnerabilities in App.js with useMemo([vulnerabilityAnalyses]) 2) Memoized filteredVulnerabilities in VulnerabilityFilter.js with useMemo([vulnerabilities, filters]) 3) Kept onFilterChange in useEffect but dependencies now stable, preventing continuous setNodes->re-render->effect loop."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
