@@ -19,7 +19,7 @@ const SimulationPanel = ({ result }) => {
   const getMitreUrl = (id) => `https://attack.mitre.org/techniques/${id.replace('.', '/')}/`;
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-gray-900 border-b border-gray-700">
       <div className="flex items-center space-x-2 mb-4">
         <Activity className="h-5 w-5 text-red-400" />
         <h3 className="text-white font-medium">Simulation Results</h3>
@@ -57,7 +57,7 @@ const SimulationPanel = ({ result }) => {
           
           <div className="space-y-3">
             {result.attack_paths.map((path, index) => (
-              <div key={index} className="attack-path">
+              <div key={index} className="bg-gray-800 border border-gray-600 rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-white">Path {index + 1}</span>
                   <div className="flex space-x-2">
@@ -80,7 +80,7 @@ const SimulationPanel = ({ result }) => {
                 
                 <div className="space-y-2">
                   {path.steps.map((step, stepIndex) => (
-                    <div key={stepIndex} className="attack-path-step">
+                    <div key={stepIndex} className="bg-gray-700 rounded p-2">
                       <div className="flex items-center space-x-2">
                         <span className="text-xs bg-gray-600 text-gray-300 px-2 py-1 rounded">
                           {stepIndex + 1}
@@ -134,7 +134,7 @@ const SimulationPanel = ({ result }) => {
           
           <div className="space-y-2">
             {result.recommendations.map((recommendation, index) => (
-              <div key={index} className="recommendation">
+              <div key={index} className="bg-gray-800 border border-gray-600 rounded-lg p-3">
                 <div className="text-sm text-green-100">{recommendation}</div>
               </div>
             ))}
