@@ -1157,6 +1157,28 @@ function AppContent() {
 
     setHighlightedPaths([]);
   };
+  
+  // QW-3: Clear All with confirmation
+  const handleClearAllConfirm = () => {
+    setShowClearAllConfirm(true);
+  };
+  
+  const executeClearAll = () => {
+    setNodes([]);
+    setEdges([]);
+    setSelectedNode(null);
+    setSimulationResult(null);
+    setHighlightedPaths([]);
+    setUndoStack([]);
+    setRedoStack([]);
+    clearAttackPathHighlighting();
+    setHasUnsavedChanges(false); // Reset unsaved changes after clearing
+    setShowClearAllConfirm(false);
+  };
+  
+  const cancelClearAll = () => {
+    setShowClearAllConfirm(false);
+  };
 
   // Enhanced function to determine edge label and styling based on connection type
   const getConnectionInfo = (sourceNode, targetNode, questionnaire_answers = {}) => {
