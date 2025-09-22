@@ -181,6 +181,9 @@ function AppContent() {
   const [filteredVulnerabilities, setFilteredVulnerabilities] = useState([]);
   const [autoVulnerabilityAnalysis, setAutoVulnerabilityAnalysis] = useState(false); // Disabled by default - require manual trigger after complete questionnaire
   
+  // Vulnerability dropdown menu state
+  const [showVulnMenu, setShowVulnMenu] = useState(false);
+  
   // Collapsible menu states
   const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
   const [isTopToolbarCollapsed, setIsTopToolbarCollapsed] = useState(false);
