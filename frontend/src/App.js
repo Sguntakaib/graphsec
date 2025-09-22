@@ -2799,6 +2799,18 @@ function AppContent() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentDiagram]);
 
+  // Handle click outside vulnerability dropdown menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showVulnMenu && !event.target.closest('.vulnerability-dropdown')) {
+        setShowVulnMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showVulnMenu]);
+
   return (
     <div className="h-screen flex flex-col bg-gray-900">
       {/* Enhanced Header */}
