@@ -833,7 +833,7 @@ const SecurityQuestionnaire = ({
           )}
         </div>
 
-        {/* Footer */}
+        {/* Enhanced Footer with Phase 2 features */}
         <div className="border-t border-gray-700 p-6">
           <div className="flex justify-between items-center">
             <button
@@ -847,8 +847,16 @@ const SecurityQuestionnaire = ({
 
             <div className="flex space-x-3">
               <button
-                onClick={validateAnswers}
+                onClick={handleMarkForLater}
                 className="flex items-center space-x-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+              >
+                <Clock className="h-4 w-4" />
+                <span>Mark for Later</span>
+              </button>
+
+              <button
+                onClick={validateAnswers}
+                className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
               >
                 <AlertTriangle className="h-4 w-4" />
                 <span>Validate</span>
@@ -874,6 +882,32 @@ const SecurityQuestionnaire = ({
             </div>
           </div>
         </div>
+
+        {/* Unsaved Changes Dialog */}
+        <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
+          <AlertDialogContent className="bg-gray-800 border-gray-700">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-white">Unsaved Changes</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-300">
+                You have unsaved changes to your security configuration. Are you sure you want to close without saving?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="bg-gray-600 text-white hover:bg-gray-700">
+                Keep Editing
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => {
+                  setShowUnsavedDialog(false);
+                  onCancel();
+                }}
+                className="bg-red-600 text-white hover:bg-red-700"
+              >
+                Discard Changes
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
     </TooltipProvider>
