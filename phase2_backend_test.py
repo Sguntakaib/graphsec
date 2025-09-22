@@ -582,14 +582,21 @@ class Phase2BackendTester:
             print("🎯 TEST SCENARIO 5: Findings Creation Integration")
             print("=" * 80)
             
-            # Test creating findings from vulnerabilities
+            # Test creating findings from vulnerabilities with correct model
             findings_data = {
                 "diagram_id": self.test_diagram_id,
-                "vulnerability_ids": [f"vuln-{uuid.uuid4().hex[:8]}", f"vuln-{uuid.uuid4().hex[:8]}"],
+                "node_id": self.test_node_id,
                 "title": "Test Security Findings",
                 "description": "Test findings created from vulnerability analysis",
                 "severity": "High",
-                "status": "Open"
+                "risk_score": 7.5,
+                "source": "VulnerabilityAnalysis",
+                "category": "Authentication",
+                "status": "New",
+                "evidence": {
+                    "vulnerability_ids": [f"vuln-{uuid.uuid4().hex[:8]}", f"vuln-{uuid.uuid4().hex[:8]}"]
+                },
+                "recommendations": ["Implement OAuth 2.0", "Enable MFA"]
             }
             
             response = self.session.post(f"{self.base_url}/findings", json=findings_data)
