@@ -39,6 +39,14 @@ const SecurityQuestionnaire = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validation, setValidation] = useState(null);
+  
+  // Phase 2 enhancements
+  const [markedForLater, setMarkedForLater] = useState(new Set());
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [createdDependencies, setCreatedDependencies] = useState([]);
+  const [completionSummary, setCompletionSummary] = useState(null);
+  const initialAnswersRef = useRef({});
 
   useEffect(() => {
     if (isVisible && nodeSubtype) {
