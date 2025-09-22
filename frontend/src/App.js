@@ -2798,7 +2798,7 @@ function AppContent() {
       <div className={`bg-gray-800 border-b border-gray-700 transition-all duration-300 ease-in-out ${
         isTopToolbarCollapsed ? 'h-0 overflow-hidden' : 'p-4'
       }`}>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between overflow-x-auto no-scrollbar">
           <div className="flex items-center space-x-4">
             <Shield className="h-8 w-8 text-blue-400" />
             <div>
