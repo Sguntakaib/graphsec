@@ -170,6 +170,7 @@ function AppContent() {
   const [showVulnerabilityFilter, setShowVulnerabilityFilter] = useState(false);
   const [showVulnerabilityLegend, setShowVulnerabilityLegend] = useState(false);
   const [showVulnerabilityReport, setShowVulnerabilityReport] = useState(false);
+  const [showVulnerabilityList, setShowVulnerabilityList] = useState(false); // Phase 2: Enhanced vulnerability list
   const [vulnerabilityFilter, setVulnerabilityFilter] = useState({
     severity: [],
     category: [],
