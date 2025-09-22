@@ -3611,6 +3611,32 @@ function AppContent() {
         />
       )}
 
+      {/* Clear Vulnerabilities Confirmation Dialog */}
+      {showClearConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-white mb-4">Clear All Vulnerabilities</h3>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to clear all {allVulnerabilities.length} vulnerabilities? This will remove all vulnerability nodes and analyses from the diagram.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowClearConfirmation(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmClearVulnerabilities}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Enhanced Questionnaire System - DISABLED: Using legacy system only */}
       {/*
       <QuestionnaireManager
