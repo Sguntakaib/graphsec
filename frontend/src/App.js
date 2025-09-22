@@ -2012,7 +2012,7 @@ function AppContent() {
   const allVulnerabilities = getAllVulnerabilities();
 
   // Handle vulnerability filter changes
-  const handleVulnerabilityFilterChange = (filtered, filters) => {
+  const handleVulnerabilityFilterChange = useCallback((filtered, filters) => {
     setFilteredVulnerabilities(filtered);
     
     // Update node visibility based on filters
@@ -2026,7 +2026,7 @@ function AppContent() {
       }
       return node;
     }));
-  };
+  }, []); // Empty dependency array to prevent recreation
 
   // Handle export filtered vulnerabilities
   const handleExportFilteredVulnerabilities = (filteredVulns) => {
