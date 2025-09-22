@@ -501,7 +501,7 @@ function AppContent() {
     
     setUndoStack(prev => [...prev.slice(-19), currentState]); // Keep last 20 states
     setRedoStack([]); // Clear redo stack when new action is performed
-  }, [nodes, edges]);
+  }, []); // Remove nodes, edges dependencies to prevent infinite loop
 
   // Smart Node Connector instance (initialized after saveStateToUndoStack)
   const smartNodeConnector = new SmartNodeConnector(setNodes, setEdges, saveStateToUndoStack);
