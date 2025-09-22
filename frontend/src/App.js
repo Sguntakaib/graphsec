@@ -3141,20 +3141,6 @@ function AppContent() {
       </div>
 
       
-      <div className="absolute top-0 right-1/2 transform translate-x-1/2 z-50">
-        <button
-          onClick={() => setIsTopToolbarCollapsed(!isTopToolbarCollapsed)}
-          className="px-3 py-1 bg-gray-700 text-white rounded-b hover:bg-gray-600 transition-colors flex items-center space-x-1 text-xs shadow-lg"
-          title={isTopToolbarCollapsed ? "Show Main Toolbar" : "Hide Main Toolbar"}
-        >
-          {isTopToolbarCollapsed ? (
-            <ChevronDown className="h-3 w-3" />
-          ) : (
-            <ChevronUp className="h-3 w-3" />
-          )}
-          <span>Toolbar</span>
-        </button>
-      </div>
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Left Sidebar Toggle Button */}
