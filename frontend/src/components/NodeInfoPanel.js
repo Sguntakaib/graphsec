@@ -57,10 +57,14 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
         const questions = questionsDataJson.prompts || [];
         
         // Get user answers from node data - try multiple possible sources
-        let userAnswers = activeNode.data?.questionnaireResponses || {};
+        // Merge possible locations for stored answers (root and data)
+        let userAnswers = {
+          ...(activeNode.questionnaireResponses || {}),
+          ...(activeNode.data?.questionnaireResponses || {})
+        };
         
         // If no questionnaire responses in node data, try to fetch from backend
-        if (Object.keys(userAnswers).length === 0 && activeNode.data?.subtype) {
+        if (Object.keys(userAnswers).length === 0 && (activeNode.data?.subtype || activeNode.subtype)) {
           try {
             const diagramId = window.location.pathname.includes('/diagram/') ? 
               window.location.pathname.split('/diagram/')[1] : null;
