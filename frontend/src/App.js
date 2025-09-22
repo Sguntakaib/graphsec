@@ -2944,7 +2944,7 @@ function AppContent() {
           
           {/* Vulnerability System Controls - remain as separate section */}
           {allVulnerabilities.length > 0 && (
-              <>
+            <>
                 <button
                   onClick={() => setShowVulnerabilityFilter(!showVulnerabilityFilter)}
                   className={`px-3 py-2 rounded flex items-center space-x-2 text-sm transition-colors ${
