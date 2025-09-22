@@ -2953,67 +2953,112 @@ function AppContent() {
           {/* Divider */}
           <div className="h-6 w-px bg-gray-700 mx-3 shrink-0" />
           
-          {/* Vulnerability System Controls - remain as separate section */}
-          {allVulnerabilities.length > 0 && (
-            <>
-                <button
-                  onClick={() => setShowVulnerabilityList(!showVulnerabilityList)}
-                  className={`px-3 py-1.5 rounded flex items-center space-x-2 text-sm transition-colors ${
-                    showVulnerabilityList
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-600 text-white hover:bg-gray-700'
-                  }`}
-                  title="Enhanced Vulnerability Management"
-                >
-                  <Shield className="h-4 w-4" />
-                  <span>Manage</span>
-                </button>
-
-                <button
-                  onClick={() => setShowVulnerabilityFilter(!showVulnerabilityFilter)}
-                  className={`px-3 py-1.5 rounded flex items-center space-x-2 text-sm transition-colors ${
-                    showVulnerabilityFilter
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-600 text-white hover:bg-gray-700'
-                  }`}
-                  title="Filter Vulnerabilities"
-                >
-                  <Filter className="h-4 w-4" />
-                  <span>Filter</span>
-                </button>
-
-                <button
-                  onClick={() => setShowVulnerabilityLegend(!showVulnerabilityLegend)}
-                  className={`px-3 py-1.5 rounded flex items-center space-x-2 text-sm transition-colors ${
-                    showVulnerabilityLegend
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-600 text-white hover:bg-gray-700'
-                  }`}
-                  title="Security Dashboard"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  <span>Dashboard</span>
-                </button>
-
-                <button
-                  onClick={() => setShowVulnerabilityReport(true)}
-                  className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center space-x-2 text-sm"
-                  title="Generate Vulnerability Report"
-                >
-                  <Download className="h-4 w-4" />
-                  <span>Report</span>
-                </button>
-
-                <button
-                  onClick={clearAllVulnerabilities}
-                  className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center space-x-2 text-sm"
-                  title="Clear All Vulnerabilities"
-                >
-                  <X className="h-4 w-4" />
-                  <span>Clear</span>
-                </button>
-              </>
+          {/* Vulnerability System Controls - Condensed Dropdown Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowVulnerabilityList(!showVulnerabilityList)}
+              className={`px-3 py-1.5 rounded-l flex items-center space-x-2 text-sm transition-colors ${
+                showVulnerabilityList || showVulnerabilityFilter || showVulnerabilityLegend
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-700 text-white hover:bg-gray-600'
+              }`}
+              title="Vulnerability Management"
+            >
+              <Shield className="h-4 w-4" />
+              <span>Vulnerabilities</span>
+              {allVulnerabilities.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+                  {allVulnerabilities.length}
+                </span>
+              )}
+            </button>
+            
+            <button
+              onClick={() => setShowVulnMenu(!showVulnMenu)}
+              className={`px-2 py-1.5 rounded-r flex items-center text-sm transition-colors border-l border-gray-600 ${
+                showVulnMenu
+                  ? 'bg-gray-600 text-white'
+                  : 'bg-gray-700 text-white hover:bg-gray-600'
+              }`}
+              aria-haspopup="menu"
+              aria-expanded={showVulnMenu}
+              title="More vulnerability options"
+            >
+              <ChevronDown className="h-4 w-4" />
+            </button>
+            
+            {/* Dropdown Menu */}
+            {showVulnMenu && (
+              <div className="absolute top-full right-0 mt-1 w-48 bg-gray-800 rounded-lg border border-gray-700 shadow-lg z-50 py-2">
+                <div role="menu" className="space-y-1">
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      setShowVulnerabilityList(!showVulnerabilityList);
+                      setShowVulnMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
+                    disabled={allVulnerabilities.length === 0}
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Manage</span>
+                  </button>
+                  
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      setShowVulnerabilityFilter(!showVulnerabilityFilter);
+                      setShowVulnMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
+                  >
+                    <Filter className="h-4 w-4" />
+                    <span>Filter</span>
+                  </button>
+                  
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      setShowVulnerabilityLegend(!showVulnerabilityLegend);
+                      setShowVulnMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </button>
+                  
+                  <div className="h-px bg-gray-700 my-1" />
+                  
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      setShowVulnerabilityReport(true);
+                      setShowVulnMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
+                    disabled={allVulnerabilities.length === 0}
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Report</span>
+                  </button>
+                  
+                  <button
+                    role="menuitem"
+                    onClick={() => {
+                      clearAllVulnerabilities();
+                      setShowVulnMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
+                    disabled={allVulnerabilities.length === 0}
+                  >
+                    <X className="h-4 w-4" />
+                    <span>Clear</span>
+                  </button>
+                </div>
+              </div>
             )}
+          </div>
             
             {/* Advanced Controls Toggle */}
             <button
