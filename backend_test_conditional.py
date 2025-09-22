@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://design-enhance-v2.preview.emergentagent.com/api"
+BASE_URL = "https://ui-update-bugfix.preview.emergentagent.com/api"
 
 class ConditionalDependencyTester:
     def __init__(self):
