@@ -291,24 +291,14 @@ const AdvancedLayoutControls = ({
 
       {/* Basic Controls */}
       <div className="p-3 space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            title="Smart Auto (auto-pick best algorithm and fit view to ensure all nodes are visible)"
-            onClick={() => handleAutoLayout()}
-            disabled={isLoading || nodes.length === 0}
-            className="px-3 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-          >
-            <Zap className="h-4 w-4" />
-            <span>Auto-Layout (Smart)</span>
-          </button>
-
-          {/* Always-visible algorithm selection */}
+        <div className="flex flex-col gap-3">
+          {/* Dropdown selection */}
           {algorithms.length > 0 && (
             <div className="flex items-center gap-2">
               <select
                 value={selectedAlgorithm}
                 onChange={(e) => setSelectedAlgorithm(e.target.value)}
-                className="px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="flex-1 px-2 py-2 bg-gray-800 text-gray-100 border border-gray-600 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 title={algorithms.find(a => a.id === selectedAlgorithm)?.description || 'Select a layout algorithm'}
               >
                 {algorithms.map((alg) => (
@@ -321,7 +311,7 @@ const AdvancedLayoutControls = ({
               <button
                 onClick={() => handleAutoLayout(selectedAlgorithm)}
                 disabled={isLoading || !selectedAlgorithm}
-                className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-1 text-sm"
+                className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-1 text-sm"
                 title="Apply selected layout"
               >
                 <Settings className="h-4 w-4" />
@@ -330,22 +320,7 @@ const AdvancedLayoutControls = ({
             </div>
           )}
 
-          <button
-            onClick={handleOptimizeLayout}
-            disabled={isLoading || nodes.length === 0}
-            className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-            title="Optimize current layout for spacing and crossings"
-          >
-            <Target className="h-4 w-4" />
-            <span>Optimize</span>
-          </button>
-
-          {animationState.isAnimating && (
-            <div className="flex items-center space-x-2 text-sm text-blue-600">
-              <Activity className="h-4 w-4 animate-pulse" />
-              <span>{animationState.currentFrame}/{animationState.totalFrames}</span>
-            </div>
-          )}
+          {/* Remove Smart Auto and Optimize per request */}
         </div>
 
         {/* Advanced Controls (expanded) */}
