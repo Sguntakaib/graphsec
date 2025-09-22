@@ -1,0 +1,165 @@
+WebApp Combined Questionnaire (Proposal v1)
+Source sets merged: basic (10) + advanced (18) + expert (28) = 56 total
+Proposed final set: 20 questions (−36 | −64%) focused on high-signal controls for automated design review
+
+Selection principles
+- Cover authentication, authorization, session, transport, data protection, and top attack classes (injection, XSS, CSRF)
+- Include operational readiness (logging/monitoring, incident response) and platform hygiene (secrets/config/dependencies)
+- Keep triggers for dependent nodes (Database/API) for graph expansion
+- Use consistent single_choice/boolean/multiple_choice to ease scoring and rule evaluation
+
+Proposed questions (ready to convert to YAML)
+
+1) id: webapp_authentication_method
+   type: single_choice
+   question: What authentication method is implemented?
+   options: ["OAuth2/OIDC", "SAML", "Username/Password with MFA", "Username/Password only", "No Authentication", "Unknown"]
+   help_text: Strong authentication methods prevent unauthorized access to the web application.
+   related_branch: Authentication
+
+2) id: webapp_authorization_model
+   type: single_choice
+   question: What authorization model is implemented?
+   options: ["RBAC with fine-grained permissions", "RBAC with basic roles", "Simple permissions", "No authorization", "Unknown"]
+   help_text: Proper authorization ensures users can only access appropriate resources.
+   related_branch: Authorization
+
+3) id: webapp_session_management
+   type: single_choice
+   question: How are user sessions managed?
+   options: ["Secure session management", "Standard sessions", "Basic sessions", "No session management", "Unknown"]
+   help_text: Secure session management prevents session hijacking and fixation attacks.
+   related_branch: SessionManagement
+
+4) id: webapp_https_enforcement
+   type: single_choice
+   question: Is HTTPS enforced?
+   options: ["HTTPS only (HSTS enabled)", "HTTPS preferred", "Mixed HTTP/HTTPS", "HTTP only", "Unknown"]
+   help_text: HTTPS/TLS protects data in transit and prevents downgrade/MITM attacks.
+   related_branch: Encryption
+
+5) id: webapp_security_headers
+   type: single_choice
+   question: Are security headers implemented?
+   options: ["Comprehensive security headers", "Basic headers", "Minimal headers", "No security headers", "Unknown"]
+   help_text: Security headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options) mitigate common web attacks.
+   related_branch: CSP
+
+6) id: webapp_input_validation
+   type: single_choice
+   question: How is input validation implemented?
+   options: ["Comprehensive server-side validation", "Basic validation", "Client-side only", "No validation", "Unknown"]
+   help_text: Proper input validation prevents injection attacks and data corruption.
+   related_branch: InputValidation
+
+7) id: webapp_sql_injection_protection
+   type: single_choice
+   question: How is SQL injection prevented?
+   options: ["Parameterized queries + ORM", "Parameterized queries", "Input sanitization", "No protection", "Unknown"]
+   help_text: Parameterized queries/ORM is the standard control against SQLi.
+   related_branch: InputValidation
+
+8) id: webapp_xss_protection
+   type: single_choice
+   question: How is Cross-Site Scripting (XSS) prevented?
+   options: ["Output encoding + CSP + validation", "Output encoding", "Input filtering", "No XSS protection", "Unknown"]
+   help_text: XSS protections prevent malicious script execution in user browsers.
+   related_branch: InputValidation
+
+9) id: webapp_csrf_protection
+   type: single_choice
+   question: How is Cross-Site Request Forgery (CSRF) prevented?
+   options: ["CSRF tokens + SameSite cookies", "CSRF tokens", "Referer validation", "No CSRF protection", "Unknown"]
+   help_text: CSRF protection prevents unauthorized user actions.
+   related_branch: SessionManagement
+
+10) id: webapp_logging_monitoring
+    type: single_choice
+    question: What logging and monitoring is in place?
+    options: ["Comprehensive security logging", "Basic application logging", "Minimal logging", "No logging", "Unknown"]
+    help_text: Security logging enables threat detection and incident response.
+    related_branch: Logging
+
+11) id: webapp_rate_limiting
+    type: single_choice
+    question: Is rate limiting implemented?
+    options: ["Adaptive rate limiting", "Fixed rate limiting", "Basic throttling", "No rate limiting", "Unknown"]
+    help_text: Rate limiting prevents brute force and resource exhaustion attacks.
+    related_branch: RateLimiting
+
+12) id: webapp_secrets_management
+    type: single_choice
+    question: How are application secrets managed?
+    options: ["Dedicated secrets manager", "Environment variables", "Configuration files", "Hardcoded secrets", "Unknown"]
+    help_text: Proper secrets management prevents credential exposure.
+    related_branch: SecretsManagement
+
+13) id: webapp_configuration_management
+    type: single_choice
+    question: How is application configuration managed?
+    options: ["Secure configuration management", "Version controlled config", "Manual configuration", "No configuration management", "Unknown"]
+    help_text: Secure configuration management prevents misconfiguration vulnerabilities.
+    related_branch: ConfigurationManagement
+
+14) id: webapp_dependency_management
+    type: single_choice
+    question: How are third-party dependencies managed?
+    options: ["Automated vulnerability scanning", "Regular updates", "Manual tracking", "No dependency management", "Unknown"]
+    help_text: Dependency management prevents exploitation of vulnerable components.
+    related_branch: SupplyChain
+
+15) id: webapp_data_encryption
+    type: single_choice
+    question: How is sensitive data encrypted?
+    options: ["Encryption at rest and in transit", "Encryption in transit only", "Basic encryption", "No encryption", "Unknown"]
+    help_text: Data encryption protects sensitive information from unauthorized access.
+    related_branch: Encryption
+
+16) id: webapp_database_connection
+    type: boolean
+    question: Does this application connect to a database?
+    help_text: Database connections require strong data protection and least privilege.
+    related_branch: Database
+    conditional_trigger: Database
+
+17) id: webapp_database_security
+    type: single_choice
+    question: How is database connectivity secured?
+    options: ["Encrypted connections + least privilege", "Encrypted connections", "Basic authentication", "No database security", "Unknown"]
+    help_text: DB security prevents unauthorized data access.
+    related_branch: DatabaseSecurity
+
+18) id: webapp_api_endpoints
+    type: boolean
+    question: Does this web application expose API endpoints?
+    help_text: APIs can be attack vectors if not secured.
+    related_branch: API
+    conditional_trigger: API
+
+19) id: webapp_api_security
+    type: single_choice
+    question: How are API endpoints secured?
+    options: ["OAuth2 + API gateway", "API keys", "Basic authentication", "No API security", "Unknown"]
+    help_text: API security prevents unauthorized access to application interfaces.
+    related_branch: ApiSecurity
+
+20) id: webapp_file_upload_security
+    type: single_choice
+    question: How are file uploads secured?
+    options: ["Comprehensive file validation", "File type validation", "Size limits only", "No file upload security", "Unknown"]
+    help_text: Secure uploads prevent malicious file execution and storage attacks.
+    related_branch: InputValidation
+
+Optional (deferred to keep set concise)
+- Threat modeling method, container security, runtime protection (RASP), backup/DR for app layer, compliance frameworks, incident response maturity
+
+Coverage mapping summary
+- Identity & access: Q1-Q3
+- Transport & headers: Q4-Q5
+- Data protection: Q6-Q9, Q15, Q17
+- Operational readiness: Q10-Q11, Q12-Q14
+- Architecture graph triggers: Q16 (Database), Q18 (API)
+- App surfaces: Q20 (uploads)
+
+Next steps
+- If you approve this 20-question set, I will convert it into the canonical YAML (single level), update frontend to fetch the unified set, and align progress/validation accordingly.
