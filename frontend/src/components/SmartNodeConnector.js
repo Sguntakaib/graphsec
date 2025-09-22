@@ -33,7 +33,8 @@ class SmartNodeConnector {
 
     // Create nodes and edges if any were generated
     if (nodesToCreate.length > 0 || edgesToCreate.length > 0) {
-      this.saveStateToUndoStack();
+      // Removed saveStateToUndoStack() call to prevent circular dependency
+      // Undo state will be saved by the parent component when needed
       
       if (nodesToCreate.length > 0) {
         this.setNodes(prevNodes => [...prevNodes, ...nodesToCreate]);
