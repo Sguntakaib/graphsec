@@ -477,8 +477,21 @@ class Phase2BackendTester:
                 # If endpoint doesn't exist, try alternative approach
                 print("   Trying alternative vulnerability endpoint...")
                 
-                # Try getting vulnerabilities through analysis
-                alt_response = self.session.post(f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}")
+                # Try getting vulnerabilities through analysis with proper request body
+                vulnerability_request = {
+                    "node_id": self.test_node_id,
+                    "node_type": "WebApp",
+                    "questionnaire_responses": {
+                        "authentication_method": "oauth2",
+                        "encryption_enabled": True,
+                        "input_validation": "comprehensive"
+                    }
+                }
+                
+                alt_response = self.session.post(
+                    f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}",
+                    json=vulnerability_request
+                )
                 
                 if alt_response.status_code != 200:
                     self.log_test("Vulnerability Filtering Support", False, 
