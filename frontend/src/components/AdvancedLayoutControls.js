@@ -50,17 +50,30 @@ const AdvancedLayoutControls = ({
     }
   }, [currentDiagram]);
 
+  const storageKey = currentDiagram ? `ui.layoutAlgo.${currentDiagram.id}` : null;
+
   const loadLayoutAlgorithms = async () => {
     try {
       const response = await getLayoutAlgorithms(currentDiagram.id);
-      setAlgorithms(response.algorithms || []);
-      if (response.algorithms && response.algorithms.length > 0) {
-        setSelectedAlgorithm(response.algorithms[0].id);
+      const algos = response.algorithms || [];
+      setAlgorithms(algos);
+      if (algos.length > 0) {
+        // Try persisted selection first
+        const persisted = storageKey ? window.localStorage.getItem(storageKey) : null;
+        const exists = persisted && algos.some(a => a.id === persisted);
+        setSelectedAlgorithm(exists ? persisted : algos[0].id);
       }
     } catch (error) {
       console.error('Failed to load layout algorithms:', error);
     }
   };
+
+  // Persist selected algorithm per diagram
+  useEffect(() => {
+    if (storageKey && selectedAlgorithm) {
+      try { window.localStorage.setItem(storageKey, selectedAlgorithm); } catch {}
+    }
+  }, [storageKey, selectedAlgorithm]);
 
   const handleAutoLayout = async (algorithm = null) => {
     if (!currentDiagram) return;
