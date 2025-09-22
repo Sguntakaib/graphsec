@@ -909,6 +909,10 @@ function AppContent() {
         await updateDiagram(newDiagram.id, { id: newDiagram.id, ...diagramData });
       }
       
+      // QW-3: Update save status tracking
+      setLastSavedAt(new Date());
+      setHasUnsavedChanges(false);
+      
       await loadDiagrams();
     } catch (error) {
       console.error('Failed to save diagram:', error);
