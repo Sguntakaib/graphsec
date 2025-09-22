@@ -545,7 +545,7 @@ function AppContent() {
     
     setNodes(nextState.nodes);
     setEdges(nextState.edges);
-  }, [redoStack, nodes, edges]); // Remove setNodes, setEdges dependencies
+  }, [redoStack]); // Remove nodes, edges dependencies to prevent infinite loop
 
   // Enhanced edge styles for attack paths
   const defaultEdgeOptions = useMemo(() => ({
