@@ -2970,7 +2970,7 @@ function AppContent() {
           <div className="h-6 w-px bg-gray-700 mx-3 shrink-0" />
           
           {/* Vulnerability System Controls - Condensed Dropdown Menu */}
-          <div className="relative">
+          <div className="relative vulnerability-dropdown">
             <button
               onClick={() => setShowVulnerabilityList(!showVulnerabilityList)}
               className={`px-3 py-1.5 rounded-l flex items-center space-x-2 text-sm transition-colors ${
