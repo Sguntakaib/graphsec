@@ -3103,17 +3103,9 @@ function AppContent() {
               </button>
 
               <button
-                onClick={() => {
-                  setNodes([]);
-                  setEdges([]);
-                  setSelectedNode(null);
-                  setSimulationResult(null);
-                  setHighlightedPaths([]);
-                  setUndoStack([]);
-                  setRedoStack([]);
-                  clearAttackPathHighlighting();
-                }}
+                onClick={handleClearAllConfirm}
                 className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 flex items-center space-x-2 text-sm"
+                title="Clear All Nodes and Edges"
               >
                 <Trash2 className="h-4 w-4" />
                 <span>Clear All</span>
