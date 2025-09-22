@@ -159,8 +159,20 @@ class Phase2BackendTester:
             print("🎯 TEST SCENARIO 1: Questionnaire Dependency Detection for Trigger Badges")
             print("=" * 80)
             
-            # Test WebApp dependency detection
-            response = self.session.post(f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies")
+            # Test WebApp dependency detection with required request body
+            dependency_request = {
+                "answers": {
+                    "webapp_database_connection": True,
+                    "webapp_api_endpoints": True,
+                    "webapp_authentication_method": "oauth2",
+                    "webapp_session_management": "secure_tokens"
+                }
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/intelligent-nodes/WebApp/check-dependencies",
+                json=dependency_request
+            )
             
             print(f"📋 WebApp Dependency Check Response Status: HTTP {response.status_code}")
             
