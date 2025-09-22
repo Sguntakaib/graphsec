@@ -419,7 +419,7 @@ function AppContent() {
       window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
       window.removeEventListener('edgeUpdate', handleEdgeUpdate);
     };
-  }, [nodes, currentDiagram, setEdges]);
+  }, [currentDiagram]); // Remove nodes and setEdges dependencies
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
