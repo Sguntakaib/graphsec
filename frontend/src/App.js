@@ -3392,7 +3392,8 @@ function AppContent() {
                 Run a simulation to see analysis results
               </div>
             </div>
-          )}
+          </div>
+        )}
         </div>
       </div>
 
