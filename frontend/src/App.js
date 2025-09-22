@@ -221,6 +221,28 @@ function AppContent() {
     setCurrentQuestionnaireNode(questionnaireNode);
     setCurrentQuestionnaireAnswers(existingAnswers);
     setShowSecurityQuestionnaire(true);
+    
+    // Store questionnaire meta on node for accurate progress (e.g., total_questions)
+    try {
+      let metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`;
+      if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
+        metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
+      }
+      const metaRes = await fetch(metaUrl);
+      if (metaRes.ok) {
+        const meta = await metaRes.json();
+        const total = meta.total_questions || (meta.prompts ? meta.prompts.length : 0);
+        setNodes(nds => nds.map(n => n.id === node.id ? ({
+          ...n,
+          data: {
+            ...n.data,
+            questionnaireMeta: { total_questions: total }
+          }
+        }) : n));
+      }
+    } catch (e) {
+      console.log('ℹ️ Could not fetch questionnaire meta for progress:', e?.message);
+    }
   }, [currentDiagram]);
 
   // Track zoom level changes
