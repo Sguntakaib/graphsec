@@ -208,9 +208,12 @@ class Phase2BackendTester:
             if dependent_nodes:
                 print(f"   Sample dependent nodes:")
                 for i, node in enumerate(dependent_nodes[:3]):
-                    node_type = node.get("type", "Unknown")
-                    condition = node.get("condition", "Unknown")
-                    print(f"     {i+1}. Type: {node_type}, Condition: {condition}")
+                    if isinstance(node, dict):
+                        node_type = node.get("type", "Unknown")
+                        condition = node.get("condition", "Unknown")
+                        print(f"     {i+1}. Type: {node_type}, Condition: {condition}")
+                    else:
+                        print(f"     {i+1}. Node: {node}")
             
             # Test API dependency detection
             api_request = {
