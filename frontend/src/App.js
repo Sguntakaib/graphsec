@@ -3026,7 +3026,11 @@ function AppContent() {
                       setShowVulnerabilityList(!showVulnerabilityList);
                       setShowVulnMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
+                    className={`w-full px-4 py-2 text-left text-sm flex items-center space-x-3 ${
+                      allVulnerabilities.length === 0
+                        ? 'text-gray-500 cursor-not-allowed'
+                        : 'text-white hover:bg-gray-700'
+                    }`}
                     disabled={allVulnerabilities.length === 0}
                   >
                     <Shield className="h-4 w-4" />
