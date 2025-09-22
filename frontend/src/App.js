@@ -272,154 +272,154 @@ function AppContent() {
   }, []);
 
   // Double-tap handler for nodes - Direct questionnaire access
-  useEffect(() => {
-    const handleNodeDoubleTap = async (event) => {
-      console.log('🎯 App.js: Received nodeDoubleTap event:', event.detail);
+  const handleNodeDoubleTap = useCallback(async (event) => {
+    console.log('🎯 App.js: Received nodeDoubleTap event:', event.detail);
+    
+    const { nodeId, nodeData } = event.detail;
+    const node = nodes.find(n => n.id === nodeId);
+    
+    console.log('🔍 Double-tap handler state check:', {
+      nodeId,
+      nodeFound: !!node,
+      currentDiagram: !!currentDiagram,
+      nodesLength: nodes.length
+    });
+    
+    if (node) { // Remove currentDiagram requirement for now
+      console.log('🎯 Double-tap detected on node:', nodeId);
       
-      const { nodeId, nodeData } = event.detail;
-      const node = nodes.find(n => n.id === nodeId);
+      // Get existing answers - try node data first, then backend API
+      let existingAnswers = {};
       
-      console.log('🔍 Double-tap handler state check:', {
-        nodeId,
-        nodeFound: !!node,
-        currentDiagram: !!currentDiagram,
-        nodesLength: nodes.length
-      });
-      
-      if (node) { // Remove currentDiagram requirement for now
-        console.log('🎯 Double-tap detected on node:', nodeId);
-        
-        // Get existing answers - try node data first, then backend API
-        let existingAnswers = {};
-        
-        // First check if questionnaire responses are stored in node data (for auto-created dependent nodes)
-        if (node.data?.questionnaireResponses && Object.keys(node.data.questionnaireResponses).length > 0) {
-          existingAnswers = node.data.questionnaireResponses;
-          console.log('📝 Found existing questionnaire answers in node data:', existingAnswers);
-        } else if (node.questionnaireResponses && Object.keys(node.questionnaireResponses).length > 0) {
-          existingAnswers = node.questionnaireResponses;
-          console.log('📝 Found existing questionnaire answers in node root:', existingAnswers);
-        } else if (currentDiagram) {
-          // Fallback to backend API if no data in node
-          try {
-            const response = await fetch(
-              `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
-            );
-            
-            if (response.ok) {
-              const data = await response.json();
-              existingAnswers = data.questionnaire_responses || {};
-              console.log('📝 Fetched existing questionnaire answers from backend:', existingAnswers);
-            } else {
-              console.log('⚠️ No existing questionnaire data found in backend, starting fresh questionnaire');
-            }
-          } catch (error) {
-            console.error('⚠️ Error fetching existing questionnaire answers from backend:', error);
-          }
-        } else {
-          console.log('⚠️ No currentDiagram available, starting fresh questionnaire');
-        }
-        
-        // Directly set questionnaire state instead of calling startLegacyQuestionnaire
-        const nodeSubtype = node.subtype || node.data?.subtype;
-        console.log('🚀 Opening Security Questionnaire directly from double-click');
-        
-        // Clear any existing questionnaire state to prevent completion logic from triggering
-        setQuestionnaireQueue([]);
-        setCurrentQueueIndex(0);
-        setParentQuestionnaireStack([]); // Clear parent stack
-        
-        // Set the state directly to open questionnaire
-        const questionnaireNode = {
-          id: node.id,
-          subtype: nodeSubtype,
-          data: { subtype: nodeSubtype }
-        };
-        
-        console.log('🔧 Setting questionnaire state:', {
-          showSecurityQuestionnaire: true,
-          currentQuestionnaireNode: questionnaireNode,
-          existingAnswers
-        });
-        
-        setCurrentQuestionnaireNode(questionnaireNode);
-        setCurrentQuestionnaireAnswers(existingAnswers);
-        setShowSecurityQuestionnaire(true);
-        
-        // Store questionnaire meta on node for accurate progress (e.g., total_questions)
+      // First check if questionnaire responses are stored in node data (for auto-created dependent nodes)
+      if (node.data?.questionnaireResponses && Object.keys(node.data.questionnaireResponses).length > 0) {
+        existingAnswers = node.data.questionnaireResponses;
+        console.log('📝 Found existing questionnaire answers in node data:', existingAnswers);
+      } else if (node.questionnaireResponses && Object.keys(node.questionnaireResponses).length > 0) {
+        existingAnswers = node.questionnaireResponses;
+        console.log('📝 Found existing questionnaire answers in node root:', existingAnswers);
+      } else if (currentDiagram) {
+        // Fallback to backend API if no data in node
         try {
-          let metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`;
-          if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
-            metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
+          const response = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            existingAnswers = data.questionnaire_responses || {};
+            console.log('📝 Fetched existing questionnaire answers from backend:', existingAnswers);
+          } else {
+            console.log('⚠️ No existing questionnaire data found in backend, starting fresh questionnaire');
           }
-          const metaRes = await fetch(metaUrl);
-          if (metaRes.ok) {
-            const meta = await metaRes.json();
-            const total = meta.total_questions || (meta.prompts ? meta.prompts.length : 0);
-            setNodes(nds => nds.map(n => n.id === node.id ? ({
-              ...n,
-              data: {
-                ...n.data,
-                questionnaireMeta: { total_questions: total }
-              }
-            }) : n));
-          }
-        } catch (e) {
-          console.log('ℹ️ Could not fetch questionnaire meta for progress:', e?.message);
+        } catch (error) {
+          console.error('⚠️ Error fetching existing questionnaire answers from backend:', error);
         }
-        
-        // Force a state check after setting
-        setTimeout(() => {
-          console.log('🔍 State check after 100ms:', {
-            showSecurityQuestionnaire: true, // Should be true
-            currentQuestionnaireNode: questionnaireNode // Should be set
-          });
-        }, 100);
+      } else {
+        console.log('⚠️ No currentDiagram available, starting fresh questionnaire');
       }
-    };
-
-    // Edge update handler for draggable edges
-    const handleEdgeUpdate = (event) => {
-      const { edgeId, updateData } = event.detail;
-      console.log('🔧 Received edge update:', edgeId, updateData);
       
-      setEdges((currentEdges) => {
-        const updatedEdges = currentEdges.map((edge) => {
-          if (edge.id === edgeId) {
-            const updatedEdge = {
-              ...edge,
-              // Update top-level properties like label
-              ...(updateData.label !== undefined && { label: updateData.label }),
-              data: {
-                ...edge.data,
-                ...updateData
-              }
-            };
-            return updatedEdge;
-          }
-          return edge;
-        });
-        
-        // If the updated edge is currently selected, update the selectedEdge state with the new edge object
-        // Use a callback-based update to ensure we get the latest edge from the updated edges array
-        if (selectedEdge?.id === edgeId) {
-          const newSelectedEdge = updatedEdges.find(edge => edge.id === edgeId);
-          if (newSelectedEdge) {
-            setSelectedEdge(newSelectedEdge);
-          }
-        }
-        
-        return updatedEdges;
+      // Directly set questionnaire state instead of calling startLegacyQuestionnaire
+      const nodeSubtype = node.subtype || node.data?.subtype;
+      console.log('🚀 Opening Security Questionnaire directly from double-click');
+      
+      // Clear any existing questionnaire state to prevent completion logic from triggering
+      setQuestionnaireQueue([]);
+      setCurrentQueueIndex(0);
+      setParentQuestionnaireStack([]); // Clear parent stack
+      
+      // Set the state directly to open questionnaire
+      const questionnaireNode = {
+        id: node.id,
+        subtype: nodeSubtype,
+        data: { subtype: nodeSubtype }
+      };
+      
+      console.log('🔧 Setting questionnaire state:', {
+        showSecurityQuestionnaire: true,
+        currentQuestionnaireNode: questionnaireNode,
+        existingAnswers
       });
-    };
+      
+      setCurrentQuestionnaireNode(questionnaireNode);
+      setCurrentQuestionnaireAnswers(existingAnswers);
+      setShowSecurityQuestionnaire(true);
+      
+      // Store questionnaire meta on node for accurate progress (e.g., total_questions)
+      try {
+        let metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`;
+        if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
+          metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
+        }
+        const metaRes = await fetch(metaUrl);
+        if (metaRes.ok) {
+          const meta = await metaRes.json();
+          const total = meta.total_questions || (meta.prompts ? meta.prompts.length : 0);
+          setNodes(nds => nds.map(n => n.id === node.id ? ({
+            ...n,
+            data: {
+              ...n.data,
+              questionnaireMeta: { total_questions: total }
+            }
+          }) : n));
+        }
+      } catch (e) {
+        console.log('ℹ️ Could not fetch questionnaire meta for progress:', e?.message);
+      }
+      
+      // Force a state check after setting
+      setTimeout(() => {
+        console.log('🔍 State check after 100ms:', {
+          showSecurityQuestionnaire: true, // Should be true
+          currentQuestionnaireNode: questionnaireNode // Should be set
+        });
+      }, 100);
+    }
+  }, [nodes, currentDiagram]); // Proper dependencies for useCallback
 
+  // Edge update handler for draggable edges
+  const handleEdgeUpdate = useCallback((event) => {
+    const { edgeId, updateData } = event.detail;
+    console.log('🔧 Received edge update:', edgeId, updateData);
+    
+    setEdges((currentEdges) => {
+      const updatedEdges = currentEdges.map((edge) => {
+        if (edge.id === edgeId) {
+          const updatedEdge = {
+            ...edge,
+            // Update top-level properties like label
+            ...(updateData.label !== undefined && { label: updateData.label }),
+            data: {
+              ...edge.data,
+              ...updateData
+            }
+          };
+          return updatedEdge;
+        }
+        return edge;
+      });
+      
+      // If the updated edge is currently selected, update the selectedEdge state with the new edge object
+      // Use a callback-based update to ensure we get the latest edge from the updated edges array
+      if (selectedEdge?.id === edgeId) {
+        const newSelectedEdge = updatedEdges.find(edge => edge.id === edgeId);
+        if (newSelectedEdge) {
+          setSelectedEdge(newSelectedEdge);
+        }
+      }
+      
+      return updatedEdges;
+    });
+  }, [selectedEdge]); // Add selectedEdge dependency
+
+  useEffect(() => {
     window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
     window.addEventListener('edgeUpdate', handleEdgeUpdate);
     return () => {
       window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
       window.removeEventListener('edgeUpdate', handleEdgeUpdate);
     };
-  }, [currentDiagram, nodes]); // Add nodes to dependencies to prevent infinite loop
+  }, [handleNodeDoubleTap, handleEdgeUpdate]); // Use the memoized callbacks
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
