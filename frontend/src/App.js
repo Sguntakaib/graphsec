@@ -2982,13 +2982,16 @@ function AppContent() {
           {/* Vulnerability System Controls - Condensed Dropdown Menu */}
           <div className="relative vulnerability-dropdown">
             <button
-              onClick={() => setShowVulnerabilityList(!showVulnerabilityList)}
+              onClick={() => allVulnerabilities.length > 0 ? setShowVulnerabilityList(!showVulnerabilityList) : null}
               className={`px-3 py-1.5 rounded-l flex items-center space-x-2 text-sm transition-colors ${
-                showVulnerabilityList || showVulnerabilityFilter || showVulnerabilityLegend
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-white hover:bg-gray-600'
+                allVulnerabilities.length === 0 
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : showVulnerabilityList || showVulnerabilityFilter || showVulnerabilityLegend
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-white hover:bg-gray-600'
               }`}
-              title="Vulnerability Management"
+              title={allVulnerabilities.length === 0 ? "No vulnerabilities to manage" : "Vulnerability Management"}
+              disabled={allVulnerabilities.length === 0}
             >
               <Shield className="h-4 w-4" />
               <span>Vulnerabilities</span>
