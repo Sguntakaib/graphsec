@@ -3003,7 +3003,7 @@ function AppContent() {
         </div>
         
         {/* Advanced Controls Bar */}
-        {showAdvancedControls ? (
+        {showAdvancedControls && (
           <div className="mt-3 pt-3 border-t border-gray-700 space-y-3">
             {/* First Row - Layout & Navigation */}
             <div className="flex items-center space-x-3">
