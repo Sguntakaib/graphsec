@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Tag, Shield, ExternalLink } from 'lucide-react';
+import { Settings, Tag, Shield, ExternalLink, Lock } from 'lucide-react';
 
 const PropertiesPanel = ({ node }) => {
   if (!node) return null;
@@ -9,7 +9,7 @@ const PropertiesPanel = ({ node }) => {
   const getMitreUrl = (id) => `https://attack.mitre.org/techniques/${id.replace('.', '/')}/`;
 
   return (
-    <div className="p-4 border-b border-gray-700">
+    <div className="p-4 border-b border-gray-700 bg-gray-900">
       <div className="flex items-center space-x-2 mb-4">
         <Settings className="h-5 w-5 text-gray-400" />
         <h3 className="text-white font-medium">Properties</h3>
