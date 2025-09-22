@@ -330,6 +330,15 @@ const AdvancedLayoutControls = ({
                 <Settings className="h-4 w-4" />
                 <span>Apply Layout</span>
               </button>
+
+              <button
+                onClick={() => setTimeout(() => fitView({ padding: 0.1, duration: 600 }), 50)}
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center justify-center space-x-2 text-sm"
+                title="Reset View (fit all nodes without recalculating layout)"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Reset View</span>
+              </button>
             </div>
           )}
 
