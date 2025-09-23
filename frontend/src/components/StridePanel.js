@@ -3,7 +3,7 @@ import { Shield, AlertTriangle, Eye, EyeOff, Filter, Play, CheckCircle, Circle, 
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 
-const StridePanel = ({ diagramId, onAnalyzeStride }) => {
+const StridePanel = ({ diagramId, onAnalyzeStride, onStrideDataUpdate }) => {
   const [threats, setThreats] = useState([]);
   const [coverage, setCoverage] = useState(null);
   const [loading, setLoading] = useState(false);
