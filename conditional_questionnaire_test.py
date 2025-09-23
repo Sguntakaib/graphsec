@@ -183,7 +183,11 @@ class ConditionalQuestionnaireTester:
                     api_type_found = True
                     options = question.get("options", [])
                     print(f"   API Type Question Found: {question.get('question', 'Unknown')}")
-                    print(f"     Options: {[opt.get('value', 'Unknown') for opt in options[:3]]}...")
+                    if isinstance(options, list) and len(options) > 0:
+                        if isinstance(options[0], dict):
+                            print(f"     Options: {[opt.get('value', opt.get('text', 'Unknown')) for opt in options[:3]]}...")
+                        else:
+                            print(f"     Options: {options[:3]}...")
                 
                 # Look for protocol-specific fields
                 if any(protocol in question_id for protocol in ["rest", "graphql", "soap", "grpc"]):
