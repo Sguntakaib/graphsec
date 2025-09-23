@@ -391,10 +391,220 @@ class VulnerabilityBackendTester:
             self.log_test("Test 404 Handling for Non-existent Diagram", False, f"Request error: {str(e)}")
             return False
 
-    def test_questionnaire_save_to_existing_diagram(self):
-        """BONUS TEST: Test saving questionnaire to existing diagram (should work)"""
+    def test_vulnerability_analysis(self):
+        """TEST SCENARIO 4: Test vulnerability analysis endpoints"""
         try:
-            print("🎯 BONUS TEST: Save Questionnaire to Existing Diagram")
+            print("🎯 TEST SCENARIO 4: Test Vulnerability Analysis Endpoints")
+            print("=" * 80)
+            
+            if not self.test_diagram_id or not self.test_node_id:
+                self.log_test("Test Vulnerability Analysis", False, 
+                            "No test diagram/node ID available")
+                return False
+            
+            # Test vulnerability analysis for the API node
+            response = self.session.post(f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}")
+            
+            print(f"📋 Vulnerability Analysis Response Status: HTTP {response.status_code}")
+            
+            if response.status_code != 200:
+                error_detail = "Unknown error"
+                try:
+                    error_data = response.json()
+                    error_detail = error_data.get('detail', str(error_data))
+                except:
+                    error_detail = response.text
+                
+                self.log_test("Test Vulnerability Analysis", False, 
+                            f"HTTP {response.status_code}: {error_detail}")
+                return False
+            
+            try:
+                data = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Test Vulnerability Analysis", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            # Verify vulnerability analysis response structure
+            vulnerabilities = data.get("vulnerabilities", [])
+            overall_risk_score = data.get("overall_risk_score", 0)
+            node_id = data.get("node_id")
+            
+            print(f"📊 Vulnerability Analysis Results:")
+            print(f"   Node ID: {node_id}")
+            print(f"   Vulnerabilities Found: {len(vulnerabilities)}")
+            print(f"   Overall Risk Score: {overall_risk_score}")
+            
+            if vulnerabilities:
+                # Show vulnerability breakdown by severity
+                severity_counts = {}
+                for vuln in vulnerabilities:
+                    severity = vuln.get("severity", "Unknown")
+                    severity_counts[severity] = severity_counts.get(severity, 0) + 1
+                
+                print(f"   Vulnerability Breakdown:")
+                for severity, count in severity_counts.items():
+                    print(f"     {severity}: {count}")
+                
+                # Show sample vulnerabilities
+                print(f"   Sample vulnerabilities:")
+                for i, vuln in enumerate(vulnerabilities[:3]):  # Show first 3
+                    print(f"     {i+1}. {vuln.get('title', 'Unknown')} ({vuln.get('severity', 'Unknown')})")
+            
+            self.log_test("Test Vulnerability Analysis", True, 
+                        f"✅ SUCCESS: Vulnerability analysis completed, {len(vulnerabilities)} vulnerabilities found")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Test Vulnerability Analysis", False, f"Request error: {str(e)}")
+            return False
+
+    def test_diagram_operations(self):
+        """TEST SCENARIO 5: Test diagram operations still work"""
+        try:
+            print("🎯 TEST SCENARIO 5: Test Diagram Operations")
+            print("=" * 80)
+            
+            # Test listing diagrams
+            response = self.session.get(f"{self.base_url}/diagrams")
+            
+            print(f"📋 List Diagrams Response Status: HTTP {response.status_code}")
+            
+            if response.status_code != 200:
+                error_detail = "Unknown error"
+                try:
+                    error_data = response.json()
+                    error_detail = error_data.get('detail', str(error_data))
+                except:
+                    error_detail = response.text
+                
+                self.log_test("Test Diagram Operations", False, 
+                            f"HTTP {response.status_code}: {error_detail}")
+                return False
+            
+            try:
+                diagrams = response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Test Diagram Operations", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            print(f"📊 Diagram Operations Results:")
+            print(f"   Total Diagrams: {len(diagrams)}")
+            
+            if diagrams:
+                print(f"   Sample diagrams:")
+                for i, diagram in enumerate(diagrams[:3]):  # Show first 3
+                    print(f"     {i+1}. {diagram.get('title', 'Unknown')} (ID: {diagram.get('id', 'Unknown')[:8]}...)")
+            
+            # Test getting specific diagram if we have one
+            if self.test_diagram_id:
+                specific_response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}")
+                if specific_response.status_code == 200:
+                    print(f"   ✅ Successfully retrieved specific diagram: {self.test_diagram_id}")
+                else:
+                    print(f"   ⚠️ Failed to retrieve specific diagram: HTTP {specific_response.status_code}")
+            
+            self.log_test("Test Diagram Operations", True, 
+                        f"✅ SUCCESS: Diagram operations working correctly, {len(diagrams)} diagrams found")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Test Diagram Operations", False, f"Request error: {str(e)}")
+            return False
+
+    def test_node_operations(self):
+        """TEST SCENARIO 6: Test node-related operations"""
+        try:
+            print("🎯 TEST SCENARIO 6: Test Node Operations")
+            print("=" * 80)
+            
+            if not self.test_diagram_id:
+                self.log_test("Test Node Operations", False, 
+                            "No test diagram ID available")
+                return False
+            
+            # Create a WebApp node for testing
+            webapp_node = {
+                "id": f"webapp-node-{uuid.uuid4().hex[:8]}",
+                "type": "Asset",
+                "subtype": "WebApp",
+                "label": "Test WebApp Node",
+                "position": {"x": 100, "y": 100},
+                "data": {
+                    "criticality": "High",
+                    "data_classification": "Confidential"
+                }
+            }
+            
+            # Get current diagram and add the WebApp node
+            diagram_response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}")
+            if diagram_response.status_code != 200:
+                self.log_test("Test Node Operations", False, 
+                            "Cannot retrieve test diagram")
+                return False
+            
+            diagram_data = diagram_response.json()
+            current_nodes = diagram_data.get("nodes", [])
+            current_nodes.append(webapp_node)
+            diagram_data["nodes"] = current_nodes
+            
+            # Update diagram with the WebApp node
+            update_response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", json=diagram_data)
+            if update_response.status_code != 200:
+                self.log_test("Test Node Operations", False, 
+                            "Failed to add WebApp node to diagram")
+                return False
+            
+            print(f"   Added WebApp Node ID: {webapp_node['id']}")
+            
+            # Test getting WebApp questionnaire prompts
+            prompts_response = self.session.get(f"{self.base_url}/intelligent-nodes/WebApp/prompts")
+            
+            print(f"📋 WebApp Prompts Response Status: HTTP {prompts_response.status_code}")
+            
+            if prompts_response.status_code != 200:
+                error_detail = "Unknown error"
+                try:
+                    error_data = prompts_response.json()
+                    error_detail = error_data.get('detail', str(error_data))
+                except:
+                    error_detail = prompts_response.text
+                
+                self.log_test("Test Node Operations", False, 
+                            f"HTTP {prompts_response.status_code}: {error_detail}")
+                return False
+            
+            try:
+                prompts_data = prompts_response.json()
+            except json.JSONDecodeError as e:
+                self.log_test("Test Node Operations", False, 
+                            f"Invalid JSON response: {str(e)}")
+                return False
+            
+            prompts_count = prompts_data.get("prompts_count", 0)
+            
+            print(f"📊 Node Operations Results:")
+            print(f"   WebApp Node Created: {webapp_node['id']}")
+            print(f"   WebApp Prompts Count: {prompts_count}")
+            print(f"   WebApp Prompts Success: {prompts_data.get('success', False)}")
+            
+            self.log_test("Test Node Operations", True, 
+                        f"✅ SUCCESS: Node operations working correctly, WebApp prompts: {prompts_count}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_test("Test Node Operations", False, f"Request error: {str(e)}")
+            return False
+
+    def test_questionnaire_save_to_existing_diagram(self):
+        """TEST SCENARIO 7: Test saving questionnaire to existing diagram (should work)"""
+        try:
+            print("🎯 TEST SCENARIO 7: Save Questionnaire to Existing Diagram")
             print("=" * 80)
             
             if not self.test_diagram_id:
@@ -425,8 +635,10 @@ class VulnerabilityBackendTester:
                 return False
             
             diagram_data = diagram_response.json()
-            diagram_data["nodes"] = [api_node]
-            diagram_data["edges"] = []
+            current_nodes = diagram_data.get("nodes", [])
+            current_nodes.append(api_node)
+            diagram_data["nodes"] = current_nodes
+            diagram_data["edges"] = diagram_data.get("edges", [])
             
             # Update diagram with the API node
             update_response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", json=diagram_data)
