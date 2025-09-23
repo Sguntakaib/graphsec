@@ -172,8 +172,15 @@ class StrideBackendTester:
                 self.test_node_ids[node["subtype"]] = node["id"]
             
             # Update diagram with security nodes
-            diagram_data["nodes"] = security_nodes
-            diagram_data["edges"] = []  # No edges needed for STRIDE node analysis
+            updated_diagram = {
+                "id": self.test_diagram_id,
+                "title": data.get("title"),
+                "description": data.get("description"),
+                "nodes": security_nodes,
+                "edges": [],
+                "created_at": data.get("created_at"),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
             
             update_response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", json=diagram_data)
             
