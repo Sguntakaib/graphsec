@@ -329,7 +329,7 @@ const SecurityQuestionnaire = ({
     return null;
   };
 
-  const handleAnswerChange = (promptId, value) => {
+  const handleAnswerChange = async (promptId, value) => {
     setAnswers(prev => {
       const newAnswers = { ...prev, [promptId]: value };
       
@@ -339,6 +339,67 @@ const SecurityQuestionnaire = ({
       
       return newAnswers;
     });
+
+    // Update current questionnaire answers for conditional triggers
+    setCurrentQuestionnaireAnswers(prev => {
+      const updated = { ...prev, [promptId]: value };
+      
+      // For conditional questionnaires (API/Database), trigger additional questions based on response
+      if (isConditionalQuestionnaire && (nodeSubtype === 'API' || nodeSubtype === 'Database')) {
+        // Trigger conditional questions for key answers
+        const conditionalTriggers = {
+          'api_type': ['REST API', 'GraphQL API', 'gRPC API', 'SOAP API', 'WebSocket API'],
+          'api_web_interface_exposure': ['Yes', 'true', true],
+          'database_type': ['MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Elasticsearch'],
+          'database_external_access': ['Yes', 'true', true]
+        };
+        
+        if (conditionalTriggers[promptId] && conditionalTriggers[promptId].includes(value)) {
+          console.log(`🔄 Conditional trigger detected: ${promptId} = ${value}`);
+          fetchConditionalQuestions(promptId, value, updated);
+        }
+      }
+      
+      return updated;
+    });
+  };
+
+  // Fetch additional conditional questions based on specific responses
+  const fetchConditionalQuestions = async (questionId, responseValue, allResponses) => {
+    try {
+      console.log(`🚀 Fetching conditional questions for: ${questionId} = ${responseValue}`);
+      
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}/conditional-trigger`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question_id: questionId,
+          response: responseValue,
+          all_responses: allResponses
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.conditional_questions && data.conditional_questions.length > 0) {
+          console.log(`✅ Adding ${data.conditional_questions.length} conditional questions for ${questionId}`);
+          
+          // Insert conditional questions after current prompt
+          setPrompts(prevPrompts => {
+            const newPrompts = [...prevPrompts];
+            const insertIndex = currentPromptIndex + 1;
+            newPrompts.splice(insertIndex, 0, ...data.conditional_questions);
+            return newPrompts;
+          });
+          
+          setConditionalQuestions(prev => [...prev, ...data.conditional_questions]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching conditional questions:', error);
+    }
   };
 
   // Phase 2: Get dependency trigger info for current question
