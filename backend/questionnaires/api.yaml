@@ -130,6 +130,66 @@ questionnaires:
         "Unknown": "API logging and monitoring configuration is unclear or not documented."
       help_text: "API logging enables security monitoring and forensic analysis."
       related_branch: "Monitoring"
+    - id: "api_cors_configuration"
+      question: "How is CORS configured?"
+      type: "single_choice"
+      options: ["Restrictive CORS policy", "Standard CORS", "Permissive CORS", "No CORS policy", "Unknown"]
+      option_descriptions:
+        "Restrictive CORS policy": "CORS configured with specific allowed origins, methods, and headers - provides strong protection against cross-origin attacks."
+        "Standard CORS": "Moderate CORS policy that balances security with functionality - allows common cross-origin patterns with some restrictions."
+        "Permissive CORS": "Loose CORS policy allowing broad cross-origin access - convenient but increases security risk from unauthorized domains."
+        "No CORS policy": "CORS not configured or disabled - may block legitimate cross-origin requests or allow unrestricted access."
+        "Unknown": "CORS configuration is unclear or not documented."
+      help_text: "Proper CORS configuration prevents unauthorized cross-origin API access."
+      related_branch: "ApiSecurity"
+    - id: "api_gateway_implementation"
+      question: "Is an API gateway used?"
+      type: "single_choice"
+      options: ["Full-featured API gateway", "Basic gateway", "Reverse proxy", "No gateway", "Unknown"]
+      option_descriptions:
+        "Full-featured API gateway": "Complete API gateway with authentication, authorization, rate limiting, monitoring, and policy enforcement."
+        "Basic gateway": "Simple API gateway providing basic routing and load balancing with minimal security features."
+        "Reverse proxy": "Basic reverse proxy handling traffic routing but limited API-specific security features."
+        "No gateway": "Direct API access without centralized gateway protection - increases security management complexity."
+        "Unknown": "API gateway implementation is unclear or not documented."
+      help_text: "API gateways provide centralized security, monitoring, and management."
+      related_branch: "ApiSecurity"
+    - id: "api_data_sanitization"
+      question: "How is sensitive data sanitized in API responses?"
+      type: "single_choice"
+      options: ["Automatic PII redaction", "Field-level filtering", "Basic sanitization", "No sanitization", "Unknown"]
+      option_descriptions:
+        "Automatic PII redaction": "Automated detection and redaction of personally identifiable information in API responses."
+        "Field-level filtering": "Manual configuration to exclude or mask specific sensitive fields in API responses."
+        "Basic sanitization": "Simple data cleaning that removes obvious sensitive information but may miss complex cases."
+        "No sanitization": "No filtering of sensitive data in API responses - high risk of data exposure."
+        "Unknown": "Data sanitization approach is unclear or not documented."
+      help_text: "Data sanitization prevents sensitive information exposure through API responses."
+      related_branch: "DataClassification"
+    - id: "api_pagination_security"
+      question: "How is API pagination secured?"
+      type: "single_choice"
+      options: ["Secure pagination with limits", "Basic pagination", "No pagination limits", "No pagination", "Unknown"]
+      option_descriptions:
+        "Secure pagination with limits": "Pagination with maximum page size limits, resource consumption controls, and proper offset validation."
+        "Basic pagination": "Simple pagination implementation with basic page controls but limited security protections."
+        "No pagination limits": "Pagination without size limits - vulnerable to resource exhaustion attacks."
+        "No pagination": "No pagination support - may expose large datasets or cause performance issues."
+        "Unknown": "Pagination security implementation is unclear or not documented."
+      help_text: "Secure pagination prevents resource exhaustion and data exposure attacks."
+      related_branch: "ApiSecurity"
+    - id: "api_documentation_security"
+      question: "How is API documentation secured?"
+      type: "single_choice"
+      options: ["Authenticated access to docs", "Public but sanitized docs", "Public detailed docs", "No documentation", "Unknown"]
+      option_descriptions:
+        "Authenticated access to docs": "API documentation requires authentication and provides appropriate detail based on user permissions."
+        "Public but sanitized docs": "Publicly accessible documentation with sensitive implementation details removed."
+        "Public detailed docs": "Comprehensive public documentation including internal details - helpful but potential security risk."
+        "No documentation": "No API documentation available - hinders proper usage and security review."
+        "Unknown": "API documentation security approach is unclear or not documented."
+      help_text: "Secure API documentation prevents information disclosure while enabling proper usage."
+      related_branch: "ApiSecurity"
 
   advanced:
     - id: "api_gateway_implementation"
