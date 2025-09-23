@@ -192,24 +192,12 @@ questionnaires:
       related_branch: "ApiSecurity"
 
   advanced:
-    - id: "api_gateway_implementation"
-      question: "Is an API gateway used?"
-      type: "single_choice"
-      options: ["Full-featured API gateway", "Basic gateway", "Reverse proxy", "No gateway", "Unknown"]
-      help_text: "API gateways provide centralized security, monitoring, and management."
-      related_branch: "ApiSecurity"
     - id: "api_oauth_scopes"
       question: "How are OAuth scopes/permissions managed?"
       type: "single_choice"
       options: ["Fine-grained scopes", "Coarse-grained scopes", "Basic permissions", "No scope management", "Unknown"]
       help_text: "Proper scope management implements least privilege access for API consumers."
       related_branch: "Authorization"
-    - id: "api_cors_configuration"
-      question: "How is CORS configured?"
-      type: "single_choice"
-      options: ["Restrictive CORS policy", "Standard CORS", "Permissive CORS", "No CORS policy", "Unknown"]
-      help_text: "Proper CORS configuration prevents unauthorized cross-origin API access."
-      related_branch: "ApiSecurity"
     - id: "api_versioning_security"
       question: "How is API versioning handled from a security perspective?"
       type: "single_choice"
