@@ -463,7 +463,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Fix infinite re-render on Vulnerability Filter"
+    - "API Questionnaire and Vulnerability Analysis Field Alignment Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
