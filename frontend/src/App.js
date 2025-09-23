@@ -179,6 +179,9 @@ function AppContent() {
   const [isCanvasNodesCollapsed, setIsCanvasNodesCollapsed] = useState(false);
   const [isStrideCollapsed, setIsStrideCollapsed] = useState(true);
   const [isVulnerabilitiesCollapsed, setIsVulnerabilitiesCollapsed] = useState(true);
+  
+  // STRIDE Analysis count state
+  const [strideThreatsCount, setStrideThreatsCount] = useState(0);
   const [vulnerabilityFilter, setVulnerabilityFilter] = useState({
     severity: [],
     category: [],
