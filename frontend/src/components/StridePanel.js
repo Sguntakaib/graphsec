@@ -42,6 +42,13 @@ const StridePanel = ({ diagramId, onAnalyzeStride, onStrideDataUpdate }) => {
     }
   }, [diagramId]);
 
+  // Update parent component whenever threats count changes
+  useEffect(() => {
+    if (onStrideDataUpdate) {
+      onStrideDataUpdate(threats.length);
+    }
+  }, [threats, onStrideDataUpdate]);
+
   const loadStrideCoverage = async () => {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
