@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import { useQuestionnaireConfirmation } from '../contexts/QuestionnaireConfirmationContext';
 
 const SecurityQuestionnaire = ({ 
   nodeSubtype, 
