@@ -45,7 +45,7 @@ const StridePanel = ({ diagramId, onAnalyzeStride }) => {
   const loadStrideCoverage = async () => {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${backendUrl}/diagrams/${diagramId}/stride/coverage`);
+      const response = await fetch(`${backendUrl}/api/diagrams/${diagramId}/stride/coverage`);
       
       if (response.ok) {
         const coverageData = await response.json();
