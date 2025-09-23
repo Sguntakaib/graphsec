@@ -54,7 +54,7 @@ class StrideRuleEngine:
     def __init__(self):
         self.node_threat_rules = self._initialize_node_threat_rules()
         self.edge_threat_rules = self._initialize_edge_threat_rules()
-        
+    
     def _initialize_node_threat_rules(self) -> Dict[str, List[Dict[str, Any]]]:
         """Initialize threat rules for different node subtypes"""
         return {
@@ -242,15 +242,21 @@ class StrideRuleEngine:
         if not questionnaire_responses:
             questionnaire_responses = {}
         
-        # Get threat rules for this node subtype
-        rules = self.node_threat_rules.get(node_subtype, [])
+        # 1) Use explicit questionnaire-to-STRIDE mapping
+        try:
+            from .stride_mapping import map_responses_to_threats  # local import to avoid cycles
+            mapped = map_responses_to_threats(node_subtype, questionnaire_responses, node_id=node_id, diagram_id="")
+            threats.extend(mapped)
+        except Exception as e:
+            logger.warning(f"STRIDE mapping failed for node {node_id} of type {node_subtype}: {e}")
         
+        # 2) Apply heuristic rules as fallback/augmentation
+        rules = self.node_threat_rules.get(node_subtype, [])
         for rule in rules:
             try:
-                # Check if threat conditions are met
                 if rule["conditions"](questionnaire_responses):
                     threat = Threat(
-                        diagram_id="",  # Will be set by caller
+                        diagram_id="",  # set by caller later
                         element_type=ElementType.NODE,
                         element_id=node_id,
                         stride_category=rule["stride_category"],
@@ -258,7 +264,7 @@ class StrideRuleEngine:
                         description=rule["description"],
                         residual_risk=rule["residual_risk"],
                         mitigations=rule["mitigations"],
-                        references=rule["references"]
+                        references=rule["references"],
                     )
                     threats.append(threat)
             except Exception as e:
@@ -274,7 +280,6 @@ class StrideRuleEngine:
         
         for rule in self.edge_threat_rules:
             try:
-                # Check if threat conditions are met
                 if rule["conditions"](edge_data):
                     threat = Threat(
                         diagram_id="",  # Will be set by caller
@@ -303,15 +308,8 @@ class StrideThreatAnalyzer:
                                    questionnaire_data: Dict[str, Dict[str, Any]] = None) -> List[Threat]:
         """
         Analyze STRIDE threats for entire diagram
-        
-        Args:
-            diagram: Diagram data with nodes and edges
-            questionnaire_data: Dict mapping node_id -> questionnaire responses
-        
-        Returns:
-            List of identified threats
         """
-        threats = []
+        threats: List[Threat] = []
         diagram_id = diagram.get("id", "")
         nodes = diagram.get("nodes", [])
         edges = diagram.get("edges", [])
@@ -319,76 +317,63 @@ class StrideThreatAnalyzer:
         if not questionnaire_data:
             questionnaire_data = {}
         
-        # Analyze node threats
+        # Analyze node threats (mapping + heuristic rules)
         for node in nodes:
             node_id = node.get("id", "")
             node_responses = questionnaire_data.get(node_id, {})
-            
             node_threats = self.rule_engine.analyze_node_threats(node, node_responses)
             
-            # Set diagram_id for all threats
-            for threat in node_threats:
-                threat.diagram_id = diagram_id
-            
-            threats.extend(node_threats)
+            # Set diagram_id and de-duplicate (title + category + element)
+            seen = set()
+            for t in node_threats:
+                t.diagram_id = diagram_id
+                key = (t.element_id, t.stride_category.value, t.title)
+                if key in seen:
+                    continue
+                seen.add(key)
+                threats.append(t)
         
         # Analyze edge threats
         for edge in edges:
             edge_threats = self.rule_engine.analyze_edge_threats(edge)
-            
-            # Set diagram_id for all threats
-            for threat in edge_threats:
-                threat.diagram_id = diagram_id
-            
-            threats.extend(edge_threats)
+            for t in edge_threats:
+                t.diagram_id = diagram_id
+                threats.append(t)
         
         logger.info(f"STRIDE analysis complete: {len(threats)} threats identified for diagram {diagram_id}")
         return threats
     
     def calculate_coverage_summary(self, threats: List[Threat]) -> Dict[str, Any]:
         """Calculate STRIDE coverage summary from threat list"""
-        
-        # Initialize category counts
         category_counts = {category.value: 0 for category in StrideCategory}
         mitigated_counts = {category.value: 0 for category in StrideCategory}
-        
-        # Count threats by category and status
         total_risk = 0.0
         threat_count = 0
-        
-        by_node = {}
-        by_edge = {}
+        by_node: Dict[str, Any] = {}
+        by_edge: Dict[str, Any] = {}
         
         for threat in threats:
             category = threat.stride_category.value
             category_counts[category] += 1
-            
             if threat.status in [ThreatStatus.MITIGATED, ThreatStatus.PARTIAL]:
                 mitigated_counts[category] += 1
-            
             total_risk += threat.residual_risk
             threat_count += 1
             
-            # Group by element
             if threat.element_type == ElementType.NODE:
                 if threat.element_id not in by_node:
-                    by_node[threat.element_id] = {"totals": {cat.value: 0 for cat in StrideCategory}, 
-                                                 "mitigated": {cat.value: 0 for cat in StrideCategory}}
+                    by_node[threat.element_id] = {"totals": {cat.value: 0 for cat in StrideCategory}, "mitigated": {cat.value: 0 for cat in StrideCategory}}
                 by_node[threat.element_id]["totals"][category] += 1
                 if threat.status in [ThreatStatus.MITIGATED, ThreatStatus.PARTIAL]:
                     by_node[threat.element_id]["mitigated"][category] += 1
-            
             elif threat.element_type == ElementType.EDGE:
                 if threat.element_id not in by_edge:
-                    by_edge[threat.element_id] = {"totals": {cat.value: 0 for cat in StrideCategory}, 
-                                                 "mitigated": {cat.value: 0 for cat in StrideCategory}}
+                    by_edge[threat.element_id] = {"totals": {cat.value: 0 for cat in StrideCategory}, "mitigated": {cat.value: 0 for cat in StrideCategory}}
                 by_edge[threat.element_id]["totals"][category] += 1
                 if threat.status in [ThreatStatus.MITIGATED, ThreatStatus.PARTIAL]:
                     by_edge[threat.element_id]["mitigated"][category] += 1
         
-        # Calculate average residual risk
         residual_risk_avg = total_risk / max(threat_count, 1)
-        
         return {
             "totals": category_counts,
             "mitigated": mitigated_counts,
