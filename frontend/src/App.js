@@ -2082,14 +2082,11 @@ function AppContent() {
       if (responses.webapp_deployment_type !== undefined) {
         mapped.webapp_session_management = responses.webapp_deployment_type === 'Cloud' ? 'Secure session management' : 'Basic sessions';
       }
-      // Add default insecure values to trigger vulnerabilities for testing
-      mapped.webapp_data_encryption = mapped.webapp_data_encryption || 'No encryption';
-      mapped.webapp_https_enforcement = mapped.webapp_https_enforcement || 'HTTP only';
-      mapped.webapp_session_management = mapped.webapp_session_management || 'Basic sessions';
+      // P3: REMOVED default insecure injections - let backend handle Unknown values properly
     }
     
     if (nodeType === 'API') {
-      // Map API fields
+      // P4: Map API fields with correct keys for enhanced vulnerability rules
       if (responses.api_auth_method !== undefined) {
         const authMapping = {
           'None': 'No Authentication',
@@ -2105,36 +2102,93 @@ function AppContent() {
       if (responses.api_input_validation !== undefined) {
         mapped.api_input_validation = responses.api_input_validation === 'None' ? 'No validation' : 'Schema validation';
       }
-      // Add default insecure values
-      mapped.api_cors_policy = mapped.api_cors_policy || 'Permissive';
-      mapped.api_https_enforcement = mapped.api_https_enforcement || 'HTTP allowed';
+      
+      // P4: FIX KEY MISMATCH - Use correct field name expected by enhanced rules
+      if (responses.api_cors_configuration !== undefined) {
+        mapped.api_cors_configuration = responses.api_cors_configuration; // Fixed: was api_cors_policy
+      }
+      
+      // P1: Map conditional API fields collected by conditional questionnaires
+      if (responses.api_type !== undefined) {
+        mapped.api_type = responses.api_type; // Critical for enhanced rules
+      }
+      
+      // P1: Map protocol-specific fields for enhanced vulnerability analysis
+      const conditionalFields = [
+        'graphql_query_depth_limiting', 'graphql_introspection', 'graphql_batch_query_security',
+        'rest_bola_protection', 'rest_http_methods_security', 'rest_parameter_pollution',
+        'grpc_streaming_security', 'grpc_tls_config', 'grpc_auth_method',
+        'soap_xml_injection_prevention', 'soap_ws_security_implementation'
+      ];
+      
+      conditionalFields.forEach(field => {
+        if (responses[field] !== undefined) {
+          mapped[field] = responses[field];
+        }
+      });
+      
+      // P3: REMOVED default insecure injections - let backend rules handle Unknown values
     }
     
     if (nodeType === 'Database') {
-      // Map Database fields
+      // P4: Map Database fields with correct keys
       if (responses.db_encryption_at_rest !== undefined) {
         mapped.database_encryption_at_rest = responses.db_encryption_at_rest === 'None' ? 'No encryption' : 'Full encryption';
       }
+      if (responses.database_encryption_at_rest !== undefined) {
+        mapped.database_encryption_at_rest = responses.database_encryption_at_rest;
+      }
       if (responses.db_encryption_in_transit !== undefined) {
         mapped.database_encryption_in_transit = responses.db_encryption_in_transit ? 'TLS enabled' : 'No TLS';
+      }
+      if (responses.database_encryption_in_transit !== undefined) {
+        mapped.database_encryption_in_transit = responses.database_encryption_in_transit;
       }
       if (responses.db_access_control !== undefined) {
         mapped.database_access_control = Array.isArray(responses.db_access_control) ? 
           responses.db_access_control.join(',') : responses.db_access_control;
       }
-      // Add default insecure values
-      mapped.database_authentication = mapped.database_authentication || 'Weak passwords';
-      mapped.database_patch_management = mapped.database_patch_management || 'Manual updates';
+      
+      // P1: Map conditional Database fields collected by conditional questionnaires
+      if (responses.database_type !== undefined) {
+        mapped.database_type = responses.database_type; // Critical for enhanced rules
+      }
+      
+      // P1: Map engine-specific fields for enhanced vulnerability analysis
+      const conditionalFields = [
+        'postgresql_row_level_security', 'postgresql_connection_encryption',
+        'mongodb_authorization', 'mongodb_encryption_at_rest', 'mongodb_network_encryption',
+        'mysql_ssl_configuration', 'redis_authentication', 'elasticsearch_security_features'
+      ];
+      
+      conditionalFields.forEach(field => {
+        if (responses[field] !== undefined) {
+          mapped[field] = responses[field];
+        }
+      });
+      
+      // P3: REMOVED default insecure injections - let backend rules handle Unknown values
     }
     
-    // Copy any existing properly named fields
+    // Copy any existing properly named fields (preserve all prefixed fields)
     Object.keys(responses).forEach(key => {
-      if (key.startsWith('webapp_') || key.startsWith('api_') || key.startsWith('database_') || key.startsWith('backup_') || key.startsWith('monitoring_')) {
-        mapped[key] = responses[key];
+      if (key.startsWith('webapp_') || key.startsWith('api_') || key.startsWith('database_') || 
+          key.startsWith('backup_') || key.startsWith('monitoring_')) {
+        if (!mapped[key]) { // Don't overwrite already mapped fields
+          mapped[key] = responses[key];
+        }
       }
     });
     
-    console.log(`🔄 Mapped questionnaire responses for ${nodeType}:`, { original: responses, mapped });
+    console.log(`🔄 Enhanced mapping for ${nodeType}:`, { 
+      original: Object.keys(responses).length, 
+      mapped: Object.keys(mapped).length, 
+      conditionalFields: Object.keys(mapped).filter(k => 
+        k.includes('graphql_') || k.includes('rest_') || k.includes('grpc_') || 
+        k.includes('soap_') || k.includes('postgresql_') || k.includes('mongodb_')
+      ).length
+    });
+    
     return mapped;
   };
 
