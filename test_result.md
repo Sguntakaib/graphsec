@@ -458,6 +458,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "STRIDE API Prefix Fix in Frontend"
     - "Vulnerability Section UX Positioning Fix"
   stuck_tasks: []
   test_all: false
