@@ -147,12 +147,6 @@ questionnaires:
       related_branch: "DataClassification"
 
   advanced:
-    - id: "database_privilege_management"
-      question: "How are database privileges managed?"
-      type: "single_choice"
-      options: ["Dynamic privilege management", "Role-based privileges", "Static user privileges", "Excessive privileges", "Unknown"]
-      help_text: "Proper privilege management implements least privilege access principles."
-      related_branch: "AccessControl"
     - id: "database_column_level_encryption"
       question: "Is column-level encryption implemented for sensitive data?"
       type: "single_choice"
