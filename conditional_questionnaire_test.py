@@ -255,8 +255,8 @@ class ConditionalQuestionnaireTester:
             
             # Verify conditional questionnaire structure
             questions = data.get("questions", [])
-            has_conditional = data.get("has_conditional", False)
-            total_questions = data.get("total_questions", 0)
+            has_conditional = data.get("has_conditional_questions", False)
+            total_questions = data.get("question_count", 0)  # Use question_count as total_questions
             level = data.get("level", "")
             
             print(f"📊 Database Conditional Questionnaire Results:")
