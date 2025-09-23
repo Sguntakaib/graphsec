@@ -130,13 +130,6 @@ class StrideBackendTester:
                     "data": {
                         "criticality": "High",
                         "data_classification": "Confidential"
-                    },
-                    "questionnaire_responses": {
-                        "authentication_method": "basic",  # Weak auth to trigger threats
-                        "input_validation": "none",        # No validation to trigger threats
-                        "encryption_enabled": False,       # No encryption to trigger threats
-                        "rate_limiting": False,           # No rate limiting to trigger threats
-                        "authorization_model": "none"     # No authorization to trigger threats
                     }
                 },
                 {
@@ -148,11 +141,6 @@ class StrideBackendTester:
                     "data": {
                         "criticality": "High",
                         "data_classification": "Confidential"
-                    },
-                    "questionnaire_responses": {
-                        "authentication_method": "api_key_only",  # Weak auth to trigger threats
-                        "response_filtering": False,              # No filtering to trigger threats
-                        "rate_limiting": False                    # No rate limiting to trigger threats
                     }
                 },
                 {
@@ -164,12 +152,6 @@ class StrideBackendTester:
                     "data": {
                         "criticality": "Critical",
                         "data_classification": "Restricted"
-                    },
-                    "questionnaire_responses": {
-                        "authentication_method": "none",      # No auth to trigger threats
-                        "parameterized_queries": False,      # No parameterized queries to trigger SQL injection
-                        "encryption_at_rest": False,         # No encryption to trigger threats
-                        "audit_logging": False               # No logging to trigger threats
                     }
                 },
                 {
