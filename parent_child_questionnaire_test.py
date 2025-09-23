@@ -44,7 +44,7 @@ import sys
 import time
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://api-schema-sync.preview.emergentagent.com/api"
+BASE_URL = "https://questionnaire-sync.preview.emergentagent.com/api"
 
 class ParentChildQuestionnaireTester:
     def __init__(self):
