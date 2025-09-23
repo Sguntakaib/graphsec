@@ -233,7 +233,7 @@ class StrideRuleEngine:
             }
         ]
     
-    def analyze_node_threats(self, node: Dict[str, Any], questionnaire_responses: Dict[str, Any] = None) -> List[Threat]:
+    def analyze_node_threats(self, node: Dict[str, Any], questionnaire_responses: Dict[str, Any] = None, diagram_id: str = "") -> List[Threat]:
         """Analyze STRIDE threats for a single node"""
         threats = []
         node_subtype = node.get("subtype", "")
