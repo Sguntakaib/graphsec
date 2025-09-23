@@ -3816,10 +3816,12 @@ function AppContent() {
 function App() {
   return (
     <QuestionnaireProvider>
-      <ReactFlowProvider>
-        <AppContent />
-        <Toaster />
-      </ReactFlowProvider>
+      <QuestionnaireConfirmationProvider>
+        <ReactFlowProvider>
+          <AppContent />
+          <Toaster />
+        </ReactFlowProvider>
+      </QuestionnaireConfirmationProvider>
     </QuestionnaireProvider>
   );
 }
