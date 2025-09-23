@@ -3154,31 +3154,22 @@ function AppContent() {
               )}
             </div>
           </div>
-            
-            {/* Advanced Controls Toggle */}
-            <button
-              onClick={() => setShowAdvancedControls(!showAdvancedControls)}
-              className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm"
-              title="Advanced Controls"
-            >
-              <Settings className="h-4 w-4" />
-            </button>
-          </div>
         </div>
         
-        {/* Advanced Controls Bar */}
+        {/* Advanced Layout Controls - Simplified */}
         {showAdvancedControls && (
-          <div className="mt-3 pt-3 border-t border-gray-700 space-y-3">
-            {/* First Row - Layout & Navigation */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={handleAutoLayout}
-                disabled={isLoading || nodes.length === 0}
-                className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-              >
-                <Zap className="h-4 w-4" />
-                <span>Auto-Layout</span>
-              </button>
+          <div className="mt-3 pt-3 border-t border-gray-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleAutoLayout}
+                  disabled={isLoading || nodes.length === 0}
+                  className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                  title="Automatically arrange nodes"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>Auto-Layout</span>
+                </button>
               
               <button
                 onClick={handleFitAllNodes}
