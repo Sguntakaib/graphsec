@@ -39,7 +39,7 @@ import sys
 from datetime import datetime, timezone
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://threat-model-fix.preview.emergentagent.com/api"
+BASE_URL = "https://stride-metrics.preview.emergentagent.com/api"
 
 class QuestionnaireEndpointsTester:
     def __init__(self):
