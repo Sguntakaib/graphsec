@@ -888,7 +888,7 @@ class ConditionalQuestionnaireTester:
                 return False
             
             # Analyze vulnerabilities for PostgreSQL-specific issues
-            vulnerabilities = data.get("vulnerabilities", [])
+            vulnerabilities = data.get("vulnerability_nodes", [])
             overall_risk_score = data.get("overall_risk_score", 0)
             
             print(f"📊 PostgreSQL Vulnerability Analysis Results:")
