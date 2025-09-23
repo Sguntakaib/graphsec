@@ -55,7 +55,7 @@ const StridePanel = ({ diagramId, onAnalyzeStride }) => {
         if (coverageData.total_threats > 0) {
           setHasAnalysis(true);
           // Load the actual threats
-          const threatsResponse = await fetch(`${backendUrl}/api/diagrams/${diagramId}/stride/analyze`);
+          const threatsResponse = await fetch(`${backendUrl}/api/diagrams/${diagramId}/stride/threats`);
           if (threatsResponse.ok) {
             const threatsData = await threatsResponse.json();
             setThreats(threatsData.threats || []);
