@@ -3474,6 +3474,16 @@ function AppContent() {
                 </div>
               )}
 
+              {/* STRIDE Threat Analysis Panel - Phase 1 Implementation */}
+              <div className="border-b border-gray-700">
+                <StridePanel 
+                  diagramId={currentDiagram?.id}
+                  onAnalyzeStride={(result) => {
+                    console.log('STRIDE Analysis completed:', result);
+                  }}
+                />
+              </div>
+
               {/* Advanced Layout Controls */}
               <div className="p-4 border-b border-gray-700">
                 <AdvancedLayoutControls 
