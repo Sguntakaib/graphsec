@@ -609,18 +609,7 @@ class ConditionalQuestionnaireTester:
             print("🎯 P4 TEST: Field Mapping Fixes")
             print("=" * 80)
             
-            # Test API conditional questionnaire for correct field names
-            api_response = self.session.get(f"{self.base_url}/questionnaires/API/conditional?level=basic")
-            
-            if api_response.status_code != 200:
-                self.log_test("P4 Field Mapping Fixes", False, 
-                            f"Cannot get API conditional questionnaire: HTTP {api_response.status_code}")
-                return False
-            
-            api_data = api_response.json()
-            api_questions = api_data.get("questions", [])
-            
-            # Check for correct field names (P4 requirement)
+            # Test field mapping by triggering conditional questions
             field_mapping_checks = {
                 "api_cors_configuration": False,  # Should be this, not api_cors_policy
                 "graphql_introspection": False,
@@ -628,34 +617,97 @@ class ConditionalQuestionnaireTester:
                 "mongodb_authorization": False
             }
             
-            print(f"   Checking API field mappings...")
-            for question in api_questions:
-                question_id = question.get("id", "")
-                for field_name in field_mapping_checks.keys():
-                    if field_name in question_id:
-                        field_mapping_checks[field_name] = True
-                        print(f"     ✅ Found correct field: {field_name}")
+            print(f"   Testing field mappings through conditional triggers...")
             
-            # Test Database conditional questionnaire for engine-specific fields
-            db_response = self.session.get(f"{self.base_url}/questionnaires/Database/conditional?level=basic")
+            # Test GraphQL API conditional trigger for graphql_introspection
+            graphql_trigger_data = {
+                "question_id": "api_type",
+                "response": "GraphQL API"
+            }
             
-            if db_response.status_code == 200:
-                db_data = db_response.json()
-                db_questions = db_data.get("questions", [])
+            graphql_response = self.session.post(
+                f"{self.base_url}/questionnaires/API/conditional-trigger",
+                json=graphql_trigger_data
+            )
+            
+            if graphql_response.status_code == 200:
+                graphql_data = graphql_response.json()
+                graphql_questions = graphql_data.get("conditional_questions", [])
                 
-                print(f"   Checking Database field mappings...")
-                for question in db_questions:
+                for question in graphql_questions:
                     question_id = question.get("id", "")
-                    for field_name in field_mapping_checks.keys():
-                        if field_name in question_id:
-                            field_mapping_checks[field_name] = True
-                            print(f"     ✅ Found correct field: {field_name}")
+                    if "graphql_introspection" in question_id:
+                        field_mapping_checks["graphql_introspection"] = True
+                        print(f"     ✅ Found GraphQL field: graphql_introspection")
+            
+            # Test PostgreSQL Database conditional trigger for postgresql_row_level_security
+            postgresql_trigger_data = {
+                "question_id": "database_type",
+                "response": "PostgreSQL"
+            }
+            
+            postgresql_response = self.session.post(
+                f"{self.base_url}/questionnaires/Database/conditional-trigger",
+                json=postgresql_trigger_data
+            )
+            
+            if postgresql_response.status_code == 200:
+                postgresql_data = postgresql_response.json()
+                postgresql_questions = postgresql_data.get("conditional_questions", [])
+                
+                for question in postgresql_questions:
+                    question_id = question.get("id", "")
+                    if "postgresql_row_level_security" in question_id:
+                        field_mapping_checks["postgresql_row_level_security"] = True
+                        print(f"     ✅ Found PostgreSQL field: postgresql_row_level_security")
+            
+            # Test MongoDB Database conditional trigger for mongodb_authorization
+            mongodb_trigger_data = {
+                "question_id": "database_type",
+                "response": "MongoDB"
+            }
+            
+            mongodb_response = self.session.post(
+                f"{self.base_url}/questionnaires/Database/conditional-trigger",
+                json=mongodb_trigger_data
+            )
+            
+            if mongodb_response.status_code == 200:
+                mongodb_data = mongodb_response.json()
+                mongodb_questions = mongodb_data.get("conditional_questions", [])
+                
+                for question in mongodb_questions:
+                    question_id = question.get("id", "")
+                    if "mongodb_authorization" in question_id:
+                        field_mapping_checks["mongodb_authorization"] = True
+                        print(f"     ✅ Found MongoDB field: mongodb_authorization")
+            
+            # Check for api_cors_configuration in API base questionnaire
+            api_response = self.session.get(f"{self.base_url}/questionnaires/API/conditional?level=basic")
+            if api_response.status_code == 200:
+                api_data = api_response.json()
+                api_questions = api_data.get("questions", [])
+                
+                for question in api_questions:
+                    question_id = question.get("id", "")
+                    if "api_cors_configuration" in question_id:
+                        field_mapping_checks["api_cors_configuration"] = True
+                        print(f"     ✅ Found API field: api_cors_configuration")
             
             # Check for incorrect field names that should have been fixed
             incorrect_fields_found = []
             
-            # Check if old incorrect field names are still present
-            all_questions = api_questions + (db_data.get("questions", []) if 'db_data' in locals() else [])
+            # Check all conditional questions for old incorrect field names
+            all_questions = []
+            if 'api_questions' in locals():
+                all_questions.extend(api_questions)
+            if 'graphql_questions' in locals():
+                all_questions.extend(graphql_questions)
+            if 'postgresql_questions' in locals():
+                all_questions.extend(postgresql_questions)
+            if 'mongodb_questions' in locals():
+                all_questions.extend(mongodb_questions)
+            
             for question in all_questions:
                 question_id = question.get("id", "")
                 if "api_cors_policy" in question_id:  # This should be api_cors_configuration
