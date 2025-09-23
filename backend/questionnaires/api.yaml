@@ -13,6 +13,20 @@ required_branches:
 
 questionnaires:
   basic:
+    - id: "api_type"
+      question: "What type of API is this?"
+      type: "single_choice"
+      options: ["REST API", "GraphQL API", "gRPC API", "SOAP API", "WebSocket API", "Other", "Unknown"]
+      option_descriptions:
+        "REST API": "RESTful API using HTTP methods (GET, POST, PUT, DELETE) with JSON/XML data exchange - most common API type."
+        "GraphQL API": "Query language API allowing clients to request specific data fields and relationships in a single request."
+        "gRPC API": "High-performance RPC framework using Protocol Buffers for efficient binary communication."
+        "SOAP API": "XML-based web service protocol with strict message structure and built-in error handling."
+        "WebSocket API": "Real-time bidirectional communication protocol for live data streaming and interactive applications."
+        "Other": "Custom or hybrid API implementation that doesn't fit standard categories."
+        "Unknown": "API type is unclear or not documented."
+      help_text: "API type determines appropriate security controls and vulnerability patterns."
+      related_branch: "ApiSecurity"
     - id: "api_authentication_method"
       question: "What authentication method does the API use?"
       type: "single_choice"
