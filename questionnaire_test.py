@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://archsecflow.preview.emergentagent.com/api"
+BASE_URL = "https://phased-builder.preview.emergentagent.com/api"
 
 class QuestionnaireAPITester:
     def __init__(self):
