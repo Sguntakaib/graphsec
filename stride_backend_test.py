@@ -33,7 +33,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://phased-builder.preview.emergentagent.com/api"
+BASE_URL = "https://stride-analyzer.preview.emergentagent.com/api"
 
 class StrideBackendTester:
     def __init__(self):
