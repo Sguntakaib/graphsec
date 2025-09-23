@@ -6780,6 +6780,184 @@ async def optimize_diagram_layout(diagram_id: str):
 
 # Duplicate ProductDesignSecurity route removed - now positioned before generic route
 
+# =============================================================================
+# STRIDE THREAT ANALYSIS API - Phase 1 Implementation
+# =============================================================================
+
+from stride_engine import stride_analyzer, Threat, StrideCategory, ThreatStatus, ElementType
+
+@api_router.post("/diagrams/{diagram_id}/stride/analyze")
+async def analyze_stride_threats(diagram_id: str, include_edges: bool = True):
+    """
+    Analyze STRIDE threats for a diagram
+    
+    Phase 1 implementation as per roadmap.txt
+    Returns threats grouped by STRIDE categories with mitigation suggestions
+    """
+    try:
+        # Get diagram
+        diagram = await db.diagrams.find_one({"id": diagram_id})
+        if not diagram:
+            raise HTTPException(status_code=404, detail="Diagram not found")
+        
+        # Get questionnaire responses for nodes in this diagram
+        questionnaire_data = {}
+        nodes = diagram.get("nodes", [])
+        
+        for node in nodes:
+            node_id = node.get("id", "")
+            
+            # Try to find questionnaire responses for this node
+            # Check multiple possible locations for questionnaire data
+            node_responses = await db.diagrams.find_one({
+                "id": diagram_id,
+                "nodes": {"$elemMatch": {"id": node_id, "questionnaire_responses": {"$exists": True}}}
+            })
+            
+            if node_responses:
+                # Find the specific node with responses
+                for diagram_node in node_responses.get("nodes", []):
+                    if diagram_node.get("id") == node_id:
+                        questionnaire_data[node_id] = diagram_node.get("questionnaire_responses", {})
+                        break
+        
+        # Perform STRIDE analysis
+        threats = await stride_analyzer.analyze_diagram_threats(diagram, questionnaire_data)
+        
+        # Convert threats to dict format for API response
+        formatted_threats = []
+        for threat in threats:
+            formatted_threats.append({
+                "id": threat.id,
+                "element_type": threat.element_type.value,
+                "element_id": threat.element_id,
+                "stride_category": threat.stride_category.value,
+                "title": threat.title,
+                "description": threat.description,
+                "references": threat.references,
+                "mitigations": threat.mitigations,
+                "status": threat.status.value,
+                "residual_risk": threat.residual_risk,
+                "created_at": threat.created_at.isoformat()
+            })
+        
+        # Store threats in database for persistence
+        if formatted_threats:
+            # Remove existing threats for this diagram
+            await db.stride_threats.delete_many({"diagram_id": diagram_id})
+            
+            # Insert new threats
+            for threat_data in formatted_threats:
+                threat_data["diagram_id"] = diagram_id
+            await db.stride_threats.insert_many(formatted_threats)
+        
+        logger.info(f"STRIDE analysis completed for diagram {diagram_id}: {len(formatted_threats)} threats")
+        
+        return {
+            "threats": formatted_threats,
+            "analysis_summary": {
+                "total_threats": len(formatted_threats),
+                "threats_by_category": {
+                    category.value: len([t for t in formatted_threats if t["stride_category"] == category.value])
+                    for category in StrideCategory
+                },
+                "analysis_timestamp": datetime.now(timezone.utc).isoformat(),
+                "diagram_id": diagram_id
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"STRIDE analysis error for diagram {diagram_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"STRIDE analysis failed: {str(e)}")
+
+@api_router.get("/diagrams/{diagram_id}/stride/coverage")
+async def get_stride_coverage(diagram_id: str):
+    """
+    Get STRIDE coverage summary for a diagram
+    
+    Returns threat counts by category, mitigation status, and risk metrics
+    """
+    try:
+        # Get stored threats for this diagram
+        stored_threats = await db.stride_threats.find({"diagram_id": diagram_id}).to_list(1000)
+        
+        if not stored_threats:
+            return {
+                "totals": {category.value: 0 for category in StrideCategory},
+                "mitigated": {category.value: 0 for category in StrideCategory},
+                "residual_risk_avg": 0.0,
+                "by_node": {},
+                "by_edge": {},
+                "total_threats": 0,
+                "mitigation_percentage": 0.0,
+                "last_analysis": None
+            }
+        
+        # Convert to Threat objects for analysis
+        threats = []
+        for threat_data in stored_threats:
+            threat = Threat(
+                id=threat_data["id"],
+                diagram_id=threat_data["diagram_id"],
+                element_type=ElementType(threat_data["element_type"]),
+                element_id=threat_data["element_id"],
+                stride_category=StrideCategory(threat_data["stride_category"]),
+                title=threat_data["title"],
+                description=threat_data["description"],
+                references=threat_data.get("references", {}),
+                mitigations=threat_data.get("mitigations", []),
+                status=ThreatStatus(threat_data.get("status", "open")),
+                residual_risk=threat_data.get("residual_risk", 0.0),
+                created_at=datetime.fromisoformat(threat_data["created_at"])
+            )
+            threats.append(threat)
+        
+        # Calculate coverage summary
+        coverage = stride_analyzer.calculate_coverage_summary(threats)
+        
+        # Add last analysis timestamp
+        latest_threat = max(stored_threats, key=lambda t: t["created_at"])
+        coverage["last_analysis"] = latest_threat["created_at"]
+        
+        return coverage
+        
+    except Exception as e:
+        logger.error(f"STRIDE coverage error for diagram {diagram_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Coverage calculation failed: {str(e)}")
+
+@api_router.patch("/diagrams/{diagram_id}/stride/threats/{threat_id}")
+async def update_threat_status(diagram_id: str, threat_id: str, status: str, mitigations: List[str] = None):
+    """
+    Update threat status and mitigations
+    
+    Allows marking threats as mitigated, partial, or open
+    """
+    try:
+        # Validate status
+        if status not in [s.value for s in ThreatStatus]:
+            raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
+        
+        # Update threat in database
+        update_data = {"status": status}
+        if mitigations:
+            update_data["mitigations"] = mitigations
+        
+        result = await db.stride_threats.update_one(
+            {"id": threat_id, "diagram_id": diagram_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Threat not found")
+        
+        return {"message": f"Threat {threat_id} updated successfully", "status": status}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Threat update error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Threat update failed: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
