@@ -252,12 +252,6 @@ questionnaires:
       options: ["Comprehensive upload validation", "File type validation", "Size limits only", "No file upload security", "Unknown"]
       help_text: "Secure file uploads prevent malicious file attacks through API endpoints."
       related_branch: "InputValidation"
-    - id: "api_pagination_security"
-      question: "How is API pagination secured?"
-      type: "single_choice"
-      options: ["Secure pagination with limits", "Basic pagination", "No pagination limits", "No pagination", "Unknown"]
-      help_text: "Secure pagination prevents resource exhaustion and data exposure attacks."
-      related_branch: "ApiSecurity"
     - id: "api_testing_automation"
       question: "What automated API security testing is performed?"
       type: "single_choice"
