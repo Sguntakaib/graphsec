@@ -3432,62 +3432,105 @@ function AppContent() {
         <div className="w-80 bg-gray-800 border-l border-gray-700 overflow-y-auto">
           {viewMode === 'modeling' && (
             <>
-              {/* Node Information Panel - Always show with nodes list */}
+              {/* Node Information Panel - Collapsible */}
               <div className="border-b border-gray-700">
-                <NodeInfoPanel 
-                  nodes={nodes}
-                  selectedNode={selectedNode}
-                  onEditQuestionnaire={handleEditQuestionnaireFromInfo}
-                />
-              </div>
-
-              {/* Vulnerability Management Section */}
-              {allVulnerabilities.length > 0 && showVulnerabilityList && (
-                <div className="border-b border-gray-700 bg-gray-800">
-                  <div className="p-2 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600 flex items-center justify-between">
+                <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600">
+                  <button
+                    onClick={() => setIsCanvasNodesCollapsed(!isCanvasNodesCollapsed)}
+                    className="w-full flex items-center justify-between text-white hover:bg-gray-700 rounded p-2 transition-colors"
+                  >
                     <div className="flex items-center space-x-2">
-                      <Shield className="h-3 w-3 text-purple-400" />
-                      <h4 className="font-medium text-white text-xs">Vulnerability Management</h4>
-                      <Badge variant="secondary" className="bg-purple-900 text-purple-300 text-xs h-4 px-1">
-                        {allVulnerabilities.length}
+                      <Layers className="h-4 w-4 text-blue-400" />
+                      <h3 className="font-medium text-sm">Canvas Nodes</h3>
+                      <Badge variant="secondary" className="bg-blue-900 text-blue-300 text-xs h-5 px-2">
+                        {nodes.length}
                       </Badge>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowVulnerabilityList(false)}
-                      className="text-gray-400 hover:text-white h-5 w-5 p-0"
+                    {isCanvasNodesCollapsed ? (
+                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <ChevronUp className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                {!isCanvasNodesCollapsed && (
+                  <NodeInfoPanel 
+                    nodes={nodes}
+                    selectedNode={selectedNode}
+                    onEditQuestionnaire={handleEditQuestionnaireFromInfo}
+                  />
+                )}
+              </div>
+
+              {/* STRIDE Threat Analysis Panel - Collapsible */}
+              <div className="border-b border-gray-700">
+                <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600">
+                  <button
+                    onClick={() => setIsStrideCollapsed(!isStrideCollapsed)}
+                    className="w-full flex items-center justify-between text-white hover:bg-gray-700 rounded p-2 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Shield className="h-4 w-4 text-green-400" />
+                      <h3 className="font-medium text-sm">STRIDE Analysis</h3>
+                    </div>
+                    {isStrideCollapsed ? (
+                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <ChevronUp className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                {!isStrideCollapsed && (
+                  <StridePanel 
+                    diagramId={currentDiagram?.id}
+                    onAnalyzeStride={(result) => {
+                      console.log('STRIDE Analysis completed:', result);
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Vulnerability Management Section - Collapsible in Right Sidebar */}
+              {allVulnerabilities.length > 0 && (
+                <div className="border-b border-gray-700">
+                  <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600">
+                    <button
+                      onClick={() => setIsVulnerabilitiesCollapsed(!isVulnerabilitiesCollapsed)}
+                      className="w-full flex items-center justify-between text-white hover:bg-gray-700 rounded p-2 transition-colors"
                     >
-                      <X className="h-3 w-3" />
-                    </Button>
+                      <div className="flex items-center space-x-2">
+                        <AlertTriangle className="h-4 w-4 text-red-400" />
+                        <h3 className="font-medium text-sm">Vulnerabilities</h3>
+                        <Badge variant="secondary" className="bg-red-900 text-red-300 text-xs h-5 px-2">
+                          {allVulnerabilities.length}
+                        </Badge>
+                      </div>
+                      {isVulnerabilitiesCollapsed ? (
+                        <ChevronDown className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <ChevronUp className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
                   </div>
-                  <div className="max-h-60 overflow-y-auto">
-                    <VulnerabilityList
-                      vulnerabilities={allVulnerabilities}
-                      nodes={nodes}
-                      onVulnerabilityClick={(vulnerability) => {
-                        setSelectedVulnerability(vulnerability);
-                        setShowVulnerabilityPanel(true);
-                      }}
-                      onCreateFindings={(selectedVulns) => {
-                        setFilteredVulnerabilities(selectedVulns);
-                        setShowVulnerabilityReport(true);
-                      }}
-                      className="p-0"
-                    />
-                  </div>
+                  {!isVulnerabilitiesCollapsed && (
+                    <div className="max-h-64 overflow-y-auto">
+                      <VulnerabilityList
+                        vulnerabilities={allVulnerabilities}
+                        nodes={nodes}
+                        onVulnerabilityClick={(vulnerability) => {
+                          setSelectedVulnerability(vulnerability);
+                          setShowVulnerabilityPanel(true);
+                        }}
+                        onCreateFindings={(selectedVulns) => {
+                          setFilteredVulnerabilities(selectedVulns);
+                          setShowVulnerabilityReport(true);
+                        }}
+                        className="p-0"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
-
-              {/* STRIDE Threat Analysis Panel - Phase 1 Implementation */}
-              <div className="border-b border-gray-700">
-                <StridePanel 
-                  diagramId={currentDiagram?.id}
-                  onAnalyzeStride={(result) => {
-                    console.log('STRIDE Analysis completed:', result);
-                  }}
-                />
-              </div>
 
               {/* Advanced Layout Controls */}
               <div className="p-4 border-b border-gray-700">
