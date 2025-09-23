@@ -62,7 +62,12 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
       const nodeSubtype = activeNode.data.subtype;
       
       if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
-        questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`);
+        // P2: Use conditional endpoints for API/Database for consistent completeness
+        if (nodeSubtype === 'API' || nodeSubtype === 'Database') {
+          questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}/conditional?level=basic`);
+        } else {
+          questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`);
+        }
       } else {
         questionsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`);
       }
