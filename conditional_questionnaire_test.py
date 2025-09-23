@@ -297,9 +297,15 @@ class ConditionalQuestionnaireTester:
                     print(f"     - {field}")
             
             # Verify required conditional elements
-            if not has_conditional:
+            conditional_info = data.get("conditional_info", {})
+            supports_conditional = conditional_info.get("supports_conditional", False)
+            
+            print(f"   Supports Conditional: {supports_conditional}")
+            print(f"   Conditional Triggers: {conditional_info.get('conditional_triggers', [])}")
+            
+            if not supports_conditional:
                 self.log_test("P1 Database Conditional Questionnaire", False, 
-                            "has_conditional flag is False - Database should have conditional questions")
+                            "supports_conditional flag is False - Database should support conditional questions")
                 return False
             
             if not database_type_found:
