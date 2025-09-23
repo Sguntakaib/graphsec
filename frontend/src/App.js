@@ -40,6 +40,7 @@ import VulnerabilityReport from './components/VulnerabilityReport';
 import AdvancedLayoutControls from './components/AdvancedLayoutControls';
 import DraggableEdge from './components/DraggableEdge';
 import { Toaster } from './components/ui/toaster';
+import { Badge } from './components/ui/badge';
 import { useNotification } from './hooks/useNotification';
 import { getDiagrams, createDiagram, updateDiagram, simulateAttackPaths, autoLayoutDiagram, applyTemplateToCurrentDiagram } from './services/api';
 import { analyzeNodeVulnerabilities, getNodeVulnerabilities, createVulnerabilityNodes, createVulnerabilityEdges } from './services/vulnerabilityApi';
