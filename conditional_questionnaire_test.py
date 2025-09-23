@@ -409,10 +409,8 @@ class ConditionalQuestionnaireTester:
                 
                 # Test POST /api/questionnaires/Database/conditional-trigger
                 trigger_data = {
-                    "responses": {
-                        "database_type": database_type
-                    },
-                    "level": "basic"
+                    "question_id": "database_type",
+                    "response": database_type
                 }
                 
                 response = self.session.post(
