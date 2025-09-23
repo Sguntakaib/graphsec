@@ -442,6 +442,23 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Applied memoization to break render loop: 1) Memoized allVulnerabilities in App.js with useMemo([vulnerabilityAnalyses]) 2) Memoized filteredVulnerabilities in VulnerabilityFilter.js with useMemo([vulnerabilities, filters]) 3) Kept onFilterChange in useEffect but dependencies now stable, preventing continuous setNodes->re-render->effect loop."
+  - task: "Database Vulnerability Analysis Filtering Fix"
+    implemented: true
+    working: true
+    file: "backend/vulnerability_engine.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reports Database vulnerability analysis flagging vulnerabilities for questions that were never shown to users. Specifically, vulnerabilities were appearing for advanced/expert level questions like 'database_change_management', 'database_stored_procedure_security', 'database_user_activity_monitoring', and 'database_backup_encryption' even when users selected all best practices in the basic questionnaire."
+      - working: true
+        agent: "main"
+        comment: "🔧 DATABASE VULNERABILITY FILTERING FIX IMPLEMENTED: Successfully resolved issue where Database vulnerability analysis was checking questions from ALL questionnaire levels (basic/advanced/expert) instead of only the active questionnaire system. PROBLEM: Users were shown basic level questions from YAML questionnaire system (/api/questionnaires/Database) but vulnerability analysis was checking for advanced/expert questions that were never presented, causing false positives for 'Not answered' responses. SOLUTION: 1) ✅ Modified _get_applicable_rules() to filter vulnerability rules based on questions actually presented to users 2) ✅ Enhanced rule evaluation to only check questions from active questionnaire responses 3) ✅ Added defensive logic to prevent triggers on missing responses for questions not shown to users 4) ✅ Improved logging to track which rules are included/excluded based on questionnaire filtering. VERIFICATION: Database with optimal security selections now shows 0 vulnerabilities (previously showed 4 false positives), vulnerability analysis properly scoped to basic level questions only, no false positives from advanced questions like database_change_management, database_stored_procedure_security, database_user_activity_monitoring, database_backup_encryption."
+      - working: true
+        agent: "testing"
+        comment: "✅ DATABASE VULNERABILITY FILTERING FIX VERIFICATION COMPLETED: Comprehensive testing confirms the fix is working perfectly. DETAILED RESULTS: 1) ✅ Health Check: API healthy and responding correctly 2) ✅ Database Node Creation: Successfully created Database node with optimal security configuration 3) ✅ Basic Questionnaire Verification: Confirmed only 12 basic level questions shown to users, 0 advanced questions 4) ✅ Optimal Security Configuration: 0 vulnerabilities, 0.0 risk score with best security practices 5) ✅ Poor Security Control Test: 10 vulnerabilities, 8.15 risk score with poor security (appropriate detection) 6) ✅ Advanced Questions Correctly Filtered: 0 vulnerabilities triggered by advanced questions not shown to users. CRITICAL SUCCESS: Database vulnerability analysis fix verified - users will no longer see vulnerabilities for questions they were never asked. The system now properly differentiates between basic, advanced, and expert questionnaire levels and only analyzes questions actually presented to users."
 
   - task: "Vulnerability Section UX Positioning Fix"
     implemented: true
