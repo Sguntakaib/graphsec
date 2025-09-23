@@ -27,8 +27,8 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://fe-be-deploy.preview.emergentagent.com/api"
-BASE_URL_NO_API = "https://fe-be-deploy.preview.emergentagent.com"
+BASE_URL = "https://rule-alignment.preview.emergentagent.com/api"
+BASE_URL_NO_API = "https://rule-alignment.preview.emergentagent.com"
 
 class StrideFrontendFixTester:
     def __init__(self):
