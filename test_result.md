@@ -338,6 +338,18 @@ backend:
         agent: "testing"
         comment: "✅ CRITICAL ISSUE RESOLVED: Questionnaire save endpoints working correctly without 500 errors. GET /api/diagrams successfully retrieves existing diagrams. POST /api/diagrams/{diagram_id}/nodes/{node_id}/questionnaire successfully saves questionnaire responses with HTTP 200 response. Test included comprehensive API node questionnaire data (api_type, authentication_method, encryption_enabled, input_validation, rate_limiting, logging_enabled) and business context (criticality, data_classification, compliance_requirements). No HTTP 500 internal server errors encountered. Endpoint properly processes and saves questionnaire data."
 
+  - task: "Database Vulnerability Analysis Filtering Fix"
+    implemented: true
+    working: true
+    file: "backend/vulnerability_rules.py, backend/questionnaire_analyzer.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DATABASE VULNERABILITY FILTERING FIX VERIFICATION COMPLETED: Comprehensive testing confirms the Database vulnerability analysis fix is working correctly. PROBLEM RESOLVED: Database vulnerability analysis was incorrectly flagging vulnerabilities for advanced questions like database_change_management, database_stored_procedure_security, database_user_activity_monitoring, and database_backup_encryption that are NEVER shown to users (advanced/expert level only). TESTING RESULTS: 6/6 tests passed (100% success rate). DETAILED VERIFICATION: 1) ✅ Basic Questionnaire Level Confirmed: Database questionnaire correctly returns only 12 basic level questions, with 0 advanced questions present in user-facing questionnaire 2) ✅ Optimal Security Configuration: Database with all best security practices (Strong MFA, TDE encryption, SSL/TLS enforced, automated encrypted backups, etc.) results in 0 vulnerabilities and 0.0 risk score 3) ✅ No Advanced Question Triggers: Zero vulnerabilities triggered by advanced questions not shown to users - filtering is working correctly 4) ✅ Poor Security Control Test: Database with poor security generates 10 appropriate vulnerabilities (8.15 risk score) but still 0 advanced question triggers 5) ✅ Questionnaire Level Filtering: Vulnerability analysis properly respects active questionnaire system (basic level only) 6) ✅ Advanced Question Absence Verified: Confirmed database_change_management, database_stored_procedure_security, database_user_activity_monitoring, database_backup_encryption are correctly absent from basic questionnaire. CRITICAL SUCCESS: Vulnerability analysis now only checks questions that were actually presented to users, eliminating false positives from advanced/expert questions users never see. The filtering fix ensures vulnerability rules are properly scoped to the active questionnaire level."
+
 frontend:
   - task: "Enhanced Canvas Node Detection System for WebApp Nodes"
     implemented: true
