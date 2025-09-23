@@ -82,7 +82,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.INFORMATION_DISCLOSURE,
                     "title": "Sensitive Data Exposure",
                     "description": "Insufficient encryption may lead to data exposure",
-                    "conditions": lambda responses: not responses.get("encryption_enabled", False),
+                    "conditions": lambda responses: responses.get("webapp_data_encryption") in ["No encryption", "Basic encryption"] if "webapp_data_encryption" in responses else not responses.get("encryption_enabled", True),
                     "residual_risk": 6.5,
                     "mitigations": ["Enable HTTPS/TLS", "Encrypt sensitive data"],
                     "references": {"owasp": ["A02:2021"], "mitre": ["T1041"]}
@@ -91,7 +91,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.DENIAL_OF_SERVICE,
                     "title": "Resource Exhaustion",
                     "description": "Missing rate limiting may allow DoS attacks",
-                    "conditions": lambda responses: not responses.get("rate_limiting", False),
+                    "conditions": lambda responses: responses.get("api_rate_limiting") in ["No rate limiting", "Basic rate limiting"] if "api_rate_limiting" in responses else (not responses.get("rate_limiting", True) and responses.get("node_subtype") == "API"),
                     "residual_risk": 5.5,
                     "mitigations": ["Implement rate limiting", "Resource monitoring"],
                     "references": {"owasp": ["A06:2021"], "mitre": ["T1499"]}
