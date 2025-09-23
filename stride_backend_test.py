@@ -182,7 +182,7 @@ class StrideBackendTester:
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
             
-            update_response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", json=diagram_data)
+            update_response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", json=updated_diagram)
             
             if update_response.status_code != 200:
                 self.log_test("Create Test Diagram with Security Nodes", False, 
