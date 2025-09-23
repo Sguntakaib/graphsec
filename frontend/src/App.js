@@ -174,6 +174,11 @@ function AppContent() {
   const [showVulnerabilityLegend, setShowVulnerabilityLegend] = useState(false);
   const [showVulnerabilityReport, setShowVulnerabilityReport] = useState(false);
   const [showVulnerabilityList, setShowVulnerabilityList] = useState(false); // Phase 2: Enhanced vulnerability list
+  
+  // Collapsible sections state
+  const [isCanvasNodesCollapsed, setIsCanvasNodesCollapsed] = useState(false);
+  const [isStrideCollapsed, setIsStrideCollapsed] = useState(true);
+  const [isVulnerabilitiesCollapsed, setIsVulnerabilitiesCollapsed] = useState(true);
   const [vulnerabilityFilter, setVulnerabilityFilter] = useState({
     severity: [],
     category: [],
