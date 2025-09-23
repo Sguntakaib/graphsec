@@ -245,7 +245,7 @@ class StrideRuleEngine:
         # 1) Use explicit questionnaire-to-STRIDE mapping
         try:
             from stride_mapping import map_responses_to_threats  # local import to avoid cycles
-            mapped = map_responses_to_threats(node_subtype, questionnaire_responses, node_id=node_id, diagram_id="", node_meta=node)
+            mapped = map_responses_to_threats(node_subtype, questionnaire_responses, node_id=node_id, diagram_id=diagram_id, node_meta=node)
             threats.extend(mapped)
         except Exception as e:
             logger.warning(f"STRIDE mapping failed for node {node_id} of type {node_subtype}: {e}")
