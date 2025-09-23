@@ -32,7 +32,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://rule-alignment.preview.emergentagent.com/api"
+BASE_URL = "https://api-schema-sync.preview.emergentagent.com/api"
 
 class CompletionCalculationTester:
     def __init__(self):

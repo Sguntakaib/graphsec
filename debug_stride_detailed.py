@@ -8,7 +8,7 @@ import json
 import uuid
 import time
 
-BASE_URL = "https://rule-alignment.preview.emergentagent.com/api"
+BASE_URL = "https://api-schema-sync.preview.emergentagent.com/api"
 
 def detailed_stride_debug():
     session = requests.Session()

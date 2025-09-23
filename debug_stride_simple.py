@@ -6,7 +6,7 @@ Simple STRIDE debug - test without updating diagram
 import requests
 import json
 
-BASE_URL = "https://rule-alignment.preview.emergentagent.com/api"
+BASE_URL = "https://api-schema-sync.preview.emergentagent.com/api"
 
 def simple_stride_debug():
     session = requests.Session()
