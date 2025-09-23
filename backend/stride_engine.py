@@ -64,7 +64,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.SPOOFING,
                     "title": "Authentication Bypass",
                     "description": "Web application may be vulnerable to authentication bypass attacks",
-                    "conditions": lambda responses: responses.get("authentication_method") in ["none", "basic"],
+                    "conditions": lambda responses: responses.get("webapp_authentication_method") in ["No Authentication", "Username/Password only"],
                     "residual_risk": 7.5,
                     "mitigations": ["Implement MFA", "Strong authentication protocols"],
                     "references": {"owasp": ["A07:2021"], "mitre": ["T1078"]}
@@ -73,7 +73,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.TAMPERING,
                     "title": "Data Integrity Compromise",
                     "description": "Lack of input validation may allow data tampering",
-                    "conditions": lambda responses: responses.get("input_validation") == "none",
+                    "conditions": lambda responses: responses.get("webapp_input_validation") in ["No validation", "Client-side only"],
                     "residual_risk": 8.0,
                     "mitigations": ["Implement server-side validation", "Use integrity checks"],
                     "references": {"owasp": ["A03:2021"], "mitre": ["T1565"]}
@@ -82,7 +82,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.INFORMATION_DISCLOSURE,
                     "title": "Sensitive Data Exposure",
                     "description": "Insufficient encryption may lead to data exposure",
-                    "conditions": lambda responses: responses.get("webapp_data_encryption") in ["No encryption", "Basic encryption"] if "webapp_data_encryption" in responses else not responses.get("encryption_enabled", True),
+                    "conditions": lambda responses: responses.get("webapp_https_enforcement") in ["HTTP only", "Mixed HTTP/HTTPS"],
                     "residual_risk": 6.5,
                     "mitigations": ["Enable HTTPS/TLS", "Encrypt sensitive data"],
                     "references": {"owasp": ["A02:2021"], "mitre": ["T1041"]}
@@ -91,7 +91,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.DENIAL_OF_SERVICE,
                     "title": "Resource Exhaustion",
                     "description": "Missing rate limiting may allow DoS attacks",
-                    "conditions": lambda responses: responses.get("api_rate_limiting") in ["No rate limiting", "Basic rate limiting"] if "api_rate_limiting" in responses else (not responses.get("rate_limiting", True) and responses.get("node_subtype") == "API"),
+                    "conditions": lambda responses: responses.get("webapp_rate_limiting") in ["No rate limiting", "Basic throttling"],
                     "residual_risk": 5.5,
                     "mitigations": ["Implement rate limiting", "Resource monitoring"],
                     "references": {"owasp": ["A06:2021"], "mitre": ["T1499"]}
@@ -100,7 +100,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.ELEVATION_OF_PRIVILEGE,
                     "title": "Authorization Flaws",
                     "description": "Weak authorization controls may allow privilege escalation",
-                    "conditions": lambda responses: responses.get("authorization_model") in ["none", "basic"],
+                    "conditions": lambda responses: responses.get("webapp_authorization_model") in ["No authorization", "Simple permissions"],
                     "residual_risk": 7.0,
                     "mitigations": ["Implement RBAC", "Least privilege principle"],
                     "references": {"owasp": ["A01:2021"], "mitre": ["T1068"]}
