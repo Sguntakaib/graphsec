@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Shield, CheckCircle, AlertCircle, Info, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useQuestionnaireConfirmation } from '../contexts/QuestionnaireConfirmationContext';
 
 const EnhancedSecurityQuestionnaire = ({ 
   nodeId, 
