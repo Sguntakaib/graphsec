@@ -6870,6 +6870,9 @@ async def analyze_stride_threats(diagram_id: str, include_edges: bool = True):
             }
         }
         
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 404) without modification
+        raise
     except Exception as e:
         logger.error(f"STRIDE analysis error for diagram {diagram_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"STRIDE analysis failed: {str(e)}")
