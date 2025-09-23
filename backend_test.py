@@ -439,8 +439,24 @@ class VulnerabilityBackendTester:
                 
                 print(f"   Created test node for vulnerability analysis: {self.test_node_id}")
             
-            # Test vulnerability analysis for the API node
-            response = self.session.post(f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}")
+            # Test vulnerability analysis for the test node
+            vulnerability_request = {
+                "node_id": self.test_node_id,
+                "node_type": "WebApp",
+                "questionnaire_responses": {
+                    "webapp_authentication": "oauth2",
+                    "webapp_encryption": True,
+                    "webapp_input_validation": "comprehensive",
+                    "webapp_session_management": "secure",
+                    "webapp_error_handling": "secure"
+                },
+                "node_position": {"x": 200, "y": 200}
+            }
+            
+            response = self.session.post(
+                f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}",
+                json=vulnerability_request
+            )
             
             print(f"📋 Vulnerability Analysis Response Status: HTTP {response.status_code}")
             
