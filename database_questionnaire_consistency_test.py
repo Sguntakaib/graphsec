@@ -27,7 +27,7 @@ import time
 from datetime import datetime
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://menu-builder-11.preview.emergentagent.com/api"
+BASE_URL = "https://fix-vuln-section.preview.emergentagent.com/api"
 
 class DatabaseQuestionnaireConsistencyTester:
     def __init__(self):
