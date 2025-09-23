@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
 """
-Backend API Testing - VULNERABILITY SECTION POSITIONING FIX VERIFICATION
-Tests backend health and vulnerability endpoints to ensure the vulnerability section positioning fix doesn't impact backend functionality:
+Backend API Testing - STRIDE Phase 1 API Endpoints Testing
+Tests the newly implemented STRIDE Phase 1 API endpoints for threat analysis:
 
 TESTING FOCUS:
-🎯 VULNERABILITY SECTION POSITIONING FIX VERIFICATION
-1. Test basic API health endpoint
-2. Test vulnerability analysis endpoints are working
-3. Verify no regressions in vulnerability system backend APIs
-4. Quick validation that diagram and node endpoints still work
+🎯 STRIDE PHASE 1 API ENDPOINTS TESTING
+1. STRIDE Analysis Endpoint: POST /api/diagrams/{diagram_id}/stride/analyze
+2. STRIDE Coverage Endpoint: GET /api/diagrams/{diagram_id}/stride/coverage  
+3. Threat Status Update: PATCH /api/diagrams/{diagram_id}/stride/threats/{threat_id}
+4. Error Handling for non-existent IDs and invalid values
 
 TEST SCENARIOS:
 1. Health Check - Verify basic API health endpoint
-2. Vulnerability Analysis - Test vulnerability analysis endpoints
-3. Diagram Operations - Verify diagram creation and retrieval still work
-4. Node Operations - Test node-related endpoints
-5. Vulnerability System - Comprehensive vulnerability system testing
+2. Create Test Diagram - Create diagram with WebApp, API, Database nodes
+3. STRIDE Analysis - Test threat analysis with proper categorization
+4. STRIDE Coverage - Test coverage summary with mitigation counts
+5. Threat Status Updates - Test updating threat status and mitigations
+6. Error Handling - Test with invalid IDs and status values
 
 **EXPECTED RESULTS:** 
-- All backend APIs should be functioning correctly
-- Vulnerability analysis endpoints should work without regressions
-- No impact from frontend vulnerability positioning changes
-- All core functionality remains operational
+- STRIDE analysis correctly identifies threats based on node subtypes
+- Threats are properly categorized by STRIDE categories (Spoofing, Tampering, etc.)
+- Coverage endpoint returns proper totals and mitigation percentages
+- Threat status updates persist in database
+- Proper error handling for invalid inputs
 """
 
 import requests
