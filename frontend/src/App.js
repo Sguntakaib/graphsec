@@ -2001,7 +2001,38 @@ function AppContent() {
 
   // Get all vulnerabilities from analyses
   const getAllVulnerabilities = () => {
-    const allVulns = [];
+    // Test data for demonstrating vulnerability panel positioning
+    const mockVulnerabilities = [
+      {
+        id: "test-1",
+        name: "SQL Injection",
+        severity: "Critical",
+        description: "Potential SQL injection vulnerability in user input fields",
+        risk_score: 9.5,
+        parent_node_id: "node-1",
+        category: "Injection"
+      },
+      {
+        id: "test-2", 
+        name: "Cross-Site Scripting (XSS)",
+        severity: "High",
+        description: "XSS vulnerability in web application",
+        risk_score: 7.8,
+        parent_node_id: "node-1",
+        category: "XSS"
+      },
+      {
+        id: "test-3",
+        name: "Weak Authentication",
+        severity: "Medium", 
+        description: "Authentication mechanism could be strengthened",
+        risk_score: 5.2,
+        parent_node_id: "node-2",
+        category: "Authentication"
+      }
+    ];
+    
+    const allVulns = [...mockVulnerabilities];
     Object.values(vulnerabilityAnalyses).forEach(analysis => {
       if (analysis.vulnerability_nodes) {
         analysis.vulnerability_nodes.forEach(vuln => {
