@@ -104,7 +104,7 @@ const StridePanel = ({ diagramId, onAnalyzeStride }) => {
   const updateThreatStatus = async (threatId, status) => {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${backendUrl}/diagrams/${diagramId}/stride/threats/${threatId}`, {
+      const response = await fetch(`${backendUrl}/api/diagrams/${diagramId}/stride/threats/${threatId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
