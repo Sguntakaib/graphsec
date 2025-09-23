@@ -3171,125 +3171,60 @@ function AppContent() {
                   <span>Auto-Layout</span>
                 </button>
               
-              <button
-                onClick={handleFitAllNodes}
-                disabled={nodes.length === 0}
-                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-                title="Fit All Nodes to Canvas"
-              >
-                <Maximize2 className="h-4 w-4" />
-                <span>Fit All</span>
-              </button>
-              
-              <button
-                onClick={() => fitView({ padding: 0.1, duration: 600 })}
-                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 flex items-center space-x-2 text-sm"
-                title="Fit Current View"
-              >
-                <Eye className="h-4 w-4" />
-                <span>Fit View</span>
-              </button>
-
-              <button
-                onClick={handleUndo}
-                disabled={undoStack.length === 0}
-                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 disabled:opacity-50 flex items-center space-x-2 text-sm"
-                title="Undo (Ctrl+Z)"
-              >
-                <Undo className="h-4 w-4" />
-                <span>Undo</span>
-              </button>
-
-              <button
-                onClick={handleRedo}
-                disabled={redoStack.length === 0}
-                className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 disabled:opacity-50 flex items-center space-x-2 text-sm"
-                title="Redo (Ctrl+Y)"
-              >
-                <Redo className="h-4 w-4" />
-                <span>Redo</span>
-              </button>
-
-              <div className="flex items-center space-x-2 px-3 py-1 bg-gray-700 rounded text-sm text-gray-300">
-                <ZoomIn className="h-4 w-4" />
-                <span>{Math.round(zoomLevel * 100)}%</span>
-              </div>
-            </div>
-
-            {/* Second Row - Grid & View Options */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setSnapToGrid(!snapToGrid)}
-                className={`px-3 py-1 rounded flex items-center space-x-2 text-sm ${
-                  snapToGrid 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-600 text-white hover:bg-gray-500'
-                }`}
-              >
-                <Grid className="h-4 w-4" />
-                <span>Snap {snapToGrid ? 'On' : 'Off'}</span>
-              </button>
-
-              <div className="flex items-center space-x-2">
-                <span className="text-xs text-gray-400">Grid:</span>
-                <select
-                  value={gridSize}
-                  onChange={(e) => setGridSize(Number(e.target.value))}
-                  className="bg-gray-700 border border-gray-600 rounded text-white text-xs px-2 py-1"
+                <button
+                  onClick={handleFitAllNodes}
+                  disabled={nodes.length === 0}
+                  className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                  title="Fit All Nodes to Canvas"
                 >
-                  <option value={10}>10px</option>
-                  <option value={20}>20px</option>
-                  <option value={30}>30px</option>
-                  <option value={50}>50px</option>
-                </select>
+                  <Maximize2 className="h-4 w-4" />
+                  <span>Fit All</span>
+                </button>
+                
+                <button
+                  onClick={handleUndo}
+                  disabled={undoStack.length === 0}
+                  className="px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-500 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                  title="Undo (Ctrl+Z)"
+                >
+                  <Undo className="h-4 w-4" />
+                  <span>Undo</span>
+                </button>
+
+                <button
+                  onClick={handleRedo}
+                  disabled={redoStack.length === 0}
+                  className="px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-500 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                  title="Redo (Ctrl+Y)"
+                >
+                  <Redo className="h-4 w-4" />
+                  <span>Redo</span>
+                </button>
               </div>
+              
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setSnapToGrid(!snapToGrid)}
+                  className={`px-3 py-1.5 rounded-lg flex items-center space-x-2 text-sm ${
+                    snapToGrid 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-gray-600 text-white hover:bg-gray-500'
+                  }`}
+                  title="Toggle snap to grid"
+                >
+                  <Grid className="h-4 w-4" />
+                  <span>Grid {snapToGrid ? 'On' : 'Off'}</span>
+                </button>
 
-              <button
-                onClick={() => setShowPerformanceMonitor(!showPerformanceMonitor)}
-                className={`px-3 py-1 rounded flex items-center space-x-2 text-sm ${
-                  showPerformanceMonitor
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-600 text-white hover:bg-gray-500'
-                }`}
-              >
-                <Monitor className="h-4 w-4" />
-                <span>Performance</span>
-              </button>
-
-              <button
-                onClick={() => setAutoVulnerabilityAnalysis(!autoVulnerabilityAnalysis)}
-                className={`px-3 py-1 rounded flex items-center space-x-2 text-sm ${
-                  autoVulnerabilityAnalysis
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-600 text-white hover:bg-gray-500'
-                }`}
-                title={autoVulnerabilityAnalysis 
-                  ? "Auto-vulnerability analysis enabled - will analyze after COMPLETE questionnaires only"
-                  : "Auto-vulnerability analysis disabled - use 'Vulnerabilities' button after completing all security questions"
-                }
-              >
-                <Shield className="h-4 w-4" />
-                <span>Auto-Vuln {autoVulnerabilityAnalysis ? 'On' : 'Off'}</span>
-              </button>
-
-              <button
-                onClick={clearAllVulnerabilities}
-                disabled={Object.keys(vulnerabilityAnalyses).length === 0}
-                className="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-                title="Clear all vulnerability nodes from the canvas"
-              >
-                <EyeOff className="h-4 w-4" />
-                <span>Clear Vulns</span>
-              </button>
-
-              <button
-                onClick={handleClearAllConfirm}
-                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 flex items-center space-x-2 text-sm"
-                title="Clear All Nodes and Edges"
-              >
-                <Trash2 className="h-4 w-4" />
-                <span>Clear All</span>
-              </button>
+                <button
+                  onClick={handleClearAllConfirm}
+                  className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center space-x-2 text-sm"
+                  title="Clear All Nodes and Edges"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Clear All</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
