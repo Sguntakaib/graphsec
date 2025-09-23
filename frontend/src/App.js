@@ -2865,240 +2865,294 @@ function AppContent() {
             </button>
           </div>
           
-          {/* QW-3: Toolbar Grouping - Modeling Actions */}
-          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1 shrink-0 sticky left-0 z-10">
-            <div className="text-xs text-gray-400 px-2">Modeling</div>
-            <button
-              onClick={handleNewDiagram}
-              className="px-3 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm"
-              title="New Diagram (Ctrl+N)"
-            >
-              <span>New</span>
-            </button>
-            
-            <button
-              onClick={() => setShowTemplateLibrary(true)}
-              className="px-3 py-1.5 bg-blue-700 text-white rounded hover:bg-blue-600 flex items-center space-x-2 text-sm"
-              title="Template Library - Apply pre-built security patterns"
-            >
-              <BookOpen className="h-4 w-4" />
-              <span>Templates</span>
-            </button>
-            
-            {/* QW-3: Save Status Display */}
-            <div className="flex items-center space-x-2">
-              <div className="text-xs text-gray-400">
-                {hasUnsavedChanges ? (
-                  <span className="text-yellow-400">Unsaved changes</span>
-                ) : lastSavedAt ? (
-                  <span className="text-green-400">
-                    Saved {lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                ) : (
-                  <span>Not saved</span>
-                )}
-              </div>
+          {/* 🎯 PRIMARY ACTIONS - Most Important Functions */}
+          <div className="flex items-center space-x-3">
+            {/* File Operations Group */}
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={handleNewDiagram}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center space-x-2 text-sm font-medium shadow-sm"
+                title="New Diagram (Ctrl+N)"
+              >
+                <span>New</span>
+              </button>
+              
               <button
                 onClick={handleSaveDiagram}
                 disabled={isLoading}
-                className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+                className={`px-4 py-2 rounded-lg flex items-center space-x-2 text-sm font-medium shadow-sm ${
+                  hasUnsavedChanges
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                } disabled:opacity-50`}
                 title="Save Diagram (Ctrl+S)"
               >
                 <Save className="h-4 w-4" />
                 <span>{isLoading ? 'Saving...' : 'Save'}</span>
+                {hasUnsavedChanges && (
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                )}
               </button>
             </div>
-            
-            <div className="relative">
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImportDiagram}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                id="import-file"
-              />
-              <label
-                htmlFor="import-file"
-                className="px-3 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center space-x-2 text-sm cursor-pointer"
-                title="Import Diagram"
+
+            {/* Divider */}
+            <div className="h-6 w-px bg-gray-600"></div>
+
+            {/* Analysis Actions - Primary Functions */}
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={handleRunSimulation}
+                disabled={isLoading || nodes.length === 0}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 text-sm font-medium shadow-sm"
+                title="Run Attack Path Simulation (Ctrl+R)"
               >
-                <Upload className="h-4 w-4" />
-                <span>Import</span>
-              </label>
+                <Play className="h-4 w-4" />
+                <span>{isLoading ? 'Analyzing...' : 'Simulate'}</span>
+              </button>
+              
+              <button
+                onClick={analyzeAllNodeVulnerabilities}
+                disabled={isLoading || nodes.filter(n => n.data?.questionnaireResponses).length === 0}
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 text-sm font-medium shadow-sm"
+                title="Analyze Security Vulnerabilities"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <span>Analyze</span>
+              </button>
             </div>
-            
-            <button
-              onClick={handleExportDiagram}
-              disabled={!currentDiagram}
-              className="px-3 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 disabled:opacity-50 flex items-center space-x-2 text-sm"
-              title="Export Diagram"
-            >
-              <Download className="h-4 w-4" />
-              <span>Export</span>
-            </button>
+
+            {/* Divider */}
+            <div className="h-6 w-px bg-gray-600"></div>
+
+            {/* 🛡️ VULNERABILITY MANAGEMENT - Enhanced Dropdown */}
+            <div className="relative vulnerability-dropdown">
+              {allVulnerabilities.length > 0 ? (
+                <div className="flex items-center bg-gray-700 rounded-lg border border-gray-600">
+                  <button
+                    onClick={() => setShowVulnerabilityList(!showVulnerabilityList)}
+                    className={`px-4 py-2 rounded-l-lg flex items-center space-x-2 text-sm font-medium transition-colors ${
+                      showVulnerabilityList || showVulnerabilityFilter || showVulnerabilityLegend
+                        ? 'bg-purple-600 text-white'
+                        : 'text-white hover:bg-gray-600'
+                    }`}
+                    title="Manage Vulnerabilities"
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Vulnerabilities</span>
+                    <span className="ml-2 px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full font-semibold">
+                      {allVulnerabilities.length}
+                    </span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowVulnMenu(!showVulnMenu)}
+                    className={`px-3 py-2 rounded-r-lg border-l border-gray-600 flex items-center transition-colors ${
+                      showVulnMenu
+                        ? 'bg-gray-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-600 hover:text-white'
+                    }`}
+                    aria-haspopup="menu"
+                    aria-expanded={showVulnMenu}
+                    title="Vulnerability Actions"
+                  >
+                    <ChevronDown className={`h-4 w-4 transition-transform ${showVulnMenu ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {/* Enhanced Dropdown Menu */}
+                  {showVulnMenu && (
+                    <div className="absolute top-full right-0 mt-2 w-56 bg-gray-800 rounded-lg border border-gray-600 shadow-xl z-50 py-2">
+                      <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-700">
+                        Vulnerability Actions
+                      </div>
+                      <div role="menu" className="py-1">
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            setShowVulnerabilityList(!showVulnerabilityList);
+                            setShowVulnMenu(false);
+                          }}
+                          className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3 transition-colors"
+                        >
+                          <Shield className="h-4 w-4 text-blue-400" />
+                          <div>
+                            <div className="font-medium">Manage</div>
+                            <div className="text-xs text-gray-400">View and organize vulnerabilities</div>
+                          </div>
+                        </button>
+                        
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            setShowVulnerabilityFilter(!showVulnerabilityFilter);
+                            setShowVulnMenu(false);
+                          }}
+                          className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3 transition-colors"
+                        >
+                          <Filter className="h-4 w-4 text-green-400" />
+                          <div>
+                            <div className="font-medium">Filter</div>
+                            <div className="text-xs text-gray-400">Filter by severity and type</div>
+                          </div>
+                        </button>
+                        
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            setShowVulnerabilityLegend(!showVulnerabilityLegend);
+                            setShowVulnMenu(false);
+                          }}
+                          className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3 transition-colors"
+                        >
+                          <BarChart3 className="h-4 w-4 text-purple-400" />
+                          <div>
+                            <div className="font-medium">Dashboard</div>
+                            <div className="text-xs text-gray-400">Security metrics overview</div>
+                          </div>
+                        </button>
+                        
+                        <div className="h-px bg-gray-700 my-2 mx-2" />
+                        
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            setShowVulnerabilityReport(true);
+                            setShowVulnMenu(false);
+                          }}
+                          className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3 transition-colors"
+                        >
+                          <Download className="h-4 w-4 text-emerald-400" />
+                          <div>
+                            <div className="font-medium">Export Report</div>
+                            <div className="text-xs text-gray-400">Generate security report</div>
+                          </div>
+                        </button>
+                        
+                        <button
+                          role="menuitem"
+                          onClick={() => {
+                            handleClearVulnerabilities();
+                            setShowVulnMenu(false);
+                          }}
+                          className="w-full px-4 py-3 text-left text-sm text-red-300 hover:bg-red-900 hover:text-red-100 flex items-center space-x-3 transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                          <div>
+                            <div className="font-medium">Clear All</div>
+                            <div className="text-xs text-red-400">Remove all vulnerabilities</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  className="px-4 py-2 bg-gray-700 text-gray-400 rounded-lg cursor-not-allowed flex items-center space-x-2 text-sm"
+                  title="No vulnerabilities found. Run analysis first."
+                  disabled
+                >
+                  <Shield className="h-4 w-4" />
+                  <span>Vulnerabilities</span>
+                  <span className="text-xs">(0)</span>
+                </button>
+              )}
+            </div>
           </div>
-          
-          {/* QW-3: Toolbar Grouping - Analysis Actions */}
-          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1 shrink-0 sticky left-0 z-10">
-            <div className="text-xs text-gray-400 px-2">Analyze</div>
-            <button
-              onClick={handleRunSimulation}
-              disabled={isLoading || nodes.length === 0}
-              className="px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-              title="Run Simulation (Ctrl+R)"
-            >
-              <Play className="h-4 w-4" />
-              <span>{isLoading ? 'Analyzing...' : 'Simulate'}</span>
-            </button>
-            
-            <button
-              onClick={analyzeAllNodeVulnerabilities}
-              disabled={isLoading || nodes.filter(n => n.data?.questionnaireResponses).length === 0}
-              className="px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
-              title="Analyze Vulnerabilities - Requires COMPLETE questionnaires for all security questions (headers, logging, authentication, etc.)"
-            >
-              <AlertTriangle className="h-4 w-4" />
-              <span>Vulnerabilities</span>
-            </button>
-          </div>
-          
-          {/* QW-3: Toolbar Grouping - View Actions */}
-          <div className="flex items-center space-x-2 bg-gray-800 rounded-lg p-1 shrink-0 sticky left-0 z-10">
-            <div className="text-xs text-gray-400 px-2">View</div>
+
+          {/* 🔧 SECONDARY ACTIONS - Organized Dropdown */}
+          <div className="flex items-center space-x-2">
+            {/* Quick Actions */}
             <button
               onClick={clearAttackPathHighlighting}
               disabled={highlightedPaths.length === 0}
-              className="px-3 py-1.5 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center space-x-2 text-sm"
+              className="px-3 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 text-sm"
               title="Clear Attack Path Highlights (Esc)"
             >
               <EyeOff className="h-4 w-4" />
-              <span>Clear Highlights</span>
             </button>
-          </div>
 
-          {/* Divider */}
-          <div className="h-6 w-px bg-gray-700 mx-3 shrink-0" />
-          
-          {/* Vulnerability System Controls - Condensed Dropdown Menu */}
-          <div className="relative vulnerability-dropdown">
-            <button
-              onClick={() => allVulnerabilities.length > 0 ? setShowVulnerabilityList(!showVulnerabilityList) : null}
-              className={`px-3 py-1.5 rounded-l flex items-center space-x-2 text-sm transition-colors ${
-                allVulnerabilities.length === 0 
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  : showVulnerabilityList || showVulnerabilityFilter || showVulnerabilityLegend
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
-              }`}
-              title={allVulnerabilities.length === 0 ? "No vulnerabilities to manage" : "Vulnerability Management"}
-              disabled={allVulnerabilities.length === 0}
-            >
-              <Shield className="h-4 w-4" />
-              <span>Vulnerabilities</span>
-              {allVulnerabilities.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 bg-blue-600 text-white text-xs rounded-full">
-                  {allVulnerabilities.length}
-                </span>
-              )}
-            </button>
-            
-            <button
-              onClick={() => setShowVulnMenu(!showVulnMenu)}
-              className={`px-2 py-1.5 rounded-r flex items-center text-sm transition-colors border-l border-gray-600 ${
-                showVulnMenu
-                  ? 'bg-gray-600 text-white'
-                  : 'bg-gray-700 text-white hover:bg-gray-600'
-              }`}
-              aria-haspopup="menu"
-              aria-expanded={showVulnMenu}
-              title="More vulnerability options"
-            >
-              <ChevronDown className="h-4 w-4" />
-            </button>
-            
-            {/* Dropdown Menu */}
-            {showVulnMenu && (
-              <div className="absolute top-full right-0 mt-1 w-48 bg-gray-800 rounded-lg border border-gray-700 shadow-lg z-50 py-2">
-                <div role="menu" className="space-y-1">
-                  <button
-                    role="menuitem"
-                    onClick={() => {
-                      setShowVulnerabilityList(!showVulnerabilityList);
-                      setShowVulnMenu(false);
-                    }}
-                    className={`w-full px-4 py-2 text-left text-sm flex items-center space-x-3 ${
-                      allVulnerabilities.length === 0
-                        ? 'text-gray-500 cursor-not-allowed'
-                        : 'text-white hover:bg-gray-700'
-                    }`}
-                    disabled={allVulnerabilities.length === 0}
-                  >
-                    <Shield className="h-4 w-4" />
-                    <span>Manage</span>
-                  </button>
-                  
-                  <button
-                    role="menuitem"
-                    onClick={() => {
-                      setShowVulnerabilityFilter(!showVulnerabilityFilter);
-                      setShowVulnMenu(false);
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
-                  >
-                    <Filter className="h-4 w-4" />
-                    <span>Filter</span>
-                  </button>
-                  
-                  <button
-                    role="menuitem"
-                    onClick={() => {
-                      setShowVulnerabilityLegend(!showVulnerabilityLegend);
-                      setShowVulnMenu(false);
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
-                  >
-                    <BarChart3 className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </button>
-                  
-                  <div className="h-px bg-gray-700 my-1" />
-                  
-                  <button
-                    role="menuitem"
-                    onClick={() => {
-                      setShowVulnerabilityReport(true);
-                      setShowVulnMenu(false);
-                    }}
-                    className={`w-full px-4 py-2 text-left text-sm flex items-center space-x-3 ${
-                      allVulnerabilities.length === 0
-                        ? 'text-gray-500 cursor-not-allowed'
-                        : 'text-white hover:bg-gray-700'
-                    }`}
-                    disabled={allVulnerabilities.length === 0}
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Report</span>
-                  </button>
-                  
-                  <button
-                    role="menuitem"
-                    onClick={() => {
-                      handleClearVulnerabilities();
-                      setShowVulnMenu(false);
-                    }}
-                    className={`w-full px-4 py-2 text-left text-sm flex items-center space-x-3 ${
-                      allVulnerabilities.length === 0
-                        ? 'text-gray-500 cursor-not-allowed'
-                        : 'text-white hover:bg-gray-700'
-                    }`}
-                    disabled={allVulnerabilities.length === 0}
-                  >
-                    <X className="h-4 w-4" />
-                    <span>Clear</span>
-                  </button>
+            {/* Tools & Options Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowAdvancedControls(!showAdvancedControls)}
+                className="px-3 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 hover:text-white flex items-center space-x-2 text-sm"
+                title="More Tools & Options"
+              >
+                <Menu className="h-4 w-4" />
+                <ChevronDown className={`h-3 w-3 transition-transform ${showAdvancedControls ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showAdvancedControls && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-gray-800 rounded-lg border border-gray-600 shadow-xl z-50 py-2">
+                  <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-700">
+                    Tools & Options
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        setShowTemplateLibrary(true);
+                        setShowAdvancedControls(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3"
+                    >
+                      <BookOpen className="h-4 w-4 text-blue-400" />
+                      <span>Templates</span>
+                    </button>
+                    
+                    <div className="h-px bg-gray-700 my-1 mx-2" />
+                    
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={(e) => {
+                          handleImportDiagram(e);
+                          setShowAdvancedControls(false);
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        id="import-file-menu"
+                      />
+                      <label
+                        htmlFor="import-file-menu"
+                        className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3 cursor-pointer"
+                      >
+                        <Upload className="h-4 w-4 text-gray-400" />
+                        <span>Import</span>
+                      </label>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        handleExportDiagram();
+                        setShowAdvancedControls(false);
+                      }}
+                      disabled={!currentDiagram}
+                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center space-x-3"
+                    >
+                      <Download className="h-4 w-4 text-gray-400" />
+                      <span>Export</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
+            {/* Save Status Indicator */}
+            <div className="text-xs text-gray-400 ml-4">
+              {hasUnsavedChanges ? (
+                <span className="text-yellow-400 flex items-center space-x-1">
+                  <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
+                  <span>Unsaved</span>
+                </span>
+              ) : lastSavedAt ? (
+                <span className="text-green-400 flex items-center space-x-1">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                  <span>Saved {lastSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </span>
+              ) : (
+                <span className="text-gray-500">Not saved</span>
+              )}
+            </div>
           </div>
             
             {/* Advanced Controls Toggle */}
