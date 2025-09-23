@@ -3544,18 +3544,38 @@ function AppContent() {
                 </div>
               )}
 
-              {/* Advanced Layout Controls */}
-              <div className="p-4 border-b border-gray-700">
-                <AdvancedLayoutControls 
-                  currentDiagram={currentDiagram}
-                  nodes={nodes}
-                  edges={edges}
-                  setNodes={setNodes}
-                  setEdges={setEdges}
-                  isLoading={isLoading}
-                  setIsLoading={setIsLoading}
-                  fitView={fitView}
-                />
+              {/* Advanced Layout Controls - Collapsible */}
+              <div className="border-b border-gray-700">
+                <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600">
+                  <button
+                    onClick={() => setIsAdvancedLayoutCollapsed(!isAdvancedLayoutCollapsed)}
+                    className="w-full flex items-center justify-between text-white hover:bg-gray-700 rounded p-2 transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Settings className="h-4 w-4 text-purple-400" />
+                      <h3 className="font-medium text-sm">Advanced Layout</h3>
+                    </div>
+                    {isAdvancedLayoutCollapsed ? (
+                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <ChevronUp className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                {!isAdvancedLayoutCollapsed && (
+                  <div className="p-4">
+                    <AdvancedLayoutControls 
+                      currentDiagram={currentDiagram}
+                      nodes={nodes}
+                      edges={edges}
+                      setNodes={setNodes}
+                      setEdges={setEdges}
+                      isLoading={isLoading}
+                      setIsLoading={setIsLoading}
+                      fitView={fitView}
+                    />
+                  </div>
+                )}
               </div>
               
               {/* Simulation Debugger */}
