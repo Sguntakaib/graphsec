@@ -33,7 +33,7 @@ import sys
 # Use the backend URL from frontend/.env with /api suffix
 BASE_URL = "https://fix-vuln-section.preview.emergentagent.com/api"
 
-class APIQuestionnaireLoopingTester:
+class VulnerabilityBackendTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.session = requests.Session()
