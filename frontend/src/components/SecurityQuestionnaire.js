@@ -40,6 +40,11 @@ const SecurityQuestionnaire = ({
   const [error, setError] = useState(null);
   const [validation, setValidation] = useState(null);
   
+  // Enhanced conditional questionnaire state
+  const [currentQuestionnaireAnswers, setCurrentQuestionnaireAnswers] = useState(existingValues);
+  const [conditionalQuestions, setConditionalQuestions] = useState([]);
+  const [isConditionalQuestionnaire, setIsConditionalQuestionnaire] = useState(false);
+  
   // Phase 2 enhancements
   const [markedForLater, setMarkedForLater] = useState(new Set());
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
