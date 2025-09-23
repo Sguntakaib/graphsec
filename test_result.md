@@ -455,7 +455,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Vulnerability Section UX Positioning Fix"
+    - "Enhanced Conditional Questionnaire Implementation - P1-P4 Improvements"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
