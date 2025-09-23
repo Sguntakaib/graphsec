@@ -28,6 +28,7 @@ import SimulationDebugger from './components/SimulationDebugger';
 import NodeBranchVisualizer from './components/NodeBranchVisualizer';
 
 import { QuestionnaireProvider, useQuestionnaire } from './contexts/QuestionnaireContext';
+import { QuestionnaireConfirmationProvider } from './contexts/QuestionnaireConfirmationContext';
 // import QuestionnaireManager from './components/QuestionnaireManager'; // DISABLED: Using legacy system only
 // import CanvasSynchronizer from './components/CanvasSynchronizer'; // DISABLED: Causing infinite re-render loops
 import VulnerabilityNode from './components/VulnerabilityNode';
