@@ -414,7 +414,55 @@ const SecurityQuestionnaire = ({
     }
   };
 
+  // Helper function to check for unanswered questions
+  const checkIncompleteAnswers = () => {
+    const unansweredQuestions = [];
+    const unansweredPrompts = prompts.filter(prompt => {
+      const isAnswered = answers[prompt.id] !== undefined && 
+                        answers[prompt.id] !== null && 
+                        answers[prompt.id] !== '' &&
+                        answers[prompt.id] !== 'Unknown';
+      
+      if (!isAnswered) {
+        unansweredQuestions.push(prompt.question);
+      }
+      
+      return !isAnswered;
+    });
+
+    return {
+      hasUnanswered: unansweredPrompts.length > 0,
+      count: unansweredPrompts.length,
+      questions: unansweredQuestions,
+      totalQuestions: prompts.length
+    };
+  };
+
   const handleComplete = async () => {
+    // Check for incomplete answers first
+    const incompleteCheck = checkIncompleteAnswers();
+    
+    if (incompleteCheck.hasUnanswered) {
+      // Show confirmation modal for incomplete questionnaire
+      const confirmed = await showConfirmation({
+        unansweredCount: incompleteCheck.count,
+        totalQuestions: incompleteCheck.totalQuestions,
+        unansweredQuestions: incompleteCheck.questions,
+        onConfirm: () => {
+          console.log('✅ User confirmed completion with incomplete answers');
+        },
+        onCancel: () => {
+          console.log('❌ User cancelled completion, returning to questionnaire');
+        }
+      });
+
+      if (!confirmed) {
+        // User chose to continue editing
+        return;
+      }
+    }
+
+    // Proceed with original completion logic
     const validationResult = await validateAnswers();
     
     if (validationResult) {
