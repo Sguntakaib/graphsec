@@ -216,12 +216,6 @@ questionnaires:
       options: ["Content-Type validation", "X-Content-Type-Options", "X-Frame-Options", "Strict-Transport-Security", "None"]
       help_text: "Security headers provide additional protection against common attacks."
       related_branch: "ApiSecurity"
-    - id: "api_data_sanitization"
-      question: "How is sensitive data sanitized in API responses?"
-      type: "single_choice"
-      options: ["Automatic PII redaction", "Field-level filtering", "Basic sanitization", "No sanitization", "Unknown"]
-      help_text: "Data sanitization prevents sensitive information exposure through API responses."
-      related_branch: "DataClassification"
     - id: "api_audit_logging"
       question: "What API audit logging is implemented?"
       type: "single_choice"
