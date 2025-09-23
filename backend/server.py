@@ -6846,10 +6846,14 @@ async def analyze_stride_threats(diagram_id: str, include_edges: bool = True):
             # Remove existing threats for this diagram
             await db.stride_threats.delete_many({"diagram_id": diagram_id})
             
-            # Insert new threats
+            # Create a copy for database insertion to avoid modifying the response data
+            db_threats = []
             for threat_data in formatted_threats:
-                threat_data["diagram_id"] = diagram_id
-            await db.stride_threats.insert_many(formatted_threats)
+                db_threat = threat_data.copy()
+                db_threat["diagram_id"] = diagram_id
+                db_threats.append(db_threat)
+            
+            await db.stride_threats.insert_many(db_threats)
         
         logger.info(f"STRIDE analysis completed for diagram {diagram_id}: {len(formatted_threats)} threats")
         
