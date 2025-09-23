@@ -3477,6 +3477,11 @@ function AppContent() {
                     <div className="flex items-center space-x-2">
                       <Shield className="h-4 w-4 text-green-400" />
                       <h3 className="font-medium text-sm">STRIDE Analysis</h3>
+                      {strideThreatsCount > 0 && (
+                        <Badge variant="secondary" className="bg-green-900 text-green-300 text-xs h-5 px-2">
+                          {strideThreatsCount}
+                        </Badge>
+                      )}
                     </div>
                     {isStrideCollapsed ? (
                       <ChevronDown className="h-4 w-4 text-gray-400" />
