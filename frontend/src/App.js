@@ -1636,9 +1636,21 @@ function AppContent() {
   // Questionnaire Completeness Check
   const checkQuestionnaireCompleteness = async (nodeId, nodeSubtype) => {
     try {
-      if (nodeSubtype === 'WebApp') {
-        // For comprehensive WebApp questionnaire, check against the full set
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`);
+      // P2: Use comprehensive YAML endpoints for ALL supported node types for consistent completeness
+      const supportedYamlNodes = ['WebApp', 'API', 'Database', 'Backup', 'Monitoring'];
+      
+      if (supportedYamlNodes.includes(nodeSubtype)) {
+        // Use comprehensive questionnaire endpoints for consistent completeness checking
+        let endpoint;
+        if (nodeSubtype === 'API' || nodeSubtype === 'Database') {
+          // For conditional questionnaires, use conditional endpoint to get accurate total
+          endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}/conditional?level=basic`;
+        } else {
+          // For standard questionnaires
+          endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
+        }
+        
+        const response = await fetch(endpoint);
         if (response.ok) {
           const data = await response.json();
           const totalQuestions = data.total_questions;
@@ -1646,9 +1658,13 @@ function AppContent() {
           // Get current node answers
           const node = nodes.find(n => n.id === nodeId);
           const currentAnswers = node?.data?.questionnaireResponses || {};
-          const answeredCount = Object.keys(currentAnswers).filter(key => currentAnswers[key] !== null && currentAnswers[key] !== undefined).length;
+          const answeredCount = Object.keys(currentAnswers).filter(key => 
+            currentAnswers[key] !== null && 
+            currentAnswers[key] !== undefined && 
+            currentAnswers[key] !== 'Unknown' // P2: Unknown counts as unanswered for completeness
+          ).length;
           
-          console.log(`🎯 WebApp questionnaire completeness: ${answeredCount}/${totalQuestions} questions answered`);
+          console.log(`🎯 ${nodeSubtype} questionnaire completeness: ${answeredCount}/${totalQuestions} questions answered (${data.has_conditional ? 'conditional' : 'standard'})`);
           return answeredCount >= totalQuestions;
         }
       } else {
@@ -1661,7 +1677,11 @@ function AppContent() {
           // Get current node answers
           const node = nodes.find(n => n.id === nodeId);
           const currentAnswers = node?.data?.questionnaireResponses || {};
-          const answeredCount = Object.keys(currentAnswers).filter(key => currentAnswers[key] !== null && currentAnswers[key] !== undefined).length;
+          const answeredCount = Object.keys(currentAnswers).filter(key => 
+            currentAnswers[key] !== null && 
+            currentAnswers[key] !== undefined &&
+            currentAnswers[key] !== 'Unknown'
+          ).length;
           
           console.log(`🎯 ${nodeSubtype} questionnaire completeness: ${answeredCount}/${totalQuestions} questions answered`);
           return answeredCount >= totalQuestions;
