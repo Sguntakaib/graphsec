@@ -397,10 +397,47 @@ class VulnerabilityBackendTester:
             print("🎯 TEST SCENARIO 4: Test Vulnerability Analysis Endpoints")
             print("=" * 80)
             
-            if not self.test_diagram_id or not self.test_node_id:
+            if not self.test_diagram_id:
                 self.log_test("Test Vulnerability Analysis", False, 
-                            "No test diagram/node ID available")
+                            "No test diagram ID available")
                 return False
+            
+            # Create a test node for vulnerability analysis if we don't have one
+            if not self.test_node_id:
+                test_node = {
+                    "id": f"vuln-test-node-{uuid.uuid4().hex[:8]}",
+                    "type": "Asset",
+                    "subtype": "WebApp",
+                    "label": "Test WebApp for Vulnerability Analysis",
+                    "position": {"x": 200, "y": 200},
+                    "data": {
+                        "criticality": "High",
+                        "data_classification": "Confidential"
+                    }
+                }
+                
+                self.test_node_id = test_node["id"]
+                
+                # Get current diagram and add the test node
+                diagram_response = self.session.get(f"{self.base_url}/diagrams/{self.test_diagram_id}")
+                if diagram_response.status_code != 200:
+                    self.log_test("Test Vulnerability Analysis", False, 
+                                "Cannot retrieve test diagram for vulnerability analysis")
+                    return False
+                
+                diagram_data = diagram_response.json()
+                current_nodes = diagram_data.get("nodes", [])
+                current_nodes.append(test_node)
+                diagram_data["nodes"] = current_nodes
+                
+                # Update diagram with the test node
+                update_response = self.session.put(f"{self.base_url}/diagrams/{self.test_diagram_id}", json=diagram_data)
+                if update_response.status_code != 200:
+                    self.log_test("Test Vulnerability Analysis", False, 
+                                "Failed to add test node for vulnerability analysis")
+                    return False
+                
+                print(f"   Created test node for vulnerability analysis: {self.test_node_id}")
             
             # Test vulnerability analysis for the API node
             response = self.session.post(f"{self.base_url}/vulnerabilities/analyze/{self.test_node_id}")
