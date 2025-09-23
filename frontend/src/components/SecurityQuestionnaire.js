@@ -148,15 +148,30 @@ const SecurityQuestionnaire = ({
       const data = await response.json();
       
       if (nodeSubtype === 'WebApp' || nodeSubtype === 'API' || nodeSubtype === 'Database' || nodeSubtype === 'Backup' || nodeSubtype === 'Monitoring') {
-        // Comprehensive questionnaire response format
-        setPrompts(data.prompts || []);
-        console.log(`🎯 Loaded ${data.total_questions} comprehensive ${nodeSubtype} questions (${data.level} level)`);
-        if (data.completion_required) {
-          console.log('⚠️ All questions must be answered before vulnerability analysis');
+        // Handle conditional questionnaire response format
+        if (data.has_conditional && (nodeSubtype === 'API' || nodeSubtype === 'Database')) {
+          console.log(`🚀 Loaded ${data.total_questions} CONDITIONAL ${nodeSubtype} questions (${data.level} level)`);
+          console.log(`📋 Conditional features enabled: ${data.has_conditional}`);
+          setIsConditionalQuestionnaire(true);
+          
+          if (data.completion_required) {
+            console.log('⚠️ All conditional questions must be answered for enhanced vulnerability analysis');
+          }
+        } else {
+          console.log(`🎯 Loaded ${data.total_questions} comprehensive ${nodeSubtype} questions (${data.level} level)`);
+          setIsConditionalQuestionnaire(false);
+          
+          if (data.completion_required) {
+            console.log('⚠️ All questions must be answered before vulnerability analysis');
+          }
         }
+        
+        // Set prompts and preserve option_descriptions for tooltips
+        setPrompts(data.prompts || []);
       } else {
         // Legacy intelligent-nodes response format
         setPrompts(data.prompts || []);
+        setIsConditionalQuestionnaire(false);
       }
       
       setError(null);
