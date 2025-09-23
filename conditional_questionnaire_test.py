@@ -576,17 +576,17 @@ class ConditionalQuestionnaireTester:
             print(f"   Nodes with Conditional Questions: {conditional_nodes}")
             
             # Verify API and Database have conditional questions (P2 requirement)
-            api_has_conditional = completeness_results.get("API", {}).get("has_conditional", False)
-            database_has_conditional = completeness_results.get("Database", {}).get("has_conditional", False)
+            api_supports_conditional = completeness_results.get("API", {}).get("supports_conditional", False)
+            database_supports_conditional = completeness_results.get("Database", {}).get("supports_conditional", False)
             
-            if not api_has_conditional:
+            if not api_supports_conditional:
                 self.log_test("P2 Completeness Checks", False, 
-                            "API node type should have has_conditional=true")
+                            "API node type should have supports_conditional=true")
                 return False
             
-            if not database_has_conditional:
+            if not database_supports_conditional:
                 self.log_test("P2 Completeness Checks", False, 
-                            "Database node type should have has_conditional=true")
+                            "Database node type should have supports_conditional=true")
                 return False
             
             if successful_checks < len(node_types_to_test) * 0.8:  # At least 80% success
