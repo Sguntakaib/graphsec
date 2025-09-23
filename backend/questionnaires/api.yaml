@@ -228,12 +228,6 @@ questionnaires:
       options: ["Automated API security testing", "Manual testing", "Basic scanning", "No vulnerability testing", "Unknown"]
       help_text: "API vulnerability scanning identifies security weaknesses in API implementations."
       related_branch: "VulnerabilityScanning"
-    - id: "api_documentation_security"
-      question: "How is API documentation secured?"
-      type: "single_choice"
-      options: ["Authenticated access to docs", "Public but sanitized docs", "Public detailed docs", "No documentation", "Unknown"]
-      help_text: "Secure API documentation prevents information disclosure while enabling proper usage."
-      related_branch: "ApiSecurity"
     - id: "api_dependency_management"
       question: "How are API framework dependencies managed?"
       type: "single_choice"
