@@ -159,12 +159,6 @@ questionnaires:
       options: ["Hardware Security Module (HSM)", "Key management service", "Application-managed keys", "Static keys", "Unknown"]
       help_text: "Proper key management ensures encryption key security and rotation."
       related_branch: "KeyManagement"
-    - id: "database_data_masking"
-      question: "Is data masking implemented for non-production environments?"
-      type: "single_choice"
-      options: ["Dynamic data masking", "Static data masking", "Anonymization", "No data masking", "Unknown"]
-      help_text: "Data masking protects sensitive information in development and testing."
-      related_branch: "DataClassification"
     - id: "database_vulnerability_scanning"
       question: "Is database vulnerability scanning performed?"
       type: "single_choice"
