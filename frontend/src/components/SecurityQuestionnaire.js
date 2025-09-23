@@ -33,6 +33,7 @@ const SecurityQuestionnaire = ({
   partialAnswers = null,
   getIncompleteDependencies = null
 }) => {
+  const { showConfirmation } = useQuestionnaireConfirmation();
   const [prompts, setPrompts] = useState([]);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [answers, setAnswers] = useState(existingValues);
