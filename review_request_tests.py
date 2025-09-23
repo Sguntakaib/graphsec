@@ -8,7 +8,7 @@ import requests
 import json
 
 # Use the production URL from review request
-BASE_URL = "https://stride-analyzer.preview.emergentagent.com/api"
+BASE_URL = "https://fe-be-deploy.preview.emergentagent.com/api"
 
 class ReviewRequestTester:
     def __init__(self):
