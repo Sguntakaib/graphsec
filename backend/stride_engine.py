@@ -111,27 +111,27 @@ class StrideRuleEngine:
             "API": [
                 {
                     "stride_category": StrideCategory.SPOOFING,
-                    "title": "API Key Spoofing",
+                    "title": "API Authentication Bypass",
                     "description": "Weak API authentication may allow spoofing attacks",
-                    "conditions": lambda responses: responses.get("authentication_method") in ["none", "api_key_only"],
+                    "conditions": lambda responses: responses.get("api_authentication_method") in ["No Authentication", "Basic Authentication"],
                     "residual_risk": 6.8,
                     "mitigations": ["Implement OAuth 2.0", "JWT tokens with short expiry"],
                     "references": {"owasp": ["API2:2023"], "mitre": ["T1078"]}
                 },
                 {
-                    "stride_category": StrideCategory.INFORMATION_DISCLOSURE,
-                    "title": "API Data Leakage", 
-                    "description": "Excessive data exposure through API responses",
-                    "conditions": lambda responses: not responses.get("response_filtering", False),
+                    "stride_category": StrideCategory.ELEVATION_OF_PRIVILEGE,
+                    "title": "API Authorization Bypass", 
+                    "description": "Weak authorization controls may allow privilege escalation",
+                    "conditions": lambda responses: responses.get("api_authorization_model") in ["No authorization", "API key permissions"],
                     "residual_risk": 7.2,
-                    "mitigations": ["Implement response filtering", "Data minimization"],
-                    "references": {"owasp": ["API3:2023"], "mitre": ["T1213"]}
+                    "mitigations": ["Implement role-based authorization", "Use scopes"],
+                    "references": {"owasp": ["API5:2023"], "mitre": ["T1068"]}
                 },
                 {
                     "stride_category": StrideCategory.DENIAL_OF_SERVICE,
                     "title": "API Rate Limit Abuse",
                     "description": "Missing rate limiting allows API abuse and DoS",
-                    "conditions": lambda responses: not responses.get("rate_limiting", False),
+                    "conditions": lambda responses: responses.get("api_rate_limiting") in ["No rate limiting", "Basic throttling"],
                     "residual_risk": 6.0,
                     "mitigations": ["API rate limiting", "Request throttling"],
                     "references": {"owasp": ["API4:2023"], "mitre": ["T1499"]}
