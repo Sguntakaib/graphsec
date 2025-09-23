@@ -12,6 +12,7 @@ const EnhancedSecurityQuestionnaire = ({
   resumeFromPromptIndex = 0,
   partialAnswers = {}
 }) => {
+  const { showConfirmation } = useQuestionnaireConfirmation();
   const [prompts, setPrompts] = useState([]);
   const [answers, setAnswers] = useState(partialAnswers);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(resumeFromPromptIndex);
