@@ -3433,6 +3433,44 @@ function AppContent() {
                 />
               </div>
 
+              {/* Vulnerability Management Section */}
+              {allVulnerabilities.length > 0 && showVulnerabilityList && (
+                <div className="border-b border-gray-700 bg-gray-800">
+                  <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Shield className="h-4 w-4 text-purple-400" />
+                      <h3 className="font-medium text-white text-sm">Vulnerability Management</h3>
+                      <Badge variant="secondary" className="bg-purple-900 text-purple-300 text-xs">
+                        {allVulnerabilities.length}
+                      </Badge>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowVulnerabilityList(false)}
+                      className="text-gray-400 hover:text-white h-6 w-6 p-0"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    <VulnerabilityList
+                      vulnerabilities={allVulnerabilities}
+                      nodes={nodes}
+                      onVulnerabilityClick={(vulnerability) => {
+                        setSelectedVulnerability(vulnerability);
+                        setShowVulnerabilityPanel(true);
+                      }}
+                      onCreateFindings={(selectedVulns) => {
+                        setFilteredVulnerabilities(selectedVulns);
+                        setShowVulnerabilityReport(true);
+                      }}
+                      className="p-0"
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Advanced Layout Controls */}
               <div className="p-4 border-b border-gray-700">
                 <AdvancedLayoutControls 
