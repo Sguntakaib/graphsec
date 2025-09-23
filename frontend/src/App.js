@@ -3438,11 +3438,11 @@ function AppContent() {
               {/* Vulnerability Management Section */}
               {allVulnerabilities.length > 0 && showVulnerabilityList && (
                 <div className="border-b border-gray-700 bg-gray-800">
-                  <div className="p-3 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600 flex items-center justify-between">
+                  <div className="p-2 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Shield className="h-4 w-4 text-purple-400" />
-                      <h3 className="font-medium text-white text-sm">Vulnerability Management</h3>
-                      <Badge variant="secondary" className="bg-purple-900 text-purple-300 text-xs">
+                      <Shield className="h-3 w-3 text-purple-400" />
+                      <h4 className="font-medium text-white text-xs">Vulnerability Management</h4>
+                      <Badge variant="secondary" className="bg-purple-900 text-purple-300 text-xs h-4 px-1">
                         {allVulnerabilities.length}
                       </Badge>
                     </div>
@@ -3450,12 +3450,12 @@ function AppContent() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowVulnerabilityList(false)}
-                      className="text-gray-400 hover:text-white h-6 w-6 p-0"
+                      className="text-gray-400 hover:text-white h-5 w-5 p-0"
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
-                  <div className="max-h-80 overflow-y-auto">
+                  <div className="max-h-60 overflow-y-auto">
                     <VulnerabilityList
                       vulnerabilities={allVulnerabilities}
                       nodes={nodes}
