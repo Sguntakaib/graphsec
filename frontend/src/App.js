@@ -39,6 +39,7 @@ import VulnerabilityList from './components/VulnerabilityList';
 import VulnerabilityReport from './components/VulnerabilityReport';
 import AdvancedLayoutControls from './components/AdvancedLayoutControls';
 import DraggableEdge from './components/DraggableEdge';
+import StridePanel from './components/StridePanel';
 import { Toaster } from './components/ui/toaster';
 import { Badge } from './components/ui/badge';
 import { Button } from './components/ui/button';
