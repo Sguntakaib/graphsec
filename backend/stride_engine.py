@@ -321,7 +321,7 @@ class StrideThreatAnalyzer:
         for node in nodes:
             node_id = node.get("id", "")
             node_responses = questionnaire_data.get(node_id, {})
-            node_threats = self.rule_engine.analyze_node_threats(node, node_responses)
+            node_threats = self.rule_engine.analyze_node_threats(node, node_responses, diagram_id)
             
             # Set diagram_id and de-duplicate (title + category + element)
             seen = set()
