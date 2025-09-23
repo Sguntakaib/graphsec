@@ -73,7 +73,7 @@ const StridePanel = ({ diagramId, onAnalyzeStride }) => {
     setLoading(true);
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${backendUrl}/diagrams/${diagramId}/stride/analyze`, {
+      const response = await fetch(`${backendUrl}/api/diagrams/${diagramId}/stride/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
