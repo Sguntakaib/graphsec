@@ -310,7 +310,7 @@ const StridePanel = ({ diagramId, onAnalyzeStride }) => {
                 </div>
               </div>
               
-              <p className="text-gray-400 text-xs mb-2 leading-relaxed">
+              <div className="text-gray-400 text-xs mb-2 leading-relaxed">
                 {threat.description}
                 {threat.references && Array.isArray(threat.references.derived_from) && threat.references.derived_from.length > 0 && (
                   <div className="mt-2 text-xs text-gray-400">
@@ -322,7 +322,7 @@ const StridePanel = ({ diagramId, onAnalyzeStride }) => {
                     </ul>
                   </div>
                 )}
-              </p>
+              </div>
               
               {threat.mitigations && threat.mitigations.length > 0 && (
                 <div className="text-xs">
