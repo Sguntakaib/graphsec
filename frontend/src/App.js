@@ -3596,24 +3596,7 @@ function AppContent() {
         />
       )}
 
-      {/* Phase 2: Enhanced Vulnerability List */}
-      {showVulnerabilityList && (
-        <div className="fixed top-20 left-4 z-40 w-96 max-h-[80vh] overflow-hidden">
-          <VulnerabilityList
-            vulnerabilities={allVulnerabilities}
-            nodes={nodes}
-            onVulnerabilityClick={(vulnerability) => {
-              setSelectedVulnerability(vulnerability);
-              setShowVulnerabilityPanel(true);
-            }}
-            onCreateFindings={(selectedVulns) => {
-              // Store selected vulnerabilities for findings creation
-              setFilteredVulnerabilities(selectedVulns);
-              setShowVulnerabilityReport(true);
-            }}
-          />
-        </div>
-      )}
+      {/* Phase 2: Enhanced Vulnerability List - Now integrated into right panel */}
 
       {/* Vulnerability Filter Panel */}
       {showVulnerabilityFilter && (
