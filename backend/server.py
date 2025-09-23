@@ -6819,20 +6819,12 @@ async def analyze_stride_threats(diagram_id: str, include_edges: bool = True):
         
         for node in nodes:
             node_id = node.get("id", "")
-            
-            # Try to find questionnaire responses for this node
-            # Check multiple possible locations for questionnaire data
-            node_responses = await db.diagrams.find_one({
-                "id": diagram_id,
-                "nodes": {"$elemMatch": {"id": node_id, "questionnaire_responses": {"$exists": True}}}
-            })
-            
-            if node_responses:
-                # Find the specific node with responses
-                for diagram_node in node_responses.get("nodes", []):
-                    if diagram_node.get("id") == node_id:
-                        questionnaire_data[node_id] = diagram_node.get("questionnaire_responses", {})
-                        break
+            # Directly read saved questionnaire responses from node structure
+            # Our app saves under data.questionnaireResponses (camelCase). Also accept snake_case for legacy.
+            data_block = node.get("data", {}) or {}
+            responses = data_block.get("questionnaireResponses") or node.get("questionnaire_responses") or {}
+            if responses:
+                questionnaire_data[node_id] = responses
         
         # Perform STRIDE analysis
         threats = await stride_analyzer.analyze_diagram_threats(diagram, questionnaire_data)
