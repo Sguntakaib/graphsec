@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from frontend/.env
-BASE_URL = "https://questionnaire-sync.preview.emergentagent.com/api"
+BASE_URL = "https://threat-model-fix.preview.emergentagent.com/api"
 
 class QuestionnaireAPITester:
     def __init__(self):
