@@ -106,17 +106,25 @@ const SecurityQuestionnaire = ({
     try {
       setLoading(true);
       
-      // Use comprehensive questionnaire for WebApp, API, Database, Backup, and Monitoring - fallback to intelligent-nodes for others
+      // Use conditional questionnaires for API and Database to enable enhanced vulnerability rules
       let response;
       if (nodeSubtype === 'WebApp') {
         console.log('🎯 Using comprehensive WebApp questionnaire system');
         response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/WebApp?level=basic`);
       } else if (nodeSubtype === 'API') {
-        console.log('🎯 Using comprehensive API questionnaire system');
-        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/API?level=basic`);
+        console.log('🚀 Using CONDITIONAL API questionnaire system to enable enhanced vulnerability rules');
+        // Use conditional questionnaire to collect api_type, protocol-specific fields
+        const responsesParam = currentQuestionnaireAnswers && Object.keys(currentQuestionnaireAnswers).length > 0 
+          ? `&responses=${encodeURIComponent(JSON.stringify(currentQuestionnaireAnswers))}` 
+          : '';
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/API/conditional?level=basic${responsesParam}`);
       } else if (nodeSubtype === 'Database') {
-        console.log('🎯 Using comprehensive Database questionnaire system');
-        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Database?level=basic`);
+        console.log('🚀 Using CONDITIONAL Database questionnaire system to enable enhanced vulnerability rules');
+        // Use conditional questionnaire to collect database_type, engine-specific fields
+        const responsesParam = currentQuestionnaireAnswers && Object.keys(currentQuestionnaireAnswers).length > 0 
+          ? `&responses=${encodeURIComponent(JSON.stringify(currentQuestionnaireAnswers))}` 
+          : '';
+        response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Database/conditional?level=basic${responsesParam}`);
       } else if (nodeSubtype === 'Backup') {
         console.log('🎯 Using comprehensive Backup questionnaire system');
         response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/Backup?level=basic`);
