@@ -502,19 +502,21 @@ class ConditionalQuestionnaireTester:
                 if conditional_response.status_code == 200:
                     try:
                         conditional_data = conditional_response.json()
-                        has_conditional = conditional_data.get("has_conditional", False)
-                        total_questions = conditional_data.get("total_questions", 0)
+                        has_conditional = conditional_data.get("has_conditional_questions", False)
+                        supports_conditional = conditional_data.get("conditional_info", {}).get("supports_conditional", False)
+                        total_questions = conditional_data.get("question_count", 0)
                         questions_count = len(conditional_data.get("questions", []))
                         
                         completeness_results[node_type] = {
                             "has_conditional_endpoint": True,
                             "has_conditional": has_conditional,
+                            "supports_conditional": supports_conditional,
                             "total_questions": total_questions,
                             "questions_count": questions_count,
                             "consistent": total_questions == questions_count
                         }
                         
-                        print(f"     ✅ {node_type}: has_conditional={has_conditional}, total_questions={total_questions}, questions={questions_count}")
+                        print(f"     ✅ {node_type}: supports_conditional={supports_conditional}, has_conditional={has_conditional}, total_questions={total_questions}, questions={questions_count}")
                         
                     except json.JSONDecodeError:
                         completeness_results[node_type] = {
