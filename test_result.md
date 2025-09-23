@@ -435,6 +435,21 @@ frontend:
         agent: "testing"
         comment: "✅ BACKEND VERIFICATION COMPLETED: Comprehensive backend testing confirms that the vulnerability section positioning fix has NO impact on backend functionality. TESTING RESULTS: 7/7 tests passed (100% success rate). All backend APIs remain fully functional: health endpoints working correctly, vulnerability analysis endpoints functioning properly, diagram CRUD operations working, node operations operational, questionnaire save functionality working. The vulnerability section UX positioning fix is purely a frontend change with zero backend impact. All vulnerability system backend APIs are unaffected by the frontend positioning changes."
 
+  - task: "STRIDE API Prefix Fix in Frontend"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/StridePanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "404 on STRIDE POST /diagrams/{id}/stride/analyze and JSON.parse error loading coverage because frontend called endpoints without /api prefix."
+      - working: "NA"
+        agent: "main"
+        comment: "Updated StridePanel.js to use `${process.env.REACT_APP_BACKEND_URL}/api/...` for coverage, analyze, and threats. Restarted frontend and backend via supervisor."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
