@@ -253,7 +253,12 @@ function AppContent() {
     try {
       let metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`;
       if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
-        metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
+        // P2: Use conditional endpoints for API/Database to get accurate question counts
+        if (nodeSubtype === 'API' || nodeSubtype === 'Database') {
+          metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}/conditional?level=basic`;
+        } else {
+          metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
+        }
       }
       const metaRes = await fetch(metaUrl);
       if (metaRes.ok) {
@@ -263,7 +268,7 @@ function AppContent() {
           ...n,
           data: {
             ...n.data,
-            questionnaireMeta: { total_questions: total }
+            questionnaireMeta: { total_questions: total, has_conditional: meta.has_conditional }
           }
         }) : n));
       }
