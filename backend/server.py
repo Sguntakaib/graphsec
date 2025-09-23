@@ -6788,6 +6788,18 @@ from stride_engine import stride_analyzer, Threat, StrideCategory, ThreatStatus,
 
 @api_router.post("/diagrams/{diagram_id}/stride/analyze")
 @api_router.get("/diagrams/{diagram_id}/stride/threats")
+@api_router.get("/diagrams/{diagram_id}/stride/threats")
+async def get_stride_threats(diagram_id: str):
+    """
+    Retrieve last computed STRIDE threats for a diagram from persistence
+    """
+    try:
+        stored_threats = await db.stride_threats.find({"diagram_id": diagram_id}).to_list(1000)
+        return {"threats": stored_threats, "count": len(stored_threats)}
+    except Exception as e:
+        logger.error(f"Fetch STRIDE threats error for diagram {diagram_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch threats: {e}")
+
 async def analyze_stride_threats(diagram_id: str, include_edges: bool = True):
     """
     Analyze STRIDE threats for a diagram
