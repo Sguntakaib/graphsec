@@ -6786,8 +6786,6 @@ async def optimize_diagram_layout(diagram_id: str):
 
 from stride_engine import stride_analyzer, Threat, StrideCategory, ThreatStatus, ElementType
 
-@api_router.post("/diagrams/{diagram_id}/stride/analyze")
-@api_router.get("/diagrams/{diagram_id}/stride/threats")
 @api_router.get("/diagrams/{diagram_id}/stride/threats")
 async def get_stride_threats(diagram_id: str):
     """
@@ -6800,6 +6798,7 @@ async def get_stride_threats(diagram_id: str):
         logger.error(f"Fetch STRIDE threats error for diagram {diagram_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch threats: {e}")
 
+@api_router.post("/diagrams/{diagram_id}/stride/analyze")
 async def analyze_stride_threats(diagram_id: str, include_edges: bool = True):
     """
     Analyze STRIDE threats for a diagram
