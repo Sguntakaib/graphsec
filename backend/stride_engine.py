@@ -144,25 +144,25 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.SPOOFING,
                     "title": "Database Authentication Bypass",
                     "description": "Weak database authentication may allow unauthorized access",
-                    "conditions": lambda responses: responses.get("authentication_method") == "none",
+                    "conditions": lambda responses: responses.get("database_authentication") in ["No authentication", "Basic authentication"],
                     "residual_risk": 8.5,
                     "mitigations": ["Strong database authentication", "Network segmentation"],
                     "references": {"owasp": ["A07:2021"], "mitre": ["T1078"]}
                 },
                 {
                     "stride_category": StrideCategory.TAMPERING,
-                    "title": "SQL Injection",
-                    "description": "Insufficient input validation may allow SQL injection",
-                    "conditions": lambda responses: not responses.get("parameterized_queries", False),
+                    "title": "SQL Injection Risk",
+                    "description": "Weak access controls may increase SQL injection risk",
+                    "conditions": lambda responses: responses.get("database_access_control") in ["No access control", "Shared accounts"],
                     "residual_risk": 9.0,
-                    "mitigations": ["Parameterized queries", "Input validation"],
+                    "mitigations": ["Role-based access control", "Input validation"],
                     "references": {"owasp": ["A03:2021"], "mitre": ["T1190"]}
                 },
                 {
                     "stride_category": StrideCategory.INFORMATION_DISCLOSURE,
                     "title": "Data Encryption Missing",
                     "description": "Unencrypted database storage may expose sensitive data",
-                    "conditions": lambda responses: not responses.get("encryption_at_rest", False),
+                    "conditions": lambda responses: responses.get("database_encryption_at_rest") in ["No encryption", "Disk encryption"],
                     "residual_risk": 7.8,
                     "mitigations": ["Database encryption", "TDE implementation"],
                     "references": {"owasp": ["A02:2021"], "mitre": ["T1005"]}
@@ -171,7 +171,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.REPUDIATION,
                     "title": "Insufficient Database Logging",
                     "description": "Missing audit logs prevent non-repudiation",
-                    "conditions": lambda responses: not responses.get("audit_logging", False),
+                    "conditions": lambda responses: responses.get("database_logging") in ["No logging", "Connection logging only"],
                     "residual_risk": 4.5,
                     "mitigations": ["Enable database audit logging", "Log monitoring"],
                     "references": {"owasp": ["A09:2021"], "mitre": ["T1562"]}
