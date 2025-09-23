@@ -1,0 +1,279 @@
+Security Design Modeling Platform — Detailed Roadmap (Non‑AI Core First)
+
+Author: main_agent
+Date: July 2025
+
+1) Vision and Objectives
+- Build a best‑in‑class, developer‑friendly security design modeling tool that makes security a first‑class concern at architecture and flow‑design time.
+- Go beyond simple diagramming: each node and flow is backed by structured questionnaires, security controls, STRIDE threats, and automated validations.
+- Provide actionable guidance: expose vulnerabilities, missing controls, and show ideal design patterns with clear remediation and coverage dashboards.
+- Maintain a crisp, fast UX with modern interaction patterns, responsive design, and smooth canvas ergonomics.
+
+2) Current State (Summary Observations)
+- Backend: FastAPI with /api router prefix, MongoDB via motor, UUIDs for IDs, robust modules (intelligent_nodes, expanded_intelligent_nodes, questionnaire_loader, vulnerability_engine, enhanced_vulnerability_rules, advanced_simulation, probabilistic_simulation, mitre_integration, findings_management, layout engines). YAML‑driven questionnaires for WebApp, API, Database, Backup, Monitoring. ProductDesignSecurity questionnaire (STRIDE‑based) exists with dedicated routing. Template library and auto‑layout in place.
+- Frontend: React 19 + @xyflow/react; legacy SecurityQuestionnaire stabilized; NodeInfoPanel shows Q/A; VulnerabilityPanel + VulnerabilityList with filters; label‑draggable edges; AdvancedLayoutControls; TemplateLibrary; keyboard shortcuts; attack‑path highlighting. Dark theme and compact control patterns are consistent.
+- Security focus: OWASP 2023 and OWASP API Top 10 vulnerability mapping; MITRE ATT&amp;CK techniques; findings management with risk scores; dependency creation workflow; reuse dialog for duplicate node types; parent–child relationships fixed.
+- Gap to Vision: STRIDE not uniformly applied to all nodes/flows; no trust boundary modeling; no rich flow semantics (protocol/auth/encryption/data class) with validations; no STRIDE coverage dashboard; limited compliance coverage; minimal diffing/versioning; importers/exporters not yet present; reporting could be richer.
+
+3) Guiding Principles and Constraints
+- URLs and Ports: Always use environment variables; all backend routes must be prefixed with /api (Kubernetes ingress requirement). Never hardcode URLs or ports. Frontend uses REACT_APP_BACKEND_URL only.
+- Database: Use os.environ.get('MONGO_URL') and DB_NAME; do not hardcode names; use UUIDs only (no Mongo ObjectId in API).
+- Performance: Keep endpoints fast; adopt pagination and caching where needed; avoid heavy synchronous CPU in request handlers; push heavy tasks to background if needed.
+- UX: Reduce friction; predictable keyboard shortcuts; affordances and overlays; progressive disclosure; clear empty states and skeletons.
+- Testing: Always update test_result.md when invoking testing agents; backend first; do not run frontend testing unless explicitly asked.
+
+4) Phased Roadmap (Backend first, then Frontend). Each phase is independently testable
+
+Phase 1 — STRIDE Foundation (Core Threats Per Node/Edge)
+- Goal: Uniform STRIDE assessment across all elements. Establish Threat model, rule engine, and UI panel.
+- Backend
+  - Data Models (Pydantic/DB):
+    - Threat: id, diagram_id, element_type (node|edge), element_id, stride_category (Spoofing|Tampering|Repudiation|Information Disclosure|Denial of Service|Elevation of Privilege), title, description, references, mitigations [control_ids or suggestions], status (open|mitigated|partial), residual_risk (0..10), created_at.
+  - Rule Engine:
+    - Determine threats based on: node subtype, questionnaire responses, and basic edge properties (existing label/known subtype relationships if available).
+    - Initially seed rules for WebApp, API, Database, Backup, Monitoring (cover common STRIDE mappings).
+  - Endpoints:
+    - POST /api/diagrams/{diagram_id}/stride/analyze → { threats: Threat[] }
+    - GET  /api/diagrams/{diagram_id}/stride/coverage → { per_category_counts, mitigated_counts, residual_risk_avg, by_node/by_edge summaries }
+- Frontend
+  - Right panel: new STRIDE tab next to Canvas Nodes/Vulnerabilities.
+  - Display: category chips with counts; list of threats per selected element; filter by category/status.
+  - Empty state: clear guidance on how to run analysis (button: Analyze STRIDE Now).
+- Acceptance Criteria
+  - Creating WebApp+API+DB and answering minimal questions yields Threat[] grouped by STRIDE categories; coverage endpoint summarizes counts; UI shows per‑element threats.
+  - Performance: analysis returns under ~500ms on small diagrams (≤ 100 nodes/edges).
+- Minimal Test
+  - Create sample diagram, run analyze; validate totals and categories; verify UI renders lists and counts.
+
+Phase 2 — Trust Boundaries & Edge Semantics (Data Flow Security)
+- Goal: Model zones and boundaries, add rich flow properties, and auto‑flag risky boundary crossings.
+- Backend
+  - Data Models:
+    - TrustBoundary: id, diagram_id, name, zone_ids[], policy (default_allow|default_deny), rules[] (e.g., require_enc_in_transit for Confidential data), notes.
+    - Edge FlowProperties: protocol (HTTP/HTTPS/gRPC/WSS/etc.), auth (None|API Key|OAuth|JWT|MTLS|Basic|Certificate), encryption (None|TLS1.2|TLS1.3|MTLS), data_classification (Public|Internal|Confidential|Restricted), rate_limit (number/unit), message_size_limit, batching, custom_tags.
+  - Logic:
+    - Compute crosses_boundary: true when source and target zones differ.
+    - Validation rules: e.g., Confidential data must have encryption in transit; cross‑boundary flows must require auth; admin flows need MTLS; map failed rules → STRIDE categories.
+  - Endpoints:
+    - POST/GET/PUT/DELETE /api/diagrams/{id}/trust-boundaries
+    - PUT /api/diagrams/{id}/edges/{edge_id}/properties
+    - Reuse /stride/analyze to include flow‑driven threats; extend /stride/coverage.
+- Frontend
+  - Canvas: Zones as containers; Trust Boundaries as visually distinct boundaries (stroked/patterned polygons) with labels.
+  - Edge Property Editor: right panel editor for protocol/auth/encryption/data class; inline badges on edges (e.g., TLS, JWT, Confidential).
+  - Overlay: toggle to highlight boundary crossings and violations (red dotted lines; warning badges on edges).
+- Acceptance Criteria
+  - Editing edge to HTTP + Confidential + crosses boundary triggers “Information Disclosure” threat; switching to HTTPS+JWT clears it or marks mitigated; overlay reflects status.
+
+Phase 3 — Coverage Dashboard & Mitigations
+- Goal: Show what’s covered, what’s not, and how to fix with concrete control suggestions and one‑click placements.
+- Backend
+  - Map Security Controls (WAF, IAM, TLS, RBAC, Monitoring, Backup, Rate Limiting) to STRIDE mitigations; compute residual risk.
+  - Endpoints:
+    - GET /api/diagrams/{id}/mitigations → catalog of controls with mappings.
+    - PATCH /api/diagrams/{id}/threats/{threat_id} (status update when mitigation present).
+- Frontend
+  - Dashboard: heatmap per STRIDE category, per node/zone/edge; residual risk trend.
+  - Quick‑Fix Panel: suggests controls (e.g., “Add WAF for WebApp” → offers to add Control node + dependency edge + default answers).
+- Acceptance Criteria
+  - Adding a WAF changes coverage and reduces residual risk; dashboard updates instantly after re‑analysis.
+
+Phase 4 — Compliance Mapping (ASVS, OWASP API Top 10, NIST 800‑53)
+- Goal: Translate model and controls into compliance coverage insights.
+- Backend
+  - Mapping tables: Control → {ASVS controls, NIST 800‑53, ISO 27001, OWASP API Top 10}; questionnaire responses influence compliance satisfaction.
+  - Endpoint: GET /api/diagrams/{id}/compliance/coverage → % coverage per framework, gaps with recommendations.
+- Frontend
+  - Compliance Tab: framework selector; progress bars; list of unmet requirements with fix suggestions; export CSV/JSON.
+- Acceptance Criteria
+  - Meaningful coverage percentages appear; changing controls impacts compliance view.
+
+Phase 5 — Snapshots, Diff, and Audit Trail
+- Goal: Version the model and compare changes for governance.
+- Backend
+  - Snapshot model: id, diagram_id, name, created_at, payload (nodes, edges, answers, threats, coverage, findings summary).
+  - Endpoints:
+    - POST /api/diagrams/{id}/snapshots
+    - GET  /api/diagrams/{id}/snapshots
+    - GET  /api/diagrams/{id}/diff/{snapshotA}/{snapshotB} → changes list (nodes/edges/answers/threats/coverage deltas).
+- Frontend
+  - Snapshot Manager: create, label, restore; diff viewer with side‑by‑side/inline changes; filter by change type.
+- Acceptance Criteria
+  - Diffs show threats added/removed, coverage % delta, and changed flows.
+
+Phase 6 — Importers/Exporters (OpenAPI, Terraform)
+- Goal: Bootstrap models from real definitions and export outcomes.
+- Backend
+  - Import endpoints (chunked uploads):
+    - POST /api/import/openapi (multipart, chunked) → parse, create API nodes/edges, detect auth/paths.
+    - POST /api/import/terraform (multipart, chunked) → parse VPC, subnets, security groups, gateways, managed services.
+  - Export endpoints:
+    - GET /api/diagrams/{id}/export/json
+    - GET /api/diagrams/{id}/export/svg (server‑side render or client‑generated returned to backend)
+- Frontend
+  - Import Wizards: drag‑and‑drop with progress; mappers to zones and security defaults; preview before applying.
+  - Export: quick buttons for JSON/SVG/PNG.
+- Acceptance Criteria
+  - Importing realistic OpenAPI yields API surface and flows; Terraform yields cloud infra nodes/zones.
+
+Phase 7 — Findings Workflow 2.0
+- Goal: Production‑grade triage.
+- Backend
+  - Extend Finding: owner, due_date, sla_policy, tags, comments; bulk operations.
+  - Endpoints: PUT /api/findings/{id}, POST /api/findings/bulk, GET /api/findings/filters.
+- Frontend
+  - Findings Board: Kanban (Open/Triaged/In‑Progress/Blocked/Resolved); assign owners; SLA badges; bulk close when mitigation applied.
+- Acceptance Criteria
+  - Assign, filter, bulk update, and SLA warnings functioning.
+
+Phase 8 — Reporting Engine (HTML/PDF)
+- Goal: One‑click executive and engineering reports.
+- Backend
+  - GET /api/reports/{diagram_id}?format=html|pdf → server‑side render with templates; includes DFD, STRIDE threats, mitigations, coverage, compliance, findings summary, recommendations.
+- Frontend
+  - Report button; scheduleable report generation; store last generated in snapshots.
+- Acceptance Criteria
+  - PDF with all sections and anchored links to nodes/flows.
+
+Phase 9 — UX and Performance Enhancements
+- Canvas ergonomics: magnetic snapping, smarter auto‑layout by zone layers, edge routing that respects boundaries, focus/zoom to selection, mini‑map cluster highlights.
+- Overlays: fast toggles for STRIDE, compliance, boundary crossings, encryption/auth badges.
+- Accessibility: labels with contrast, keyboard navigation across panels, aria roles for menus and dialogs.
+- Performance: virtualization for long lists (findings/vulns), memoized selectors, defer heavy analysis to debounced events.
+
+Phase 10 — Collaboration and Governance (Optional)
+- Multi‑user presence, comments per node/edge/threat, reviewer roles; audit trail for approvals.
+
+Phase 11 — AI Layer (Future; not in current scope)
+- Use integration_playbook_expert_v2 to add AI models later. Emergent LLM key can unify model access when needed. Target functionality: explain threats; recommend mitigations; generate standards mapping; auto‑answer easy questions from context.
+
+5) Detailed API Contracts (initial set)
+- POST /api/diagrams/{diagram_id}/stride/analyze
+  - Req: none or optional flags { include_edges: bool }
+  - Res: { threats: [ { id, element_type, element_id, stride_category, title, description, mitigations: [control_key], status, residual_risk, references: { mitre:[], owasp:[] } } ] }
+
+- GET /api/diagrams/{diagram_id}/stride/coverage
+  - Res: { totals: { Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege }, mitigated: { ... }, residual_risk_avg, by_node: {node_id: {totals, mitigated}}, by_edge: {...} }
+
+- POST /api/diagrams/{id}/trust-boundaries
+  - Req: { name, zone_ids: [], policy, rules: [] }
+  - Res: { id, ... }
+
+- PUT /api/diagrams/{id}/edges/{edge_id}/properties
+  - Req: { protocol, auth, encryption, data_classification, rate_limit, message_size_limit, batching, tags }
+  - Res: { edge_id, updated: true }
+
+- GET /api/diagrams/{id}/compliance/coverage
+  - Res: { frameworks: [{ name: "ASVS", percent, gaps: [ { id, title, description, suggested_controls:[] } ] }, ...] }
+
+- POST /api/diagrams/{id}/snapshots; GET /api/diagrams/{id}/snapshots; GET /api/diagrams/{id}/diff/{a}/{b}
+
+- POST /api/import/openapi (chunked multipart); POST /api/import/terraform (chunked multipart)
+
+6) Backend Data Models (Pydantic‑style, illustrative)
+- Threat
+  - id: str (uuid)
+  - diagram_id: str
+  - element_type: Literal["node","edge"]
+  - element_id: str
+  - stride_category: Enum
+  - title: str
+  - description: str
+  - references: { mitre: [str], owasp: [str] }
+  - mitigations: [str]
+  - status: Enum[open, mitigated, partial]
+  - residual_risk: float
+  - created_at: datetime
+
+- TrustBoundary
+  - id, diagram_id, name, zone_ids[], policy, rules[], notes
+
+- FlowProperties (attached to edge)
+  - protocol, auth, encryption, data_classification, rate_limit, message_size_limit, batching, tags, crosses_boundary (computed)
+
+7) UI/UX Detailed Design (Best‑in‑Class Experiences)
+- Information Architecture
+  - Top Toolbar: diagram actions (New, Save, Simulate, Analyze STRIDE, Coverage, Reports, Import, Export, Templates, Overlays toggle).
+  - Left Sidebar: Node libraries (Assets, Surfaces, Controls, Actors, Zones/Boundaries), Templates, Quick Actions.
+  - Canvas (center): @xyflow/react with zones, boundaries, refined edge routing; draggable labels; context menu for quick properties.
+  - Right Sidebar (Tabbed):
+    - Canvas Nodes (existing)
+    - STRIDE (new): category chips, per‑element threats, filters, update statuses
+    - Vulnerabilities (existing enhanced)
+    - Coverage (new): heatmap, residual risk, mini trendline
+    - Findings (enhanced): Kanban quick view and assignment
+    - Properties: selection‑contextual (node/edge/zone/boundary)
+
+- Interaction Patterns
+  - Overlays Menu: STRIDE heatmap, Boundary crossings, Encryption/Auth badges, Compliance coverage.
+  - Edge Property Editor: compact forms with presets (e.g., “Hardened API” applies HTTPS+MTLS+JWT+RL target values).
+  - Trust Boundary Editing: click boundary → inline rule editor (e.g., “Confidential data must be TLS1.3 and JWT min 15m expiry”).
+  - Quick Fix: from a Threat item, click “Apply mitigation” → creates/updates control nodes, edge props, questionnaire defaults with confirmation.
+  - Undo/Redo: preserve property edits and overlay toggles; autosave indicator.
+
+- Visual Design & Theming
+  - Dark theme primary; neutral gray palette; focus rings; high‑contrast labels; subtle depth shadows.
+  - Zones: lightly tinted containers; boundaries: dashed bold strokes; violations: animated red pulse on offending edges.
+  - Badges: TLS, JWT, Confidential appear as micro‑badges on edges; tooltips explain meaning and state.
+  - Consistency: shadcn/radix primitives already in project; keep consistent paddings, headings (text-xs/sm), and compact controls.
+
+- Accessibility
+  - Keyboard: Tab traversal across toolbars, sidebars, and canvas; arrow keys to navigate selection; Enter to edit properties; Esc to clear selection.
+  - Screen reader labels for badges, overlays, and buttons; tooltip content accessible; color‑agnostic indicators (icons + text).
+
+- Performance
+  - Memoization for derived lists (threats, coverage); virtualization for long lists; debounced analyze calls; incremental updates (diff apply).
+
+- Responsiveness
+  - Sidebars collapse intelligently; small screens prioritize canvas and a single contextual panel; grid breakpoints (≥1280 full; 1024 medium; &lt;1024 stacked).
+
+- Empty States and Skeletons
+  - Each tab has instructive empty states; skeleton loaders for lists; optimistic UI on apply mitigation.
+
+8) Implementation Notes (Where to add things)
+- Backend: server.py — create a STRIDE section (near ProductDesignSecurity routes) for new stride endpoints; create stride_engine.py module for rules; add models to a dedicated models.py or inline Pydantic classes; ensure all routes start with /api.
+- DB: Collections — threats, trust_boundaries, snapshots. Use UUIDs; ensure indexes on diagram_id, element_id, stride_category.
+- Frontend: src/components
+  - New: StridePanel.js, CoverageDashboard.js, EdgePropertiesEditor.js, BoundaryEditor.js, OverlaysMenu.js.
+  - Integrate into App.js right panel tabs and overlays toggles; wire existing state for selection and analysis triggers.
+
+9) Testing Strategy (Lean and Phase‑Aligned)
+- Backend first: unit tests for stride_engine rules, boundary crossings, and coverage aggregation; endpoint contract tests.
+- Frontend: manual verification initially (as requested); then optional playwright via testing agent when approved.
+- Always update test_result.md per Testing Protocol before invoking agents.
+
+10) Risks and Mitigations
+- Scope creep: stick to phases; accept partial wins each sprint.
+- Performance on large diagrams: adopt incremental analysis and caching; paginate lists.
+- UX complexity: progressive disclosure via tabs/overlays; sensible defaults and presets.
+- Data migrations: when adding snapshots/trust boundaries, provide migration scripts for existing diagrams.
+
+11) Milestones & Draft Timeline (adjustable)
+- Sprint 1 (1–1.5 weeks): Phase 1 STRIDE foundation (backend + basic UI tab).
+- Sprint 2 (1.5–2 weeks): Phase 2 Trust boundaries + edge semantics (backend + UI + overlays).
+- Sprint 3 (1–1.5 weeks): Phase 3 Coverage dashboard + mitigations.
+- Sprint 4 (1–2 weeks): Phase 4 Compliance mapping + reports groundwork.
+- Sprint 5 (1–1.5 weeks): Phase 5 Snapshots + diff; Phase 8 reporting.
+- Sprint 6 (2 weeks): Phase 6 Importers/Exporters; Phase 7 Findings 2.0 polish.
+- Sprint 7 (ongoing): Phase 9 UX/perf improvements, refinements and polish.
+
+12) Acceptance Criteria (Condensed per Phase)
+- P1: /stride/analyze returns Threat[] for WebApp/API/DB/Backup/Monitoring; UI STRIDE tab shows categorized threats; coverage endpoint returns totals.
+- P2: Trust boundaries CRUD; edge properties settable; boundary crossing violations detected and surfaced in STRIDE; overlay highlights.
+- P3: Coverage heatmap; adding controls updates coverage and reduces residual risk; quick‑fix mitigations create appropriate nodes/props.
+- P4: Compliance coverage % shown with gaps and suggested controls; changes reflected after analysis.
+- P5: Snapshots captured and diff view shows threats/coverage/answers deltas.
+- P6: OpenAPI/Terraform importers yield usable models; exporters produce JSON/SVG.
+- P7: Findings 2.0 triage workflows (owner, due, SLA) usable; bulk ops work.
+- P8: Reports generated (HTML/PDF) with links and sections.
+- P9: Interactions feel fast; overlays toggle instantly; canvas remains responsive with 200+ elements.
+
+13) Non‑Functional Requirements
+- Security: validate uploads; sanitize YAML/JSON; enforce size limits; role‑ready endpoints (future).
+- Reliability: defensive error handling, helpful messages, structured logs.
+- Observability: basic metrics (analysis time, counts), request tracing optional.
+
+14) Future (Deferred AI Layer)
+- Use integration_playbook_expert_v2 when ready to add AI: explanation of threats, control recommendations, control→compliance auto‑mapping, intelligent questionnaire assistance. We will request the appropriate keys from you beforehand and follow the playbook to the letter.
+
+End of Roadmap
