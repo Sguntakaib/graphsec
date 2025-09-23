@@ -121,6 +121,30 @@ questionnaires:
         "Unknown": "Database logging configuration is unclear or not documented."
       help_text: "Database logging enables security monitoring and compliance."
       related_branch: "AuditLogging"
+    - id: "database_privilege_management"
+      question: "How are database privileges managed?"
+      type: "single_choice"
+      options: ["Dynamic privilege management", "Role-based privileges", "Static user privileges", "Excessive privileges", "Unknown"]
+      option_descriptions:
+        "Dynamic privilege management": "Automated privilege management system that adjusts permissions based on user roles, time, and context with regular privilege reviews."
+        "Role-based privileges": "Structured role-based privilege system with defined permissions for different user types and regular access reviews."
+        "Static user privileges": "Fixed user privileges that are rarely reviewed or updated - may lead to privilege creep and unnecessary access."
+        "Excessive privileges": "Users have more database permissions than needed for their role - increases security risk from compromised accounts."
+        "Unknown": "Database privilege management approach is unclear or not documented."
+      help_text: "Proper privilege management implements least privilege access principles."
+      related_branch: "AccessControl"
+    - id: "database_data_classification"
+      question: "Is data classification implemented?"
+      type: "single_choice"
+      options: ["Comprehensive data classification", "Basic data labeling", "Informal classification", "No data classification", "Unknown"]
+      option_descriptions:
+        "Comprehensive data classification": "Systematic data classification with clear sensitivity levels, automated discovery, and appropriate security controls for each classification level."
+        "Basic data labeling": "Simple data categorization with basic sensitivity levels, but may lack comprehensive coverage or automated controls."
+        "Informal classification": "Ad-hoc data classification without formal policies or consistent application across the organization."
+        "No data classification": "No systematic approach to classifying data sensitivity - makes it difficult to apply appropriate security controls."
+        "Unknown": "Data classification implementation is unclear or not documented."
+      help_text: "Data classification drives appropriate security controls based on data sensitivity."
+      related_branch: "DataClassification"
 
   advanced:
     - id: "database_privilege_management"
