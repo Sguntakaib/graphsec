@@ -2978,7 +2978,7 @@ function AppContent() {
                         <button
                           role="menuitem"
                           onClick={() => {
-                            setShowVulnerabilityList(!showVulnerabilityList);
+                            setIsVulnerabilitiesCollapsed(false);
                             setShowVulnMenu(false);
                           }}
                           className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 flex items-center space-x-3 transition-colors"
