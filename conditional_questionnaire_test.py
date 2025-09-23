@@ -275,7 +275,11 @@ class ConditionalQuestionnaireTester:
                     database_type_found = True
                     options = question.get("options", [])
                     print(f"   Database Type Question Found: {question.get('question', 'Unknown')}")
-                    print(f"     Options: {[opt.get('value', 'Unknown') for opt in options[:3]]}...")
+                    if isinstance(options, list) and len(options) > 0:
+                        if isinstance(options[0], dict):
+                            print(f"     Options: {[opt.get('value', opt.get('text', 'Unknown')) for opt in options[:3]]}...")
+                        else:
+                            print(f"     Options: {options[:3]}...")
                 
                 # Look for engine-specific fields
                 if any(engine in question_id for engine in ["mysql", "postgresql", "mongodb", "oracle", "mssql"]):
