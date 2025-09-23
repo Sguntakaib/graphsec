@@ -736,23 +736,26 @@ class VulnerabilityBackendTester:
             print(f"   ⚠️ Cleanup error: {str(e)}")
 
     def run_all_tests(self):
-        """Run all API questionnaire looping issue fix verification tests"""
-        print("🚀 STARTING API QUESTIONNAIRE LOOPING ISSUE FIX VERIFICATION")
+        """Run all vulnerability backend verification tests"""
+        print("🚀 STARTING VULNERABILITY SECTION POSITIONING FIX BACKEND VERIFICATION")
         print("=" * 80)
-        print("Testing API questionnaire endpoints to verify looping issue fixes:")
-        print("1. Create new diagram and verify it exists")
-        print("2. Get API questionnaire prompts and verify question count")
-        print("3. Test questionnaire validation with sample API responses")
-        print("4. Test saving questionnaire to non-existent diagram (should return 404)")
-        print("5. Test saving questionnaire to existing diagram (should work)")
+        print("Testing backend health and vulnerability endpoints to ensure no regressions:")
+        print("1. Test basic API health endpoint")
+        print("2. Create new diagram and verify it exists")
+        print("3. Get API questionnaire prompts and verify question count")
+        print("4. Test vulnerability analysis endpoints are working")
+        print("5. Test diagram operations still work")
+        print("6. Test node operations still work")
+        print("7. Test questionnaire save functionality")
         print("=" * 80)
         
         tests = [
             self.test_health_check,
             self.test_create_diagram,
             self.test_api_questionnaire_prompts,
-            self.test_api_questionnaire_validation,
-            self.test_questionnaire_404_handling,
+            self.test_vulnerability_analysis,
+            self.test_diagram_operations,
+            self.test_node_operations,
             self.test_questionnaire_save_to_existing_diagram,
         ]
         
