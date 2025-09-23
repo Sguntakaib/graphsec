@@ -3496,6 +3496,7 @@ function AppContent() {
                     onAnalyzeStride={(result) => {
                       console.log('STRIDE Analysis completed:', result);
                     }}
+                    onStrideDataUpdate={setStrideThreatsCount}
                   />
                 )}
               </div>
