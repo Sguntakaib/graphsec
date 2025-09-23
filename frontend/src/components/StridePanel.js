@@ -312,6 +312,16 @@ const StridePanel = ({ diagramId, onAnalyzeStride }) => {
               
               <p className="text-gray-400 text-xs mb-2 leading-relaxed">
                 {threat.description}
+                {threat.references && Array.isArray(threat.references.derived_from) && threat.references.derived_from.length > 0 && (
+                  <div className="mt-2 text-xs text-gray-400">
+                    <span className="text-gray-500">Derived from:</span>
+                    <ul className="list-disc ml-4 mt-1">
+                      {threat.references.derived_from.slice(0, 3).map((line, i) => (
+                        <li key={i}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </p>
               
               {threat.mitigations && threat.mitigations.length > 0 && (
