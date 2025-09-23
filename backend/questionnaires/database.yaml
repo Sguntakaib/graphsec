@@ -171,18 +171,6 @@ questionnaires:
       options: ["Secure connection pooling", "Basic connection limits", "Unlimited connections", "No connection management", "Unknown"]
       help_text: "Secure connection pooling prevents resource exhaustion attacks."
       related_branch: "DatabaseSecurity"
-    - id: "database_query_monitoring"
-      question: "What database query monitoring is implemented?"
-      type: "single_choice"
-      options: ["Real-time query analysis", "Query performance monitoring", "Basic query logging", "No query monitoring", "Unknown"]
-      help_text: "Query monitoring detects suspicious database activities and performance issues."
-      related_branch: "Monitoring"
-    - id: "database_data_classification"
-      question: "Is data classification implemented?"
-      type: "single_choice"
-      options: ["Comprehensive data classification", "Basic data labeling", "Informal classification", "No data classification", "Unknown"]
-      help_text: "Data classification drives appropriate security controls based on data sensitivity."
-      related_branch: "DataClassification"
     - id: "database_backup_encryption"
       question: "Are database backups encrypted?"
       type: "single_choice"
