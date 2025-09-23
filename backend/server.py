@@ -6793,7 +6793,13 @@ async def get_stride_threats(diagram_id: str):
     """
     try:
         stored_threats = await db.stride_threats.find({"diagram_id": diagram_id}).to_list(1000)
-        return {"threats": stored_threats, "count": len(stored_threats)}
+        # Convert MongoDB documents to JSON-serializable format
+        json_threats = []
+        for threat in stored_threats:
+            # Remove MongoDB _id field and ensure all fields are JSON serializable
+            threat_dict = {k: v for k, v in threat.items() if k != "_id"}
+            json_threats.append(threat_dict)
+        return {"threats": json_threats, "count": len(json_threats)}
     except Exception as e:
         logger.error(f"Fetch STRIDE threats error for diagram {diagram_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch threats: {e}")
