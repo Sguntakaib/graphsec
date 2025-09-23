@@ -2937,9 +2937,11 @@ function AppContent() {
               {allVulnerabilities.length > 0 ? (
                 <div className="flex items-center bg-gray-700 rounded-lg border border-gray-600">
                   <button
-                    onClick={() => setShowVulnerabilityList(!showVulnerabilityList)}
+                    onClick={() => {
+                      setIsVulnerabilitiesCollapsed(false);
+                    }}
                     className={`px-4 py-2 rounded-l-lg flex items-center space-x-2 text-sm font-medium transition-colors ${
-                      showVulnerabilityList || showVulnerabilityFilter || showVulnerabilityLegend
+                      !isVulnerabilitiesCollapsed || showVulnerabilityFilter || showVulnerabilityLegend
                         ? 'bg-purple-600 text-white'
                         : 'text-white hover:bg-gray-600'
                     }`}
