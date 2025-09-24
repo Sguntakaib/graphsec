@@ -128,16 +128,17 @@ const NodeInfoOverlay = ({
         <div className="text-xs text-gray-500">Auto-dismiss in 5s</div>
         <div className="w-full bg-gray-700 h-1 rounded-full mt-1 overflow-hidden">
           <div 
-            className="h-full bg-blue-500 rounded-full animate-pulse"
+            className="h-full bg-blue-500 rounded-full"
             style={{
-              animation: 'shrink 5s linear forwards'
+              width: '100%',
+              animation: 'shrink-width 5s linear forwards'
             }}
           />
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes shrink {
+      <style jsx global>{`
+        @keyframes shrink-width {
           from { width: 100%; }
           to { width: 0%; }
         }
