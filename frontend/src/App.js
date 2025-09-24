@@ -3581,6 +3581,19 @@ function AppContent() {
               </Panel>
             )}
           </ReactFlow>
+          
+          {/* Node Info Overlay */}
+          {showNodeInfoOverlay && nodeInfoOverlayData && (
+            <NodeInfoOverlay
+              node={nodeInfoOverlayData.node}
+              position={nodeInfoOverlayData.position}
+              vulnerabilityCount={nodeInfoOverlayData.vulnerabilityCount}
+              strideScore={nodeInfoOverlayData.strideScore}
+              answeredQuestions={nodeInfoOverlayData.answeredQuestions}
+              totalQuestions={nodeInfoOverlayData.totalQuestions}
+              onClose={closeNodeInfoOverlay}
+            />
+          )}
         </div>
 
         {/* Right Sidebar - Properties and Analysis */}
