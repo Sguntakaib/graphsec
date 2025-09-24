@@ -12,7 +12,7 @@ import sys
 import time
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://hover-popup-fix.preview.emergentagent.com/api"
+BASE_URL = "https://app-deployment-28.preview.emergentagent.com/api"
 
 class ComprehensiveParentChildTester:
     def __init__(self):

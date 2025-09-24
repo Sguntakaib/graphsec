@@ -10,7 +10,7 @@ import requests
 import json
 import uuid
 
-BASE_URL = "https://hover-popup-fix.preview.emergentagent.com/api"
+BASE_URL = "https://app-deployment-28.preview.emergentagent.com/api"
 
 def test_stride_analysis_fix():
     """Test that STRIDE analysis now works correctly with optimal security"""
