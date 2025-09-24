@@ -539,20 +539,26 @@ function AppContent() {
           const strideData = await strideResponse.json();
           console.log('🎯 STRIDE response data:', strideData);
           
-          // Find this node's threats and calculate risk score
-          const nodeThreats = strideData.threats?.filter(t => 
-            t.affected_nodes?.includes(nodeId) || t.node_id === nodeId
-          ) || [];
+          // Since threats don't have node associations, calculate average risk from all threats
+          // This is a simplified approach - all nodes will show the same overall risk score
+          const allThreats = strideData.threats || [];
+          console.log('🎯 All threats found:', allThreats.length);
           
-          console.log('🎯 Filtered threats for node', nodeId, ':', nodeThreats);
-          
-          if (nodeThreats.length > 0) {
-            // Calculate average risk score from threats
-            const totalRisk = nodeThreats.reduce((sum, threat) => sum + (threat.risk_score || 0), 0);
-            strideScore = nodeThreats.length > 0 ? (totalRisk / nodeThreats.length) : 0;
-            console.log('🎯 Calculated STRIDE score:', strideScore, 'from', nodeThreats.length, 'threats');
+          if (allThreats.length > 0) {
+            // Use residual_risk field (not risk_score) as identified by backend testing
+            const threatScores = allThreats.map(threat => {
+              const score = threat.residual_risk || threat.risk_score || 0;
+              console.log('🎯 Threat score:', threat.title, '=', score);
+              return score;
+            });
+            
+            // Calculate average risk score
+            const totalRisk = threatScores.reduce((sum, score) => sum + score, 0);
+            strideScore = allThreats.length > 0 ? (totalRisk / allThreats.length) : 0;
+            console.log('🎯 Calculated average STRIDE score:', strideScore, 'from', allThreats.length, 'threats');
+            console.log('🎯 Individual scores:', threatScores);
           } else {
-            console.log('🎯 No threats found for node:', nodeId);
+            console.log('🎯 No threats found in STRIDE analysis');
           }
         } else {
           console.error('🎯 STRIDE API error:', strideResponse.status, await strideResponse.text());
