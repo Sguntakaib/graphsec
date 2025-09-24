@@ -1,0 +1,304 @@
+================================================================================
+STRIDE THREAT ANALYSIS SYSTEM - DETAILED IMPLEMENTATION DOCUMENTATION
+================================================================================
+
+OVERVIEW:
+========
+The STRIDE system implements comprehensive threat modeling based on the Microsoft 
+STRIDE framework (Spoofing, Tampering, Repudiation, Information Disclosure, 
+Denial of Service, Elevation of Privilege). It analyzes security diagrams both 
+per-node and across the entire canvas to identify and score security threats.
+
+SYSTEM ARCHITECTURE:
+==================
+
+1. CORE COMPONENTS:
+   - StrideRuleEngine: Evaluates threat rules against questionnaire responses
+   - StrideThreatAnalyzer: Main orchestrator for threat analysis
+   - Threat Models: Structured threat definitions with MITRE & OWASP mappings
+   - STRIDE Mapping: Declarative questionnaire-to-threat mappings
+
+2. KEY FILES:
+   - backend/stride_engine.py: Core analysis engine
+   - backend/stride_mapping.py: Questionnaire response mappings
+   - frontend/src/components/StridePanel.js: UI interface
+
+ANALYSIS MODES:
+==============
+
+A. PER-NODE BASIS ANALYSIS:
+===========================
+
+1. INPUT PROCESSING:
+   - Node Type: WebApp, API, Database, ExternalAttacker, etc.
+   - Questionnaire Responses: Security configuration answers
+   - Node Metadata: Criticality (High/Medium/Low), Data Classification
+   - Node Position: For threat positioning on canvas
+
+2. ANALYSIS WORKFLOW:
+   
+   Step 1: Load Node-Specific Rules
+   - Each node type has predefined threat rules
+   - Rules contain conditions that check questionnaire responses
+   - Example WebApp rule: Check "webapp_authentication_method"
+   
+   Step 2: Apply Questionnaire-to-STRIDE Mapping
+   - Declarative mapping from responses to threats
+   - Uses stride_mapping.py for precise threat identification
+   - Maps specific answers to threat categories with descriptions
+   
+   Step 3: Evaluate Heuristic Rules
+   - Backup/fallback rules in stride_engine.py
+   - Condition-based evaluation (lambda functions)
+   - Example: lambda responses: responses.get("webapp_authentication_method") in ["No Authentication"]
+   
+   Step 4: Apply Risk Multipliers
+   - Criticality Multiplier: High=1.25, Medium=1.0, Low=0.85
+   - Data Classification: Highly Confidential=1.25, Confidential=1.15, Internal=1.0, Public=0.85
+   - Final Risk = Base Risk × Criticality × Classification (capped at 10.0)
+
+3. THREAT GENERATION:
+   
+   Each Threat Contains:
+   - ID: Unique identifier
+   - Element Type: NODE or EDGE
+   - Element ID: Source node/edge ID
+   - STRIDE Category: One of 6 categories
+   - Title: Human-readable threat name
+   - Description: Detailed explanation
+   - Residual Risk: 0-10 scale score
+   - Status: OPEN, MITIGATED, or PARTIAL
+   - Mitigations: Recommended controls
+   - References: MITRE & OWASP mappings
+   
+   Example Threat:
+   {
+     "id": "threat-uuid",
+     "element_type": "node",
+     "element_id": "webapp-123",
+     "stride_category": "Spoofing",
+     "title": "Authentication Bypass",
+     "description": "Web application vulnerable to authentication bypass attacks",
+     "residual_risk": 7.5,
+     "status": "open",
+     "mitigations": ["Implement MFA", "Strong authentication protocols"],
+     "references": {"owasp": ["A07:2021"], "mitre": ["T1078"]}
+   }
+
+4. NODE-SPECIFIC THREAT RULES:
+
+   WebApp Threats:
+   - Spoofing: Authentication bypass (weak/no auth)
+   - Tampering: Data integrity compromise (no input validation)
+   - Information Disclosure: Sensitive data exposure (no HTTPS)
+   - Denial of Service: Resource exhaustion (no rate limiting)
+   - Elevation of Privilege: Authorization flaws (weak authorization)
+   
+   API Threats:
+   - Spoofing: API authentication bypass
+   - Elevation of Privilege: Authorization bypass
+   - Denial of Service: Rate limit abuse
+   
+   Database Threats:
+   - Spoofing: Database authentication bypass
+   - Tampering: SQL injection risk
+   - Information Disclosure: Unencrypted data
+   - Repudiation: Insufficient logging
+   
+   ExternalAttacker Threats:
+   - Spoofing: Identity spoofing attacks (always applicable)
+   - Elevation of Privilege: Privilege escalation attempts (always applicable)
+
+B. ENTIRE CANVAS BASIS ANALYSIS:
+===============================
+
+1. CANVAS-WIDE PROCESSING:
+   - Processes all nodes and edges in the diagram
+   - Maintains relationships between connected components
+   - Identifies systemic vulnerabilities across the architecture
+
+2. ANALYSIS WORKFLOW:
+
+   Step 1: Iterate Through All Nodes
+   - Apply per-node analysis to each node
+   - Collect questionnaire responses for each node
+   - Generate individual node threats
+   
+   Step 2: Analyze Edge Relationships
+   - Process all edges (connections) between nodes
+   - Apply edge-specific threat rules
+   - Consider data flow security between components
+   
+   Step 3: De-duplication
+   - Remove duplicate threats using (element_id, category, title) key
+   - Prevents multiple rules from creating identical threats
+   
+   Step 4: Aggregate Analysis
+   - Calculate overall diagram risk
+   - Generate coverage statistics
+   - Provide mitigation recommendations
+
+3. EDGE THREAT ANALYSIS:
+   
+   Edge Rules Check For:
+   - Unencrypted Data Flow: HTTP, FTP, Telnet protocols
+   - Data Interception Risk: Missing encryption flags
+   - Authentication Missing: No mutual authentication
+   
+   Edge Threat Example:
+   {
+     "element_type": "edge",
+     "element_id": "edge-webapp-db",
+     "stride_category": "Information Disclosure",
+     "title": "Data Interception Risk",
+     "description": "Unencrypted communication may allow data interception",
+     "residual_risk": 6.8,
+     "mitigations": ["Enable TLS encryption", "VPN tunneling"]
+   }
+
+4. COVERAGE CALCULATION:
+   
+   Metrics Generated:
+   - Total threats per STRIDE category
+   - Mitigated threats per category
+   - Overall residual risk average
+   - Per-node threat breakdown
+   - Per-edge threat breakdown
+   - Mitigation percentage
+   
+   Coverage Structure:
+   {
+     "totals": {"Spoofing": 7, "Tampering": 3, ...},
+     "mitigated": {"Spoofing": 1, "Tampering": 1, ...},
+     "residual_risk_avg": 6.15,
+     "by_node": {
+       "node-id": {
+         "totals": {"Spoofing": 2, ...},
+         "mitigated": {"Spoofing": 0, ...}
+       }
+     },
+     "by_edge": {...},
+     "total_threats": 26,
+     "mitigation_percentage": 26.9
+   }
+
+THREAT SCORING SYSTEM:
+=====================
+
+1. BASE RISK SCORES:
+   - Critical vulnerabilities: 8.0-10.0
+   - High vulnerabilities: 6.0-7.9
+   - Medium vulnerabilities: 4.0-5.9
+   - Low vulnerabilities: 2.0-3.9
+   - Informational: 0.0-1.9
+
+2. RISK CALCULATION:
+   - Base risk from threat rules
+   - Applied criticality multiplier
+   - Applied data classification multiplier
+   - Capped at maximum 10.0
+
+3. AGGREGATION:
+   - Average across all threats for overall score
+   - Weighted by threat count per category
+   - Separate scoring for nodes vs edges
+
+THREAT MITIGATION STATUS:
+========================
+
+1. STATUS TYPES:
+   - OPEN: Active threat requiring attention
+   - MITIGATED: Threat has been addressed
+   - PARTIAL: Partial controls in place
+
+2. STATUS DETERMINATION:
+   - Automatic based on questionnaire responses
+   - Strong controls → MITIGATED status
+   - Weak controls → PARTIAL status
+   - No controls → OPEN status
+
+3. MITIGATION TRACKING:
+   - Updates threat status via API
+   - Recalculates coverage percentages
+   - Maintains mitigation history
+
+INTEGRATION POINTS:
+==================
+
+1. FRONTEND INTEGRATION:
+   - StridePanel.js displays threats and coverage
+   - Interactive threat management
+   - Real-time coverage updates
+
+2. API ENDPOINTS:
+   - POST /api/diagrams/{id}/stride/analyze: Run analysis
+   - GET /api/diagrams/{id}/stride/coverage: Get coverage stats
+   - PATCH /api/diagrams/{id}/stride/threats/{id}: Update threat status
+
+3. HOVER POPUP INTEGRATION:
+   - Uses coverage API for per-node risk scores
+   - Displays residual_risk_avg for quick assessment
+   - Falls back to analysis endpoint if no coverage data
+
+4. DATABASE PERSISTENCE:
+   - Threats stored with diagram data
+   - Analysis timestamps tracked
+   - Mitigation status preserved
+
+PERFORMANCE OPTIMIZATIONS:
+=========================
+
+1. CACHING:
+   - Coverage data cached for hover popups
+   - Analysis results cached per diagram
+   - Incremental updates when possible
+
+2. BATCH PROCESSING:
+   - Multiple nodes analyzed together
+   - Efficient rule evaluation
+   - Optimized database queries
+
+3. SMART ANALYSIS:
+   - Only re-analyze when questionnaire changes
+   - Use cached results when available
+   - Progressive threat loading
+
+ERROR HANDLING:
+==============
+
+1. GRACEFUL DEGRADATION:
+   - Continue analysis if individual rules fail
+   - Log warnings for problematic rules
+   - Provide partial results when possible
+
+2. VALIDATION:
+   - Questionnaire response validation
+   - Threat data structure validation
+   - Risk score bounds checking
+
+3. RECOVERY:
+   - Fallback to heuristic rules if mapping fails
+   - Default risk scores for missing data
+   - Safe defaults for malformed responses
+
+EXTENSIBILITY:
+=============
+
+1. NEW THREAT RULES:
+   - Add to stride_engine.py heuristic rules
+   - Extend stride_mapping.py declarative mappings
+   - Support new node types and categories
+
+2. CUSTOM SCORING:
+   - Modify risk multipliers
+   - Add new severity levels
+   - Implement custom aggregation logic
+
+3. INTEGRATION EXPANSION:
+   - Additional MITRE technique mappings
+   - Extended OWASP category support
+   - Custom threat frameworks
+
+This comprehensive STRIDE system provides both detailed per-node threat analysis
+and holistic canvas-wide security assessment, enabling organizations to understand
+and mitigate security risks across their entire architecture.
