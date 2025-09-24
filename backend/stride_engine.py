@@ -91,7 +91,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.DENIAL_OF_SERVICE,
                     "title": "Resource Exhaustion",
                     "description": "Missing rate limiting may allow DoS attacks",
-                    "conditions": lambda responses: responses.get("webapp_rate_limiting") in ["No rate limiting", "Basic throttling"],
+                    "conditions": lambda responses: responses.get("webapp_rate_limiting") in ["No rate limiting", "Basic throttling"] and "webapp_rate_limiting" in responses,
                     "residual_risk": 5.5,
                     "mitigations": ["Implement rate limiting", "Resource monitoring"],
                     "references": {"owasp": ["A06:2021"], "mitre": ["T1499"]}
@@ -100,7 +100,7 @@ class StrideRuleEngine:
                     "stride_category": StrideCategory.ELEVATION_OF_PRIVILEGE,
                     "title": "Authorization Flaws",
                     "description": "Weak authorization controls may allow privilege escalation",
-                    "conditions": lambda responses: responses.get("webapp_authorization_model") in ["No authorization", "Simple permissions"],
+                    "conditions": lambda responses: responses.get("webapp_authorization_model") in ["No authorization", "Simple permissions"] and "webapp_authorization_model" in responses,
                     "residual_risk": 7.0,
                     "mitigations": ["Implement RBAC", "Least privilege principle"],
                     "references": {"owasp": ["A01:2021"], "mitre": ["T1068"]}
