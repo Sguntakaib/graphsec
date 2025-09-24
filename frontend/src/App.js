@@ -591,10 +591,6 @@ function AppContent() {
       } catch (e) {
         console.error('🎯 STRIDE API exception:', e.message);
       }
-        }
-      } catch (e) {
-        console.error('🎯 STRIDE API exception:', e.message);
-      }
     } else {
       console.log('🎯 No current diagram ID available for STRIDE analysis');
     }
