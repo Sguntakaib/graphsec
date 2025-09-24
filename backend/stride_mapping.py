@@ -209,12 +209,29 @@ WEBAPP_MAPPINGS: Dict[str, Dict[str, List[OptionImpact]]] = {
             OptionImpact(StrideCategory.INFORMATION_DISCLOSURE, "mitigate", "Comprehensive Headers Mitigate Disclosure", "Well-configured CSP/HSTS/XFO/XCTO protect against several web risks.", ["Continuous header audits"], 1.5)
         ],
     },
+    "webapp_session_management": {
+        "No session management": [
+            OptionImpact(StrideCategory.ELEVATION_OF_PRIVILEGE, "increase", "No Sessions Facilitate Privilege Abuse", "Lack of session controls enables fixation/hijacking patterns.", ["Use secure cookies", "Rotate session IDs", "Short timeouts"], 6.5)
+        ],
+        "Basic sessions": [
+            OptionImpact(StrideCategory.ELEVATION_OF_PRIVILEGE, "partial", "Basic Sessions Provide Limited Protection", "Minimal features leave room for escalation attacks.", ["Harden cookie flags", "Implement rotation"], 4.0, status_override=ThreatStatus.PARTIAL)
+        ],
+        "Standard sessions": [
+            OptionImpact(StrideCategory.ELEVATION_OF_PRIVILEGE, "partial", "Standard Sessions Provide Basic Protection", "Standard session handling with reasonable security but may lack advanced protections.", ["Add session rotation", "Enhance security"], 3.5, status_override=ThreatStatus.PARTIAL)
+        ],
+        "Secure session management": [
+            OptionImpact(StrideCategory.ELEVATION_OF_PRIVILEGE, "mitigate", "Secure Sessions Mitigate Elevation", "Strong session practices reduce privilege escalation avenues.", ["Harden SameSite/HttpOnly/Secure flags"], 2.0)
+        ],
+    },
     "webapp_rate_limiting": {
         "No rate limiting": [
             OptionImpact(StrideCategory.DENIAL_OF_SERVICE, "increase", "Missing Throttling Enables DoS", "Unlimited requests enable resource exhaustion.", ["Introduce per-user limits", "Adaptive throttling"], 6.5)
         ],
         "Basic throttling": [
             OptionImpact(StrideCategory.DENIAL_OF_SERVICE, "partial", "Basic Throttling Partially Prevents DoS", "Simple caps reduce but don't stop abusive patterns.", ["Use adaptive/dynamic limits"], 4.0, status_override=ThreatStatus.PARTIAL)
+        ],
+        "Fixed rate limiting": [
+            OptionImpact(StrideCategory.DENIAL_OF_SERVICE, "partial", "Fixed Rate Limiting Partially Prevents DoS", "Static limits may not adapt to legitimate traffic patterns.", ["Introduce adaptive limiting"], 3.5, status_override=ThreatStatus.PARTIAL)
         ],
         "Adaptive rate limiting": [
             OptionImpact(StrideCategory.DENIAL_OF_SERVICE, "mitigate", "Adaptive Rate Limiting Mitigates DoS", "Per-user adaptive controls reduce attack surface.", ["Monitor anomalies"], 2.0)
