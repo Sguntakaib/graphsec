@@ -2314,10 +2314,36 @@ function AppContent() {
       const vulnerabilityNodes = createVulnerabilityNodes(analysisResult);
       const vulnerabilityEdges = createVulnerabilityEdges(analysisResult, nodeId);
       
-      // Add vulnerability nodes and edges to the graph
+      // Remove existing vulnerability nodes and edges for this parent node first to prevent duplicates
       if (vulnerabilityNodes.length > 0) {
-        setNodes(nds => [...nds, ...vulnerabilityNodes]);
-        setEdges(eds => [...eds, ...vulnerabilityEdges]);
+        setNodes(nds => {
+          // Filter out existing vulnerability nodes for this parent node
+          const filteredNodes = nds.filter(node => {
+            if (node.type !== 'vulnerability') return true;
+            // Check if this vulnerability node belongs to the current parent node
+            return !node.data?.parent_node_id || node.data.parent_node_id !== nodeId;
+          });
+          // Add new vulnerability nodes with unique keys
+          const uniqueVulnNodes = vulnerabilityNodes.map(vuln => ({
+            ...vuln,
+            id: `${nodeId}-${vuln.id}` // Ensure unique IDs by prefixing with parent node ID
+          }));
+          return [...filteredNodes, ...uniqueVulnNodes];
+        });
+        
+        setEdges(eds => {
+          // Filter out existing vulnerability edges for this parent node
+          const filteredEdges = eds.filter(edge => {
+            return !edge.id?.includes(`${nodeId}-vulnerability-`);
+          });
+          // Add new vulnerability edges with updated IDs
+          const uniqueVulnEdges = vulnerabilityEdges.map(edge => ({
+            ...edge,
+            id: `${nodeId}-vulnerability-${edge.target}`,
+            target: `${nodeId}-${edge.target}` // Update target to match new vulnerability node ID
+          }));
+          return [...filteredEdges, ...uniqueVulnEdges];
+        });
         
         console.log(`✅ Created ${vulnerabilityNodes.length} vulnerability nodes for node ${nodeId}`);
       }
