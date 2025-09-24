@@ -516,32 +516,52 @@ function AppContent() {
     }
     
     // Get STRIDE score for this node
-    try {
-      const strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram?.id}/stride/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nodes: [{
-            id: nodeId,
-            type: node.type,
-            subtype: nodeSubtype,
-            questionnaire_responses: questionnaireResponses,
-            position: node.position
-          }]
-        })
-      });
-      if (strideResponse.ok) {
-        const strideData = await strideResponse.json();
-        // Find this node's threats and calculate risk score
-        const nodeThreats = strideData.threats?.filter(t => t.affected_nodes?.includes(nodeId)) || [];
-        if (nodeThreats.length > 0) {
-          // Calculate average risk score from threats
-          const totalRisk = nodeThreats.reduce((sum, threat) => sum + (threat.risk_score || 0), 0);
-          strideScore = nodeThreats.length > 0 ? totalRisk / nodeThreats.length : 0;
+    if (currentDiagram?.id) {
+      try {
+        console.log('🎯 Fetching STRIDE data for node:', nodeId, 'in diagram:', currentDiagram.id);
+        const strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nodes: [{
+              id: nodeId,
+              type: node.type,
+              subtype: nodeSubtype,
+              questionnaire_responses: questionnaireResponses,
+              position: node.position
+            }]
+          })
+        });
+        
+        console.log('🎯 STRIDE response status:', strideResponse.status);
+        
+        if (strideResponse.ok) {
+          const strideData = await strideResponse.json();
+          console.log('🎯 STRIDE response data:', strideData);
+          
+          // Find this node's threats and calculate risk score
+          const nodeThreats = strideData.threats?.filter(t => 
+            t.affected_nodes?.includes(nodeId) || t.node_id === nodeId
+          ) || [];
+          
+          console.log('🎯 Filtered threats for node', nodeId, ':', nodeThreats);
+          
+          if (nodeThreats.length > 0) {
+            // Calculate average risk score from threats
+            const totalRisk = nodeThreats.reduce((sum, threat) => sum + (threat.risk_score || 0), 0);
+            strideScore = nodeThreats.length > 0 ? (totalRisk / nodeThreats.length) : 0;
+            console.log('🎯 Calculated STRIDE score:', strideScore, 'from', nodeThreats.length, 'threats');
+          } else {
+            console.log('🎯 No threats found for node:', nodeId);
+          }
+        } else {
+          console.error('🎯 STRIDE API error:', strideResponse.status, await strideResponse.text());
         }
+      } catch (e) {
+        console.error('🎯 STRIDE API exception:', e.message);
       }
-    } catch (e) {
-      console.log('Could not fetch STRIDE score:', e.message);
+    } else {
+      console.log('🎯 No current diagram ID available for STRIDE analysis');
     }
     
     setNodeInfoOverlayData({
