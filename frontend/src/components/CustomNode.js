@@ -88,6 +88,8 @@ const CustomNode = ({ data, selected, id }) => {
     <div 
       className={`react-flow__node-custom ${nodeClass} ${selected ? 'selected' : ''} cursor-pointer`}
       onClick={handleNodeClick}
+      onMouseEnter={handleNodeHover}
+      onMouseLeave={handleNodeHoverEnd}
     >
       <Handle type="target" position={Position.Top} />
       
