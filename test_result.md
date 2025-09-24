@@ -130,7 +130,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Security Modeling Platform - A web application for creating and analyzing security threat models with attack path simulation capabilities"
+user_problem_statement: "Security Modeling Platform - A web application for creating and analyzing security threat models with attack path simulation capabilities. NEW REQUIREMENT: AT present if we double tap on each node then it will open the questionnaire of each node thats good, now if i just single click on the each node, it should just show an overlay popup that show the information about the node, information like what is this node, how many questions user has answered, how many vulnerabilities exist for this node and what is the STRIDE score for this node. also we need one more functionality when we click Analyze button we see vulnerabilities would popup on all the nodes, now we might need on hide/unhide eye button to only hide/unhide the vulnerabilities nodes attached to each parent node"
 
   - task: "Parent-Child Relationship Bug Fixes"
     implemented: true
