@@ -142,17 +142,7 @@ WEBAPP_MAPPINGS: Dict[str, Dict[str, List[OptionImpact]]] = {
             OptionImpact(StrideCategory.INFORMATION_DISCLOSURE, "mitigate", "Strict HTTPS Mitigates Info Disclosure", "HSTS prevents downgrade and ensures encrypted transit.", ["Monitor TLS posture"], 1.5)
         ],
     },
-    "webapp_session_management": {
-        "No session management": [
-            OptionImpact(StrideCategory.ELEVATION_OF_PRIVILEGE, "increase", "No Sessions Facilitate Privilege Abuse", "Lack of session controls enables fixation/hijacking patterns.", ["Use secure cookies", "Rotate session IDs", "Short timeouts"], 6.5)
-        ],
-        "Basic sessions": [
-            OptionImpact(StrideCategory.ELEVATION_OF_PRIVILEGE, "partial", "Basic Sessions Provide Limited Protection", "Minimal features leave room for escalation attacks.", ["Harden cookie flags", "Implement rotation"], 4.0, status_override=ThreatStatus.PARTIAL)
-        ],
-        "Secure session management": [
-            OptionImpact(StrideCategory.ELEVATION_OF_PRIVILEGE, "mitigate", "Secure Sessions Mitigate Elevation", "Strong session practices reduce privilege escalation avenues.", ["Harden SameSite/HttpOnly/Secure flags"], 2.0)
-        ],
-    },
+    # webapp_session_management moved to later in file with complete options
     "webapp_error_handling": {
         "No error handling": [
             OptionImpact(StrideCategory.INFORMATION_DISCLOSURE, "increase", "No Error Handling Causes Info Disclosure", "Unhandled exceptions and verbose responses leak sensitive information.", ["Centralize error handlers", "Return generic messages"], 6.5)
