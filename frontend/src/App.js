@@ -3064,6 +3064,22 @@ function AppContent() {
                 <AlertTriangle className="h-4 w-4" />
                 <span>Analyze</span>
               </button>
+              
+              {/* Vulnerability Toggle Button - Shows when vulnerability nodes exist */}
+              {nodes.some(n => n.type === 'vulnerability') && (
+                <button
+                  onClick={toggleVulnerabilityNodesVisibility}
+                  className={`px-4 py-2 rounded-lg flex items-center space-x-2 text-sm font-medium shadow-sm transition-colors ${
+                    vulnerabilityNodesVisible
+                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      : 'bg-gray-600 text-gray-300 hover:bg-gray-700'
+                  }`}
+                  title={`${vulnerabilityNodesVisible ? 'Hide' : 'Show'} Vulnerability Nodes`}
+                >
+                  {vulnerabilityNodesVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  <span>{vulnerabilityNodesVisible ? 'Hide' : 'Show'}</span>
+                </button>
+              )}
             </div>
 
             {/* Divider */}
