@@ -94,8 +94,8 @@ const NodeInfoOverlay = ({
     <div 
       className="absolute z-50 bg-gray-900 border border-gray-600 rounded-lg shadow-2xl p-4 min-w-[280px] max-w-[320px]"
       style={{
-        left: position.x + 10,
-        top: position.y - 10,
+        left: adjustedPosition.x,
+        top: adjustedPosition.y,
         transform: 'translateY(-50%)'
       }}
     >
