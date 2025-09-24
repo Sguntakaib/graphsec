@@ -537,8 +537,8 @@ frontend:
         comment: "✅ STRIDE FRONTEND FIX VERIFICATION COMPLETED: Comprehensive testing confirms all STRIDE backend endpoints are working correctly with /api prefix. DETAILED RESULTS: 1) ✅ Health Check: GET /api/ endpoint responding correctly with 'Security Modeling Platform API' message 2) ✅ Diagram Creation: POST /api/diagrams successfully creates diagrams with WebApp nodes containing questionnaire responses 3) ✅ STRIDE Analysis: POST /api/diagrams/{id}/stride/analyze returns HTTP 200 with proper JSON structure containing 'threats' and 'analysis_summary' keys, identified 2 threats for test WebApp node 4) ✅ STRIDE Coverage: GET /api/diagrams/{id}/stride/coverage returns HTTP 200 with all required keys (totals, mitigated, residual_risk_avg, total_threats, mitigation_percentage) 5) ✅ Threat Mitigation: PATCH /api/diagrams/{id}/stride/threats/{threat_id} with status=mitigated successfully updates threat status and increases mitigation percentage from 0% to 50% 6) ✅ Route Protection: Non-/api routes properly return 404, confirming frontend 404 issues are resolved. CRITICAL SUCCESS: All STRIDE endpoints accessible with /api prefix, proper JSON responses with required keys, threat mitigation updates working, coverage calculations accurate. The frontend StridePanel.js /api prefix fix has completely resolved the 404 errors and JSON parsing issues."
 
   - task: "Hover Popup Timing Behavior Fix"
-    implemented: false
-    working: false
+    implemented: true
+    working: "NA"
     file: "frontend/src/components/NodeInfoOverlay.js, frontend/src/App.js"
     stuck_count: 0
     priority: "high"
@@ -547,6 +547,9 @@ frontend:
       - working: false
         agent: "user"
         comment: "User reports popup is showing when we hover on the node, and it will be there until 5 sec, we need to ensure the popup shows only on hovering on node, and it should go away when the hovering is taken away or when user hover on other node."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 HOVER POPUP TIMING BEHAVIOR FIX IMPLEMENTED: Removed 5-second auto-dismiss timer that was causing popup to persist. CHANGES: 1) ✅ Removed auto-dismiss useEffect from NodeInfoOverlay.js that was keeping popup visible for 5 seconds 2) ✅ Enhanced hover state management in App.js to immediately clear timers when switching nodes 3) ✅ Reduced hover end delay from 100ms to 50ms for more responsive behavior 4) ✅ Added immediate overlay hiding when switching between nodes 5) ✅ Replaced auto-dismiss indicator with simple hover tip. RESULT: Popup now shows only while hovering and hides immediately when hover ends or switching to other nodes."
 
   - task: "STRIDE Analysis Score Display Fix"
     implemented: false
@@ -559,6 +562,9 @@ frontend:
       - working: false
         agent: "user"  
         comment: "User reports STRIDE analysis score for each node is not showing when we hover - all scores show as 0.0/10.0 instead of actual risk scores."
+      - working: false
+        agent: "main"
+        comment: "🔍 INVESTIGATING STRIDE SCORE DISPLAY ISSUE: Added comprehensive debugging to STRIDE API calls in hover handler. DEBUGGING ADDED: 1) ✅ Console logging for STRIDE API request details (node ID, diagram ID) 2) ✅ Response status and data logging 3) ✅ Threat filtering logic debugging 4) ✅ Score calculation logging 5) ✅ Error handling improvements. INVESTIGATION: Current API call structure may not match backend expectations or threat data structure may be different than expected. Need to test and analyze console output to identify root cause."
 
 metadata:
   created_by: "main_agent"
