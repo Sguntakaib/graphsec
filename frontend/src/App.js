@@ -436,14 +436,97 @@ function AppContent() {
     });
   }, [selectedEdge]); // Add selectedEdge dependency
 
+  // Node hover handlers for info overlay
+  const handleNodeHover = useCallback(async (event) => {
+    const { nodeId, nodeData, position } = event.detail;
+    const node = nodes.find(n => n.id === nodeId);
+    
+    if (!node || node.type === 'vulnerability') return; // Skip vulnerability nodes
+    
+    // Clear any existing hover timer
+    if (overlayHoverTimer) {
+      clearTimeout(overlayHoverTimer);
+    }
+    
+    // Get node statistics
+    const nodeSubtype = node.data?.subtype || node.subtype;
+    let answeredQuestions = 0;
+    let totalQuestions = 0;
+    let vulnerabilityCount = 0;
+    let strideScore = 0;
+    
+    // Calculate answered questions
+    const questionnaireResponses = node.data?.questionnaireResponses || node.questionnaireResponses || {};
+    answeredQuestions = Object.keys(questionnaireResponses).length;
+    
+    // Get total questions from node meta or fetch from API
+    if (node.data?.questionnaireMeta?.total_questions) {
+      totalQuestions = node.data.questionnaireMeta.total_questions;
+    } else {
+      try {
+        let metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`;
+        if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
+          metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
+        }
+        const metaRes = await fetch(metaUrl);
+        if (metaRes.ok) {
+          const meta = await metaRes.json();
+          totalQuestions = meta.total_questions || (meta.prompts ? meta.prompts.length : 0);
+        }
+      } catch (e) {
+        console.log('Could not fetch question count:', e.message);
+      }
+    }
+    
+    // Get vulnerability count for this node
+    if (vulnerabilityAnalyses[nodeId]) {
+      vulnerabilityCount = vulnerabilityAnalyses[nodeId].vulnerabilities?.length || 0;
+    }
+    
+    // Get STRIDE score for this node (implement this later)
+    // strideScore = getStrideScoreForNode(nodeId) || 0;
+    
+    setNodeInfoOverlayData({
+      node,
+      position,
+      answeredQuestions,
+      totalQuestions,
+      vulnerabilityCount,
+      strideScore
+    });
+    setShowNodeInfoOverlay(true);
+  }, [nodes, vulnerabilityAnalyses, overlayHoverTimer]);
+
+  const handleNodeHoverEnd = useCallback((event) => {
+    // Delay hiding the overlay slightly to prevent flicker
+    const timer = setTimeout(() => {
+      setShowNodeInfoOverlay(false);
+      setNodeInfoOverlayData(null);
+    }, 100);
+    setOverlayHoverTimer(timer);
+  }, []);
+
+  const closeNodeInfoOverlay = useCallback(() => {
+    setShowNodeInfoOverlay(false);
+    setNodeInfoOverlayData(null);
+    if (overlayHoverTimer) {
+      clearTimeout(overlayHoverTimer);
+      setOverlayHoverTimer(null);
+    }
+  }, [overlayHoverTimer]);
+
   useEffect(() => {
     window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
     window.addEventListener('edgeUpdate', handleEdgeUpdate);
+    window.addEventListener('nodeHover', handleNodeHover);
+    window.addEventListener('nodeHoverEnd', handleNodeHoverEnd);
     return () => {
       window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
       window.removeEventListener('edgeUpdate', handleEdgeUpdate);
+      window.removeEventListener('nodeHover', handleNodeHover);
+      window.removeEventListener('nodeHoverEnd', handleNodeHoverEnd);
     };
-  }, [handleNodeDoubleTap, handleEdgeUpdate]); // Use the memoized callbacks
+  }, [handleNodeDoubleTap, handleEdgeUpdate, handleNodeHover, handleNodeHoverEnd]); // Use the memoized callbacks
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
