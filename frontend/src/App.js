@@ -519,19 +519,41 @@ function AppContent() {
     if (currentDiagram?.id) {
       try {
         console.log('🎯 Fetching STRIDE data for node:', nodeId, 'in diagram:', currentDiagram.id);
-        const strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/analyze`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nodes: [{
-              id: nodeId,
-              type: node.type,
-              subtype: nodeSubtype,
-              questionnaire_responses: questionnaireResponses,
-              position: node.position
-            }]
-          })
-        });
+        
+        // First try to get existing STRIDE coverage data (faster than re-analyzing)
+        let strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/coverage`);
+        let useAnalysisEndpoint = false;
+        
+        if (strideResponse.ok) {
+          const coverageData = await strideResponse.json();
+          console.log('🎯 STRIDE coverage data:', coverageData);
+          
+          if (coverageData.total_threats > 0) {
+            // Use existing analysis data
+            strideScore = coverageData.residual_risk_avg || 0;
+            console.log('🎯 Using existing STRIDE coverage average:', strideScore);
+          } else {
+            useAnalysisEndpoint = true;
+          }
+        } else {
+          useAnalysisEndpoint = true;
+        }
+        
+        // If no existing analysis, run new analysis
+        if (useAnalysisEndpoint) {
+          strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              nodes: [{
+                id: nodeId,
+                type: node.type,
+                subtype: nodeSubtype,
+                questionnaire_responses: questionnaireResponses,
+                position: node.position
+              }]
+            })
+          });
         
         console.log('🎯 STRIDE response status:', strideResponse.status);
         
