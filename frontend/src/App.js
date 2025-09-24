@@ -443,9 +443,16 @@ function AppContent() {
     
     if (!node || node.type === 'vulnerability') return; // Skip vulnerability nodes
     
-    // Clear any existing hover timer
+    // Clear any existing hover timer and immediately hide existing overlay
     if (overlayHoverTimer) {
       clearTimeout(overlayHoverTimer);
+      setOverlayHoverTimer(null);
+    }
+    
+    // If switching to a different node, immediately show new overlay
+    if (showNodeInfoOverlay && nodeInfoOverlayData?.node?.id !== nodeId) {
+      // Immediately switch to new node
+      setShowNodeInfoOverlay(false);
     }
     
     // Get node statistics
