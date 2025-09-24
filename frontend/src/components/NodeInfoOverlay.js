@@ -168,26 +168,10 @@ const NodeInfoOverlay = ({
         </div>
       </div>
 
-      {/* Auto-dismiss indicator */}
+      {/* Hover tip */}
       <div className="mt-3 text-center">
-        <div className="text-xs text-gray-500">Auto-dismiss in 5s</div>
-        <div className="w-full bg-gray-700 h-1 rounded-full mt-1 overflow-hidden">
-          <div 
-            className="h-full bg-blue-500 rounded-full"
-            style={{
-              width: '100%',
-              animation: 'shrink-width 5s linear forwards'
-            }}
-          />
-        </div>
+        <div className="text-xs text-gray-500">Hover to view details</div>
       </div>
-
-      <style jsx global>{`
-        @keyframes shrink-width {
-          from { width: 100%; }
-          to { width: 0%; }
-        }
-      `}</style>
     </div>
   );
 };
