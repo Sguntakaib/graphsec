@@ -12,14 +12,7 @@ const NodeInfoOverlay = ({
 }) => {
   const [adjustedPosition, setAdjustedPosition] = useState(position);
 
-  // Auto-dismiss after 5 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [onClose]);
+  // No auto-dismiss - only close when hover ends
 
   // Calculate smart positioning to keep overlay within canvas bounds
   useEffect(() => {
