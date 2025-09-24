@@ -58,6 +58,32 @@ const CustomNode = ({ data, selected, id }) => {
     });
   };
 
+  const handleNodeHover = (event) => {
+    event.stopPropagation();
+    const rect = event.currentTarget.getBoundingClientRect();
+    
+    console.log('🎯 Node hover detected on node:', id, 'with data:', data);
+    const customEvent = new CustomEvent('nodeHover', {
+      detail: { 
+        nodeId: id, 
+        nodeData: data,
+        position: {
+          x: rect.right,
+          y: rect.top + rect.height / 2
+        }
+      }
+    });
+    window.dispatchEvent(customEvent);
+  };
+
+  const handleNodeHoverEnd = (event) => {
+    event.stopPropagation();
+    const customEvent = new CustomEvent('nodeHoverEnd', {
+      detail: { nodeId: id }
+    });
+    window.dispatchEvent(customEvent);
+  };
+
   return (
     <div 
       className={`react-flow__node-custom ${nodeClass} ${selected ? 'selected' : ''} cursor-pointer`}
