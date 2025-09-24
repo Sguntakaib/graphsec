@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Shield, FileText, AlertTriangle, BarChart3, X } from 'lucide-react';
 
 const NodeInfoOverlay = ({ 
@@ -10,6 +10,8 @@ const NodeInfoOverlay = ({
   totalQuestions = 0,
   onClose 
 }) => {
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
+
   // Auto-dismiss after 5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,6 +20,56 @@ const NodeInfoOverlay = ({
 
     return () => clearTimeout(timer);
   }, [onClose]);
+
+  // Calculate smart positioning to keep overlay within canvas bounds
+  useEffect(() => {
+    if (!position) return;
+
+    const overlayWidth = 320; // max-w-[320px] from component
+    const overlayHeight = 280; // approximate height
+    const margin = 20; // minimum margin from edges
+
+    // Get canvas dimensions (ReactFlow container)
+    const canvasElement = document.querySelector('.react-flow');
+    if (!canvasElement) {
+      setAdjustedPosition(position);
+      return;
+    }
+
+    const canvasRect = canvasElement.getBoundingClientRect();
+    const canvasLeft = canvasRect.left;
+    const canvasRight = canvasRect.right;
+    const canvasTop = canvasRect.top;
+    const canvasBottom = canvasRect.bottom;
+
+    let newX = position.x + 15; // Default: to the right of node
+    let newY = position.y;
+
+    // Check right boundary - if overlay would go outside canvas, position to the left
+    if (newX + overlayWidth + margin > canvasRight) {
+      newX = position.x - overlayWidth - 15; // Position to the left of node
+    }
+
+    // Check left boundary
+    if (newX < canvasLeft + margin) {
+      newX = canvasLeft + margin;
+    }
+
+    // Check bottom boundary
+    if (newY + overlayHeight / 2 + margin > canvasBottom) {
+      newY = canvasBottom - overlayHeight / 2 - margin;
+    }
+
+    // Check top boundary  
+    if (newY - overlayHeight / 2 < canvasTop + margin) {
+      newY = canvasTop + overlayHeight / 2 + margin;
+    }
+
+    setAdjustedPosition({
+      x: newX,
+      y: newY
+    });
+  }, [position]);
 
   if (!node || !position) return null;
 
