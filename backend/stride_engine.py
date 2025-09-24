@@ -234,7 +234,7 @@ class StrideRuleEngine:
         ]
     
     def analyze_node_threats(self, node: Dict[str, Any], questionnaire_responses: Dict[str, Any] = None, diagram_id: str = "") -> List[Threat]:
-        """Analyze STRIDE threats for a single node"""
+        """Analyze STRIDE threats for a single node using context-aware approach"""
         threats = []
         node_subtype = node.get("subtype", "")
         node_id = node.get("id", "")
@@ -242,33 +242,52 @@ class StrideRuleEngine:
         if not questionnaire_responses:
             questionnaire_responses = {}
         
-        # 1) Use explicit questionnaire-to-STRIDE mapping
-        try:
-            from stride_mapping import map_responses_to_threats  # local import to avoid cycles
-            mapped = map_responses_to_threats(node_subtype, questionnaire_responses, node_id=node_id, diagram_id=diagram_id, node_meta=node)
-            threats.extend(mapped)
-        except Exception as e:
-            logger.warning(f"STRIDE mapping failed for node {node_id} of type {node_subtype}: {e}")
-        
-        # 2) Apply heuristic rules as fallback/augmentation
-        rules = self.node_threat_rules.get(node_subtype, [])
-        for rule in rules:
+        # 1) Use context-aware analysis for WebApps (more intelligent)
+        if node_subtype == "WebApp":
             try:
-                if rule["conditions"](questionnaire_responses):
-                    threat = Threat(
-                        diagram_id="",  # set by caller later
-                        element_type=ElementType.NODE,
-                        element_id=node_id,
-                        stride_category=rule["stride_category"],
-                        title=rule["title"],
-                        description=rule["description"],
-                        residual_risk=rule["residual_risk"],
-                        mitigations=rule["mitigations"],
-                        references=rule["references"],
-                    )
-                    threats.append(threat)
+                from context_aware_stride import contextual_analyzer
+                contextual_threats = contextual_analyzer.analyze_context_aware_threats(node, questionnaire_responses)
+                threats.extend(contextual_threats)
+                logger.info(f"Context-aware analysis generated {len(contextual_threats)} threats for WebApp {node_id}")
             except Exception as e:
-                logger.warning(f"Error evaluating threat rule for {node_subtype}: {e}")
+                logger.warning(f"Context-aware analysis failed for WebApp {node_id}: {e}")
+                # Fallback to mapping approach
+                try:
+                    from stride_mapping import map_responses_to_threats
+                    mapped = map_responses_to_threats(node_subtype, questionnaire_responses, node_id=node_id, diagram_id=diagram_id, node_meta=node)
+                    threats.extend(mapped)
+                except Exception as e2:
+                    logger.warning(f"STRIDE mapping fallback also failed for node {node_id}: {e2}")
+        
+        # 2) Use explicit questionnaire-to-STRIDE mapping for other node types
+        else:
+            try:
+                from stride_mapping import map_responses_to_threats  # local import to avoid cycles
+                mapped = map_responses_to_threats(node_subtype, questionnaire_responses, node_id=node_id, diagram_id=diagram_id, node_meta=node)
+                threats.extend(mapped)
+            except Exception as e:
+                logger.warning(f"STRIDE mapping failed for node {node_id} of type {node_subtype}: {e}")
+        
+        # 3) Apply heuristic rules as fallback/augmentation (only for non-WebApp or when context analysis fails)
+        if node_subtype != "WebApp" or len(threats) == 0:
+            rules = self.node_threat_rules.get(node_subtype, [])
+            for rule in rules:
+                try:
+                    if rule["conditions"](questionnaire_responses):
+                        threat = Threat(
+                            diagram_id="",  # set by caller later
+                            element_type=ElementType.NODE,
+                            element_id=node_id,
+                            stride_category=rule["stride_category"],
+                            title=rule["title"],
+                            description=rule["description"],
+                            residual_risk=rule["residual_risk"],
+                            mitigations=rule["mitigations"],
+                            references=rule["references"],
+                        )
+                        threats.append(threat)
+                except Exception as e:
+                    logger.warning(f"Error evaluating threat rule for {node_subtype}: {e}")
         
         return threats
     
