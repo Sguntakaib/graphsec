@@ -552,8 +552,8 @@ frontend:
         comment: "🔧 HOVER POPUP TIMING BEHAVIOR FIX IMPLEMENTED: Removed 5-second auto-dismiss timer that was causing popup to persist. CHANGES: 1) ✅ Removed auto-dismiss useEffect from NodeInfoOverlay.js that was keeping popup visible for 5 seconds 2) ✅ Enhanced hover state management in App.js to immediately clear timers when switching nodes 3) ✅ Reduced hover end delay from 100ms to 50ms for more responsive behavior 4) ✅ Added immediate overlay hiding when switching between nodes 5) ✅ Replaced auto-dismiss indicator with simple hover tip. RESULT: Popup now shows only while hovering and hides immediately when hover ends or switching to other nodes."
 
   - task: "STRIDE Analysis Score Display Fix"
-    implemented: false
-    working: false
+    implemented: true
+    working: "NA"
     file: "frontend/src/App.js"
     stuck_count: 0
     priority: "high"
@@ -565,6 +565,9 @@ frontend:
       - working: false
         agent: "main"
         comment: "🔍 INVESTIGATING STRIDE SCORE DISPLAY ISSUE: Added comprehensive debugging to STRIDE API calls in hover handler. DEBUGGING ADDED: 1) ✅ Console logging for STRIDE API request details (node ID, diagram ID) 2) ✅ Response status and data logging 3) ✅ Threat filtering logic debugging 4) ✅ Score calculation logging 5) ✅ Error handling improvements. INVESTIGATION: Current API call structure may not match backend expectations or threat data structure may be different than expected. Need to test and analyze console output to identify root cause."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 STRIDE SCORE DISPLAY FIX IMPLEMENTED: Root cause identified and fixed based on backend testing results. PROBLEM: Frontend was looking for 'risk_score' field but API returns 'residual_risk' field. SOLUTION: 1) ✅ Updated hover handler to use 'threat.residual_risk || threat.risk_score || 0' for score extraction 2) ✅ Added fallback to use existing STRIDE coverage data (residual_risk_avg) when available for better performance 3) ✅ Enhanced error handling with comprehensive debugging logs 4) ✅ Fixed JavaScript syntax error from duplicate catch blocks. BACKEND VERIFICATION: Confirmed existing STRIDE analysis with residual_risk_avg: 6.15 and per-node threat breakdowns available. The fix should now display actual STRIDE scores instead of 0.0 values."
 
 metadata:
   created_by: "main_agent"
