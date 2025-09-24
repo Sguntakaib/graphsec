@@ -8,7 +8,7 @@ import json
 import uuid
 import time
 
-BASE_URL = "https://vulnstride-popup.preview.emergentagent.com/api"
+BASE_URL = "https://hover-popup-fix.preview.emergentagent.com/api"
 
 def detailed_stride_debug():
     session = requests.Session()

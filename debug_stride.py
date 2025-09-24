@@ -6,7 +6,7 @@ Debug STRIDE issue - check if diagram exists in database
 import requests
 import json
 
-BASE_URL = "https://vulnstride-popup.preview.emergentagent.com/api"
+BASE_URL = "https://hover-popup-fix.preview.emergentagent.com/api"
 
 def test_diagram_creation_and_retrieval():
     session = requests.Session()
