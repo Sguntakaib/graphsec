@@ -2311,7 +2311,7 @@ function AppContent() {
       }));
       
       // Create vulnerability nodes for visualization
-      const vulnerabilityNodes = createVulnerabilityNodes(analysisResult);
+      const vulnerabilityNodes = createVulnerabilityNodes(analysisResult, nodeId);
       const vulnerabilityEdges = createVulnerabilityEdges(analysisResult, nodeId);
       
       // Remove existing vulnerability nodes and edges for this parent node first to prevent duplicates
