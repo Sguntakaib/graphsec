@@ -176,6 +176,12 @@ function AppContent() {
   const [showVulnerabilityLegend, setShowVulnerabilityLegend] = useState(false);
   const [showVulnerabilityReport, setShowVulnerabilityReport] = useState(false);
   const [showVulnerabilityList, setShowVulnerabilityList] = useState(false); // Phase 2: Enhanced vulnerability list
+  const [vulnerabilityNodesVisible, setVulnerabilityNodesVisible] = useState(true); // Global toggle for vulnerability nodes
+  
+  // Node info overlay state
+  const [showNodeInfoOverlay, setShowNodeInfoOverlay] = useState(false);
+  const [nodeInfoOverlayData, setNodeInfoOverlayData] = useState(null);
+  const [overlayHoverTimer, setOverlayHoverTimer] = useState(null);
   
   // Collapsible sections state
   const [isCanvasNodesCollapsed, setIsCanvasNodesCollapsed] = useState(false);
