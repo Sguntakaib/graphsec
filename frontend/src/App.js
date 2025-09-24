@@ -2402,6 +2402,48 @@ function AppContent() {
     setShowClearConfirmation(false);
   };
 
+  // Toggle vulnerability nodes visibility
+  const toggleVulnerabilityNodesVisibility = useCallback(() => {
+    const newVisibility = !vulnerabilityNodesVisible;
+    setVulnerabilityNodesVisible(newVisibility);
+    
+    // Update all vulnerability nodes visibility
+    setNodes(currentNodes => 
+      currentNodes.map(node => {
+        if (node.type === 'vulnerability') {
+          return {
+            ...node,
+            hidden: !newVisibility,
+            style: {
+              ...node.style,
+              display: newVisibility ? 'block' : 'none'
+            }
+          };
+        }
+        return node;
+      })
+    );
+    
+    // Update all vulnerability edges visibility
+    setEdges(currentEdges =>
+      currentEdges.map(edge => {
+        if (edge.data?.vulnerability || edge.type === 'vulnerability-edge') {
+          return {
+            ...edge,
+            hidden: !newVisibility,
+            style: {
+              ...edge.style,
+              display: newVisibility ? 'block' : 'none'
+            }
+          };
+        }
+        return edge;
+      })
+    );
+    
+    console.log(`${newVisibility ? '👁️ Showing' : '👁️‍🗨️ Hiding'} vulnerability nodes and edges`);
+  }, [vulnerabilityNodesVisible]);
+
   const saveQuestionnaireResponses = async (nodeId, responses) => {
     if (!currentDiagram) return;
     
