@@ -564,6 +564,14 @@ function AppContent() {
       console.log('🎯 No current diagram ID available for STRIDE analysis');
     }
     
+    console.log('🎯 Setting overlay data:', {
+      nodeId,
+      answeredQuestions,
+      totalQuestions,
+      vulnerabilityCount,
+      strideScore
+    });
+    
     setNodeInfoOverlayData({
       node,
       position,
