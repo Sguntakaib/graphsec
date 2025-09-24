@@ -480,11 +480,62 @@ function AppContent() {
     
     // Get vulnerability count for this node
     if (vulnerabilityAnalyses[nodeId]) {
-      vulnerabilityCount = vulnerabilityAnalyses[nodeId].vulnerabilities?.length || 0;
+      const analysis = vulnerabilityAnalyses[nodeId];
+      // Try different possible data structures
+      vulnerabilityCount = analysis.vulnerabilities?.length || 
+                          analysis.vulnerability_nodes?.length || 
+                          analysis.total_vulnerabilities || 
+                          0;
+    } else {
+      // Try to fetch vulnerability data from API if not in state
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/vulnerabilities/analyze/${nodeId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            node_type: nodeSubtype,
+            questionnaire_responses: questionnaireResponses,
+            node_position: node.position
+          })
+        });
+        if (response.ok) {
+          const vulnData = await response.json();
+          vulnerabilityCount = vulnData.vulnerabilities?.length || vulnData.total_vulnerabilities || 0;
+        }
+      } catch (e) {
+        console.log('Could not fetch vulnerability count:', e.message);
+      }
     }
     
-    // Get STRIDE score for this node (implement this later)
-    // strideScore = getStrideScoreForNode(nodeId) || 0;
+    // Get STRIDE score for this node
+    try {
+      const strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram?.id}/stride/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nodes: [{
+            id: nodeId,
+            type: node.type,
+            subtype: nodeSubtype,
+            questionnaire_responses: questionnaireResponses,
+            position: node.position
+          }]
+        })
+      });
+      if (strideResponse.ok) {
+        const strideData = await strideResponse.json();
+        // Find this node's threats and calculate risk score
+        const nodeThreats = strideData.threats?.filter(t => t.affected_nodes?.includes(nodeId)) || [];
+        if (nodeThreats.length > 0) {
+          // Calculate average risk score from threats
+          const totalRisk = nodeThreats.reduce((sum, threat) => sum + (threat.risk_score || 0), 0);
+          strideScore = nodeThreats.length > 0 ? totalRisk / nodeThreats.length : 0;
+        }
+      }
+    } catch (e) {
+      console.log('Could not fetch STRIDE score:', e.message);
+    }
     
     setNodeInfoOverlayData({
       node,
