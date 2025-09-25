@@ -169,17 +169,24 @@ const NodeInfoOverlay = ({
           </div>
           <div className="flex items-center justify-between">
             <div className="text-sm text-white font-semibold">
-              {strideScore.toFixed(1)}/10.0
+              {strideScore > 0 ? `${strideScore.toFixed(1)}/10.0` : 'Not analyzed'}
             </div>
-            <div className={`text-xs px-2 py-1 rounded ${
-              strideScore >= 7 ? 'bg-red-900 text-red-300' :
-              strideScore >= 4 ? 'bg-yellow-900 text-yellow-300' :
-              'bg-green-900 text-green-300'
-            }`}>
-              {strideScore >= 7 ? 'High Risk' :
-               strideScore >= 4 ? 'Medium Risk' :
-               'Low Risk'}
-            </div>
+            {strideScore > 0 && (
+              <div className={`text-xs px-2 py-1 rounded ${
+                strideScore >= 7 ? 'bg-red-900 text-red-300' :
+                strideScore >= 4 ? 'bg-yellow-900 text-yellow-300' :
+                'bg-green-900 text-green-300'
+              }`}>
+                {strideScore >= 7 ? 'High Risk' :
+                 strideScore >= 4 ? 'Medium Risk' :
+                 'Low Risk'}
+              </div>
+            )}
+            {strideScore === 0 && (
+              <div className="text-xs text-gray-500">
+                Run STRIDE analysis
+              </div>
+            )}
           </div>
         </div>
       </div>
