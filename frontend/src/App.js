@@ -615,13 +615,12 @@ function AppContent() {
   }, [nodes, vulnerabilityAnalyses, overlayHoverTimer]);
 
   const handleNodeHoverEnd = useCallback((event) => {
-    // Small delay to prevent flicker when moving between hover areas
-    const timer = setTimeout(() => {
-      setShowNodeInfoOverlay(false);
-      setNodeInfoOverlayData(null);
-    }, 50); // Reduced from 100ms to 50ms for more responsive feel
-    setOverlayHoverTimer(timer);
-  }, []);
+    // Immediately hide overlay when mouse leaves node (no delay)
+    clearTimeout(overlayHoverTimer);
+    setOverlayHoverTimer(null);
+    setShowNodeInfoOverlay(false);
+    setNodeInfoOverlayData(null);
+  }, [overlayHoverTimer]);
 
   const closeNodeInfoOverlay = useCallback(() => {
     setShowNodeInfoOverlay(false);
