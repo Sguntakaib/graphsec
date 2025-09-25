@@ -614,13 +614,15 @@ function AppContent() {
     window.addEventListener('edgeUpdate', handleEdgeUpdate);
     window.addEventListener('nodeHover', handleNodeHover);
     window.addEventListener('nodeHoverEnd', handleNodeHoverEnd);
+    window.addEventListener('overlayHover', handleOverlayHover);
     return () => {
       window.removeEventListener('nodeDoubleTap', handleNodeDoubleTap);
       window.removeEventListener('edgeUpdate', handleEdgeUpdate);
       window.removeEventListener('nodeHover', handleNodeHover);
       window.removeEventListener('nodeHoverEnd', handleNodeHoverEnd);
+      window.removeEventListener('overlayHover', handleOverlayHover);
     };
-  }, [handleNodeDoubleTap, handleEdgeUpdate, handleNodeHover, handleNodeHoverEnd]); // Use the memoized callbacks
+  }, [handleNodeDoubleTap, handleEdgeUpdate, handleNodeHover, handleNodeHoverEnd, handleOverlayHover]); // Use the memoized callbacks
 
   // Performance monitoring
   const [performance, setPerformance] = useState({
