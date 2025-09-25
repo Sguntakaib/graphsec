@@ -1,0 +1,464 @@
+# New Generation STRIDE Threat Analysis Approach
+# Goal: Simple, comprehensive, user-design-aligned threat generation for ALL NODE TYPES
+
+## CORE PRINCIPLES:
+1. Generate threats aligned to user's actual design/development intent
+2. Keep approach simple but ensure relevance 
+3. Ensure FULL STRIDE coverage (all 6 categories) for WebApp, API, and Database nodes
+4. Base threats on questionnaire responses that capture design decisions
+5. Context-aware threat generation that considers node purpose and architecture
+
+## COMPREHENSIVE STRIDE COVERAGE ANALYSIS:
+
+### 🌐 WEBAPP NODES:
+**✅ WELL COVERED:**
+- **Spoofing**: webapp_authentication_method (No Auth → OAuth/SAML)
+- **Information Disclosure**: webapp_https_enforcement, webapp_data_encryption, webapp_error_handling, webapp_security_headers
+
+**⚠️ PARTIALLY COVERED:**
+- **Tampering**: webapp_input_validation (needs context: static vs interactive)
+- **Elevation of Privilege**: webapp_session_management (missing authorization model)
+
+**❌ MISSING/POORLY COVERED:**
+- **Denial of Service**: webapp_rate_limiting is in ADVANCED only
+- **Repudiation**: Only webapp_logging_monitoring covers this
+
+### 🔌 API NODES:
+**✅ WELL COVERED:**
+- **Spoofing**: api_authentication_method (No Auth → OAuth2/JWT)
+- **Elevation of Privilege**: api_authorization_model (No auth → RBAC with scopes)
+- **Denial of Service**: api_rate_limiting (No limiting → Per-user limiting) ✅
+- **Tampering**: api_input_validation (No validation → Schema validation)
+- **Information Disclosure**: api_https_enforcement, api_error_handling, api_data_sanitization
+- **Repudiation**: api_logging_monitoring (No logging → Comprehensive logging)
+
+**⚠️ GAPS TO ADDRESS:**
+- Missing design-intent questions (API purpose, data sensitivity, exposure level)
+- No context about whether API is public vs internal
+- Missing questions about API complexity and attack surface
+
+### 🗄️ DATABASE NODES:
+**✅ WELL COVERED:**
+- **Spoofing**: database_authentication (No auth → Strong auth with MFA)
+- **Information Disclosure**: database_encryption_at_rest, database_encryption_in_transit, database_network_security
+- **Elevation of Privilege**: database_access_control (No control → RBAC with least privilege)
+- **Repudiation**: database_logging (No logging → Comprehensive audit logging)
+
+**❌ MISSING STRIDE CATEGORIES:**
+- **Tampering**: No questions about database input validation or SQL injection protection ❌
+- **Denial of Service**: No questions about database rate limiting or resource controls ❌
+
+**⚠️ GAPS TO ADDRESS:**
+- Missing design-intent questions (database purpose, data classification, access patterns)
+- No context about internal vs external access
+- Missing database performance/availability protection questions
+
+## ENHANCED APPROACH: DESIGN-INTENT-BASED QUESTIONS FOR ALL NODES
+
+### 1. WEBAPP DESIGN-INTENT QUESTIONS
+Move critical questions from advanced to basic and add missing context:
+
+#### ADD TO WEBAPP BASIC QUESTIONNAIRE:
+```yaml
+# Move from advanced to basic (critical for STRIDE coverage)
+- id: "webapp_authorization_model"
+  question: "What authorization model does your application need?"
+  type: "single_choice"
+  options: ["No authorization needed", "Simple admin/user roles", "Department-based permissions", "Fine-grained RBAC", "Attribute-based access control"]
+  help_text: "Determines privilege escalation threats"
+
+- id: "webapp_rate_limiting"
+  question: "Is rate limiting implemented?"
+  type: "single_choice"
+  options: ["Adaptive rate limiting", "Fixed rate limiting", "Basic throttling", "No rate limiting", "Unknown"]
+  help_text: "Rate limiting prevents brute force attacks and resource exhaustion"
+
+# Add new design-intent questions
+- id: "webapp_application_type"
+  question: "What type of web application are you building?"
+  type: "single_choice" 
+  options: ["Static website/blog", "Interactive web app", "E-commerce platform", "SaaS application", "Admin dashboard", "Content management system", "Other"]
+  help_text: "Application type determines relevant threat vectors"
+
+- id: "webapp_data_sensitivity"
+  question: "What type of data does your application handle?"
+  type: "multiple_choice" 
+  options: ["Public information only", "User personal data", "Financial information", "Health records", "Business confidential data", "Authentication credentials"]
+  help_text: "Determines information disclosure threat severity and appropriate controls"
+
+- id: "webapp_exposure_level"
+  question: "How is your application exposed?"
+  type: "single_choice"
+  options: ["Internal network only", "VPN access", "Public internet", "Behind CDN/WAF", "API gateway protected"]
+  help_text: "Determines denial of service and exposure threat relevance"
+```
+
+### 2. API DESIGN-INTENT QUESTIONS
+Add missing context questions to API basic questionnaire:
+
+#### ADD TO API BASIC QUESTIONNAIRE:
+```yaml
+- id: "api_purpose"
+  question: "What is the primary purpose of this API?"
+  type: "single_choice"
+  options: ["Internal microservice communication", "Third-party integration", "Mobile app backend", "Public developer API", "Partner integration", "Admin/management interface"]
+  help_text: "API purpose determines relevant security controls and threat vectors"
+
+- id: "api_data_sensitivity"
+  question: "What type of data does this API handle?"
+  type: "multiple_choice"
+  options: ["Public data only", "User personal data", "Financial transactions", "Health information", "Business secrets", "Authentication tokens", "System configuration"]
+  help_text: "Data sensitivity determines appropriate security controls and threat severity"
+
+- id: "api_exposure_level" 
+  question: "How is this API exposed?"
+  type: "single_choice"
+  options: ["Internal network only", "VPN/private network", "Public internet", "Behind API gateway", "Through CDN/WAF"]
+  help_text: "Exposure level determines DoS and access control threat relevance"
+
+- id: "api_operation_types"
+  question: "What operations does this API perform?"
+  type: "multiple_choice" 
+  options: ["Read-only queries", "Data creation", "Data updates", "Data deletion", "Administrative operations", "File uploads", "Payment processing"]
+  help_text: "Operation types determine tampering and privilege escalation threats"
+```
+
+### 3. DATABASE DESIGN-INTENT QUESTIONS
+Add missing STRIDE coverage and context questions:
+
+#### ADD TO DATABASE BASIC QUESTIONNAIRE:
+```yaml
+- id: "database_purpose"
+  question: "What is the primary purpose of this database?"
+  type: "single_choice"
+  options: ["Application data storage", "Analytics/reporting", "User authentication", "Logging/audit data", "Configuration storage", "Cache/session storage", "Backup/archive storage"]
+  help_text: "Database purpose determines relevant security controls and threats"
+
+- id: "database_data_classification"
+  question: "What type of data is stored in this database?"
+  type: "multiple_choice"
+  options: ["Public information", "User personal data", "Financial records", "Health information", "Business confidential", "Authentication data", "System logs"]
+  help_text: "Data classification determines appropriate security controls"
+
+- id: "database_access_pattern"
+  question: "How is this database typically accessed?"
+  type: "single_choice"
+  options: ["Single application only", "Multiple applications", "Direct user access", "Administrative access", "Analytics/reporting tools", "Batch processing"]
+  help_text: "Access patterns determine relevant access control and monitoring threats"
+
+# MISSING STRIDE CATEGORIES - ADD THESE:
+- id: "database_input_validation"
+  question: "How is data input validation handled?"
+  type: "single_choice"
+  options: ["Parameterized queries + stored procedures", "Parameterized queries only", "Application-level validation", "Basic input filtering", "No validation controls"]
+  help_text: "Input validation prevents SQL injection and data tampering attacks"
+
+- id: "database_resource_controls"
+  question: "What database resource controls are implemented?"
+  type: "single_choice"
+  options: ["Connection limits + query timeouts", "Basic connection limits", "Query complexity controls", "No resource controls", "Unknown"]
+  help_text: "Resource controls prevent denial of service attacks against the database"
+
+- id: "database_exposure_level"
+  question: "How is database access controlled?"
+  type: "single_choice"
+  options: ["Application-only access", "Internal network access", "VPN-protected access", "Direct network access", "Internet-accessible"]
+  help_text: "Exposure level determines network-based threat relevance"
+```
+
+### 4. DESIGN-ALIGNED STRIDE MAPPING LOGIC:
+
+#### 🎯 WEBAPP THREATS:
+**SPOOFING (Authentication-based)**:
+```
+Trigger Logic: authentication_method + application_type + data_sensitivity
+- Static website/blog + Public data only = NO spoofing threat
+- Interactive web app + No Authentication = HIGH spoofing threat  
+- SaaS/E-commerce + Basic auth + Financial data = CRITICAL spoofing threat
+```
+
+**TAMPERING (Input Processing)**:
+```
+Trigger Logic: input_validation + application_type + database_connection
+- Static website + Read-only = NO tampering threat
+- Interactive app + No validation + Database = HIGH tampering threat
+- E-commerce + Basic validation + Database = MEDIUM tampering threat
+```
+
+**REPUDIATION (Audit Requirements)**:
+```
+Trigger Logic: logging_monitoring + data_sensitivity + authorization_model
+- Public info only + No authorization = NO repudiation threat
+- Financial/Health data + No logging = HIGH repudiation threat
+- User accounts + Basic logging = MEDIUM repudiation threat
+```
+
+**INFORMATION_DISCLOSURE (Data Protection)**:
+```
+Trigger Logic: https_enforcement + data_encryption + data_sensitivity
+- Public info + HTTP only = LOW disclosure threat
+- Financial data + HTTP only = CRITICAL disclosure threat
+- Personal data + HTTPS preferred = MEDIUM disclosure threat
+```
+
+**DENIAL_OF_SERVICE (Availability Protection)**:
+```
+Trigger Logic: exposure_level + rate_limiting + application_type
+- Internal network only = NO DoS threat
+- Public internet + No rate limiting = HIGH DoS threat  
+- Behind CDN/WAF + No rate limiting = LOW DoS threat
+```
+
+**ELEVATION_OF_PRIVILEGE (Access Control)**:
+```
+Trigger Logic: session_management + authorization_model + application_type
+- No authorization needed = NO privilege escalation threat
+- Fine-grained RBAC + Basic sessions = HIGH privilege escalation threat
+- Admin dashboard + No authorization = CRITICAL privilege escalation threat
+```
+
+#### 🔌 API THREATS:
+**SPOOFING**: api_authentication_method + api_purpose + api_exposure_level
+**TAMPERING**: api_input_validation + api_operation_types + api_data_sensitivity  
+**REPUDIATION**: api_logging_monitoring + api_purpose + api_data_sensitivity
+**INFORMATION_DISCLOSURE**: api_https_enforcement + api_data_sanitization + api_data_sensitivity
+**DENIAL_OF_SERVICE**: api_rate_limiting + api_exposure_level + api_purpose
+**ELEVATION_OF_PRIVILEGE**: api_authorization_model + api_operation_types + api_purpose
+
+#### 🗄️ DATABASE THREATS:
+**SPOOFING**: database_authentication + database_access_pattern + database_exposure_level
+**TAMPERING**: database_input_validation + database_access_pattern + database_data_classification
+**REPUDIATION**: database_logging + database_data_classification + database_purpose
+**INFORMATION_DISCLOSURE**: database_encryption_at_rest + database_encryption_in_transit + database_data_classification
+**DENIAL_OF_SERVICE**: database_resource_controls + database_exposure_level + database_access_pattern  
+**ELEVATION_OF_PRIVILEGE**: database_access_control + database_privilege_management + database_purpose
+
+### 5. IMPLEMENTATION STRATEGY:
+
+#### Phase 1: Enhanced Questionnaires (Immediate)
+**WEBAPP Enhancements:**
+1. Move `webapp_authorization_model` and `webapp_rate_limiting` from advanced to basic
+2. Add 4 new design-intent questions: application_type, data_sensitivity, exposure_level
+3. Update existing questions to include "Unknown" options where missing
+
+**API Enhancements:**
+1. Add 4 new design-intent questions: purpose, data_sensitivity, exposure_level, operation_types
+2. Verify all existing basic questions have proper STRIDE mapping
+
+**DATABASE Enhancements:**
+1. Add 6 new questions: purpose, data_classification, access_pattern, input_validation, resource_controls, exposure_level
+2. Fill critical STRIDE gaps for Tampering and DoS categories
+
+#### Phase 2: Enhanced Context-Aware Mapping Logic
+```python
+class UniversalContextualThreatAnalyzer:
+    """Context-aware threat analysis for all node types"""
+    
+    def analyze_threats_by_node_type(self, node_type: str, responses: Dict[str, Any]) -> List[Threat]:
+        if node_type == "WebApp":
+            return self._analyze_webapp_threats(responses)
+        elif node_type == "API":
+            return self._analyze_api_threats(responses)  
+        elif node_type == "Database":
+            return self._analyze_database_threats(responses)
+        else:
+            return []  # Fallback to existing mapping
+    
+    def _analyze_webapp_threats(self, responses: Dict[str, Any]) -> List[Threat]:
+        threats = []
+        context = self._get_webapp_context(responses)
+        
+        # Only generate threats where contextually relevant
+        if context.needs_authentication:
+            threats.extend(self._webapp_spoofing_threats(responses, context))
+        if context.processes_input:
+            threats.extend(self._webapp_tampering_threats(responses, context))
+        if context.handles_sensitive_data:
+            threats.extend(self._webapp_disclosure_threats(responses, context))
+        if context.publicly_exposed:
+            threats.extend(self._webapp_dos_threats(responses, context))
+        if context.has_authorization:
+            threats.extend(self._webapp_privilege_threats(responses, context))
+        if context.requires_audit:
+            threats.extend(self._webapp_repudiation_threats(responses, context))
+        
+        return threats
+    
+    def _get_webapp_context(self, responses: Dict[str, Any]) -> WebAppContext:
+        app_type = responses.get("webapp_application_type", "")
+        data_sensitivity = responses.get("webapp_data_sensitivity", [])
+        exposure = responses.get("webapp_exposure_level", "")
+        auth_model = responses.get("webapp_authorization_model", "")
+        
+        return WebAppContext(
+            needs_authentication=self._needs_auth(app_type, data_sensitivity),
+            processes_input=self._processes_input(app_type),
+            handles_sensitive_data=self._handles_sensitive(data_sensitivity),
+            publicly_exposed=self._is_public(exposure),
+            has_authorization=self._has_auth_model(auth_model),
+            requires_audit=self._needs_audit(data_sensitivity, auth_model)
+        )
+```
+
+#### Phase 3: Enhanced STRIDE Mapping Rules
+```python
+# Context-aware threat generation rules
+WEBAPP_THREAT_RULES = {
+    "spoofing": {
+        "trigger_when": lambda ctx: ctx.needs_authentication,
+        "severity_factors": {
+            "webapp_authentication_method": {
+                "No Authentication": 8.0,
+                "Username/Password only": 6.0,  
+                "Username/Password with MFA": 2.0,
+                "OAuth2/OIDC": 1.5
+            },
+            "webapp_data_sensitivity": {
+                "Financial information": 1.3,  # multiplier
+                "Health records": 1.3,
+                "User personal data": 1.1,
+                "Public information only": 0.7
+            }
+        }
+    },
+    "tampering": {
+        "trigger_when": lambda ctx: ctx.processes_input,
+        "conditions": {
+            "high_risk": lambda r: r.get("webapp_input_validation") in ["No validation", "Client-side only"],
+            "medium_risk": lambda r: r.get("webapp_input_validation") == "Basic validation",
+            "low_risk": lambda r: r.get("webapp_input_validation") == "Comprehensive server-side validation"
+        }
+    }
+}
+
+API_THREAT_RULES = {
+    "spoofing": {
+        "trigger_when": lambda ctx: ctx.needs_authentication,
+        "context_factors": {
+            "api_purpose": {
+                "Public developer API": 1.2,  # Higher risk
+                "Internal microservice communication": 0.8  # Lower risk
+            }
+        }
+    }
+}
+
+DATABASE_THREAT_RULES = {
+    "tampering": {  # NEW - Previously missing!
+        "trigger_when": lambda ctx: ctx.accepts_input,
+        "conditions": {
+            "database_input_validation": {
+                "No validation controls": 8.0,
+                "Basic input filtering": 6.0,
+                "Application-level validation": 4.0,
+                "Parameterized queries only": 2.5,
+                "Parameterized queries + stored procedures": 1.5
+            }
+        }
+    },
+    "denial_of_service": {  # NEW - Previously missing!
+        "trigger_when": lambda ctx: ctx.has_resource_risk,
+        "conditions": {
+            "database_resource_controls": {
+                "No resource controls": 7.0,
+                "Basic connection limits": 4.0,
+                "Connection limits + query timeouts": 2.0
+            }
+        }
+    }
+}
+```
+
+### 6. EXPECTED OUTCOMES FOR ALL NODE TYPES:
+
+#### 🌐 WebApp Examples:
+**Static Website/Blog:**
+- Type: "Static website/blog", Data: "Public information only", Exposure: "Public internet"
+- **Result**: 0-1 threats (basic HTTPS recommendation only)
+
+**SaaS Application:**
+- Type: "SaaS application", Data: "User personal data + Auth credentials", Exposure: "Public internet"  
+- **Result**: 4-6 relevant threats across all STRIDE categories
+
+**E-commerce Platform:**
+- Type: "E-commerce platform", Data: "Financial + User personal data", Exposure: "Behind CDN/WAF"
+- **Result**: 6-8 threats with higher severity due to financial data
+
+#### 🔌 API Examples:
+**Internal Microservice:**
+- Purpose: "Internal microservice", Data: "Public data only", Exposure: "Internal network"
+- **Result**: 1-2 threats (basic input validation, logging)
+
+**Public Developer API:**
+- Purpose: "Public developer API", Data: "User personal data", Exposure: "Public internet"
+- **Result**: 5-7 threats across all STRIDE categories
+
+**Payment Processing API:**
+- Purpose: "Third-party integration", Data: "Financial transactions", Exposure: "API gateway protected"
+- **Result**: 7-9 high-severity threats due to financial data
+
+#### 🗄️ Database Examples:
+**Cache/Session Storage:**
+- Purpose: "Cache/session storage", Data: "Public information", Access: "Application-only"
+- **Result**: 1-2 threats (basic access control)
+
+**User Authentication Database:**
+- Purpose: "User authentication", Data: "Authentication data + Personal data", Access: "Multiple applications"
+- **Result**: 6-8 threats covering all STRIDE categories
+
+**Financial Records Database:**
+- Purpose: "Application data storage", Data: "Financial records", Access: "Direct user access"
+- **Result**: 8-10 high-severity threats with comprehensive controls required
+
+### 7. COMPREHENSIVE BENEFITS:
+
+✅ **Node-Type Aware**: Different threat profiles for WebApp vs API vs Database
+✅ **Design-Intent Aligned**: Threats match what user is actually building
+✅ **Complete STRIDE Coverage**: All 6 categories covered for all node types where relevant
+✅ **Severity Scaling**: Threat severity matches actual data sensitivity and exposure
+✅ **Context-Driven**: Only generates applicable threats (no noise)
+✅ **Scalable Architecture**: Easy to add new node types and threat patterns
+
+### 8. IMPLEMENTATION ROADMAP:
+
+#### 🚀 **Immediate (Phase 1 - Week 1-2)**:
+1. **Questionnaire Enhancement**:
+   - Add missing design-intent questions to all 3 node types
+   - Move critical questions from advanced to basic level
+   - Fill STRIDE coverage gaps (Database tampering/DoS)
+
+2. **Quick Wins**:
+   - Update existing stride_mapping.py with new questions
+   - Add Database tampering and DoS threat mappings
+   - Test with current application
+
+#### 🔧 **Short-term (Phase 2 - Week 3-4)**:
+1. **Context-Aware Logic**:
+   - Implement UniversalContextualThreatAnalyzer
+   - Add node-type-specific threat generation
+   - Create threat relevance rules engine
+
+2. **Enhanced Mapping**:
+   - Context-based threat triggering
+   - Data sensitivity multipliers
+   - Exposure level adjustments
+
+#### 📈 **Long-term (Phase 3 - Week 5-6)**:
+1. **Advanced Features**:
+   - Cross-node threat correlation (API + Database threats)
+   - Architecture-aware threats (behind WAF vs direct exposure)
+   - Compliance-driven threat requirements
+
+2. **Validation & Optimization**:
+   - Test with diverse application scenarios
+   - Fine-tune threat severity calculations
+   - Validate threat relevance with security experts
+
+### 9. SUCCESS METRICS:
+
+🎯 **Coverage**: 100% STRIDE coverage for all applicable node scenarios
+📊 **Relevance**: <5% irrelevant threats generated (vs current ~30-40%)
+⚡ **Usability**: Clear threat explanations tied to user's design decisions
+🔄 **Scalability**: Easy addition of new node types with same framework
+
+This approach transforms our generic threat application into an intelligent, design-aware system that generates precisely the threats users need to consider for their specific architecture and requirements.
