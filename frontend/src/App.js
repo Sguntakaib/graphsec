@@ -449,10 +449,10 @@ function AppContent() {
       setOverlayHoverTimer(null);
     }
     
-    // If switching to a different node, immediately show new overlay
+    // If switching to a different node, immediately switch overlays
     if (showNodeInfoOverlay && nodeInfoOverlayData?.node?.id !== nodeId) {
-      // Immediately switch to new node
-      setShowNodeInfoOverlay(false);
+      // Clear existing timer and immediately switch to new node
+      console.log('🎯 Switching from node', nodeInfoOverlayData.node.id, 'to node', nodeId);
     }
     
     // Get node statistics
