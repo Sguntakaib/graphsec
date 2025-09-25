@@ -559,10 +559,11 @@ function AppContent() {
     
     console.log('🎯 Setting overlay data:', {
       nodeId,
+      nodeSubtype,
       answeredQuestions,
       totalQuestions,
       vulnerabilityCount,
-      strideScore
+      strideScore: strideScore.toFixed(1)
     });
     
     setNodeInfoOverlayData({
