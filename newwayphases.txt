@@ -1,0 +1,1119 @@
+# Dynamic Questionnaire System - Phase-wise Development Plan
+## "NewWay Phases" - Practical Implementation Roadmap
+
+**Version**: 1.0  
+**Approach**: Incremental development with maximum component reuse  
+**Goal**: Minimize new code while maximizing functionality enhancement
+
+---
+
+# 🎯 **DEVELOPMENT PHILOSOPHY**
+
+## Core Principles
+1. **Reuse First**: Extend existing components before creating new ones
+2. **Incremental Enhancement**: Each phase builds on previous phase
+3. **Backward Compatibility**: Legacy system remains functional throughout
+4. **Early Testing**: Each phase includes immediate testing capability
+5. **Minimal Risk**: Small, testable changes with rollback capability
+
+## Component Reuse Strategy
+- **Existing SecurityQuestionnaire**: Enhance with dynamic logic
+- **Existing NodeInfoPanel**: Add context visualization  
+- **Existing Vulnerability Engine**: Extend with context awareness
+- **Existing STRIDE Engine**: Add conditional logic
+- **Existing Database Models**: Extend schemas incrementally
+
+---
+
+# 📅 **PHASE OVERVIEW**
+
+| Phase | Duration | Focus | Reuse Level | Risk Level |
+|-------|----------|-------|-------------|------------|
+| **Phase 0** | 2-3 days | Assessment & Preparation | 100% | Minimal |
+| **Phase 1** | 1 week | Basic Dynamic Logic | 90% | Low |
+| **Phase 2** | 1 week | Context Intelligence | 80% | Medium |
+| **Phase 3** | 1 week | Templates & Dependencies | 70% | Medium |
+| **Phase 4** | 3-4 days | Integration & Polish | 85% | Low |
+
+---
+
+# 🔍 **PHASE 0: ASSESSMENT & PREPARATION** 
+## Duration: 2-3 days
+## Risk Level: Minimal (No code changes)
+
+### **Objectives**
+- Understand current system deeply
+- Identify reusable components  
+- Create enhancement plan
+- Set up development environment
+
+### **Tasks**
+
+#### **Day 1: System Analysis**
+```bash
+# 1. Map Current Components
+- Analyze existing SecurityQuestionnaire.js structure
+- Document current question rendering logic  
+- Identify state management patterns
+- Map current API endpoints structure
+
+# 2. Database Schema Review
+- Review current questionnaire storage
+- Analyze node response structure
+- Document vulnerability engine integration
+- Map STRIDE engine data flow
+```
+
+#### **Day 2: Reuse Identification**
+```bash
+# 1. Component Reuse Analysis
+- SecurityQuestionnaire: Can be enhanced (90% reuse)
+- Question rendering: Existing pattern extensible (85% reuse)
+- Progress tracking: Current system adaptable (95% reuse)
+- API structure: Existing endpoints extensible (80% reuse)
+
+# 2. Data Model Extension Plan
+- questionnaire_definitions: New collection (0% reuse)
+- user_response_sessions: Extend existing (70% reuse)
+- context_rules: New collection (0% reuse)  
+- node_templates: New collection (0% reuse)
+```
+
+#### **Day 3: Development Setup**
+```bash
+# 1. Feature Flag System
+- Add feature toggles for gradual rollout
+- Set up A/B testing capability
+- Create rollback mechanisms
+
+# 2. Development Branch Strategy  
+- Create feature branch: feature/dynamic-questionnaire
+- Set up testing environment
+- Prepare migration scripts
+```
+
+### **Deliverables**
+- [ ] Current system component map
+- [ ] Reuse strategy document  
+- [ ] Development environment setup
+- [ ] Feature flag implementation
+
+---
+
+# 🔧 **PHASE 1: BASIC DYNAMIC LOGIC**
+## Duration: 1 week  
+## Risk Level: Low (Minimal changes to existing code)
+
+### **Objectives**
+- Add basic conditional logic to existing questionnaire system
+- Implement simple context tracking
+- Enable basic question branching
+- Maintain full backward compatibility
+
+### **Component Enhancement Strategy**
+
+#### **1.1 Enhance Existing SecurityQuestionnaire Component (Day 1-2)**
+
+```javascript
+// EXISTING: SecurityQuestionnaire.js (Reuse 90%)
+// ADD: Dynamic logic to existing structure
+
+// Current structure - KEEP AS IS
+const SecurityQuestionnaire = ({ node, onClose, onComplete }) => {
+  // EXISTING STATE - Keep all current state
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [responses, setResponses] = useState({});
+  
+  // NEW: Add dynamic context state (minimal addition)
+  const [dynamicContext, setDynamicContext] = useState({});
+  const [isDynamic, setIsDynamic] = useState(false);
+  
+  // EXISTING: Current question loading - KEEP
+  const loadQuestions = async () => {
+    // Current logic remains unchanged
+    // ADD: Check if dynamic mode enabled
+    const useDynamic = checkFeatureFlag('dynamic_questionnaire');
+    setIsDynamic(useDynamic);
+  };
+
+  // NEW: Minimal context update logic  
+  const updateContext = (questionId, answer) => {
+    if (!isDynamic) return; // Skip if not in dynamic mode
+    
+    // Simple context rules
+    const contextUpdates = getContextUpdates(questionId, answer);
+    setDynamicContext(prev => ({ ...prev, ...contextUpdates }));
+  };
+
+  // EXISTING: Answer handling - ENHANCE slightly
+  const handleAnswer = (questionId, answer) => {
+    // EXISTING logic - keep unchanged
+    setResponses(prev => ({ ...prev, [questionId]: answer }));
+    
+    // NEW: Add context update (5 lines added)
+    updateContext(questionId, answer);
+    
+    // EXISTING navigation logic - keep unchanged  
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
+  };
+  
+  // EXISTING: Render logic - minimal changes
+  return (
+    <div className="existing-questionnaire-structure">
+      {/* ALL EXISTING UI KEPT AS IS */}
+      
+      {/* NEW: Context display (optional, can be hidden) */}
+      {isDynamic && Object.keys(dynamicContext).length > 0 && (
+        <ContextDisplay context={dynamicContext} />
+      )}
+    </div>
+  );
+};
+```
+
+#### **1.2 Create Simple Context Rules Engine (Day 2-3)**
+
+```javascript
+// NEW FILE: utils/contextRules.js (100 lines max)
+// Simple rule engine that works with existing structure
+
+const CONTEXT_RULES = {
+  // Basic application type detection
+  'website_type_classification': {
+    'static_site': { 
+      app_type: 'static', 
+      skip_categories: ['authentication', 'database'] 
+    },
+    'interactive_webapp': { 
+      app_type: 'interactive',
+      requires_auth: true 
+    },
+    'saas_platform': { 
+      app_type: 'saas',
+      multi_tenant: true 
+    }
+  },
+  
+  // Authentication context
+  'webapp_authentication_method': {
+    'no_authentication': { auth_level: 0, security_risk: 'high' },
+    'oauth2_oidc': { auth_level: 9, security_risk: 'low' }
+  }
+};
+
+export const getContextUpdates = (questionId, answer) => {
+  const rules = CONTEXT_RULES[questionId];
+  return rules?.[answer] || {};
+};
+
+export const shouldSkipQuestion = (questionId, context) => {
+  // Simple skip logic based on context
+  const skipCategories = context.skip_categories || [];
+  return skipCategories.some(category => questionId.includes(category));
+};
+```
+
+#### **1.3 Extend Existing API Endpoints (Day 3-4)**
+
+```python
+# EXISTING: server.py - questionnaire endpoints
+# ENHANCE: Add optional dynamic mode to existing endpoints
+
+# EXISTING endpoint - ADD dynamic parameter
+@api_router.get("/questionnaires/{node_subtype}")
+async def get_questionnaire_prompts(
+    node_subtype: str, 
+    level: str = "basic",
+    dynamic: bool = False  # NEW: Optional parameter
+):
+    # EXISTING logic - keep unchanged
+    questionnaire_file = f"/app/backend/questionnaires/{node_subtype.lower()}.yaml"
+    
+    if dynamic and node_subtype in ["WebApp"]:  # Gradual rollout
+        # NEW: Enhanced logic for dynamic mode
+        return await get_dynamic_questionnaire(node_subtype, level)
+    else:
+        # EXISTING logic - unchanged
+        return await get_legacy_questionnaire(node_subtype, level)
+
+# NEW: Simple dynamic questionnaire function (reuses 80% of existing logic)
+async def get_dynamic_questionnaire(node_subtype: str, level: str):
+    # Load base questionnaire (existing logic)
+    base_questionnaire = await get_legacy_questionnaire(node_subtype, level)
+    
+    # Add dynamic metadata
+    base_questionnaire["dynamic_mode"] = True
+    base_questionnaire["context_rules"] = load_context_rules(node_subtype)
+    
+    return base_questionnaire
+```
+
+#### **1.4 Simple Context Storage (Day 4-5)**
+
+```javascript
+// Extend existing MongoDB node model
+// NO new collections - just add fields to existing structure
+
+// EXISTING: Node document structure - ADD context field
+{
+  "_id": "existing_node_id",
+  "type": "WebApp",
+  "data": {
+    "label": "Web Application",
+    "subtype": "WebApp",
+    
+    // EXISTING fields - keep unchanged
+    "questionnaireResponses": {...},
+    "questionnaireMeta": {...},
+    
+    // NEW: Add context field (minimal change)
+    "dynamicContext": {
+      "app_type": "interactive",
+      "requires_auth": true,
+      "security_level": 7
+    },
+    "contextHistory": [
+      {
+        "timestamp": "2025-01-01T10:00:00Z",
+        "question": "website_type_classification", 
+        "answer": "interactive_webapp",
+        "context_update": {"app_type": "interactive"}
+      }
+    ]
+  }
+}
+```
+
+### **Phase 1 Testing Strategy**
+
+#### **Day 5: Testing**
+```bash
+# 1. Backward Compatibility Test
+- Verify existing questionnaires work unchanged
+- Test with dynamic mode disabled
+- Validate all existing functionality
+
+# 2. Basic Dynamic Features Test  
+- Test context updates on WebApp nodes
+- Verify skip logic works
+- Test context display
+
+# 3. Integration Test
+- Test with existing vulnerability analysis
+- Verify STRIDE analysis still works
+- Test node saving/loading
+```
+
+### **Phase 1 Success Metrics**
+- [ ] Zero regression in existing functionality
+- [ ] Basic context tracking working for WebApp nodes
+- [ ] Simple question skipping operational  
+- [ ] Feature flag system working
+- [ ] All existing tests still pass
+
+### **Phase 1 Deliverables**
+- [ ] Enhanced SecurityQuestionnaire component (90% reused)
+- [ ] Basic context rules engine (100 lines)
+- [ ] Extended API endpoints (5 lines changed)
+- [ ] Context storage in existing node structure
+- [ ] Comprehensive test coverage
+
+---
+
+# 🧠 **PHASE 2: CONTEXT INTELLIGENCE**
+## Duration: 1 week
+## Risk Level: Medium (More logic, but builds on Phase 1)
+
+### **Objectives**
+- Add intelligent question branching
+- Implement context-aware vulnerability analysis  
+- Enhance STRIDE mapping with context
+- Add progress estimation based on context
+
+### **Component Enhancement Strategy**
+
+#### **2.1 Enhance Question Branching Logic (Day 1-2)**
+
+```javascript
+// ENHANCE: SecurityQuestionnaire.js (build on Phase 1 changes)
+// ADD: Intelligent next question logic
+
+const SecurityQuestionnaire = ({ node, onClose, onComplete }) => {
+  // EXISTING: All Phase 1 state - keep unchanged
+  
+  // NEW: Add question flow state
+  const [questionFlow, setQuestionFlow] = useState([]);
+  const [estimatedProgress, setEstimatedProgress] = useState(0);
+  
+  // ENHANCE: Question navigation with branching
+  const getNextQuestionIndex = (currentIndex, context) => {
+    if (!isDynamic) {
+      // EXISTING: Linear progression - unchanged
+      return currentIndex + 1;
+    }
+    
+    // NEW: Dynamic next question logic
+    const currentQuestion = questions[currentIndex];
+    const nextIndex = findNextRelevantQuestion(
+      questions, 
+      currentIndex + 1, 
+      context, 
+      responses
+    );
+    
+    return nextIndex;
+  };
+  
+  // NEW: Intelligent question filtering
+  const findNextRelevantQuestion = (questions, startIndex, context, responses) => {
+    for (let i = startIndex; i < questions.length; i++) {
+      const question = questions[i];
+      
+      // Skip questions based on context
+      if (shouldSkipQuestion(question.id, context)) {
+        continue;
+      }
+      
+      // Skip if dependencies not met
+      if (!areDependenciesMet(question, responses)) {
+        continue;
+      }
+      
+      return i;
+    }
+    
+    return questions.length; // End of questionnaire
+  };
+  
+  // NEW: Progress estimation based on context
+  const calculateProgress = (context, responses) => {
+    if (!isDynamic) {
+      // EXISTING calculation - unchanged
+      return (Object.keys(responses).length / questions.length) * 100;
+    }
+    
+    // NEW: Context-aware progress
+    const relevantQuestions = questions.filter(q => 
+      !shouldSkipQuestion(q.id, context)
+    );
+    const answeredRelevant = Object.keys(responses).filter(qId =>
+      relevantQuestions.find(q => q.id === qId)
+    );
+    
+    return (answeredRelevant.length / relevantQuestions.length) * 100;
+  };
+};
+```
+
+#### **2.2 Extend Existing Vulnerability Engine (Day 2-3)**
+
+```python
+# EXISTING: vulnerability_engine.py
+# ENHANCE: Add context-aware analysis (reuse 85% of existing code)
+
+class VulnerabilityEngine:
+    # EXISTING: All current methods - keep unchanged
+    
+    # NEW: Context-aware vulnerability analysis (enhance existing method)
+    async def analyze_vulnerabilities(self, node_id: str, questionnaire_responses: Dict, context: Dict = None):
+        # EXISTING: Base vulnerability analysis - keep unchanged
+        base_vulnerabilities = await self.get_base_vulnerabilities(node_id, questionnaire_responses)
+        
+        # NEW: Apply context filtering (if context provided)
+        if context and context.get('app_type'):
+            filtered_vulnerabilities = self.filter_by_context(base_vulnerabilities, context)
+            return filtered_vulnerabilities
+        
+        # EXISTING: Return base analysis if no context
+        return base_vulnerabilities
+    
+    # NEW: Context filtering method (30 lines)
+    def filter_by_context(self, vulnerabilities: List, context: Dict) -> List:
+        app_type = context.get('app_type')
+        
+        # Filter out irrelevant vulnerabilities
+        relevant_vulns = []
+        for vuln in vulnerabilities:
+            if self.is_vulnerability_relevant(vuln, context):
+                # Adjust severity based on context
+                vuln.severity = self.adjust_severity_by_context(vuln, context)
+                relevant_vulns.append(vuln)
+        
+        return relevant_vulns
+    
+    # NEW: Relevance checking (20 lines)
+    def is_vulnerability_relevant(self, vulnerability, context: Dict) -> bool:
+        app_type = context.get('app_type')
+        
+        # Static sites don't have authentication vulnerabilities
+        if app_type == 'static' and 'authentication' in vulnerability.category.lower():
+            return False
+            
+        # SaaS platforms need multi-tenant specific checks
+        if app_type == 'saas' and vulnerability.category == 'multi_tenant':
+            return True
+            
+        return True  # Default: include vulnerability
+```
+
+#### **2.3 Enhance Existing STRIDE Engine (Day 3-4)**
+
+```python
+# EXISTING: stride_engine.py  
+# ENHANCE: Add context awareness (reuse 90% of existing code)
+
+class StrideRuleEngine:
+    # EXISTING: All current STRIDE rules - keep unchanged
+    
+    # ENHANCE: Existing analyze_node_threats method
+    def analyze_node_threats(self, node: Dict, questionnaire_responses: Dict, context: Dict = None) -> List[Threat]:
+        # EXISTING: Base STRIDE analysis - keep unchanged
+        base_threats = self.get_base_threats(node, questionnaire_responses)
+        
+        # NEW: Apply context filtering (if available)
+        if context:
+            filtered_threats = self.filter_threats_by_context(base_threats, context)
+            return filtered_threats
+            
+        return base_threats
+    
+    # NEW: Context-based threat filtering (25 lines)
+    def filter_threats_by_context(self, threats: List[Threat], context: Dict) -> List[Threat]:
+        app_type = context.get('app_type')
+        relevant_threats = []
+        
+        for threat in threats:
+            # Skip spoofing for static sites (no authentication)
+            if app_type == 'static' and threat.stride_category == StrideCategory.SPOOFING:
+                continue
+                
+            # Adjust threat severity based on context
+            threat.residual_risk = self.adjust_risk_by_context(threat, context)
+            relevant_threats.append(threat)
+            
+        return relevant_threats
+    
+    # NEW: Context-based risk adjustment (15 lines)  
+    def adjust_risk_by_context(self, threat: Threat, context: Dict) -> float:
+        base_risk = threat.residual_risk
+        
+        # Increase risk for SaaS multi-tenant issues
+        if context.get('multi_tenant') and 'isolation' in threat.description.lower():
+            return min(base_risk * 1.5, 10.0)
+            
+        # Decrease risk for static sites
+        if context.get('app_type') == 'static':
+            return base_risk * 0.7
+            
+        return base_risk
+```
+
+#### **2.4 Enhanced Progress Tracking (Day 4-5)**
+
+```javascript
+// ENHANCE: Existing progress components
+// REUSE: Existing AdvancedLayoutControls progress display
+
+// ADD: Context-aware progress component (reuse existing UI patterns)
+const ContextAwareProgress = ({ context, responses, totalQuestions }) => {
+  const relevantQuestions = useMemo(() => {
+    return calculateRelevantQuestions(totalQuestions, context);
+  }, [context, totalQuestions]);
+  
+  const completionStats = useMemo(() => {
+    const answered = Object.keys(responses).length;
+    const total = relevantQuestions.length;
+    const skipped = totalQuestions.length - relevantQuestions.length;
+    
+    return {
+      answered,
+      total,  
+      skipped,
+      percentage: (answered / total) * 100,
+      estimated_remaining: Math.max(0, total - answered)
+    };
+  }, [responses, relevantQuestions]);
+  
+  // REUSE: Existing progress bar styling and components
+  return (
+    <div className="context-aware-progress">
+      {/* Existing progress bar component - just pass new values */}
+      <ExistingProgressBar percentage={completionStats.percentage} />
+      
+      {/* Context summary - reuse existing card styling */}
+      <div className="bg-gray-800 rounded-md p-3 mt-2">
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div className="text-white font-semibold">{completionStats.answered}</div>
+            <div className="text-xs text-gray-400">Answered</div>
+          </div>
+          <div>
+            <div className="text-white font-semibold">{completionStats.total}</div>
+            <div className="text-xs text-gray-400">Required</div>
+          </div>
+          <div>
+            <div className="text-green-400 font-semibold">{completionStats.skipped}</div>
+            <div className="text-xs text-gray-400">Skipped</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+### **Phase 2 Testing Strategy**
+
+#### **Day 5: Testing**
+```bash
+# 1. Question Branching Test
+- Test static site skips authentication questions
+- Test SaaS platform includes multi-tenant questions
+- Verify progress calculation accuracy
+
+# 2. Context-Aware Analysis Test
+- Test vulnerability filtering by app type  
+- Test STRIDE threat relevance filtering
+- Verify risk score adjustments
+
+# 3. Integration Test
+- Test full flow: questionnaire → context → analysis
+- Verify backward compatibility maintained
+- Test performance with context processing
+```
+
+### **Phase 2 Success Metrics**
+- [ ] 30-50% reduction in irrelevant questions for static sites
+- [ ] Context-aware vulnerability analysis working
+- [ ] STRIDE threats filtered by relevance  
+- [ ] Progress estimation reflects actual remaining work
+- [ ] Performance impact <100ms per question
+
+### **Phase 2 Deliverables**
+- [ ] Enhanced question branching logic (40 lines added)
+- [ ] Context-aware vulnerability engine (60 lines added)
+- [ ] Enhanced STRIDE analysis (40 lines added)
+- [ ] Improved progress tracking (50 lines added)
+- [ ] Integration tests for all enhancements
+
+---
+
+# 📋 **PHASE 3: TEMPLATES & DEPENDENCIES**
+## Duration: 1 week
+## Risk Level: Medium (New features, but isolated)
+
+### **Objectives**
+- Add template save/load functionality
+- Implement dependency suggestions
+- Create node creation automation
+- Add template recommendation system
+
+### **Component Enhancement Strategy**
+
+#### **3.1 Add Template Management to Existing NodeInfoPanel (Day 1-2)**
+
+```javascript
+// EXISTING: NodeInfoPanel.js
+// ENHANCE: Add template functionality to existing component (reuse 80%)
+
+const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
+  // EXISTING: All current state and logic - keep unchanged
+  
+  // NEW: Add template state (minimal addition)
+  const [showTemplateOptions, setShowTemplateOptions] = useState(false);
+  const [availableTemplates, setAvailableTemplates] = useState([]);
+  
+  // EXISTING: All current rendering logic - keep unchanged
+  
+  // NEW: Add template section to existing UI (reuse existing styling)
+  const renderTemplateSection = () => (
+    <div className="mt-4 border-t border-gray-600 pt-4">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-sm font-medium text-gray-300">Quick Setup</h4>
+        <button
+          onClick={() => setShowTemplateOptions(!showTemplateOptions)}
+          className="text-blue-400 hover:text-blue-300 text-xs"
+        >
+          {showTemplateOptions ? 'Hide' : 'Show'} Templates
+        </button>
+      </div>
+      
+      {showTemplateOptions && (
+        <div className="space-y-2">
+          {availableTemplates.map(template => (
+            <button
+              key={template.id}
+              onClick={() => applyTemplate(template.id)}
+              className="w-full text-left text-xs bg-gray-700 hover:bg-gray-600 p-2 rounded border border-gray-600"
+            >
+              <div className="font-medium text-white">{template.name}</div>
+              <div className="text-gray-400">{template.description}</div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+  
+  return (
+    <div className="existing-nodeinfopanel-structure">
+      {/* ALL EXISTING CONTENT - keep unchanged */}
+      
+      {/* NEW: Add template section */}
+      {selectedNode && renderTemplateSection()}
+    </div>
+  );
+};
+```
+
+#### **3.2 Simple Template Storage (Day 2-3)**
+
+```javascript
+// NEW: Simple template management (reuse existing API patterns)
+
+// BACKEND: Add to existing server.py (minimal new endpoints)
+@api_router.post("/templates/save")  
+async def save_node_template(template_data: dict):
+    # Simple template storage - reuse existing MongoDB patterns
+    template = {
+        "name": template_data["name"],
+        "description": template_data["description"], 
+        "node_type": template_data["node_type"],
+        "responses": template_data["responses"],
+        "context": template_data["context"],
+        "created_at": datetime.utcnow()
+    }
+    
+    result = await db.node_templates.insert_one(template)
+    return {"template_id": str(result.inserted_id)}
+
+@api_router.get("/templates/{node_type}")
+async def get_templates(node_type: str):
+    # Simple template retrieval 
+    templates = await db.node_templates.find(
+        {"node_type": node_type}
+    ).sort("created_at", -1).limit(10).to_list()
+    
+    return {"templates": templates}
+
+# FRONTEND: Simple template API calls (reuse existing fetch patterns)
+const saveAsTemplate = async (name, description, responses, context) => {
+  const response = await fetch('/api/templates/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description, responses, context, node_type: 'WebApp' })
+  });
+  return response.json();
+};
+
+const loadTemplates = async (nodeType) => {
+  const response = await fetch(`/api/templates/${nodeType}`);
+  return response.json();
+};
+```
+
+#### **3.3 Basic Dependency Suggestions (Day 3-4)**
+
+```javascript
+// ENHANCE: SecurityQuestionnaire.js
+// ADD: Simple dependency detection (reuse existing modal patterns)
+
+const SecurityQuestionnaire = ({ node, onClose, onComplete }) => {
+  // EXISTING: All current state - keep unchanged
+  
+  // NEW: Add dependency state
+  const [suggestedDependencies, setSuggestedDependencies] = useState([]);
+  
+  // NEW: Simple dependency detection logic
+  const checkDependencies = (questionId, answer, context) => {
+    const dependencies = [];
+    
+    // Simple rules for common dependencies
+    if (questionId === 'database_integration' && answer === 'yes') {
+      dependencies.push({
+        type: 'Database',
+        reason: 'Application requires database storage',
+        confidence: 'high'
+      });
+    }
+    
+    if (context.app_type === 'saas' && questionId === 'api_required' && answer === 'yes') {
+      dependencies.push({
+        type: 'API', 
+        reason: 'SaaS platform typically needs API layer',
+        confidence: 'medium'
+      });
+    }
+    
+    return dependencies;
+  };
+  
+  // ENHANCE: Existing handleAnswer method
+  const handleAnswer = (questionId, answer) => {
+    // EXISTING: All current logic - keep unchanged
+    setResponses(prev => ({ ...prev, [questionId]: answer }));
+    updateContext(questionId, answer);
+    
+    // NEW: Check for dependencies (5 lines added)
+    const newDependencies = checkDependencies(questionId, answer, dynamicContext);
+    if (newDependencies.length > 0) {
+      setSuggestedDependencies(prev => [...prev, ...newDependencies]);
+    }
+    
+    // EXISTING: Navigation logic - keep unchanged
+    setCurrentQuestionIndex(getNextQuestionIndex(currentQuestionIndex, dynamicContext));
+  };
+  
+  // NEW: Dependency suggestion display (reuse existing modal styling)
+  const renderDependencySuggestions = () => {
+    if (suggestedDependencies.length === 0) return null;
+    
+    return (
+      <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-500/50 rounded-lg">
+        <h4 className="text-sm font-medium text-yellow-300 mb-2">
+          Suggested Components
+        </h4>
+        {suggestedDependencies.map((dep, index) => (
+          <div key={index} className="flex items-center justify-between text-sm">
+            <div>
+              <span className="text-white">{dep.type}</span>
+              <span className="text-gray-400 ml-2">- {dep.reason}</span>
+            </div>
+            <button
+              onClick={() => createDependencyNode(dep.type)}
+              className="text-blue-400 hover:text-blue-300 text-xs"
+            >
+              Create
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+};
+```
+
+#### **3.4 Simple Node Creation (Day 4-5)**
+
+```javascript
+// ENHANCE: Existing App.js - add node creation helper
+// REUSE: Existing addNode functionality (90% reuse)
+
+const App = () => {
+  // EXISTING: All current state and methods - keep unchanged
+  
+  // NEW: Helper method for dependency node creation (reuse existing addNode)
+  const createDependencyNode = useCallback((nodeType, position = null) => {
+    // Calculate position near parent node
+    const parentPosition = selectedNode?.position || { x: 300, y: 300 };
+    const newPosition = position || {
+      x: parentPosition.x + 200,
+      y: parentPosition.y + 100
+    };
+    
+    // REUSE: Existing addNode method with default configuration
+    const newNode = {
+      id: `${nodeType.toLowerCase()}-${Date.now()}`,
+      type: 'custom',
+      position: newPosition,
+      data: {
+        label: nodeType,
+        subtype: nodeType,
+        questionnaireResponses: {},
+        dynamicContext: {
+          created_by_dependency: true,
+          parent_node: selectedNode?.id
+        }
+      }
+    };
+    
+    // EXISTING: Add to nodes array (reuse existing logic)
+    setNodes(prevNodes => [...prevNodes, newNode]);
+    
+    // EXISTING: Create connection edge (reuse existing edge creation)
+    const newEdge = {
+      id: `edge-${selectedNode.id}-${newNode.id}`,
+      source: selectedNode.id,
+      target: newNode.id,
+      type: 'smoothstep',
+      data: { label: 'uses' }
+    };
+    
+    setEdges(prevEdges => [...prevEdges, newEdge]);
+    
+    return newNode;
+  }, [selectedNode, setNodes, setEdges]);
+  
+  // EXISTING: All other methods and rendering - keep unchanged
+};
+```
+
+### **Phase 3 Testing Strategy**
+
+#### **Day 5: Testing**
+```bash
+# 1. Template Functionality Test
+- Test template save for completed questionnaires
+- Test template load and application
+- Verify template list display
+
+# 2. Dependency Suggestion Test  
+- Test database dependency detection
+- Test API dependency for SaaS apps
+- Verify node creation positioning
+
+# 3. Integration Test
+- Test full flow: questionnaire → dependencies → node creation
+- Test template application with dependencies
+- Verify edge creation between parent and dependent nodes
+```
+
+### **Phase 3 Success Metrics**
+- [ ] Template save/load functionality working
+- [ ] Basic dependency detection operational
+- [ ] Automatic node creation functioning
+- [ ] Templates reduce setup time by 60%
+- [ ] Dependency suggestions 80% accurate
+
+### **Phase 3 Deliverables**
+- [ ] Template management in NodeInfoPanel (30 lines added)
+- [ ] Simple template storage system (50 lines total)
+- [ ] Basic dependency detection (40 lines added)
+- [ ] Automated node creation (25 lines added)
+- [ ] Integration between templates and dependencies
+
+---
+
+# 🎨 **PHASE 4: INTEGRATION & POLISH**
+## Duration: 3-4 days  
+## Risk Level: Low (Polish and optimization)
+
+### **Objectives**
+- Integrate all phases seamlessly
+- Add user experience improvements
+- Optimize performance
+- Create comprehensive documentation
+- Prepare for production rollout
+
+### **Integration Tasks**
+
+#### **Day 1: Seamless Integration**
+```bash
+# 1. End-to-End Flow Testing
+- Test complete dynamic questionnaire flow
+- Verify context propagation through all phases
+- Test template + dependency + analysis integration
+
+# 2. Performance Optimization
+- Optimize context calculation performance
+- Add caching for template recommendations
+- Minimize re-renders in dynamic components
+
+# 3. Error Handling Enhancement
+- Add graceful fallbacks for dynamic mode failures
+- Implement error recovery mechanisms
+- Add comprehensive error logging
+```
+
+#### **Day 2: User Experience Polish**
+```javascript
+// ADD: Enhanced user experience features (reuse existing UI patterns)
+
+// 1. Progress Visualization Enhancement
+const EnhancedProgressTracker = () => {
+  return (
+    <div className="enhanced-progress">
+      {/* REUSE: Existing progress bar styling */}
+      <div className="progress-summary">
+        <span className="text-green-400">✓ {answeredCount} answered</span>
+        <span className="text-blue-400">⏭ {skippedCount} skipped</span>
+        <span className="text-gray-400">⏳ {remainingCount} remaining</span>
+      </div>
+    </div>
+  );
+};
+
+// 2. Context Visualization Enhancement  
+const ContextSummaryCard = ({ context }) => {
+  return (
+    <div className="bg-gray-800 rounded-lg p-3 border border-gray-600">
+      <h4 className="text-sm font-medium text-gray-300 mb-2">Configuration Summary</h4>
+      <div className="space-y-1">
+        {context.app_type && (
+          <div className="text-xs">
+            <span className="text-gray-400">Type:</span>
+            <span className="text-white ml-2">{context.app_type}</span>
+          </div>
+        )}
+        {context.security_level && (
+          <div className="text-xs">
+            <span className="text-gray-400">Security Level:</span>
+            <span className="text-green-400 ml-2">{context.security_level}/10</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// 3. Smart Recommendations Display
+const SmartRecommendations = ({ context, responses }) => {
+  const recommendations = useMemo(() => {
+    return generateRecommendations(context, responses);
+  }, [context, responses]);
+  
+  return (
+    <div className="recommendations-panel">
+      {recommendations.map((rec, index) => (
+        <div key={index} className="recommendation-item bg-blue-900/20 p-2 rounded border border-blue-500/50">
+          <div className="text-blue-300 text-sm font-medium">{rec.title}</div>
+          <div className="text-gray-400 text-xs">{rec.description}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+#### **Day 3: Production Readiness**
+```bash
+# 1. Feature Flag Management
+- Set up gradual rollout controls
+- Add A/B testing capabilities  
+- Implement rollback mechanisms
+
+# 2. Monitoring & Analytics
+- Add performance monitoring
+- Track user completion rates
+- Monitor context accuracy metrics
+
+# 3. Documentation
+- Create user guide for dynamic questionnaires
+- Document template creation process
+- Create troubleshooting guide
+```
+
+#### **Day 4: Final Testing & Deployment**
+```bash
+# 1. Comprehensive Testing
+- Full regression testing
+- Performance testing under load
+- User acceptance testing
+
+# 2. Migration Preparation
+- Prepare data migration scripts
+- Set up feature flag controls
+- Create rollback procedures
+
+# 3. Production Deployment
+- Deploy with feature flags disabled
+- Gradual rollout to 10% of users
+- Monitor metrics and feedback
+```
+
+### **Phase 4 Success Metrics**
+- [ ] Complete end-to-end flow working smoothly
+- [ ] Performance impact <50ms per question
+- [ ] User completion rate improved by 25%
+- [ ] Zero critical bugs in production rollout
+- [ ] Feature flag system operational
+
+### **Phase 4 Deliverables**  
+- [ ] Polished user experience enhancements
+- [ ] Performance optimizations
+- [ ] Comprehensive documentation
+- [ ] Production-ready deployment
+- [ ] Monitoring and analytics setup
+
+---
+
+# 📊 **COMPONENT REUSE SUMMARY**
+
+## Total Lines of Code Analysis
+
+| Component | Current Lines | Added Lines | Reuse % | Risk Level |
+|-----------|---------------|-------------|---------|------------|
+| SecurityQuestionnaire.js | ~800 | ~120 | 85% | Low |
+| NodeInfoPanel.js | ~600 | ~80 | 87% | Low |  
+| App.js (main) | ~2000 | ~100 | 95% | Low |
+| vulnerability_engine.py | ~500 | ~125 | 75% | Medium |
+| stride_engine.py | ~400 | ~80 | 80% | Medium |
+| server.py (API) | ~1500 | ~150 | 90% | Low |
+
+## New Components Created
+
+| Component | Lines | Purpose | Risk Level |
+|-----------|-------|---------|------------|
+| contextRules.js | ~100 | Context management | Low |
+| templateManager.js | ~200 | Template operations | Medium |
+| dependencyDetector.js | ~150 | Dependency logic | Medium |
+
+## **Total Development Estimate**
+- **Existing Code Modified**: 5,800 lines
+- **New Code Created**: 1,025 lines  
+- **Reuse Percentage**: 85%
+- **Total Development Time**: 3.5 weeks
+- **Risk Level**: Low-Medium
+
+---
+
+# 🎯 **SUCCESS METRICS BY PHASE**
+
+## Phase 1 Metrics
+- [ ] 100% backward compatibility maintained
+- [ ] Basic context tracking: 90% accuracy
+- [ ] Feature flag system: 100% functional
+- [ ] Question skipping: 30% reduction for static sites
+
+## Phase 2 Metrics  
+- [ ] Context-aware analysis: 40% accuracy improvement
+- [ ] Question relevance: 70% improvement  
+- [ ] Performance impact: <100ms per question
+- [ ] User satisfaction: 25% improvement
+
+## Phase 3 Metrics
+- [ ] Template usage: 60% time reduction
+- [ ] Dependency accuracy: 80% correct suggestions
+- [ ] Node creation: 90% success rate
+- [ ] Template adoption: 40% of users
+
+## Phase 4 Metrics
+- [ ] Overall question reduction: 70% achieved
+- [ ] Threat accuracy: 40% improvement
+- [ ] User completion rate: 85% (vs 60% current)
+- [ ] Production stability: 99.9% uptime
+
+---
+
+# 🚀 **ROLLOUT STRATEGY**
+
+## Gradual Feature Rollout
+
+### Week 1 (Phase 1): Internal Testing
+- Enable for development team only
+- Test with existing diagrams
+- Validate backward compatibility
+
+### Week 2 (Phase 2): Beta Users  
+- Enable for 10% of active users
+- Monitor performance metrics
+- Collect user feedback
+
+### Week 3 (Phase 3): Expanded Beta
+- Enable for 25% of users
+- Add template functionality
+- Monitor adoption rates
+
+### Week 4 (Phase 4): Full Rollout
+- Enable for 100% of users
+- Monitor system performance
+- Support user transition
+
+## Rollback Plan
+- **Level 1**: Disable feature flags (30 seconds)
+- **Level 2**: Revert to previous deployment (5 minutes)
+- **Level 3**: Database rollback if needed (15 minutes)
+
+---
+
+This phase-wise plan maximizes component reuse (85% overall) while delivering significant functionality improvements through incremental, low-risk development cycles. Each phase builds on the previous one and can be independently tested and deployed.
