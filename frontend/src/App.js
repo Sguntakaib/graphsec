@@ -515,78 +515,40 @@ function AppContent() {
       }
     }
     
-    // Get STRIDE score for this node
+    // Get STRIDE score for this node (use diagram-level analysis)
     if (currentDiagram?.id) {
       try {
-        console.log('🎯 Fetching STRIDE data for node:', nodeId, 'in diagram:', currentDiagram.id);
+        console.log('🎯 Fetching STRIDE data for diagram:', currentDiagram.id);
         
-        // First try to get existing STRIDE coverage data (faster than re-analyzing)
-        let strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/coverage`);
-        let useAnalysisEndpoint = false;
+        // Get STRIDE coverage data (diagram-level analysis)
+        const strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/coverage`);
         
         if (strideResponse.ok) {
           const coverageData = await strideResponse.json();
           console.log('🎯 STRIDE coverage data:', coverageData);
           
           if (coverageData.total_threats > 0) {
-            // Use existing analysis data
+            // Use existing analysis data - all nodes show same diagram risk
             strideScore = coverageData.residual_risk_avg || 0;
-            console.log('🎯 Using existing STRIDE coverage average:', strideScore);
+            console.log('🎯 Using STRIDE coverage average:', strideScore);
           } else {
-            useAnalysisEndpoint = true;
+            // No existing analysis, try to get stored threats
+            const threatsResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/threats`);
+            if (threatsResponse.ok) {
+              const threatsData = await threatsResponse.json();
+              const threats = threatsData.threats || [];
+              
+              if (threats.length > 0) {
+                // Calculate average from stored threats
+                const threatScores = threats.map(threat => threat.residual_risk || 0);
+                const totalRisk = threatScores.reduce((sum, score) => sum + score, 0);
+                strideScore = totalRisk / threats.length;
+                console.log('🎯 Calculated STRIDE score from stored threats:', strideScore);
+              }
+            }
           }
         } else {
-          useAnalysisEndpoint = true;
-        }
-        
-        // If no existing analysis, run new analysis
-        if (useAnalysisEndpoint) {
-          strideResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/stride/analyze`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              nodes: [{
-                id: nodeId,
-                type: node.type,
-                subtype: nodeSubtype,
-                questionnaire_responses: questionnaireResponses,
-                position: node.position
-              }]
-            })
-          });
-          
-          console.log('🎯 STRIDE response status:', strideResponse.status);
-          
-          if (strideResponse.ok && useAnalysisEndpoint) {
-            const strideData = await strideResponse.json();
-            console.log('🎯 STRIDE analysis response data:', strideData);
-            
-            // Since threats don't have node associations, calculate average risk from all threats
-            // This is a simplified approach - all nodes will show the same overall risk score
-            const allThreats = strideData.threats || [];
-            console.log('🎯 All threats found:', allThreats.length);
-            
-            if (allThreats.length > 0) {
-              // Use residual_risk field (not risk_score) as identified by backend testing
-              const threatScores = allThreats.map(threat => {
-                const score = threat.residual_risk || threat.risk_score || 0;
-                console.log('🎯 Threat score:', threat.title, '=', score);
-                return score;
-              });
-              
-              // Calculate average risk score
-              const totalRisk = threatScores.reduce((sum, score) => sum + score, 0);
-              strideScore = allThreats.length > 0 ? (totalRisk / allThreats.length) : 0;
-              console.log('🎯 Calculated average STRIDE score:', strideScore, 'from', allThreats.length, 'threats');
-              console.log('🎯 Individual scores:', threatScores);
-            } else {
-              console.log('🎯 No threats found in STRIDE analysis');
-            }
-          } else if (!useAnalysisEndpoint) {
-            console.log('🎯 Used existing STRIDE coverage data');
-          } else {
-            console.error('🎯 STRIDE API error:', strideResponse.status, await strideResponse.text());
-          }
+          console.log('🎯 STRIDE coverage API returned:', strideResponse.status);
         }
       } catch (e) {
         console.error('🎯 STRIDE API exception:', e.message);
