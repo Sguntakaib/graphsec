@@ -593,6 +593,22 @@ function AppContent() {
     }
   }, [overlayHoverTimer]);
 
+  const handleOverlayHover = useCallback((event) => {
+    const action = event.detail?.action;
+    
+    if (action === 'enter') {
+      // Cancel any pending hide timer when hovering over overlay
+      if (overlayHoverTimer) {
+        clearTimeout(overlayHoverTimer);
+        setOverlayHoverTimer(null);
+      }
+    } else if (action === 'leave') {
+      // Hide overlay when leaving overlay area
+      setShowNodeInfoOverlay(false);
+      setNodeInfoOverlayData(null);
+    }
+  }, [overlayHoverTimer]);
+
   useEffect(() => {
     window.addEventListener('nodeDoubleTap', handleNodeDoubleTap);
     window.addEventListener('edgeUpdate', handleEdgeUpdate);
