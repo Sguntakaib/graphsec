@@ -1,0 +1,1980 @@
+# Dynamic Questionnaire System Architecture
+## "NewWay" - Context-Aware Security Assessment Platform
+
+**Version**: 1.0  
+**Date**: January 2025  
+**Author**: Security Platform Development Team
+
+---
+
+# 📋 **TABLE OF CONTENTS**
+
+1. [Executive Summary](#executive-summary)
+2. [System Architecture Overview](#system-architecture-overview)
+3. [Database Schema Design](#database-schema-design)
+4. [Backend API Architecture](#backend-api-architecture)
+5. [Frontend Component Architecture](#frontend-component-architecture)
+6. [Dynamic Question Engine](#dynamic-question-engine)
+7. [Context-Aware Analysis Engine](#context-aware-analysis-engine)
+8. [Integration Architecture](#integration-architecture)
+9. [Data Flow Architecture](#data-flow-architecture)
+10. [Security & Performance Considerations](#security--performance-considerations)
+11. [Implementation Phases](#implementation-phases)
+12. [Migration Strategy](#migration-strategy)
+
+---
+
+## 📊 **EXECUTIVE SUMMARY**
+
+### **System Goals**
+- **70% reduction in irrelevant questions** through context-aware filtering
+- **40% increase in threat accuracy** via intelligent branching
+- **Real-time adaptability** based on user responses
+- **Template-based reusability** for common configurations
+- **Cross-node dependency management** with intelligent suggestions
+
+### **Key Architectural Innovations**
+1. **Dynamic Question Engine**: Conditional branching based on context
+2. **Context-Aware Vulnerability Analysis**: Application-type specific threat detection
+3. **Intelligent STRIDE Mapping**: Relevance-filtered threat modeling
+4. **Template Management System**: Save/load/share configurations
+5. **Dependency Graph Engine**: Auto-suggest related components
+
+---
+
+## 🏗️ **SYSTEM ARCHITECTURE OVERVIEW**
+
+### **High-Level Architecture Diagram**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    FRONTEND LAYER                               │
+├─────────────────────────────────────────────────────────────────┤
+│  Dynamic UI Controller  │  Question Renderer  │  Template Mgr   │
+│  - Context Manager      │  - Branching Logic  │  - Save/Load    │
+│  - Progress Tracker     │  - Validation       │  - Recommend    │
+│  - State Manager        │  - UI Adaptation    │  - Share        │
+└─────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼ REST API
+┌─────────────────────────────────────────────────────────────────┐
+│                     API GATEWAY LAYER                           │
+├─────────────────────────────────────────────────────────────────┤
+│           Dynamic Questionnaire Controller                      │
+│  - Route Management     │  - Request Validation  │  - Response   │
+│  - Authentication       │  - Rate Limiting        │  - Caching    │
+└─────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    BUSINESS LOGIC LAYER                         │
+├─────────────────────────────────────────────────────────────────┤
+│  Question Engine    │  Context Analyzer   │  Template Engine    │
+│  - Branching Logic  │  - App Type Det.    │  - Config Save      │
+│  - Flow Control     │  - Context Rules    │  - Template Match   │
+│  - Validation       │  - Response Eval    │  - Recommendations  │
+│                     │                     │                     │
+│  Vulnerability Eng. │  STRIDE Engine      │  Dependency Engine  │
+│  - Context Mapping  │  - Context Filter   │  - Node Suggestion  │
+│  - Threat Analysis  │  - Relevance Score  │  - Relation Mapping │
+│  - Risk Calculation │  - Dynamic Scoring  │  - Auto-Creation    │
+└─────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     DATA ACCESS LAYER                           │
+├─────────────────────────────────────────────────────────────────┤
+│  Question Repository │ Context Repository │ Template Repository │
+│  - Question CRUD     │ - Context Rules    │ - Template CRUD     │
+│  - Flow Management   │ - App Type Config  │ - Sharing Logic     │
+│  - Version Control   │ - Mapping Rules    │ - Version Control   │
+└─────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      DATABASE LAYER                             │
+├─────────────────────────────────────────────────────────────────┤
+│     MongoDB Collections                                         │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
+│  │ questionnaire_  │ │ context_rules   │ │ node_templates  │   │
+│  │ definitions     │ │                 │ │                 │   │
+│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
+│  │ user_responses  │ │ vulnerability_  │ │ stride_rules    │   │
+│  │                 │ │ mappings        │ │                 │   │
+│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### **Technology Stack**
+
+#### **Backend Components**
+- **Framework**: FastAPI (Python 3.11+)
+- **Database**: MongoDB with aggregation pipelines
+- **Caching**: Redis for question flow caching
+- **Queue**: Celery for async template processing
+- **Validation**: Pydantic v2 for data validation
+
+#### **Frontend Components**  
+- **Framework**: React 19 with Context API
+- **State Management**: Zustand for complex flows
+- **UI Library**: Radix UI + Tailwind CSS
+- **Forms**: React Hook Form with Zod validation
+- **Flow Visualization**: React Flow for dependency mapping
+
+---
+
+## 🗄️ **DATABASE SCHEMA DESIGN**
+
+### **1. Questionnaire Definitions Collection**
+
+```javascript
+// questionnaire_definitions
+{
+  _id: ObjectId,
+  version: "2.0.0",
+  node_type: "WebApp", // WebApp, API, Database, etc.
+  schema: {
+    // Root question that starts the flow
+    initial_question: {
+      id: "webapp_development_context",
+      question: "What are you building?",
+      type: "single_choice",
+      options: [
+        {
+          value: "new_website",
+          label: "New website from scratch", 
+          next_flow: "new_website_flow",
+          context_updates: {
+            "development_stage": "new",
+            "complexity_level": "medium"
+          }
+        },
+        {
+          value: "custom_feature",
+          label: "Adding feature to existing website",
+          next_flow: "existing_enhancement_flow",
+          requires_existing_node: true,
+          context_updates: {
+            "development_stage": "enhancement",
+            "requires_parent_node": true
+          }
+        }
+      ]
+    },
+    
+    // Named flows for different paths
+    flows: {
+      new_website_flow: {
+        questions: [
+          {
+            id: "website_type_classification",
+            question: "What type of website are you creating?",
+            type: "single_choice",
+            required: true,
+            options: [
+              {
+                value: "static_site",
+                label: "Static website/blog",
+                context_updates: {
+                  "app_type": "static_website",
+                  "requires_authentication": false,
+                  "requires_database": false,
+                  "complexity_level": "low"
+                },
+                skip_question_categories: ["authentication", "database", "session_management"],
+                next_questions: ["static_hosting_method", "static_security_headers"]
+              },
+              {
+                value: "interactive_webapp",
+                label: "Interactive web application",
+                context_updates: {
+                  "app_type": "interactive_webapp",
+                  "requires_authentication": true,
+                  "requires_database": true,
+                  "complexity_level": "high"
+                },
+                include_question_categories: ["authentication", "input_validation", "session_management"],
+                next_questions: ["webapp_authentication_method", "webapp_database_integration"]
+              }
+            ]
+          }
+        ]
+      },
+      
+      existing_enhancement_flow: {
+        prerequisite_questions: [
+          {
+            id: "existing_node_selection", 
+            question: "Select the existing website node to enhance:",
+            type: "node_selector",
+            filter: {"node_type": "WebApp", "status": "configured"},
+            inherit_context: true
+          }
+        ],
+        questions: [
+          {
+            id: "feature_type_classification",
+            question: "What type of feature are you adding?",
+            type: "single_choice",
+            context_dependent: true,
+            options: [
+              {
+                value: "user_interaction",
+                label: "User interaction features",
+                condition: "parent_node.context.app_type != 'static_site'",
+                next_questions: ["user_input_handling", "session_requirements"]
+              },
+              {
+                value: "database_integration", 
+                label: "Database integration",
+                dependency_trigger: {
+                  action: "suggest_node_creation",
+                  node_type: "Database",
+                  reason: "Feature requires database functionality"
+                },
+                next_questions: ["database_connection_type", "data_sensitivity"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  
+  // Context-aware question filtering rules
+  conditional_rules: {
+    skip_conditions: [
+      {
+        rule_id: "skip_auth_for_static",
+        condition: "context.app_type == 'static_website'",
+        skip_categories: ["authentication", "session_management", "user_management"]
+      }
+    ],
+    include_conditions: [
+      {
+        rule_id: "include_payment_for_ecommerce", 
+        condition: "context.app_type == 'ecommerce'",
+        include_categories: ["payment_processing", "pci_compliance", "financial_security"]
+      }
+    ]
+  },
+  
+  created_at: ISODate,
+  updated_at: ISODate,
+  created_by: "system",
+  is_active: true
+}
+```
+
+### **2. Context Rules Collection**
+
+```javascript
+// context_rules  
+{
+  _id: ObjectId,
+  rule_name: "WebApp Type Classification",
+  node_type: "WebApp",
+  version: "1.0",
+  
+  // Define how context determines question flow
+  context_mappings: {
+    "static_website": {
+      question_categories: ["hosting", "cdn", "security_headers", "content_security"],
+      vulnerability_profile: "static_site_vulns",
+      stride_categories: ["information_disclosure", "denial_of_service"],
+      compliance_requirements: [],
+      estimated_questions: 6
+    },
+    
+    "interactive_webapp": {
+      question_categories: ["authentication", "session_management", "input_validation", "database"],
+      vulnerability_profile: "interactive_webapp_vulns", 
+      stride_categories: ["spoofing", "tampering", "information_disclosure", "elevation_of_privilege"],
+      compliance_requirements: ["data_protection"],
+      estimated_questions: 14
+    },
+    
+    "saas_platform": {
+      question_categories: ["multi_tenancy", "api_security", "authorization", "data_isolation"],
+      vulnerability_profile: "saas_vulns",
+      stride_categories: ["spoofing", "elevation_of_privilege", "information_disclosure", "repudiation"],
+      compliance_requirements: ["data_protection", "multi_tenant_security"],
+      estimated_questions: 18
+    }
+  },
+  
+  // Dynamic dependency rules
+  dependency_rules: [
+    {
+      trigger_condition: "responses.database_integration == 'yes'",
+      action: "suggest_node_creation",
+      suggested_node: {
+        type: "Database",
+        subtype: "ApplicationDatabase",
+        inherit_context: ["data_sensitivity", "compliance_requirements"],
+        relationship: "uses_database"
+      }
+    }
+  ],
+  
+  created_at: ISODate,
+  is_active: true
+}
+```
+
+### **3. User Response Sessions Collection**
+
+```javascript
+// user_response_sessions
+{
+  _id: ObjectId,
+  session_id: "uuid-v4",
+  user_id: "user_uuid", // optional for guest users
+  diagram_id: "diagram_uuid",
+  node_id: "node_uuid",
+  
+  // Session state management
+  session_state: {
+    current_flow: "new_website_flow",
+    current_question_id: "website_type_classification", 
+    completed_questions: ["webapp_development_context"],
+    context: {
+      "development_stage": "new",
+      "app_type": "interactive_webapp",
+      "requires_authentication": true,
+      "requires_database": true,
+      "complexity_level": "high"
+    },
+    progress_percentage: 25,
+    estimated_remaining_questions: 10
+  },
+  
+  // User responses with full context
+  responses: [
+    {
+      question_id: "webapp_development_context",
+      response_value: "new_website", 
+      response_label: "New website from scratch",
+      timestamp: ISODate,
+      context_at_time: {"development_stage": "new"}
+    },
+    {
+      question_id: "website_type_classification",
+      response_value: "interactive_webapp",
+      response_label: "Interactive web application", 
+      timestamp: ISODate,
+      context_at_time: {
+        "development_stage": "new",
+        "app_type": "interactive_webapp"
+      }
+    }
+  ],
+  
+  // Branching history for audit trail
+  branching_history: [
+    {
+      from_question: "webapp_development_context",
+      to_flow: "new_website_flow",
+      reason: "Selected new website development",
+      timestamp: ISODate
+    }
+  ],
+  
+  // Suggested dependencies during session
+  suggested_dependencies: [
+    {
+      node_type: "Database",
+      reason: "Interactive webapp requires data storage",
+      trigger_question: "website_type_classification",
+      status: "pending", // pending, accepted, rejected
+      created_at: ISODate
+    }
+  ],
+  
+  created_at: ISODate,
+  updated_at: ISODate,
+  completed: false,
+  session_timeout: ISODate
+}
+```
+
+### **4. Node Templates Collection**
+
+```javascript
+// node_templates
+{
+  _id: ObjectId,
+  template_name: "E-commerce WebApp - Stripe Integration",
+  template_description: "Pre-configured e-commerce website with Stripe payment processing",
+  node_type: "WebApp",
+  
+  // Template configuration
+  template_config: {
+    context: {
+      "app_type": "ecommerce",
+      "payment_processor": "stripe", 
+      "pci_scope": "saq_a",
+      "requires_database": true,
+      "complexity_level": "high"
+    },
+    
+    // Pre-filled responses
+    questionnaire_responses: {
+      "webapp_development_context": "new_website",
+      "website_type_classification": "ecommerce",
+      "payment_processing_method": "external_processor_stripe",
+      "pci_compliance_scope": "saq_a",
+      "https_enforcement": "strict_https_hsts",
+      "session_management": "secure_jwt_refresh"
+    },
+    
+    // Associated dependency nodes
+    dependency_nodes: [
+      {
+        node_type: "Database", 
+        template_name: "E-commerce Product Database",
+        relationship: "stores_product_data"
+      },
+      {
+        node_type: "API",
+        template_name: "Stripe Payment API Integration", 
+        relationship: "processes_payments"
+      }
+    ]
+  },
+  
+  // Template metadata
+  usage_stats: {
+    usage_count: 47,
+    success_rate: 0.94,
+    average_completion_time: "8_minutes",
+    user_rating: 4.7
+  },
+  
+  tags: ["ecommerce", "payments", "stripe", "pci_compliant"],
+  category: "popular_templates",
+  visibility: "public", // public, private, organization
+  created_by: "user_uuid",
+  created_at: ISODate,
+  updated_at: ISODate,
+  is_active: true
+}
+```
+
+### **5. Vulnerability Mappings Collection**
+
+```javascript
+// vulnerability_mappings
+{
+  _id: ObjectId,
+  mapping_name: "Context-Aware Vulnerability Rules v2.0",
+  version: "2.0.0",
+  
+  // Application-type specific vulnerability rules
+  vulnerability_rules: {
+    "static_website": [
+      {
+        vulnerability_id: "missing_csp",
+        trigger_conditions: [
+          "responses.content_security_policy == 'no_csp'"
+        ],
+        vulnerability: {
+          type: "Cross_Site_Scripting_Risk",
+          severity: "HIGH", 
+          owasp_category: "A03:2021_Injection",
+          description: "Missing Content Security Policy allows content injection attacks",
+          remediation: "Implement strict CSP with nonce or hash-based script loading",
+          references: ["https://owasp.org/www-community/controls/Content_Security_Policy"]
+        }
+      }
+    ],
+    
+    "saas_platform": [
+      {
+        vulnerability_id: "tenant_isolation_failure", 
+        trigger_conditions: [
+          "responses.tenant_isolation_model == 'application_level_filtering'"
+        ],
+        vulnerability: {
+          type: "Insecure_Direct_Object_Reference",
+          severity: "CRITICAL",
+          owasp_category: "A01:2021_Broken_Access_Control",
+          description: "Tenant isolation relies on application logic - risk of cross-tenant data access",
+          remediation: "Implement database-level or schema-level tenant isolation",
+          compliance_impact: ["SOC2", "ISO27001"]
+        }
+      }
+    ]
+  },
+  
+  // Context-aware filtering rules
+  relevance_rules: {
+    exclude_for_static_sites: [
+      "sql_injection", "authentication_bypass", "session_management_flaws"
+    ],
+    include_for_ecommerce: [
+      "payment_card_data_exposure", "transaction_tampering", "pci_compliance_violations"
+    ]
+  },
+  
+  created_at: ISODate,
+  is_active: true
+}
+```
+
+### **6. STRIDE Rules Collection**
+
+```javascript
+// stride_rules
+{
+  _id: ObjectId,
+  rule_set_name: "Context-Aware STRIDE Analysis v2.0",
+  version: "2.0.0",
+  
+  // Context-aware STRIDE mapping
+  stride_mappings: {
+    "spoofing": {
+      relevance_conditions: [
+        "context.requires_authentication == true",
+        "context.app_type != 'static_website'"
+      ],
+      threat_rules: [
+        {
+          threat_id: "authentication_bypass",
+          trigger_conditions: [
+            "responses.authentication_method == 'no_authentication'",
+            "context.app_type == 'interactive_webapp'"
+          ],
+          threat: {
+            title: "Authentication Bypass Risk",
+            description: "Interactive application without authentication allows unauthorized access",
+            base_severity: 8.0,
+            context_multipliers: {
+              "financial_data_handling": 1.5,
+              "personal_data_handling": 1.2
+            }
+          }
+        }
+      ]
+    },
+    
+    "tampering": {
+      relevance_conditions: [
+        "context.processes_user_input == true"
+      ],
+      exclusion_conditions: [
+        "context.app_type == 'static_website'"
+      ]
+    }
+  },
+  
+  created_at: ISODate,
+  is_active: true
+}
+```
+
+---
+
+## 🔧 **BACKEND API ARCHITECTURE**
+
+### **API Endpoint Structure**
+
+```python
+# Dynamic Questionnaire API Endpoints
+
+# 1. Session Management
+POST   /api/questionnaire/sessions                    # Start new session
+GET    /api/questionnaire/sessions/{session_id}      # Get session state  
+PUT    /api/questionnaire/sessions/{session_id}      # Update session
+DELETE /api/questionnaire/sessions/{session_id}      # End session
+
+# 2. Dynamic Question Flow
+GET    /api/questionnaire/{node_type}/initial        # Get initial question
+POST   /api/questionnaire/sessions/{session_id}/respond  # Submit response + get next
+GET    /api/questionnaire/sessions/{session_id}/current  # Get current question
+POST   /api/questionnaire/sessions/{session_id}/skip     # Skip optional question
+
+# 3. Context Management  
+GET    /api/questionnaire/sessions/{session_id}/context  # Get current context
+POST   /api/questionnaire/sessions/{session_id}/context  # Update context
+GET    /api/questionnaire/sessions/{session_id}/progress # Get progress info
+
+# 4. Template Management
+GET    /api/templates                                # List available templates
+GET    /api/templates/{template_id}                  # Get template details
+POST   /api/templates                                # Save current config as template
+PUT    /api/templates/{template_id}                  # Update template
+POST   /api/templates/{template_id}/apply            # Apply template to session
+
+# 5. Dependency Management
+GET    /api/questionnaire/sessions/{session_id}/dependencies     # Get suggested dependencies
+POST   /api/questionnaire/sessions/{session_id}/dependencies    # Accept/reject dependency
+GET    /api/questionnaire/dependencies/suggest                  # Get dependency suggestions
+
+# 6. Analysis Integration
+POST   /api/analysis/vulnerability/context-aware    # Context-aware vulnerability analysis
+POST   /api/analysis/stride/context-aware          # Context-aware STRIDE analysis  
+GET    /api/analysis/sessions/{session_id}/preview # Preview analysis results
+```
+
+### **Core Backend Services**
+
+#### **1. Dynamic Question Engine**
+
+```python
+from typing import Dict, List, Optional, Any
+from pydantic import BaseModel
+from enum import Enum
+
+class QuestionType(str, Enum):
+    SINGLE_CHOICE = "single_choice"
+    MULTIPLE_CHOICE = "multiple_choice" 
+    TEXT_INPUT = "text_input"
+    NODE_SELECTOR = "node_selector"
+    BOOLEAN = "boolean"
+
+class QuestionOption(BaseModel):
+    value: str
+    label: str
+    context_updates: Dict[str, Any] = {}
+    next_questions: List[str] = []
+    skip_question_categories: List[str] = []
+    dependency_trigger: Optional[Dict[str, Any]] = None
+    condition: Optional[str] = None
+
+class DynamicQuestion(BaseModel):
+    id: str
+    question: str
+    type: QuestionType
+    required: bool = True
+    options: List[QuestionOption] = []
+    context_dependent: bool = False
+    help_text: Optional[str] = None
+    validation_rules: Dict[str, Any] = {}
+
+class QuestionnaireSession(BaseModel):
+    session_id: str
+    node_id: str
+    diagram_id: str
+    current_flow: str
+    current_question_id: Optional[str]
+    context: Dict[str, Any] = {}
+    responses: Dict[str, Any] = {}
+    completed_questions: List[str] = []
+    progress_percentage: float = 0.0
+    estimated_remaining: int = 0
+
+class DynamicQuestionEngine:
+    def __init__(self, db_client, context_analyzer, dependency_engine):
+        self.db = db_client
+        self.context_analyzer = context_analyzer
+        self.dependency_engine = dependency_engine
+        
+    async def start_session(self, node_type: str, diagram_id: str, node_id: str) -> QuestionnaireSession:
+        """Initialize new dynamic questionnaire session"""
+        
+        # Get initial question for node type
+        questionnaire_def = await self.get_questionnaire_definition(node_type)
+        initial_question = questionnaire_def["schema"]["initial_question"]
+        
+        session = QuestionnaireSession(
+            session_id=generate_uuid(),
+            node_id=node_id,
+            diagram_id=diagram_id,
+            current_flow="initial",
+            current_question_id=initial_question["id"],
+            context={},
+            estimated_remaining=self.estimate_questions(node_type, {})
+        )
+        
+        # Store session in database
+        await self.save_session(session)
+        return session
+        
+    async def process_response(self, session_id: str, question_id: str, response: Any) -> Dict[str, Any]:
+        """Process user response and determine next question"""
+        
+        session = await self.get_session(session_id)
+        questionnaire_def = await self.get_questionnaire_definition_by_session(session)
+        
+        # Update session with response
+        session.responses[question_id] = response
+        session.completed_questions.append(question_id)
+        
+        # Update context based on response
+        updated_context = await self.update_context(session, question_id, response, questionnaire_def)
+        session.context.update(updated_context)
+        
+        # Check for dependency triggers
+        dependencies = await self.check_dependency_triggers(session, question_id, response, questionnaire_def)
+        
+        # Determine next question using branching logic
+        next_question = await self.determine_next_question(session, questionnaire_def)
+        
+        # Update progress
+        session.progress_percentage = self.calculate_progress(session)
+        session.estimated_remaining = self.estimate_remaining_questions(session)
+        
+        if next_question:
+            session.current_question_id = next_question["id"]
+            session.current_flow = next_question.get("flow", session.current_flow)
+        else:
+            # Questionnaire complete
+            session.current_question_id = None
+            session.progress_percentage = 100.0
+            
+        await self.save_session(session)
+        
+        return {
+            "next_question": next_question,
+            "context_updates": updated_context,
+            "suggested_dependencies": dependencies,
+            "progress": {
+                "percentage": session.progress_percentage,
+                "completed": len(session.completed_questions),
+                "estimated_remaining": session.estimated_remaining
+            },
+            "session_complete": next_question is None
+        }
+        
+    async def determine_next_question(self, session: QuestionnaireSession, questionnaire_def: Dict) -> Optional[DynamicQuestion]:
+        """Intelligent next question determination with branching logic"""
+        
+        current_response = session.responses.get(session.current_question_id)
+        if not current_response:
+            return None
+            
+        # Get current question definition
+        current_question = await self.find_question_by_id(session.current_question_id, questionnaire_def)
+        
+        # Check for explicit next questions from response option
+        option = next((opt for opt in current_question.get("options", []) if opt["value"] == current_response), None)
+        if option and option.get("next_questions"):
+            # Get first valid next question from option
+            for next_q_id in option["next_questions"]:
+                next_question = await self.find_question_by_id(next_q_id, questionnaire_def)
+                if self.is_question_relevant(next_question, session.context):
+                    return next_question
+        
+        # Check flow-based next question
+        current_flow = questionnaire_def["schema"]["flows"].get(session.current_flow, {})
+        questions = current_flow.get("questions", [])
+        
+        # Find current question index in flow
+        current_index = next((i for i, q in enumerate(questions) if q["id"] == session.current_question_id), -1)
+        
+        # Get next question in flow that's relevant to context
+        for i in range(current_index + 1, len(questions)):
+            next_question = questions[i]
+            if self.is_question_relevant(next_question, session.context):
+                return next_question
+                
+        # No more questions in current flow - questionnaire complete
+        return None
+        
+    def is_question_relevant(self, question: Dict, context: Dict[str, Any]) -> bool:
+        """Check if question is relevant based on current context"""
+        
+        # Check skip conditions
+        if question.get("skip_conditions"):
+            for condition in question["skip_conditions"]:
+                if self.evaluate_condition(condition, context):
+                    return False
+                    
+        # Check include conditions  
+        if question.get("include_conditions"):
+            for condition in question["include_conditions"]:
+                if not self.evaluate_condition(condition, context):
+                    return False
+                    
+        return True
+        
+    async def update_context(self, session: QuestionnaireSession, question_id: str, response: Any, questionnaire_def: Dict) -> Dict[str, Any]:
+        """Update session context based on response"""
+        
+        context_updates = {}
+        
+        # Get context updates from question option
+        current_question = await self.find_question_by_id(question_id, questionnaire_def)
+        option = next((opt for opt in current_question.get("options", []) if opt["value"] == response), None)
+        
+        if option and option.get("context_updates"):
+            context_updates.update(option["context_updates"])
+            
+        # Apply context analysis rules
+        analyzed_context = await self.context_analyzer.analyze_response(question_id, response, session.context)
+        context_updates.update(analyzed_context)
+        
+        return context_updates
+```
+
+#### **2. Context Analyzer Service**
+
+```python
+class ContextAnalyzer:
+    def __init__(self, db_client):
+        self.db = db_client
+        
+    async def analyze_response(self, question_id: str, response: Any, current_context: Dict) -> Dict[str, Any]:
+        """Analyze response and determine context implications"""
+        
+        context_updates = {}
+        
+        # Application type specific analysis
+        if question_id == "website_type_classification":
+            context_updates.update(self.analyze_website_type(response))
+        elif question_id == "payment_processing_method":
+            context_updates.update(self.analyze_payment_method(response))
+        elif question_id == "tenant_isolation_model":
+            context_updates.update(self.analyze_tenant_model(response))
+            
+        # Security posture analysis
+        security_posture = self.analyze_security_posture(question_id, response, current_context)
+        context_updates.update(security_posture)
+        
+        return context_updates
+        
+    def analyze_website_type(self, website_type: str) -> Dict[str, Any]:
+        """Analyze website type and set context flags"""
+        
+        type_mappings = {
+            "static_site": {
+                "requires_authentication": False,
+                "requires_database": False,
+                "processes_user_input": False,
+                "complexity_level": "low",
+                "attack_surface": "minimal"
+            },
+            "interactive_webapp": {
+                "requires_authentication": True,
+                "requires_database": True, 
+                "processes_user_input": True,
+                "complexity_level": "medium",
+                "attack_surface": "moderate"
+            },
+            "saas_platform": {
+                "requires_authentication": True,
+                "requires_database": True,
+                "multi_tenant": True,
+                "requires_api": True,
+                "complexity_level": "high",
+                "attack_surface": "high"
+            }
+        }
+        
+        return type_mappings.get(website_type, {})
+        
+    def analyze_security_posture(self, question_id: str, response: Any, context: Dict) -> Dict[str, Any]:
+        """Analyze security implications of response"""
+        
+        security_updates = {}
+        
+        # Authentication security level
+        if question_id == "authentication_method":
+            auth_levels = {
+                "no_authentication": {"auth_security_level": 0, "spoofing_risk": "critical"},
+                "basic_password": {"auth_security_level": 3, "spoofing_risk": "high"},
+                "mfa_enabled": {"auth_security_level": 8, "spoofing_risk": "low"},
+                "oauth2_oidc": {"auth_security_level": 9, "spoofing_risk": "minimal"}
+            }
+            security_updates.update(auth_levels.get(response, {}))
+            
+        # Input validation security
+        if question_id == "input_validation":
+            validation_levels = {
+                "no_validation": {"input_security_level": 0, "injection_risk": "critical"},
+                "client_side_only": {"input_security_level": 2, "injection_risk": "high"},
+                "server_side_basic": {"input_security_level": 6, "injection_risk": "medium"},
+                "comprehensive_validation": {"input_security_level": 9, "injection_risk": "low"}
+            }
+            security_updates.update(validation_levels.get(response, {}))
+            
+        return security_updates
+```
+
+#### **3. Template Management Service**
+
+```python
+class TemplateManager:
+    def __init__(self, db_client):
+        self.db = db_client
+        
+    async def save_as_template(self, session_id: str, template_name: str, description: str, visibility: str = "private") -> str:
+        """Save current questionnaire session as reusable template"""
+        
+        session = await self.get_session(session_id)
+        
+        template = {
+            "template_name": template_name,
+            "template_description": description,
+            "node_type": session.node_type,
+            "template_config": {
+                "context": session.context,
+                "questionnaire_responses": session.responses,
+                "dependency_nodes": await self.extract_dependencies(session)
+            },
+            "usage_stats": {
+                "usage_count": 0,
+                "success_rate": 1.0,
+                "average_completion_time": self.calculate_completion_time(session)
+            },
+            "tags": self.generate_tags(session.context),
+            "visibility": visibility,
+            "created_by": session.user_id,
+            "created_at": datetime.utcnow(),
+            "is_active": True
+        }
+        
+        template_id = await self.db.node_templates.insert_one(template)
+        return str(template_id.inserted_id)
+        
+    async def recommend_templates(self, context: Dict[str, Any], node_type: str) -> List[Dict]:
+        """Recommend relevant templates based on current context"""
+        
+        # Build recommendation query
+        query = {
+            "node_type": node_type,
+            "is_active": True,
+            "visibility": {"$in": ["public", "organization"]}
+        }
+        
+        # Context-based filtering
+        context_filters = []
+        if context.get("app_type"):
+            context_filters.append({"template_config.context.app_type": context["app_type"]})
+        if context.get("complexity_level"):  
+            context_filters.append({"template_config.context.complexity_level": context["complexity_level"]})
+            
+        if context_filters:
+            query["$or"] = context_filters
+            
+        templates = await self.db.node_templates.find(query).sort("usage_stats.usage_count", -1).limit(5).to_list()
+        
+        # Calculate relevance scores
+        for template in templates:
+            template["relevance_score"] = self.calculate_relevance(template, context)
+            
+        return sorted(templates, key=lambda x: x["relevance_score"], reverse=True)
+        
+    async def apply_template(self, session_id: str, template_id: str) -> Dict[str, Any]:
+        """Apply template configuration to current session"""
+        
+        template = await self.db.node_templates.find_one({"_id": ObjectId(template_id)})
+        if not template:
+            raise ValueError("Template not found")
+            
+        session = await self.get_session(session_id)
+        
+        # Apply template context
+        session.context.update(template["template_config"]["context"])
+        
+        # Apply template responses
+        session.responses.update(template["template_config"]["questionnaire_responses"])
+        
+        # Mark questions as completed
+        session.completed_questions.extend(template["template_config"]["questionnaire_responses"].keys())
+        session.completed_questions = list(set(session.completed_questions))  # Remove duplicates
+        
+        # Update progress
+        session.progress_percentage = self.calculate_progress(session)
+        
+        await self.save_session(session)
+        
+        # Update template usage stats
+        await self.db.node_templates.update_one(
+            {"_id": ObjectId(template_id)},
+            {"$inc": {"usage_stats.usage_count": 1}}
+        )
+        
+        return {
+            "applied_context": template["template_config"]["context"],
+            "applied_responses": template["template_config"]["questionnaire_responses"],
+            "suggested_dependencies": template["template_config"].get("dependency_nodes", []),
+            "progress": session.progress_percentage
+        }
+```
+
+---
+
+## 🎨 **FRONTEND COMPONENT ARCHITECTURE**
+
+### **React Component Hierarchy**
+
+```
+DynamicQuestionnaireApp
+├── QuestionnaireSessionProvider (Context)
+├── ProgressTracker
+├── QuestionFlowController
+│   ├── QuestionRenderer
+│   │   ├── SingleChoiceQuestion
+│   │   ├── MultipleChoiceQuestion  
+│   │   ├── TextInputQuestion
+│   │   ├── NodeSelectorQuestion
+│   │   └── BooleanQuestion
+│   ├── ResponseValidator
+│   └── NavigationControls
+├── ContextVisualization
+│   ├── ContextSummary
+│   ├── ProgressVisualization
+│   └── DependencyGraph
+├── TemplateManager
+│   ├── TemplateSelector
+│   ├── TemplateSaveDialog
+│   └── TemplateRecommendations
+└── DependencyManager
+    ├── SuggestedDependencies
+    ├── DependencyPreview
+    └── DependencyAcceptance
+```
+
+### **Core Frontend Components**
+
+#### **1. Questionnaire Session Provider**
+
+```typescript
+// contexts/QuestionnaireSessionContext.tsx
+import React, { createContext, useContext, useReducer, useCallback } from 'react';
+
+interface QuestionnaireSession {
+  sessionId: string;
+  nodeId: string;
+  diagramId: string;
+  currentFlow: string;
+  currentQuestionId: string | null;
+  context: Record<string, any>;
+  responses: Record<string, any>;
+  completedQuestions: string[];
+  progressPercentage: number;
+  estimatedRemaining: number;
+  suggestedDependencies: DependencyNode[];
+}
+
+interface QuestionnaireState {
+  session: QuestionnaireSession | null;
+  currentQuestion: DynamicQuestion | null;
+  loading: boolean;
+  error: string | null;
+  templates: Template[];
+}
+
+type QuestionnaireAction =
+  | { type: 'START_SESSION'; payload: QuestionnaireSession }
+  | { type: 'SET_CURRENT_QUESTION'; payload: DynamicQuestion }
+  | { type: 'SUBMIT_RESPONSE'; payload: { questionId: string; response: any } }
+  | { type: 'UPDATE_CONTEXT'; payload: Record<string, any> }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'LOAD_TEMPLATES'; payload: Template[] };
+
+const questionnaireReducer = (state: QuestionnaireState, action: QuestionnaireAction): QuestionnaireState => {
+  switch (action.type) {
+    case 'START_SESSION':
+      return {
+        ...state,
+        session: action.payload,
+        loading: false,
+        error: null
+      };
+      
+    case 'SET_CURRENT_QUESTION':
+      return {
+        ...state,
+        currentQuestion: action.payload
+      };
+      
+    case 'SUBMIT_RESPONSE':
+      if (!state.session) return state;
+      return {
+        ...state,
+        session: {
+          ...state.session,
+          responses: {
+            ...state.session.responses,
+            [action.payload.questionId]: action.payload.response
+          },
+          completedQuestions: [
+            ...state.session.completedQuestions,
+            action.payload.questionId
+          ]
+        }
+      };
+      
+    // ... other cases
+    default:
+      return state;
+  }
+};
+
+const QuestionnaireSessionContext = createContext<{
+  state: QuestionnaireState;
+  startSession: (nodeType: string, diagramId: string, nodeId: string) => Promise<void>;
+  submitResponse: (questionId: string, response: any) => Promise<void>;
+  skipQuestion: () => Promise<void>;
+  saveAsTemplate: (name: string, description: string) => Promise<void>;
+  applyTemplate: (templateId: string) => Promise<void>;
+  acceptDependency: (dependencyId: string) => Promise<void>;
+} | null>(null);
+
+export const QuestionnaireSessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [state, dispatch] = useReducer(questionnaireReducer, {
+    session: null,
+    currentQuestion: null,
+    loading: false,
+    error: null,
+    templates: []
+  });
+
+  const startSession = useCallback(async (nodeType: string, diagramId: string, nodeId: string) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    
+    try {
+      const response = await fetch('/api/questionnaire/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeType, diagramId, nodeId })
+      });
+      
+      const sessionData = await response.json();
+      dispatch({ type: 'START_SESSION', payload: sessionData.session });
+      
+      // Load initial question
+      if (sessionData.initialQuestion) {
+        dispatch({ type: 'SET_CURRENT_QUESTION', payload: sessionData.initialQuestion });
+      }
+      
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+    }
+  }, []);
+
+  const submitResponse = useCallback(async (questionId: string, response: any) => {
+    if (!state.session) return;
+    
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SUBMIT_RESPONSE', payload: { questionId, response } });
+    
+    try {
+      const apiResponse = await fetch(`/api/questionnaire/sessions/${state.session.sessionId}/respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionId, response })
+      });
+      
+      const responseData = await apiResponse.json();
+      
+      // Update context
+      if (responseData.contextUpdates) {
+        dispatch({ type: 'UPDATE_CONTEXT', payload: responseData.contextUpdates });
+      }
+      
+      // Set next question or complete
+      if (responseData.nextQuestion) {
+        dispatch({ type: 'SET_CURRENT_QUESTION', payload: responseData.nextQuestion });
+      } else {
+        // Questionnaire complete
+        dispatch({ type: 'SET_CURRENT_QUESTION', payload: null });
+      }
+      
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, [state.session]);
+
+  return (
+    <QuestionnaireSessionContext.Provider value={{
+      state,
+      startSession,
+      submitResponse,
+      skipQuestion,
+      saveAsTemplate,
+      applyTemplate,
+      acceptDependency
+    }}>
+      {children}
+    </QuestionnaireSessionContext.Provider>
+  );
+};
+
+export const useQuestionnaireSession = () => {
+  const context = useContext(QuestionnaireSessionContext);
+  if (!context) {
+    throw new Error('useQuestionnaireSession must be used within QuestionnaireSessionProvider');
+  }
+  return context;
+};
+```
+
+#### **2. Dynamic Question Renderer**
+
+```typescript
+// components/QuestionRenderer.tsx
+import React from 'react';
+import { SingleChoiceQuestion } from './questions/SingleChoiceQuestion';
+import { MultipleChoiceQuestion } from './questions/MultipleChoiceQuestion';
+import { TextInputQuestion } from './questions/TextInputQuestion';
+import { NodeSelectorQuestion } from './questions/NodeSelectorQuestion';
+import { BooleanQuestion } from './questions/BooleanQuestion';
+
+interface QuestionRendererProps {
+  question: DynamicQuestion;
+  context: Record<string, any>;
+  onResponse: (response: any) => void;
+  loading?: boolean;
+}
+
+export const QuestionRenderer: React.FC<QuestionRendererProps> = ({
+  question,
+  context,
+  onResponse,
+  loading = false
+}) => {
+  // Filter options based on context conditions
+  const filteredOptions = question.options?.filter(option => {
+    if (!option.condition) return true;
+    return evaluateCondition(option.condition, context);
+  }) || [];
+
+  const renderQuestion = () => {
+    switch (question.type) {
+      case 'single_choice':
+        return (
+          <SingleChoiceQuestion
+            question={question}
+            options={filteredOptions}
+            onResponse={onResponse}
+            loading={loading}
+          />
+        );
+        
+      case 'multiple_choice':
+        return (
+          <MultipleChoiceQuestion
+            question={question}
+            options={filteredOptions}
+            onResponse={onResponse}
+            loading={loading}
+          />
+        );
+        
+      case 'text_input':
+        return (
+          <TextInputQuestion
+            question={question}
+            onResponse={onResponse}
+            loading={loading}
+          />
+        );
+        
+      case 'node_selector':
+        return (
+          <NodeSelectorQuestion
+            question={question}
+            context={context}
+            onResponse={onResponse}
+            loading={loading}
+          />
+        );
+        
+      case 'boolean':
+        return (
+          <BooleanQuestion
+            question={question}
+            onResponse={onResponse}
+            loading={loading}
+          />
+        );
+        
+      default:
+        return <div>Unsupported question type: {question.type}</div>;
+    }
+  };
+
+  return (
+    <div className="question-renderer">
+      {/* Question Header */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-white mb-2">
+          {question.question}
+        </h2>
+        
+        {question.helpText && (
+          <div className="text-sm text-gray-400 bg-gray-800 p-3 rounded-md border-l-4 border-blue-500">
+            <div className="flex items-start space-x-2">
+              <InfoIcon className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+              <p>{question.helpText}</p>
+            </div>
+          </div>
+        )}
+        
+        {question.required && (
+          <span className="inline-block mt-1 text-xs text-red-400">* Required</span>
+        )}
+      </div>
+
+      {/* Question Content */}
+      <div className="question-content">
+        {renderQuestion()}
+      </div>
+
+      {/* Context Visualization */}
+      {Object.keys(context).length > 0 && (
+        <div className="mt-6 p-3 bg-gray-800 rounded-md">
+          <h4 className="text-sm font-medium text-gray-300 mb-2">Current Context:</h4>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(context).map(([key, value]) => (
+              <span
+                key={key}
+                className="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded"
+              >
+                {key}: {String(value)}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Utility function to evaluate conditions
+function evaluateCondition(condition: string, context: Record<string, any>): boolean {
+  try {
+    // Simple condition evaluation - in production, use a proper expression parser
+    // Example: "context.app_type == 'saas_platform'"
+    return new Function('context', `return ${condition}`)(context);
+  } catch {
+    return true; // Default to true if evaluation fails
+  }
+}
+```
+
+#### **3. Single Choice Question Component**
+
+```typescript
+// components/questions/SingleChoiceQuestion.tsx
+import React, { useState } from 'react';
+import { ChevronRightIcon, InfoIcon } from 'lucide-react';
+
+interface SingleChoiceQuestionProps {
+  question: DynamicQuestion;
+  options: QuestionOption[];
+  onResponse: (response: string) => void;
+  loading: boolean;
+}
+
+export const SingleChoiceQuestion: React.FC<SingleChoiceQuestionProps> = ({
+  question,
+  options,
+  onResponse,
+  loading
+}) => {
+  const [selectedValue, setSelectedValue] = useState<string>('');
+  const [showPreview, setShowPreview] = useState<string | null>(null);
+
+  const handleSelection = (value: string) => {
+    setSelectedValue(value);
+  };
+
+  const handleSubmit = () => {
+    if (selectedValue && !loading) {
+      onResponse(selectedValue);
+    }
+  };
+
+  return (
+    <div className="single-choice-question">
+      <div className="space-y-3">
+        {options.map((option) => (
+          <div
+            key={option.value}
+            className={`relative group cursor-pointer transition-all duration-200 ${
+              selectedValue === option.value
+                ? 'bg-blue-900/30 border-blue-500'
+                : 'bg-gray-800 border-gray-600 hover:border-gray-500'
+            } border rounded-lg p-4`}
+            onClick={() => handleSelection(option.value)}
+            onMouseEnter={() => setShowPreview(option.value)}
+            onMouseLeave={() => setShowPreview(null)}
+          >
+            <div className="flex items-center space-x-3">
+              {/* Radio Button */}
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                selectedValue === option.value
+                  ? 'border-blue-500 bg-blue-500'
+                  : 'border-gray-400'
+              }`}>
+                {selectedValue === option.value && (
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
+                )}
+              </div>
+
+              {/* Option Label */}
+              <div className="flex-1">
+                <div className="font-medium text-white">{option.label}</div>
+                
+                {/* Context Updates Preview */}
+                {showPreview === option.value && option.contextUpdates && (
+                  <div className="mt-2 text-xs text-gray-400">
+                    <div className="flex items-center space-x-1 mb-1">
+                      <InfoIcon className="h-3 w-3" />
+                      <span>This choice will:</span>
+                    </div>
+                    <div className="pl-4 space-y-1">
+                      {Object.entries(option.contextUpdates).map(([key, value]) => (
+                        <div key={key} className="text-blue-300">
+                          Set {key} to {String(value)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Next Questions Preview */}
+                {showPreview === option.value && option.nextQuestions && option.nextQuestions.length > 0 && (
+                  <div className="mt-2 text-xs text-gray-400">
+                    <div className="flex items-center space-x-1 mb-1">
+                      <ChevronRightIcon className="h-3 w-3" />
+                      <span>Next questions: {option.nextQuestions.length}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dependency Trigger Preview */}
+                {showPreview === option.value && option.dependencyTrigger && (
+                  <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/20 px-2 py-1 rounded">
+                    Will suggest creating {option.dependencyTrigger.nodeType} node
+                  </div>
+                )}
+              </div>
+
+              {/* Selection Indicator */}
+              {selectedValue === option.value && (
+                <ChevronRightIcon className="h-5 w-5 text-blue-400" />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Submit Button */}
+      {selectedValue && (
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200"
+          >
+            {loading ? (
+              <div className="flex items-center space-x-2">
+                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                <span>Processing...</span>
+              </div>
+            ) : (
+              'Continue'
+            )}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+#### **4. Template Manager Component**
+
+```typescript
+// components/TemplateManager.tsx
+import React, { useState, useEffect } from 'react';
+import { Save, Download, Star, Clock, Users } from 'lucide-react';
+import { useQuestionnaireSession } from '../contexts/QuestionnaireSessionContext';
+
+interface Template {
+  id: string;
+  templateName: string;
+  templateDescription: string;
+  nodeType: string;
+  tags: string[];
+  usageStats: {
+    usageCount: number;
+    successRate: number;
+    averageCompletionTime: string;
+    userRating: number;
+  };
+  relevanceScore?: number;
+}
+
+export const TemplateManager: React.FC = () => {
+  const { state, saveAsTemplate, applyTemplate } = useQuestionnaireSession();
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [recommendations, setRecommendations] = useState<Template[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Load template recommendations based on current context
+  useEffect(() => {
+    if (state.session?.context && Object.keys(state.session.context).length > 0) {
+      loadRecommendations();
+    }
+  }, [state.session?.context]);
+
+  const loadRecommendations = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/templates/recommend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          context: state.session?.context,
+          nodeType: state.session?.nodeType
+        })
+      });
+      const data = await response.json();
+      setRecommendations(data.recommendations || []);
+    } catch (error) {
+      console.error('Failed to load recommendations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveTemplate = async (name: string, description: string) => {
+    try {
+      await saveAsTemplate(name, description);
+      setShowSaveDialog(false);
+    } catch (error) {
+      console.error('Failed to save template:', error);
+    }
+  };
+
+  const handleApplyTemplate = async (templateId: string) => {
+    try {
+      await applyTemplate(templateId);
+    } catch (error) {
+      console.error('Failed to apply template:', error);
+    }
+  };
+
+  return (
+    <div className="template-manager">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-white">Configuration Templates</h3>
+        
+        {/* Save Current Configuration */}
+        {state.session && Object.keys(state.session.responses).length > 0 && (
+          <button
+            onClick={() => setShowSaveDialog(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+          >
+            <Save className="h-4 w-4" />
+            <span>Save as Template</span>
+          </button>
+        )}
+      </div>
+
+      {/* Template Recommendations */}
+      {recommendations.length > 0 && (
+        <div className="mb-6">
+          <h4 className="text-md font-medium text-gray-300 mb-3">Recommended Templates</h4>
+          <div className="grid gap-4">
+            {recommendations.map((template) => (
+              <div key={template.id} className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <h5 className="font-medium text-white">{template.templateName}</h5>
+                      {template.relevanceScore && template.relevanceScore > 0.8 && (
+                        <span className="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">
+                          High Match
+                        </span>
+                      )}
+                    </div>
+                    
+                    <p className="text-sm text-gray-400 mb-3">{template.templateDescription}</p>
+                    
+                    {/* Template Stats */}
+                    <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-3 w-3" />
+                        <span>{template.usageStats.usageCount} uses</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-3 w-3" />
+                        <span>{template.usageStats.userRating.toFixed(1)}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-3 w-3" />
+                        <span>{template.usageStats.averageCompletionTime}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {template.tags.map((tag) => (
+                        <span key={tag} className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => handleApplyTemplate(template.id)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 ml-4"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Apply</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Save Template Dialog */}
+      {showSaveDialog && (
+        <SaveTemplateDialog
+          onSave={handleSaveTemplate}
+          onCancel={() => setShowSaveDialog(false)}
+        />
+      )}
+    </div>
+  );
+};
+
+// Save Template Dialog Component
+const SaveTemplateDialog: React.FC<{
+  onSave: (name: string, description: string) => void;
+  onCancel: () => void;
+}> = ({ onSave, onCancel }) => {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim() && description.trim()) {
+      onSave(name.trim(), description.trim());
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 w-full max-w-md">
+        <h3 className="text-lg font-semibold text-white mb-4">Save Configuration as Template</h3>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Template Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., E-commerce with Stripe"
+              className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+              required
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief description of this configuration..."
+              rows={3}
+              className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none resize-none"
+              required
+            />
+          </div>
+          
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+            >
+              Save Template
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+```
+
+---
+
+## 🔄 **DATA FLOW ARCHITECTURE**
+
+### **Complete User Journey Flow**
+
+```mermaid
+graph TD
+    A[User Selects Node Type] --> B[Initialize Dynamic Session]
+    B --> C[Load Initial Question]
+    C --> D[Present Question with Context]
+    D --> E[User Responds]
+    E --> F[Update Context]
+    F --> G[Check Dependency Triggers]
+    G --> H{Suggest New Nodes?}
+    H -->|Yes| I[Show Dependency Suggestions]
+    H -->|No| J[Determine Next Question]
+    I --> K{User Accepts Dependency?}
+    K -->|Yes| L[Create Suggested Node]
+    K -->|No| J
+    L --> J
+    J --> M{More Questions?}
+    M -->|Yes| C
+    M -->|No| N[Complete Questionnaire]
+    N --> O[Generate Context-Aware Analysis]
+    O --> P[Update Node Configuration]
+    P --> Q[Show Results & Recommendations]
+```
+
+### **Context Evolution During Session**
+
+```mermaid
+graph LR
+    A[Initial Context: {}] --> B[After Type Selection]
+    B --> C[After Security Config] 
+    C --> D[After Integration Choices]
+    D --> E[Final Context]
+    
+    subgraph "Context Growth"
+        B --> B1["app_type: saas_platform<br/>complexity: high<br/>requires_auth: true"]
+        C --> C1["auth_method: oauth2<br/>security_level: 8<br/>multi_tenant: true"]
+        D --> D1["api_required: true<br/>database_required: true<br/>compliance: [SOC2]"]
+        E --> E1["Complete Security Profile<br/>Ready for Analysis"]
+    end
+```
+
+---
+
+## 🔒 **SECURITY & PERFORMANCE CONSIDERATIONS**
+
+### **Security Measures**
+
+#### **1. Input Validation & Sanitization**
+```python
+class QuestionResponseValidator:
+    @staticmethod
+    def validate_response(question: DynamicQuestion, response: Any) -> ValidationResult:
+        # Type validation
+        if question.type == "single_choice":
+            valid_values = [opt.value for opt in question.options]
+            if response not in valid_values:
+                return ValidationResult(valid=False, error="Invalid option selected")
+                
+        # Custom validation rules
+        if question.validation_rules:
+            for rule_name, rule_config in question.validation_rules.items():
+                if not validate_rule(rule_name, response, rule_config):
+                    return ValidationResult(valid=False, error=f"Validation failed: {rule_name}")
+                    
+        return ValidationResult(valid=True)
+```
+
+#### **2. Session Security**
+```python
+class SecureSessionManager:
+    def __init__(self, redis_client):
+        self.redis = redis_client
+        self.session_timeout = 3600  # 1 hour
+        
+    async def create_session(self, user_id: str, diagram_id: str) -> str:
+        session_id = secrets.token_urlsafe(32)
+        session_key = f"questionnaire_session:{session_id}"
+        
+        session_data = {
+            "user_id": user_id,
+            "diagram_id": diagram_id,
+            "created_at": datetime.utcnow().isoformat(),
+            "last_activity": datetime.utcnow().isoformat()
+        }
+        
+        await self.redis.setex(session_key, self.session_timeout, json.dumps(session_data))
+        return session_id
+        
+    async def validate_session(self, session_id: str, user_id: str) -> bool:
+        session_key = f"questionnaire_session:{session_id}"
+        session_data = await self.redis.get(session_key)
+        
+        if not session_data:
+            return False
+            
+        data = json.loads(session_data)
+        return data.get("user_id") == user_id
+```
+
+### **Performance Optimizations**
+
+#### **1. Question Flow Caching**
+```python
+class QuestionFlowCache:
+    def __init__(self, redis_client):
+        self.redis = redis_client
+        self.cache_ttl = 300  # 5 minutes
+        
+    async def get_next_questions(self, context_hash: str) -> Optional[List[DynamicQuestion]]:
+        cache_key = f"question_flow:{context_hash}"
+        cached_data = await self.redis.get(cache_key)
+        
+        if cached_data:
+            return [DynamicQuestion(**q) for q in json.loads(cached_data)]
+        return None
+        
+    async def cache_question_flow(self, context_hash: str, questions: List[DynamicQuestion]):
+        cache_key = f"question_flow:{context_hash}"
+        question_data = [q.dict() for q in questions]
+        await self.redis.setex(cache_key, self.cache_ttl, json.dumps(question_data))
+```
+
+#### **2. Database Query Optimization**
+```python
+class OptimizedQuestionnaireRepository:
+    def __init__(self, db_client):
+        self.db = db_client
+        
+    async def get_questionnaire_with_cache(self, node_type: str, version: str = "latest"):
+        # Use MongoDB aggregation pipeline for complex queries
+        pipeline = [
+            {"$match": {"node_type": node_type, "is_active": True}},
+            {"$sort": {"version": -1}},
+            {"$limit": 1},
+            {"$lookup": {
+                "from": "context_rules",
+                "localField": "node_type", 
+                "foreignField": "node_type",
+                "as": "context_rules"
+            }}
+        ]
+        
+        result = await self.db.questionnaire_definitions.aggregate(pipeline).to_list(1)
+        return result[0] if result else None
+```
+
+---
+
+## 🚀 **IMPLEMENTATION PHASES**
+
+### **Phase 1: Foundation (Weeks 1-2)**
+
+#### **Week 1: Backend Core**
+- [ ] Database schema implementation
+- [ ] Dynamic Question Engine basic functionality
+- [ ] Context Analyzer service
+- [ ] Session management system
+- [ ] Basic API endpoints
+
+#### **Week 2: Frontend Core**  
+- [ ] React Context API setup
+- [ ] Question rendering components
+- [ ] Response handling system
+- [ ] Progress tracking
+- [ ] Basic UI components
+
+### **Phase 2: Intelligence (Weeks 3-4)**
+
+#### **Week 3: Advanced Logic**
+- [ ] Conditional branching engine
+- [ ] Dependency detection system
+- [ ] Context-aware vulnerability analysis
+- [ ] STRIDE mapping enhancement
+- [ ] Template management backend
+
+#### **Week 4: User Experience**
+- [ ] Template save/load functionality  
+- [ ] Recommendation engine
+- [ ] Advanced progress visualization
+- [ ] Context visualization
+- [ ] Error handling & validation
+
+### **Phase 3: Integration (Weeks 5-6)**
+
+#### **Week 5: System Integration**
+- [ ] Integration with existing vulnerability engine
+- [ ] STRIDE analysis enhancement
+- [ ] Node creation automation
+- [ ] Cross-node dependency mapping
+- [ ] Performance optimization
+
+#### **Week 6: Polish & Testing**
+- [ ] UI/UX refinements
+- [ ] Comprehensive testing
+- [ ] Documentation
+- [ ] Migration scripts
+- [ ] Performance monitoring
+
+---
+
+## 🔄 **MIGRATION STRATEGY**
+
+### **Backward Compatibility Approach**
+
+#### **1. Gradual Migration**
+```python
+class HybridQuestionnaireController:
+    def __init__(self, legacy_engine, dynamic_engine):
+        self.legacy_engine = legacy_engine
+        self.dynamic_engine = dynamic_engine
+        
+    async def get_questionnaire(self, node_type: str, use_dynamic: bool = False):
+        if use_dynamic and self.dynamic_engine.supports_node_type(node_type):
+            return await self.dynamic_engine.get_questionnaire(node_type)
+        else:
+            return await self.legacy_engine.get_questionnaire(node_type)
+```
+
+#### **2. Feature Flag System**
+```python
+class FeatureFlags:
+    DYNAMIC_QUESTIONNAIRE = "dynamic_questionnaire_enabled"
+    TEMPLATE_SYSTEM = "template_system_enabled"
+    DEPENDENCY_SUGGESTIONS = "dependency_suggestions_enabled"
+    
+    @staticmethod
+    def is_enabled(flag: str, user_id: str = None) -> bool:
+        # Implementation for feature flag checking
+        pass
+```
+
+#### **3. Data Migration Script**
+```python
+async def migrate_legacy_questionnaires():
+    """Migrate existing questionnaire responses to new format"""
+    
+    legacy_responses = await db.nodes.find({"questionnaireResponses": {"$exists": True}})
+    
+    async for node in legacy_responses:
+        # Convert legacy responses to new session format
+        session_data = {
+            "session_id": str(uuid.uuid4()),
+            "node_id": node["_id"],
+            "responses": node["questionnaireResponses"],
+            "context": infer_context_from_responses(node["questionnaireResponses"]),
+            "completed": True,
+            "migration_source": "legacy_questionnaire"
+        }
+        
+        await db.user_response_sessions.insert_one(session_data)
+```
+
+---
+
+This comprehensive architecture document provides the complete technical foundation for implementing the "NewWay" dynamic questionnaire system. The modular design allows for incremental implementation while maintaining backward compatibility with existing systems.
+
+The architecture supports the core goals of reducing irrelevant questions by 70% and increasing threat accuracy by 40% through intelligent context-aware branching, template reusability, and dynamic dependency management.
