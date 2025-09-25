@@ -83,6 +83,20 @@ const NodeInfoOverlay = ({
 
   const completionPercentage = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
 
+  const handleOverlayMouseEnter = (event) => {
+    event.stopPropagation();
+    // Dispatch event to let parent know overlay is being hovered
+    const customEvent = new CustomEvent('overlayHover', { detail: { action: 'enter' } });
+    window.dispatchEvent(customEvent);
+  };
+
+  const handleOverlayMouseLeave = (event) => {
+    event.stopPropagation();
+    // Dispatch event to let parent know overlay hover ended
+    const customEvent = new CustomEvent('overlayHover', { detail: { action: 'leave' } });
+    window.dispatchEvent(customEvent);
+  };
+
   return (
     <div 
       className="absolute z-50 bg-gray-900 border border-gray-600 rounded-lg shadow-2xl p-4 min-w-[280px] max-w-[320px]"
@@ -91,6 +105,8 @@ const NodeInfoOverlay = ({
         top: adjustedPosition.y,
         transform: 'translateY(-50%)'
       }}
+      onMouseEnter={handleOverlayMouseEnter}
+      onMouseLeave={handleOverlayMouseLeave}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
