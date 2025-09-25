@@ -193,7 +193,7 @@ const NodeInfoOverlay = ({
 
       {/* Hover tip */}
       <div className="mt-3 text-center">
-        <div className="text-xs text-gray-500">Hover to view details</div>
+        <div className="text-xs text-gray-500">Double-click to configure security</div>
       </div>
     </div>
   );
