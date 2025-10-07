@@ -16,10 +16,6 @@ const ReactFlowCanvasManager = ({
   setSelectedEdge
 }) => {
   const { fitView, zoomIn, zoomOut, updateNodeData, updateEdgeData, getNode, getEdge } = useReactFlow();
-  
-  // Modern React Flow v12 hooks for reactive state management
-  const reactFlowNodes = useNodes();
-  const reactFlowEdges = useEdges();
 
   // Modern pattern: Memoized edge options for better performance
   const defaultEdgeOptions = useMemo(() => ({
