@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { useNodes, useEdges } from '@xyflow/react';
 import { Monitor, Activity, Zap } from 'lucide-react';
 
 /**
- * ReactFlowPerformanceMonitor - Modern React Flow v12 performance monitoring component
- * Uses new reactive hooks for efficient performance tracking
+ * ReactFlowPerformanceMonitor - Performance monitoring component
+ * Receives nodes and edges as props to avoid hook conflicts
  */
 const ReactFlowPerformanceMonitor = memo(({ 
-  showPerformanceMonitor = false, 
+  showPerformanceMonitor = false,
+  nodes = [],
+  edges = [],
   onClose 
 }) => {
   const [performanceData, setPerformanceData] = useState({
