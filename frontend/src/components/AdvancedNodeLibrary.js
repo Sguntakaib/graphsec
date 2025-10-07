@@ -580,107 +580,11 @@ const AdvancedNodeLibrary = ({ onAddNode }) => {
                         key={nodeKey}
                         draggable
                         onDragStart={(event) => onDragStart(event, node)}
-                        className={`security-node-item p-3 rounded-lg cursor-grab border border-opacity-20 ${getNodeColorClass(node.type)} relative group`}
+                        className="simple-library-node cursor-grab"
                         data-testid={`node-${node.subtype.toLowerCase()}`}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start space-x-3 flex-1">
-                            <IconComponent className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center space-x-2 mb-1">
-                                <div className="text-white text-sm font-medium">{node.label}</div>
-                                <span className="px-1.5 py-0.5 bg-black bg-opacity-20 text-xs rounded text-gray-300">
-                                  {node.categoryTitle}
-                                </span>
-                              </div>
-                              <div className="text-gray-300 text-xs mb-2 line-clamp-2">
-                                {node.description}
-                              </div>
-                              
-                              {/* Node-specific metadata */}
-                              <div className="flex flex-wrap gap-1 mb-2">
-                                {node.sophistication && (
-                                  <span className="px-2 py-1 bg-purple-900 bg-opacity-30 text-purple-300 text-xs rounded">
-                                    {node.sophistication}
-                                  </span>
-                                )}
-                                {node.criticality && (
-                                  <span className={`px-2 py-1 text-xs rounded ${
-                                    node.criticality === 'Critical' ? 'bg-red-900 bg-opacity-30 text-red-300' :
-                                    node.criticality === 'High' ? 'bg-orange-900 bg-opacity-30 text-orange-300' :
-                                    node.criticality === 'Medium' ? 'bg-yellow-900 bg-opacity-30 text-yellow-300' :
-                                    'bg-green-900 bg-opacity-30 text-green-300'
-                                  }`}>
-                                    {node.criticality}
-                                  </span>
-                                )}
-                                {node.effectiveness && (
-                                  <span className={`px-2 py-1 text-xs rounded ${
-                                    node.effectiveness === 'High' ? 'bg-green-900 bg-opacity-30 text-green-300' :
-                                    node.effectiveness === 'Medium' ? 'bg-yellow-900 bg-opacity-30 text-yellow-300' :
-                                    'bg-red-900 bg-opacity-30 text-red-300'
-                                  }`}>
-                                    {node.effectiveness}
-                                  </span>
-                                )}
-                                {node.risk_level && (
-                                  <span className={`px-2 py-1 text-xs rounded ${
-                                    node.risk_level === 'Critical' ? 'bg-red-900 bg-opacity-30 text-red-300' :
-                                    node.risk_level === 'High' ? 'bg-orange-900 bg-opacity-30 text-orange-300' :
-                                    node.risk_level === 'Medium' ? 'bg-yellow-900 bg-opacity-30 text-yellow-300' :
-                                    'bg-green-900 bg-opacity-30 text-green-300'
-                                  }`}>
-                                    {node.risk_level}
-                                  </span>
-                                )}
-                                {node.trust_level && (
-                                  <span className={`px-2 py-1 text-xs rounded ${
-                                    node.trust_level === 'High' ? 'bg-green-900 bg-opacity-30 text-green-300' :
-                                    node.trust_level === 'Medium' ? 'bg-yellow-900 bg-opacity-30 text-yellow-300' :
-                                    node.trust_level === 'Low' ? 'bg-orange-900 bg-opacity-30 text-orange-300' :
-                                    'bg-red-900 bg-opacity-30 text-red-300'
-                                  }`}>
-                                    Trust: {node.trust_level}
-                                  </span>
-                                )}
-                              </div>
-                              
-                              {/* MITRE ATT&CK IDs */}
-                              {detailView && node.mitre_ids && node.mitre_ids.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                  {node.mitre_ids.map(mitreId => (
-                                    <span key={mitreId} className="px-1.5 py-0.5 bg-gray-800 text-gray-300 text-xs rounded font-mono">
-                                      {mitreId}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                              
-                              {/* CVE References */}
-                              {detailView && node.cve_references && node.cve_references.length > 0 && (
-                                <div className="flex flex-wrap gap-1">
-                                  {node.cve_references.map(cve => (
-                                    <span key={cve} className="px-1.5 py-0.5 bg-red-900 bg-opacity-20 text-red-300 text-xs rounded font-mono">
-                                      {cve}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Drag indicator */}
-                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="flex flex-col space-y-1">
-                            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                          </div>
-                        </div>
+                        <IconComponent className="simple-library-icon" />
+                        <span className="simple-library-label">{node.label}</span>
                       </div>
                     );
                   })}
