@@ -591,8 +591,8 @@ function AppContent() {
     const node = getNode(nodeId);
     if (!node) return null;
     
-    // Get connections for this node using modern pattern
-    const connectedEdges = reactFlowEdges.filter(edge => 
+    // Get connections for this node using current edges state
+    const connectedEdges = edges.filter(edge => 
       edge.source === nodeId || edge.target === nodeId
     );
     
@@ -601,7 +601,7 @@ function AppContent() {
       connectedEdges,
       connectionCount: connectedEdges.length
     };
-  }, [getNode, reactFlowEdges]);
+  }, [getNode, edges]);
 
   // Initialize modern React Flow component managers
   const questionnaireFlowManager = QuestionnaireFlowManager({
