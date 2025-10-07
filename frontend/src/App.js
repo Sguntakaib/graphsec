@@ -3189,6 +3189,15 @@ function AppContent() {
                 <span>Analyze</span>
               </button>
               
+              {/* UI Demo Button */}
+              <button
+                onClick={() => setShowUIDemo(!showUIDemo)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2 text-sm font-medium shadow-sm"
+                title="Show UI Improvements Demo"
+              >
+                <span>UI Demo</span>
+              </button>
+              
               {/* Vulnerability Toggle Button - Shows when vulnerability nodes exist */}
               {nodes.some(n => n.type === 'vulnerability') && (
                 <button
