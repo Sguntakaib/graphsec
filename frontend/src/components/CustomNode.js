@@ -93,7 +93,7 @@ const CustomNode = memo(({ data, selected, id }) => {
 
   return (
     <div 
-      className={`simple-node ${nodeClass} ${selected ? 'selected' : ''} cursor-pointer`}
+      className={nodeClassName}
       data-subtype={data.subtype}
       onClick={handleNodeClick}
       onMouseEnter={handleNodeHover}
@@ -109,6 +109,9 @@ const CustomNode = memo(({ data, selected, id }) => {
       <Handle type="source" position={Position.Bottom} className="simple-handle" />
     </div>
   );
-};
+});
+
+// Add display name for better debugging
+CustomNode.displayName = 'CustomNode';
 
 export { CustomNode };
