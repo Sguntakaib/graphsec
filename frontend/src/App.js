@@ -685,6 +685,38 @@ function AppContent() {
     };
   }, [getNode, reactFlowEdges]);
 
+  // Initialize modern React Flow component managers
+  const questionnaireFlowManager = QuestionnaireFlowManager({
+    currentQuestionnaireNode,
+    setCurrentQuestionnaireNode,
+    currentQuestionnaireAnswers,
+    setCurrentQuestionnaireAnswers,
+    showSecurityQuestionnaire,
+    setShowSecurityQuestionnaire,
+    questionnaireQueue,
+    setQuestionnaireQueue,
+    currentQueueIndex,
+    setCurrentQueueIndex,
+    parentQuestionnaireStack,
+    setParentQuestionnaireStack,
+    activeQuestionnaires,
+    setActiveQuestionnaires,
+    nodes,
+    setNodes,
+    currentDiagram
+  });
+
+  const canvasManager = ReactFlowCanvasManager({
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+    selectedNode,
+    setSelectedNode,
+    selectedEdge,
+    setSelectedEdge
+  });
+
   // Function to automatically fit all nodes within canvas when they go out of bounds
   const handleFitAllNodes = useCallback(() => {
     if (nodes.length === 0) return;
