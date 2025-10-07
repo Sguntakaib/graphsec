@@ -96,7 +96,7 @@ const ReactFlowCanvasManager = ({
 
   // Modern pattern: Advanced edge management
   const manageEdgeConnections = useCallback((nodeId) => {
-    const connectedEdges = reactFlowEdges.filter(edge => 
+    const connectedEdges = edges.filter(edge => 
       edge.source === nodeId || edge.target === nodeId
     );
     
@@ -107,7 +107,7 @@ const ReactFlowCanvasManager = ({
       edgeTypes: [...new Set(connectedEdges.map(edge => edge.type || 'default'))],
       hasLoops: connectedEdges.some(edge => edge.source === edge.target)
     };
-  }, [reactFlowEdges]);
+  }, [edges]);
 
   // Modern pattern: Smart node positioning
   const smartPositionNode = useCallback((newNode, referenceNodeId = null) => {
