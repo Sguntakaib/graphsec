@@ -87,6 +87,7 @@ const CustomNode = ({ data, selected, id }) => {
   return (
     <div 
       className={`simple-node ${nodeClass} ${selected ? 'selected' : ''} cursor-pointer`}
+      data-subtype={data.subtype}
       onClick={handleNodeClick}
       onMouseEnter={handleNodeHover}
       onMouseLeave={handleNodeHoverEnd}
