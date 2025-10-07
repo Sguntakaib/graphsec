@@ -8,7 +8,7 @@ import json
 import uuid
 import time
 
-BASE_URL = "https://ui-enhancement-46.preview.emergentagent.com/api"
+BASE_URL = "https://frontend-audit-5.preview.emergentagent.com/api"
 
 def detailed_stride_debug():
     session = requests.Session()
