@@ -140,6 +140,7 @@ function AppContent() {
   const [diagrams, setDiagrams] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState('modeling'); // 'modeling' or 'analysis'
+  const [showUIDemo, setShowUIDemo] = useState(false);
   const [highlightedPaths, setHighlightedPaths] = useState([]);
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
   const [undoStack, setUndoStack] = useState([]);
