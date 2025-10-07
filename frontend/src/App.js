@@ -653,6 +653,35 @@ function AppContent() {
   const reactFlowNodes = useNodes();
   const reactFlowEdges = useEdges();
 
+  // Modern React Flow v12 pattern: Efficient node data updates
+  const updateNodeDataEfficiently = useCallback((nodeId, newData) => {
+    updateNodeData(nodeId, newData);
+    console.log('🔄 Updated node data using React Flow v12 updateNodeData:', nodeId, newData);
+  }, [updateNodeData]);
+
+  // Modern React Flow v12 pattern: Efficient edge data updates
+  const updateEdgeDataEfficiently = useCallback((edgeId, newData) => {
+    updateEdgeData(edgeId, newData);
+    console.log('🔄 Updated edge data using React Flow v12 updateEdgeData:', edgeId, newData);
+  }, [updateEdgeData]);
+
+  // Modern React Flow v12 pattern: Get node with data dependencies
+  const getNodeWithDependencies = useCallback((nodeId) => {
+    const node = getNode(nodeId);
+    if (!node) return null;
+    
+    // Get connections for this node using modern pattern
+    const connectedEdges = reactFlowEdges.filter(edge => 
+      edge.source === nodeId || edge.target === nodeId
+    );
+    
+    return {
+      ...node,
+      connectedEdges,
+      connectionCount: connectedEdges.length
+    };
+  }, [getNode, reactFlowEdges]);
+
   // Function to automatically fit all nodes within canvas when they go out of bounds
   const handleFitAllNodes = useCallback(() => {
     if (nodes.length === 0) return;
