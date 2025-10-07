@@ -39,31 +39,31 @@ body {
   background: #9CA3AF;
 }
 
-/* Workflow Builder Style Nodes - Matching Screenshot 2 */
+/* Compact Workflow Builder Style Nodes */
 .simple-node {
-  border-radius: 16px;
-  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   color: white;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
-  padding: 16px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
-  min-width: 120px;
-  max-width: 180px;
+  min-width: 80px;
+  max-width: 140px;
   text-align: center;
   position: relative;
 }
 
 .simple-node:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   border-color: rgba(255, 255, 255, 0.3);
 }
 
 .simple-node.selected {
   border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2), 0 8px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .simple-node-content {
@@ -71,21 +71,22 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 .simple-node-icon {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   color: rgba(255, 255, 255, 0.9);
   flex-shrink: 0;
 }
 
 .simple-node-label {
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.2;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  font-size: 11px;
 }
 
 .simple-handle {
