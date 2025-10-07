@@ -453,6 +453,9 @@ const DraggableEdge = memo(({
       )}
     </g>
   );
-};
+});
+
+// Add display name for better debugging
+DraggableEdge.displayName = 'DraggableEdge';
 
 export default DraggableEdge;
