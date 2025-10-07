@@ -10,7 +10,7 @@ import requests
 import json
 import uuid
 
-BASE_URL = "https://enhance-planner.preview.emergentagent.com/api"
+BASE_URL = "https://ui-enhancement-46.preview.emergentagent.com/api"
 
 def test_stride_analysis_fix():
     """Test that STRIDE analysis now works correctly with optimal security"""

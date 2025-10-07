@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 import sys
 
 # Use the backend URL from frontend/.env with /api suffix
-BASE_URL = "https://enhance-planner.preview.emergentagent.com/api"
+BASE_URL = "https://ui-enhancement-46.preview.emergentagent.com/api"
 
 class EdgeSelectionTester:
     def __init__(self):
