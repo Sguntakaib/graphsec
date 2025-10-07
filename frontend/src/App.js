@@ -26,6 +26,7 @@ import QuestionnaireOverview from './components/QuestionnaireOverview';
 import SmartNodeConnector from './components/SmartNodeConnector';
 import SimulationDebugger from './components/SimulationDebugger';
 import NodeBranchVisualizer from './components/NodeBranchVisualizer';
+import UIComparisonDemo from './components/UIComparisonDemo';
 
 import { QuestionnaireProvider, useQuestionnaire } from './contexts/QuestionnaireContext';
 import { QuestionnaireConfirmationProvider } from './contexts/QuestionnaireConfirmationContext';
