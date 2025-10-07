@@ -86,42 +86,19 @@ const CustomNode = ({ data, selected, id }) => {
 
   return (
     <div 
-      className={`react-flow__node-custom ${nodeClass} ${selected ? 'selected' : ''} cursor-pointer`}
+      className={`simple-node ${nodeClass} ${selected ? 'selected' : ''} cursor-pointer`}
       onClick={handleNodeClick}
       onMouseEnter={handleNodeHover}
       onMouseLeave={handleNodeHoverEnd}
     >
-      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Top} className="simple-handle" />
       
-      <div className="flex items-center justify-center space-x-2">
-        <IconComponent className="h-4 w-4" />
-        <div className="text-center">
-          <div className="font-medium">{data.label}</div>
-          {data.subtype && (
-            <div className="text-xs opacity-75">{data.subtype}</div>
-          )}
-        </div>
+      <div className="simple-node-content">
+        <IconComponent className="simple-node-icon" />
+        <span className="simple-node-label">{data.label}</span>
       </div>
       
-      {data.mitre_ids && data.mitre_ids.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-1 justify-center">
-          {data.mitre_ids.slice(0, 2).map((id) => (
-            <span
-              key={id}
-              className="px-1 py-0.5 bg-black bg-opacity-20 text-xs rounded"
-            >
-              {id}
-            </span>
-          ))}
-          {data.mitre_ids.length > 2 && (
-            <span className="px-1 py-0.5 bg-black bg-opacity-20 text-xs rounded">
-              +{data.mitre_ids.length - 2}
-            </span>
-          )}
-        </div>
-      )}
-      
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" position={Position.Bottom} className="simple-handle" />
     </div>
   );
 };
