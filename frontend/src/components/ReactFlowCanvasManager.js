@@ -179,11 +179,7 @@ const ReactFlowCanvasManager = ({
     defaultEdgeOptions,
     
     // Data and statistics
-    getCanvasStats,
-    
-    // React Flow v12 reactive data
-    reactFlowNodes,
-    reactFlowEdges
+    getCanvasStats
   };
 };
 
