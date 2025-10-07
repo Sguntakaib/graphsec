@@ -81,8 +81,8 @@ const ReactFlowCanvasManager = ({
       bounds
     });
     
-    console.log('🔍 Auto-fit applied to', reactFlowNodes.length, 'nodes');
-  }, [reactFlowNodes, fitView]);
+    console.log('🔍 Auto-fit applied to', nodes.length, 'nodes');
+  }, [nodes, fitView]);
 
   // Modern pattern: Batch node updates for better performance
   const batchUpdateNodes = useCallback((updates) => {
