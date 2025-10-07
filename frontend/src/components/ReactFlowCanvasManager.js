@@ -54,10 +54,10 @@ const ReactFlowCanvasManager = ({
 
   // Modern pattern: Efficient auto-fit with bounds calculation
   const autoFitNodes = useCallback(() => {
-    if (reactFlowNodes.length === 0) return;
+    if (nodes.length === 0) return;
     
-    // Calculate bounds using React Flow v12 reactive nodes
-    const bounds = reactFlowNodes.reduce((acc, node) => {
+    // Calculate bounds using passed nodes state
+    const bounds = nodes.reduce((acc, node) => {
       const x = node.position.x;
       const y = node.position.y;
       const width = node.measured?.width || node.width || 200;
