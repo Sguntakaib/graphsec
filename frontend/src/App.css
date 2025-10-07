@@ -96,35 +96,68 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Node type specific colors - Matching workflow builder palette */
+/* Node type specific colors - Workflow builder palette like Screenshot 2 */
 .node-actor {
   background: linear-gradient(135deg, #ef4444, #dc2626);
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 .node-asset {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  border-color: rgba(34, 197, 94, 0.3);
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
 .node-surface {
   background: linear-gradient(135deg, #f59e0b, #d97706);
-  border-color: rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.2);
 }
 
 .node-control {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border-color: rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .node-zone {
   background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  border-color: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.2);
 }
 
 .node-signal {
   background: linear-gradient(135deg, #06b6d4, #0891b2);
-  border-color: rgba(6, 182, 212, 0.3);
+  border-color: rgba(6, 182, 212, 0.2);
+}
+
+/* Additional workflow-style colors for different subtypes */
+.simple-node[data-subtype="WebApp"] {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.simple-node[data-subtype="API"] {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+}
+
+.simple-node[data-subtype="Database"] {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
+.simple-node[data-subtype="ExternalAttacker"] {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.simple-node[data-subtype="MaliciousInsider"] {
+  background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+}
+
+.simple-node[data-subtype="S3Bucket"] {
+  background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
+}
+
+.simple-node[data-subtype="PublicCloud"] {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+}
+
+.simple-node[data-subtype="Firewall"] {
+  background: linear-gradient(135deg, #059669, #047857) !important;
 }
 
 /* React Flow controls */
