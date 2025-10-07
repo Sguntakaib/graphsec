@@ -3190,6 +3190,19 @@ function AppContent() {
                 <span>Analyze</span>
               </button>
               
+              <button
+                onClick={() => setShowPerformanceMonitor(!showPerformanceMonitor)}
+                className={`px-4 py-2 rounded-lg hover:bg-gray-600 flex items-center space-x-2 text-sm font-medium shadow-sm transition-colors ${
+                  showPerformanceMonitor 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-700 text-gray-300'
+                }`}
+                title="React Flow Performance Monitor"
+              >
+                <Monitor className="h-4 w-4" />
+                <span>Performance</span>
+              </button>
+              
               {/* UI Demo Button - Commented out after demonstration
               <button
                 onClick={() => setShowUIDemo(!showUIDemo)}
