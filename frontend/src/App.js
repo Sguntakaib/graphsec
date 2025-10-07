@@ -573,10 +573,6 @@ function AppContent() {
   }, []); // Remove nodes, edges dependencies to prevent infinite loop
   
   const { fitView, zoomIn, zoomOut, updateNodeData, updateEdgeData, getNode, getEdge } = useReactFlow();
-  
-  // Modern React Flow v12 hooks for reactive state management
-  const reactFlowNodes = useNodes();
-  const reactFlowEdges = useEdges();
 
   // Modern React Flow v12 pattern: Efficient node data updates
   const updateNodeDataEfficiently = useCallback((nodeId, newData) => {
