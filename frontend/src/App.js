@@ -319,92 +319,14 @@ function AppContent() {
     if (node) { // Remove currentDiagram requirement for now
       console.log('🎯 Double-tap detected on node:', nodeId);
       
-      // Get existing answers - try node data first, then backend API
-      let existingAnswers = {};
+      // Modern React Flow v12 pattern: Use questionnaire flow manager
+      console.log('🚀 Opening Security Questionnaire using modern flow manager');
       
-      // First check if questionnaire responses are stored in node data (for auto-created dependent nodes)
-      if (node.data?.questionnaireResponses && Object.keys(node.data.questionnaireResponses).length > 0) {
-        existingAnswers = node.data.questionnaireResponses;
-        console.log('📝 Found existing questionnaire answers in node data:', existingAnswers);
-      } else if (node.questionnaireResponses && Object.keys(node.questionnaireResponses).length > 0) {
-        existingAnswers = node.questionnaireResponses;
-        console.log('📝 Found existing questionnaire answers in node root:', existingAnswers);
-      } else if (currentDiagram) {
-        // Fallback to backend API if no data in node
-        try {
-          const response = await fetch(
-            `${process.env.REACT_APP_BACKEND_URL}/api/diagrams/${currentDiagram.id}/nodes/${node.id}/questionnaire`
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            existingAnswers = data.questionnaire_responses || {};
-            console.log('📝 Fetched existing questionnaire answers from backend:', existingAnswers);
-          } else {
-            console.log('⚠️ No existing questionnaire data found in backend, starting fresh questionnaire');
-          }
-        } catch (error) {
-          console.error('⚠️ Error fetching existing questionnaire answers from backend:', error);
-        }
-      } else {
-        console.log('⚠️ No currentDiagram available, starting fresh questionnaire');
-      }
+      // Fetch existing answers using the modern manager
+      const existingAnswers = await questionnaireFlowManager.fetchExistingAnswers(node);
       
-      // Directly set questionnaire state instead of calling startLegacyQuestionnaire
-      const nodeSubtype = node.subtype || node.data?.subtype;
-      console.log('🚀 Opening Security Questionnaire directly from double-click');
-      
-      // Clear any existing questionnaire state to prevent completion logic from triggering
-      setQuestionnaireQueue([]);
-      setCurrentQueueIndex(0);
-      setParentQuestionnaireStack([]); // Clear parent stack
-      
-      // Set the state directly to open questionnaire
-      const questionnaireNode = {
-        id: node.id,
-        subtype: nodeSubtype,
-        data: { subtype: nodeSubtype }
-      };
-      
-      console.log('🔧 Setting questionnaire state:', {
-        showSecurityQuestionnaire: true,
-        currentQuestionnaireNode: questionnaireNode,
-        existingAnswers
-      });
-      
-      setCurrentQuestionnaireNode(questionnaireNode);
-      setCurrentQuestionnaireAnswers(existingAnswers);
-      setShowSecurityQuestionnaire(true);
-      
-      // Store questionnaire meta on node for accurate progress (e.g., total_questions)
-      try {
-        let metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/prompts`;
-        if (['WebApp','API','Database','Backup','Monitoring'].includes(nodeSubtype)) {
-          metaUrl = `${process.env.REACT_APP_BACKEND_URL}/api/questionnaires/${nodeSubtype}?level=basic`;
-        }
-        const metaRes = await fetch(metaUrl);
-        if (metaRes.ok) {
-          const meta = await metaRes.json();
-          const total = meta.total_questions || (meta.prompts ? meta.prompts.length : 0);
-          setNodes(nds => nds.map(n => n.id === node.id ? ({
-            ...n,
-            data: {
-              ...n.data,
-              questionnaireMeta: { total_questions: total }
-            }
-          }) : n));
-        }
-      } catch (e) {
-        console.log('ℹ️ Could not fetch questionnaire meta for progress:', e?.message);
-      }
-      
-      // Force a state check after setting
-      setTimeout(() => {
-        console.log('🔍 State check after 100ms:', {
-          showSecurityQuestionnaire: true, // Should be true
-          currentQuestionnaireNode: questionnaireNode // Should be set
-        });
-      }, 100);
+      // Initialize questionnaire using the modern flow manager
+      await questionnaireFlowManager.initializeQuestionnaire(node, existingAnswers);
     }
   }, [nodes, currentDiagram]); // Proper dependencies for useCallback
 
