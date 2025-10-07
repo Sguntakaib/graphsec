@@ -144,13 +144,13 @@ const ReactFlowCanvasManager = ({
   // Modern pattern: Canvas statistics for performance monitoring
   const getCanvasStats = useCallback(() => {
     return {
-      nodeCount: reactFlowNodes.length,
-      edgeCount: reactFlowEdges.length,
-      nodeTypes: [...new Set(reactFlowNodes.map(n => n.type || 'default'))],
-      edgeTypes: [...new Set(reactFlowEdges.map(e => e.type || 'default'))],
-      totalConnections: reactFlowEdges.length,
-      isolatedNodes: reactFlowNodes.filter(node => 
-        !reactFlowEdges.some(edge => edge.source === node.id || edge.target === node.id)
+      nodeCount: nodes.length,
+      edgeCount: edges.length,
+      nodeTypes: [...new Set(nodes.map(n => n.type || 'default'))],
+      edgeTypes: [...new Set(edges.map(e => e.type || 'default'))],
+      totalConnections: edges.length,
+      isolatedNodes: nodes.filter(node => 
+        !edges.some(edge => edge.source === node.id || edge.target === node.id)
       ).length,
       performance: {
         renderTime: performance.now(),
@@ -160,7 +160,7 @@ const ReactFlowCanvasManager = ({
         } : 'Not available'
       }
     };
-  }, [reactFlowNodes, reactFlowEdges]);
+  }, [nodes, edges]);
 
   return {
     // Canvas operations
