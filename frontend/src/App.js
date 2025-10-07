@@ -603,7 +603,7 @@ function AppContent() {
     };
   }, [getNode, edges]);
 
-  // Initialize modern React Flow component managers
+  // Initialize modern React Flow component managers (using legacy hook pattern for compatibility)
   const questionnaireFlowManager = QuestionnaireFlowManager({
     currentQuestionnaireNode,
     setCurrentQuestionnaireNode,
