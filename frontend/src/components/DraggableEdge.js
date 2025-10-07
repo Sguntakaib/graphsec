@@ -391,65 +391,8 @@ const DraggableEdge = memo(({
             </text>
           )}
           
-          {/* Visual hint when selected or recently interacted */}
-          {(selected || recentlyInteracted) && !isEditingLabel && (
-            <text
-              x={0}
-              y={30}
-              textAnchor="middle"
-              style={{
-                fill: '#3B82F6',
-                fontSize: '10px',
-                opacity: 0.7,
-                pointerEvents: 'none'
-              }}
-            >
-              ← Drag to reshape → | Double-click to edit
-            </text>
-          )}
+          {/* Removed visual indicators - users found them confusing */}
         </g>
-      )}
-      
-      {/* Visual indicators when dragging */}
-      {isDragging && (
-        <>
-          {/* Show control points when dragging for visual feedback */}
-          <circle
-            cx={cp1.x}
-            cy={cp1.y}
-            r={4}
-            fill="#3B82F6"
-            opacity={0.6}
-          />
-          <circle
-            cx={cp2.x}
-            cy={cp2.y}
-            r={4}
-            fill="#3B82F6"
-            opacity={0.6}
-          />
-          {/* Helper lines */}
-          <line
-            x1={sourceX}
-            y1={sourceY}
-            x2={cp1.x}
-            y2={cp1.y}
-            stroke="#3B82F6"
-            strokeWidth={1}
-            strokeDasharray="3,3"
-            opacity={0.4}
-          />
-          <line
-            x1={cp2.x}
-            y1={cp2.y}
-            x2={targetX}
-            y2={targetY}
-            stroke="#3B82F6"
-            strokeWidth={1}
-            strokeDasharray="3,3"
-            opacity={0.4}
-          />
-        </>
       )}
     </g>
   );
