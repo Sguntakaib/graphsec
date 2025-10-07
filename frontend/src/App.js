@@ -4123,9 +4123,11 @@ function AppContent() {
         </div>
       )}
 
-      {/* React Flow v12 Performance Monitor */}
+      {/* React Flow Performance Monitor */}
       <ReactFlowPerformanceMonitor 
         showPerformanceMonitor={showPerformanceMonitor}
+        nodes={nodes}
+        edges={edges}
         onClose={() => setShowPerformanceMonitor(false)}
       />
     </div>
