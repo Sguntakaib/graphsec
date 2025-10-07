@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { useReactFlow, useNodes, useEdges } from '@xyflow/react';
+import { useReactFlow } from '@xyflow/react';
 
 /**
  * ReactFlowCanvasManager - Modern React Flow v12 component for canvas operations
