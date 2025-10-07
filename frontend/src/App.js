@@ -745,18 +745,8 @@ function AppContent() {
     setEdges(nextState.edges);
   }, [redoStack]); // Remove nodes, edges dependencies to prevent infinite loop
 
-  // Enhanced edge styles for attack paths
-  const defaultEdgeOptions = useMemo(() => ({
-    type: 'draggable',  // Use draggable type for all edges
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      color: '#9CA3AF',
-    },
-    style: {
-      strokeWidth: 2,
-      stroke: '#9CA3AF',
-    },
-  }), []);
+  // Modern React Flow v12 pattern: Use canvas manager's optimized edge options
+  const defaultEdgeOptions = canvasManager.defaultEdgeOptions;
 
   const attackPathEdgeOptions = useMemo(() => ({
     type: 'draggable',  // Use draggable type for attack path edges
