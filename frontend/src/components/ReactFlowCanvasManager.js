@@ -35,8 +35,8 @@ const ReactFlowCanvasManager = ({
     const node = getNode(nodeId);
     if (!node) return;
     
-    // Get connected edges using React Flow v12 patterns
-    const connectedEdges = reactFlowEdges.filter(edge => 
+    // Get connected edges using passed edges state
+    const connectedEdges = edges.filter(edge => 
       edge.source === nodeId || edge.target === nodeId
     );
     
@@ -50,7 +50,7 @@ const ReactFlowCanvasManager = ({
     
     setSelectedNode(enhancedNode);
     console.log('🎯 Selected node with dependencies:', enhancedNode);
-  }, [getNode, reactFlowEdges, setSelectedNode]);
+  }, [getNode, edges, setSelectedNode]);
 
   // Modern pattern: Efficient auto-fit with bounds calculation
   const autoFitNodes = useCallback(() => {
