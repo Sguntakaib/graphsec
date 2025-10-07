@@ -1948,19 +1948,27 @@ function AppContent() {
           [currentQuestionnaireNode.id]: updatedBranches
         }));
 
-        // Update node data with security information
+        // Modern React Flow v12 pattern: Update node data efficiently
+        const nodeUpdateData = {
+          securityBranches: updatedBranches,
+          completionStatus: result.validation,
+          recommendations: result.recommendations,
+          intelligentNode: true,
+          questionnaireResponses: result.answers,
+          lastQuestionnaireUpdate: new Date().toISOString()
+        };
+        
+        // Use React Flow v12's updateNodeData for better performance
+        updateNodeDataEfficiently(currentQuestionnaireNode.id, nodeUpdateData);
+        
+        // Fallback: Also update via setNodes for compatibility
         setNodes(nds => nds.map(node => {
           if (node.id === currentQuestionnaireNode.id) {
             return {
               ...node,
               data: {
                 ...node.data,
-                securityBranches: updatedBranches,
-                completionStatus: result.validation,
-                recommendations: result.recommendations,
-                intelligentNode: true,
-                questionnaireResponses: result.answers,
-                lastQuestionnaireUpdate: new Date().toISOString()
+                ...nodeUpdateData
               }
             };
           }
