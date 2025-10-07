@@ -4123,6 +4123,12 @@ function AppContent() {
           </div>
         </div>
       )}
+
+      {/* React Flow v12 Performance Monitor */}
+      <ReactFlowPerformanceMonitor 
+        showPerformanceMonitor={showPerformanceMonitor}
+        onClose={() => setShowPerformanceMonitor(false)}
+      />
     </div>
   );
 }
