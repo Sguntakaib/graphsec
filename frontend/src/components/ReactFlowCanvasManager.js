@@ -113,8 +113,8 @@ const ReactFlowCanvasManager = ({
   const smartPositionNode = useCallback((newNode, referenceNodeId = null) => {
     let position = { x: 100, y: 100 };
     
-    if (referenceNodeId && reactFlowNodes.length > 0) {
-      const refNode = reactFlowNodes.find(n => n.id === referenceNodeId);
+    if (referenceNodeId && nodes.length > 0) {
+      const refNode = nodes.find(n => n.id === referenceNodeId);
       if (refNode) {
         // Position relative to reference node
         position = {
@@ -124,9 +124,9 @@ const ReactFlowCanvasManager = ({
       } else {
         // Smart grid positioning
         const gridSize = 200;
-        const cols = Math.ceil(Math.sqrt(reactFlowNodes.length + 1));
-        const row = Math.floor(reactFlowNodes.length / cols);
-        const col = reactFlowNodes.length % cols;
+        const cols = Math.ceil(Math.sqrt(nodes.length + 1));
+        const row = Math.floor(nodes.length / cols);
+        const col = nodes.length % cols;
         
         position = {
           x: col * gridSize + 100,
@@ -139,7 +139,7 @@ const ReactFlowCanvasManager = ({
       ...newNode,
       position
     };
-  }, [reactFlowNodes]);
+  }, [nodes]);
 
   // Modern pattern: Canvas statistics for performance monitoring
   const getCanvasStats = useCallback(() => {
