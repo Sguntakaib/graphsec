@@ -1,38 +1,44 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useCallback, memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Shield, Server, AlertTriangle, Lock, Network, Activity } from 'lucide-react';
 
-const CustomNode = ({ data, selected, id }) => {
+// Icon mapping - moved outside component to prevent recreation
+const ICON_MAP = {
+  'Actor': Shield,
+  'Asset': Server,
+  'Surface': AlertTriangle,
+  'Control': Lock,
+  'Zone': Network,
+  'Signal': Activity
+};
+
+// Class mapping - moved outside component to prevent recreation
+const CLASS_MAP = {
+  'Actor': 'node-actor',
+  'Asset': 'node-asset',
+  'Surface': 'node-surface',
+  'Control': 'node-control',
+  'Zone': 'node-zone',
+  'Signal': 'node-signal'
+};
+
+const CustomNode = memo(({ data, selected, id }) => {
   const [tapCount, setTapCount] = useState(0);
   const tapTimer = useRef(null);
-  const getIcon = (type) => {
-    const iconMap = {
-      'Actor': Shield,
-      'Asset': Server,
-      'Surface': AlertTriangle,
-      'Control': Lock,
-      'Zone': Network,
-      'Signal': Activity
-    };
-    return iconMap[type] || Shield;
-  };
+  
+  // Memoized icon component to prevent recreation
+  const IconComponent = useMemo(() => {
+    return ICON_MAP[data.type] || Shield;
+  }, [data.type]);
 
-  const getNodeClass = (type) => {
-    const classMap = {
-      'Actor': 'node-actor',
-      'Asset': 'node-asset',
-      'Surface': 'node-surface',
-      'Control': 'node-control',
-      'Zone': 'node-zone',
-      'Signal': 'node-signal'
-    };
-    return classMap[type] || 'bg-gray-600';
-  };
+  // Memoized node class to prevent string concatenation on every render
+  const nodeClassName = useMemo(() => {
+    const baseClass = CLASS_MAP[data.type] || 'bg-gray-600';
+    return `simple-node ${baseClass} ${selected ? 'selected' : ''} cursor-pointer`;
+  }, [data.type, selected]);
 
-  const IconComponent = getIcon(data.type);
-  const nodeClass = getNodeClass(data.type);
-
-  const handleNodeClick = (event) => {
+  // Memoized click handler to prevent recreation
+  const handleNodeClick = useCallback((event) => {
     event.stopPropagation();
     
     setTapCount(prev => {
@@ -56,13 +62,13 @@ const CustomNode = ({ data, selected, id }) => {
       
       return newCount;
     });
-  };
+  }, [id, data]);
 
-  const handleNodeHover = (event) => {
+  // Memoized hover handler to prevent recreation
+  const handleNodeHover = useCallback((event) => {
     event.stopPropagation();
     const rect = event.currentTarget.getBoundingClientRect();
     
-    console.log('🎯 Node hover detected on node:', id, 'with data:', data);
     const customEvent = new CustomEvent('nodeHover', {
       detail: { 
         nodeId: id, 
@@ -74,15 +80,16 @@ const CustomNode = ({ data, selected, id }) => {
       }
     });
     window.dispatchEvent(customEvent);
-  };
+  }, [id, data]);
 
-  const handleNodeHoverEnd = (event) => {
+  // Memoized hover end handler to prevent recreation
+  const handleNodeHoverEnd = useCallback((event) => {
     event.stopPropagation();
     const customEvent = new CustomEvent('nodeHoverEnd', {
       detail: { nodeId: id }
     });
     window.dispatchEvent(customEvent);
-  };
+  }, [id]);
 
   return (
     <div 
