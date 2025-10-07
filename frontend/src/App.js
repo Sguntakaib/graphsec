@@ -647,7 +647,11 @@ function AppContent() {
     }));
   }, []); // Remove nodes, edges dependencies to prevent infinite loop
   
-  const { fitView, zoomIn, zoomOut } = useReactFlow();
+  const { fitView, zoomIn, zoomOut, updateNodeData, updateEdgeData, getNode, getEdge } = useReactFlow();
+  
+  // Modern React Flow v12 hooks for reactive state management
+  const reactFlowNodes = useNodes();
+  const reactFlowEdges = useEdges();
 
   // Function to automatically fit all nodes within canvas when they go out of bounds
   const handleFitAllNodes = useCallback(() => {
