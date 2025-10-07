@@ -20,9 +20,7 @@ const ReactFlowPerformanceMonitor = memo(({
     lastUpdate: new Date().toISOString()
   });
 
-  // Modern React Flow v12 hooks for reactive performance monitoring
-  const nodes = useNodes();
-  const edges = useEdges();
+  // Use props instead of hooks to avoid conflicts
 
   // Performance tracking with React Flow v12 patterns
   const updatePerformanceMetrics = useCallback(() => {
