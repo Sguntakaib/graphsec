@@ -1,7 +1,7 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, memo } from 'react';
 import { getBezierPath, BaseEdge } from '@xyflow/react';
 
-const DraggableEdge = ({
+const DraggableEdge = memo(({
   id,
   sourceX,
   sourceY,
