@@ -180,8 +180,10 @@ body {
 
 /* Drag preview */
 .drag-preview {
-  opacity: 0.8;
+  opacity: 0.7;
   pointer-events: none;
+  transform: rotate(2deg) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Simple Library Node Styles */
