@@ -394,16 +394,16 @@ const DraggableEdge = memo(({
         >
           {labelShowBg && (
             <rect
-              x={-Math.max(35, (label?.length || 0) * 2.5)}
-              y={-9}
-              width={Math.max(70, (label?.length || 0) * 5)}
-              height={18}
+              x={-Math.max(25, (label?.length || 0) * 1.8)}
+              y={-7}
+              width={Math.max(50, (label?.length || 0) * 3.6)}
+              height={14}
               {...labelBoxStyle}
               style={{ 
                 ...labelBoxStyle, 
                 cursor: isEditingLabel ? 'text' : (isDragging ? 'grabbing' : 'grab'),
                 stroke: isDragging ? '#3B82F6' : (selected ? '#60A5FA' : '#6B7280'),
-                strokeWidth: isDragging || selected ? 1.5 : 0.5,
+                strokeWidth: isDragging || selected ? 1 : 0.5,
                 fill: isDragging ? '#1E3A8A' : (isEditingLabel ? '#1F2937' : labelBgStyle.fill || '#374151'),
                 pointerEvents: 'all' // Ensure the rect can receive mouse events
               }}
