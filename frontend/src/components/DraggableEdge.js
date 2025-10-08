@@ -315,47 +315,60 @@ const DraggableEdge = memo(({
         className="react-flow__edge-interaction"
       />
       
-      {/* Warning Badge for connections with security issues */}
+      {/* Warning Badge for connections with security issues - Only show when selected */}
       {data?.warnings && data.warnings.length > 0 && selected && (
-        <g transform={`translate(${labelPos.x}, ${labelPos.y + 30})`}>
-          {/* Warning tooltip background */}
+        <g transform={`translate(${labelPos.x}, ${labelPos.y + 35})`}>
+          {/* Warning tooltip background - compact size */}
           <rect
-            x={-60}
+            x={-80}
             y={0}
-            width={120}
-            height={20 + (data.warnings.length * 18)}
-            rx={4}
-            ry={4}
+            width={160}
+            height={16 + (data.warnings.length * 14)}
+            rx={3}
+            ry={3}
             fill="#1F2937"
             stroke={data.warnings.some(w => w.level === 'critical' || w.level === 'high') ? '#DC2626' : '#F59E0B'}
-            strokeWidth={2}
-            opacity={0.95}
+            strokeWidth={1.5}
+            opacity={0.98}
           />
-          {/* Warning title */}
+          {/* Warning title - smaller */}
           <text
             x={0}
-            y={12}
+            y={10}
             fill="#FFFFFF"
-            fontSize="11px"
+            fontSize="9px"
             fontWeight="bold"
             textAnchor="middle"
           >
-            Security Warnings
+            ⚠️ Security Issues
           </text>
-          {/* Warning list */}
-          {data.warnings.map((warning, idx) => (
+          {/* Warning list - more compact */}
+          {data.warnings.slice(0, 2).map((warning, idx) => (
             <text
               key={idx}
               x={0}
-              y={30 + (idx * 18)}
+              y={22 + (idx * 14)}
               fill={warning.level === 'critical' ? '#FCA5A5' : 
                     warning.level === 'high' ? '#FCD34D' : '#FDE68A'}
-              fontSize="10px"
+              fontSize="8px"
               textAnchor="middle"
             >
-              {warning.icon} {warning.message}
+              {warning.icon} {warning.message.substring(0, 35)}{warning.message.length > 35 ? '...' : ''}
             </text>
           ))}
+          {/* Show count if more warnings */}
+          {data.warnings.length > 2 && (
+            <text
+              x={0}
+              y={22 + (2 * 14)}
+              fill="#9CA3AF"
+              fontSize="8px"
+              fontStyle="italic"
+              textAnchor="middle"
+            >
+              +{data.warnings.length - 2} more warning{data.warnings.length > 3 ? 's' : ''}
+            </text>
+          )}
         </g>
       )}
       
