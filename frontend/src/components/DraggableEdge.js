@@ -456,20 +456,20 @@ const DraggableEdge = memo(({
                 {data.warnings.map(w => `${w.icon} ${w.message}`).join('\n')}
               </title>
               <circle
-                cx={Math.max(35, (label?.length || 0) * 2.5) + 5}
+                cx={Math.max(25, (label?.length || 0) * 1.8) + 4}
                 cy={0}
-                r={6}
+                r={5}
                 fill={data.warnings.some(w => w.level === 'critical') ? '#DC2626' : 
                       data.warnings.some(w => w.level === 'high') ? '#EF4444' : 
                       data.warnings.some(w => w.level === 'medium') ? '#F59E0B' : '#FCD34D'}
                 stroke="#FFFFFF"
-                strokeWidth={1}
+                strokeWidth={0.8}
                 style={{ cursor: 'help' }}
               />
               <text
-                x={Math.max(35, (label?.length || 0) * 2.5) + 5}
+                x={Math.max(25, (label?.length || 0) * 1.8) + 4}
                 y={0}
-                fontSize="8px"
+                fontSize="7px"
                 fontWeight="bold"
                 fill="#FFFFFF"
                 textAnchor="middle"
