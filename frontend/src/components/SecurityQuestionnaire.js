@@ -959,10 +959,24 @@ const SecurityQuestionnaire = ({
               ) : (
                 <button
                   onClick={handleComplete}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  disabled={isCompleting}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    isCompleting 
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
                 >
-                  <Save className="h-4 w-4" />
-                  <span>Complete</span>
+                  {isCompleting ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      <span>Completing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      <span>Complete</span>
+                    </>
+                  )}
                 </button>
               )}
             </div>
