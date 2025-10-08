@@ -558,6 +558,11 @@ const SecurityQuestionnaire = ({
         isActualCompletion: true, // Flag to indicate this was a real completion button click
         completionSummary: summary // Phase 2: Include completion summary
       });
+    } catch (error) {
+      console.error('❌ Error during questionnaire completion:', error);
+    } finally {
+      // Reset completing state after operation finishes
+      setIsCompleting(false);
     }
   };
 
