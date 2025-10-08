@@ -315,6 +315,50 @@ const DraggableEdge = memo(({
         className="react-flow__edge-interaction"
       />
       
+      {/* Warning Badge for connections with security issues */}
+      {data?.warnings && data.warnings.length > 0 && selected && (
+        <g transform={`translate(${labelPos.x}, ${labelPos.y + 30})`}>
+          {/* Warning tooltip background */}
+          <rect
+            x={-60}
+            y={0}
+            width={120}
+            height={20 + (data.warnings.length * 18)}
+            rx={4}
+            ry={4}
+            fill="#1F2937"
+            stroke={data.warnings.some(w => w.level === 'critical' || w.level === 'high') ? '#DC2626' : '#F59E0B'}
+            strokeWidth={2}
+            opacity={0.95}
+          />
+          {/* Warning title */}
+          <text
+            x={0}
+            y={12}
+            fill="#FFFFFF"
+            fontSize="11px"
+            fontWeight="bold"
+            textAnchor="middle"
+          >
+            Security Warnings
+          </text>
+          {/* Warning list */}
+          {data.warnings.map((warning, idx) => (
+            <text
+              key={idx}
+              x={0}
+              y={30 + (idx * 18)}
+              fill={warning.level === 'critical' ? '#FCA5A5' : 
+                    warning.level === 'high' ? '#FCD34D' : '#FDE68A'}
+              fontSize="10px"
+              textAnchor="middle"
+            >
+              {warning.icon} {warning.message}
+            </text>
+          ))}
+        </g>
+      )}
+      
       {/* Draggable label for curve reshaping and editing */}
       {label && (
         <g 
