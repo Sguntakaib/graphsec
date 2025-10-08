@@ -391,7 +391,38 @@ const DraggableEdge = memo(({
             </text>
           )}
           
-          {/* Removed visual indicators - users found them confusing */}
+          {/* Security Warning Indicator */}
+          {!isEditingLabel && data?.warnings && data.warnings.length > 0 && (
+            <g>
+              {/* Warning icon with tooltip */}
+              <title>
+                {data.warnings.map(w => `${w.icon} ${w.message}`).join('\n')}
+              </title>
+              <circle
+                cx={45}
+                cy={0}
+                r={8}
+                fill={data.warnings.some(w => w.level === 'critical') ? '#DC2626' : 
+                      data.warnings.some(w => w.level === 'high') ? '#EF4444' : 
+                      data.warnings.some(w => w.level === 'medium') ? '#F59E0B' : '#FCD34D'}
+                stroke="#FFFFFF"
+                strokeWidth={1.5}
+                style={{ cursor: 'help' }}
+              />
+              <text
+                x={45}
+                y={0}
+                fontSize="10px"
+                fontWeight="bold"
+                fill="#FFFFFF"
+                textAnchor="middle"
+                dominantBaseline="central"
+                style={{ pointerEvents: 'none' }}
+              >
+                {data.warnings.length}
+              </text>
+            </g>
+          )}
         </g>
       )}
     </g>
