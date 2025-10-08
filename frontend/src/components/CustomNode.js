@@ -104,10 +104,15 @@ const CustomNode = memo(({ data, selected, id }) => {
   const [tapCount, setTapCount] = useState(0);
   const tapTimer = useRef(null);
   
-  // Memoized icon component to prevent recreation
+  // Memoized icon component to prevent recreation - now uses subtype-specific icons
   const IconComponent = useMemo(() => {
-    return ICON_MAP[data.type] || Shield;
-  }, [data.type]);
+    // First try to get icon by subtype for dedicated representation
+    if (data.subtype && SUBTYPE_ICON_MAP[data.subtype]) {
+      return SUBTYPE_ICON_MAP[data.subtype];
+    }
+    // Fallback to type-based icon if subtype not found
+    return TYPE_FALLBACK_ICON_MAP[data.type] || Shield;
+  }, [data.type, data.subtype]);
 
   // Memoized node class to prevent string concatenation on every render
   const nodeClassName = useMemo(() => {
