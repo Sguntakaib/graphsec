@@ -24,8 +24,64 @@ import {
   Bug
 } from 'lucide-react';
 
-// Icon mapping - moved outside component to prevent recreation
-const ICON_MAP = {
+// Subtype-specific icon mapping for more dedicated visual representation
+const SUBTYPE_ICON_MAP = {
+  // Actor subtypes
+  'ExternalAttacker': Shield,
+  'Insider': Users,
+  'ServiceAccount': Settings,
+  
+  // Infrastructure subtypes  
+  'CloudDeployment': Cloud,
+  'OnPremisesDeployment': Server,
+  
+  // Service subtypes
+  'AWSService': Cloud,
+  'GCPService': Cloud,
+  
+  // Asset subtypes
+  'WebApp': Globe,
+  'API': Zap,
+  'Database': Database,
+  'S3Bucket': HardDrive,
+  'VM': Monitor,
+  'IMDS': FileText,
+  
+  // Surface subtypes (Attack Surfaces)
+  'SSRF': Bug,
+  'SQLi': Database,
+  'IDOR': Lock,
+  'RCE': Cpu,
+  'WeakIAM': Users,
+  
+  // Control subtypes (Security Controls)
+  'WAF': Shield,
+  'EDR': Eye,
+  'EgressProxy': Router,
+  'IAMPolicy': Users,
+  'NetworkACL': Network,
+  
+  // Zone subtypes
+  'Internet': Globe,
+  'DMZ': Network,
+  'Internal': Lock,
+  'CloudVPC': Cloud,
+  
+  // Signal subtypes
+  'WAFAlert': Shield,
+  'EDRAlert': Eye,
+  'NetworkLog': Activity,
+  
+  // Additional subtypes for dynamic nodes
+  'Backup': HardDrive,
+  'Monitoring': Monitor,
+  'Container': Container,
+  'LoadBalancer': Router,
+  'CDN': Wifi
+};
+
+// Fallback icon mapping by type for unknown subtypes
+const TYPE_FALLBACK_ICON_MAP = {
   'Actor': Shield,
   'Asset': Server,
   'Surface': AlertTriangle,
