@@ -1680,15 +1680,72 @@ function AppContent() {
       };
     }
     
-    // Default connection with improved styling
+    // Default connection - Enhanced with security context
+    const dataClass = getDataClassification(sourceNode, targetNode);
+    const isEncrypted = isEncryptedConnection(sourceNode, targetNode, questionnaire_answers);
+    const hasAuth = hasAuthentication(sourceNode, targetNode, questionnaire_answers);
+    const warnings = validateConnection(sourceNode, targetNode, questionnaire_answers);
+    
+    // Create enhanced label with security indicators
+    const securityIcon = isEncrypted ? '🔒' : '⚠️';
+    const authIcon = hasAuth ? '🔑' : '';
+    const classLabel = dataClass !== 'Unknown' ? ` ${dataClass}` : '';
+    const enhancedLabel = `${securityIcon}${authIcon}${classLabel} Data Flow`;
+    
+    // Apply security-based styling
+    const securityStyle = getSecurityStyling(isEncrypted, hasAuth, warnings);
+    
     return {
-      label: 'Data Flow',
-      style: { stroke: '#9CA3AF', strokeWidth: 2 },
-      markerEnd: { type: 'arrowclosed', color: '#9CA3AF' },
-      labelStyle: { fill: '#9CA3AF', fontWeight: 'bold', fontSize: '12px' },
-      labelBgStyle: { fill: '#374151', fillOpacity: 0.8 }
+      label: enhancedLabel,
+      style: securityStyle,
+      markerEnd: { type: 'arrowclosed', color: securityStyle.stroke },
+      labelStyle: { fill: securityStyle.stroke, fontWeight: 'bold', fontSize: '12px' },
+      labelBgStyle: { fill: '#374151', fillOpacity: 0.8 },
+      warnings: warnings  // Add warnings for potential UI display
     };
   };
+
+  // Enhanced wrapper function that applies security context to ALL connection types
+  const getEnhancedConnectionInfo = (sourceNode, targetNode, questionnaire_answers = {}) => {
+    // Get base connection info
+    const baseConnection = getOriginalConnectionInfo(sourceNode, targetNode, questionnaire_answers);
+    
+    // Add security enhancements
+    const dataClass = getDataClassification(sourceNode, targetNode);
+    const isEncrypted = isEncryptedConnection(sourceNode, targetNode, questionnaire_answers);
+    const hasAuth = hasAuthentication(sourceNode, targetNode, questionnaire_answers);
+    const warnings = validateConnection(sourceNode, targetNode, questionnaire_answers);
+    
+    // Enhance label with security context (preserve original connection type)
+    const securityIcon = isEncrypted ? '🔒' : '⚠️';
+    const authIcon = hasAuth ? '🔑' : '';
+    const classPrefix = dataClass !== 'Unknown' && dataClass !== 'Public' ? `${dataClass} ` : '';
+    const enhancedLabel = `${securityIcon}${authIcon} ${classPrefix}${baseConnection.label}`;
+    
+    // Apply security styling if there are warnings, otherwise keep original styling
+    let finalStyle = baseConnection.style;
+    if (warnings.length > 0) {
+      const securityStyle = getSecurityStyling(isEncrypted, hasAuth, warnings);
+      finalStyle = {
+        ...baseConnection.style,
+        stroke: securityStyle.stroke,
+        strokeWidth: Math.max(baseConnection.style.strokeWidth || 2, securityStyle.strokeWidth),
+        strokeDasharray: securityStyle.strokeDasharray || baseConnection.style.strokeDasharray
+      };
+    }
+    
+    return {
+      ...baseConnection,
+      label: enhancedLabel,
+      style: finalStyle,
+      markerEnd: { ...baseConnection.markerEnd, color: finalStyle.stroke },
+      labelStyle: { ...baseConnection.labelStyle, fill: finalStyle.stroke },
+      warnings: warnings
+    };
+  };
+
+  // Rename original function for use in enhanced wrapper
+  const getOriginalConnectionInfo = getConnectionInfo;
 
   const handleAutoLayout = async () => {
     if (!currentDiagram) {
