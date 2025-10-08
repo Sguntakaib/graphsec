@@ -278,8 +278,8 @@ const DraggableEdge = memo(({
 
   const labelTextStyle = {
     fill: labelStyle.fill || '#FFFFFF',
-    fontSize: labelStyle.fontSize || '9px',  // Reduced from 12px to 9px
-    fontWeight: labelStyle.fontWeight || '600',  // Slightly lighter
+    fontSize: labelStyle.fontSize || '7px',  // Much smaller - reduced to 7px
+    fontWeight: labelStyle.fontWeight || '500',  // Even lighter
     textAnchor: 'middle',
     dominantBaseline: 'central',
     pointerEvents: 'none'
