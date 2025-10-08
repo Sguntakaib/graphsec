@@ -1705,12 +1705,23 @@ function AppContent() {
     };
   };
 
-  // Enhanced wrapper function that applies security context to ALL connection types
-  const getEnhancedConnectionInfo = (sourceNode, targetNode, questionnaire_answers = {}) => {
-    // Get base connection info
-    const baseConnection = getOriginalConnectionInfo(sourceNode, targetNode, questionnaire_answers);
+  
+  // Enhanced function that applies security context to specific high-risk connection types
+  const applySecurityEnhancements = (baseConnection, sourceNode, targetNode, questionnaire_answers = {}) => {
+    const sourceType = sourceNode?.data?.subtype || sourceNode?.type;
+    const targetType = targetNode?.data?.subtype || targetNode?.type;
     
-    // Add security enhancements
+    // Only enhance data flow connections (not attack vectors, protections, etc.)
+    const shouldEnhance = (
+      (sourceType === 'WebApp' || sourceType === 'API' || sourceType === 'Database') &&
+      (targetType === 'WebApp' || targetType === 'API' || targetType === 'Database' || targetType === 'S3Bucket')
+    );
+    
+    if (!shouldEnhance) {
+      return baseConnection; // Return original for non-data flow connections
+    }
+    
+    // Add security enhancements for data flow connections
     const dataClass = getDataClassification(sourceNode, targetNode);
     const isEncrypted = isEncryptedConnection(sourceNode, targetNode, questionnaire_answers);
     const hasAuth = hasAuthentication(sourceNode, targetNode, questionnaire_answers);
@@ -1718,19 +1729,17 @@ function AppContent() {
     
     // Enhance label with security context (preserve original connection type)
     const securityIcon = isEncrypted ? '🔒' : '⚠️';
-    const authIcon = hasAuth ? '🔑' : '';
     const classPrefix = dataClass !== 'Unknown' && dataClass !== 'Public' ? `${dataClass} ` : '';
-    const enhancedLabel = `${securityIcon}${authIcon} ${classPrefix}${baseConnection.label}`;
+    const enhancedLabel = `${securityIcon} ${classPrefix}${baseConnection.label}`;
     
-    // Apply security styling if there are warnings, otherwise keep original styling
+    // Apply security styling if there are warnings
     let finalStyle = baseConnection.style;
     if (warnings.length > 0) {
       const securityStyle = getSecurityStyling(isEncrypted, hasAuth, warnings);
       finalStyle = {
         ...baseConnection.style,
         stroke: securityStyle.stroke,
-        strokeWidth: Math.max(baseConnection.style.strokeWidth || 2, securityStyle.strokeWidth),
-        strokeDasharray: securityStyle.strokeDasharray || baseConnection.style.strokeDasharray
+        strokeDasharray: securityStyle.strokeDasharray
       };
     }
     
@@ -1743,9 +1752,6 @@ function AppContent() {
       warnings: warnings
     };
   };
-
-  // Rename original function for use in enhanced wrapper
-  const getOriginalConnectionInfo = getConnectionInfo;
 
   const handleAutoLayout = async () => {
     if (!currentDiagram) {
