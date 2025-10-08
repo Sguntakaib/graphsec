@@ -3030,7 +3030,7 @@ function AppContent() {
       allDependentNodes.push(newNode);
       setDependencyState(sourceNode.id, nodeType, 'CREATED');
 
-      // Create edge connecting parent to dependent node
+      // Create edge connecting parent to dependent node with enhanced security context
       const edgeId = `edge-${sourceNode.id}-${newNode.id}`;
       
       // Check if edge already exists to prevent duplicates
@@ -3038,36 +3038,47 @@ function AppContent() {
                         newEdges.some(edge => edge.id === edgeId);
       
       if (!edgeExists) {
+        // Get questionnaire answers for enhanced connection info
+        const sourceQuestionnaireAnswers = sourceNode?.data?.questionnaire_answers || {};
+        const targetQuestionnaireAnswers = newNode?.data?.questionnaire_answers || {};
+        const combinedAnswers = { ...sourceQuestionnaireAnswers, ...targetQuestionnaireAnswers };
+        
+        // Get enhanced connection info
+        const baseConnectionInfo = getConnectionInfo(sourceNode, newNode, combinedAnswers);
+        const enhancedConnectionInfo = applySecurityEnhancements(baseConnectionInfo, sourceNode, newNode, combinedAnswers);
+        
         const newEdge = {
           id: edgeId,
           source: sourceNode.id,
           target: newNode.id,
-          label: 'has_dependency',
+          label: `${enhancedConnectionInfo.label} (dependency)`,
           type: 'draggable',
           animated: true,
           style: {
-            strokeWidth: 2,
-            stroke: '#10B981',
-            strokeDasharray: '3,3'
+            ...enhancedConnectionInfo.style,
+            strokeDasharray: enhancedConnectionInfo.style.strokeDasharray || '3,3'
           },
           labelStyle: {
+            ...enhancedConnectionInfo.labelStyle,
             fill: '#ffffff',
             fontWeight: 600,
-            fontSize: '12px',
-            backgroundColor: 'rgba(17, 24, 39, 0.9)',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            border: '1px solid #10B981'
+            fontSize: '12px'
           },
           labelBgStyle: {
+            ...enhancedConnectionInfo.labelBgStyle,
             fill: 'rgba(17, 24, 39, 0.9)',
-            stroke: '#10B981',
+            stroke: enhancedConnectionInfo.warnings?.length > 0 ? '#EF4444' : '#10B981',
             strokeWidth: 1,
             fillOpacity: 0.9
           },
           markerEnd: {
-            type: 'arrowclosed',
-            color: '#10B981',
+            ...enhancedConnectionInfo.markerEnd,
+            type: 'arrowclosed'
+          },
+          data: {
+            warnings: enhancedConnectionInfo.warnings || [],
+            sourceNode: sourceNode,
+            targetNode: newNode
           }
         };
         newEdges.push(newEdge);
