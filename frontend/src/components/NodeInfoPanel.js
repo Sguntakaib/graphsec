@@ -151,13 +151,60 @@ const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
   };
 
   const getNodeIcon = (subtype) => {
+    // Enhanced subtype-specific icon mapping matching CustomNode
     const iconMap = {
+      // Actor subtypes
+      'ExternalAttacker': Shield,
+      'Insider': Users,
+      'ServiceAccount': Settings,
+      
+      // Infrastructure subtypes  
+      'CloudDeployment': Cloud,
+      'OnPremisesDeployment': Server,
+      
+      // Service subtypes
+      'AWSService': Cloud,
+      'GCPService': Cloud,
+      
+      // Asset subtypes
       'WebApp': Globe,
-      'API': Server,
+      'API': Zap,
       'Database': Database,
+      'S3Bucket': HardDrive,
+      'VM': Monitor,
+      'IMDS': FileText,
+      
+      // Surface subtypes (Attack Surfaces)
+      'SSRF': Bug,
+      'SQLi': Database,
+      'IDOR': Lock,
+      'RCE': Cpu,
+      'WeakIAM': Users,
+      
+      // Control subtypes (Security Controls)
+      'WAF': Shield,
+      'EDR': Eye,
+      'EgressProxy': Router,
+      'IAMPolicy': Users,
+      'NetworkACL': Network,
+      
+      // Zone subtypes
+      'Internet': Globe,
+      'DMZ': Network,
+      'Internal': Lock,
+      'CloudVPC': Cloud,
+      
+      // Signal subtypes
+      'WAFAlert': Shield,
+      'EDRAlert': Eye,
+      'NetworkLog': Activity,
+      
+      // Additional subtypes for dynamic nodes
       'Backup': HardDrive,
       'Monitoring': Monitor,
-      'ExternalAttacker': Shield
+      'Container': Container,
+      'LoadBalancer': Router,
+      'CDN': Wifi
     };
     return iconMap[subtype] || Server;
   };
