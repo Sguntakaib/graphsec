@@ -648,7 +648,7 @@ const AdvancedNodeLibrary = ({ onAddNode }) => {
                 <div className="mt-2 space-y-2 ml-4" data-testid={`category-${category.id}-nodes`}>
                   {category.nodes.map((node) => {
                     const nodeKey = `${node.type}-${node.subtype}`;
-                    const IconComponent = getCategoryIcon(node.category);
+                    const IconComponent = getNodeIcon(node.subtype);
                     
                     return (
                       <div
