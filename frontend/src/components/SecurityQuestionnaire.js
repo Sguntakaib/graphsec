@@ -39,6 +39,7 @@ const SecurityQuestionnaire = ({
   const [answers, setAnswers] = useState(existingValues);
   const [triggeredDependencies, setTriggeredDependencies] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [isCompleting, setIsCompleting] = useState(false); // Prevent double-click on Complete button
   const [error, setError] = useState(null);
   const [validation, setValidation] = useState(null);
   
