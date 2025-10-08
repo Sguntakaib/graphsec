@@ -11,7 +11,21 @@ import {
   AlertCircle,
   Info,
   ArrowLeft,
-  User
+  User,
+  Cloud,
+  Container,
+  Zap,
+  Users,
+  Settings,
+  Eye,
+  FileText,
+  Cpu,
+  Wifi,
+  Router,
+  Bug,
+  Lock,
+  Network,
+  Activity
 } from 'lucide-react';
 
 const NodeInfoPanel = ({ nodes, selectedNode, onEditQuestionnaire }) => {
