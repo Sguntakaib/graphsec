@@ -805,9 +805,14 @@ function AppContent() {
       const sourceNode = nodes.find(n => n.id === params.source);
       const targetNode = nodes.find(n => n.id === params.target);
       
-      // Get connection info with enhanced security styling
-      const baseConnectionInfo = getConnectionInfo(sourceNode, targetNode);
-      const enhancedConnectionInfo = applySecurityEnhancements(baseConnectionInfo, sourceNode, targetNode);
+      // Get questionnaire answers from nodes
+      const sourceQuestionnaireAnswers = sourceNode?.data?.questionnaire_answers || {};
+      const targetQuestionnaireAnswers = targetNode?.data?.questionnaire_answers || {};
+      const combinedAnswers = { ...sourceQuestionnaireAnswers, ...targetQuestionnaireAnswers };
+      
+      // Get connection info with enhanced security styling and questionnaire data
+      const baseConnectionInfo = getConnectionInfo(sourceNode, targetNode, combinedAnswers);
+      const enhancedConnectionInfo = applySecurityEnhancements(baseConnectionInfo, sourceNode, targetNode, combinedAnswers);
       
       // Create enhanced edge with security-aware styling
       const newEdge = {
@@ -824,15 +829,15 @@ function AppContent() {
           ...enhancedConnectionInfo.markerEnd
         },
         labelStyle: {
-          ...connectionInfo.labelStyle,
+          ...enhancedConnectionInfo.labelStyle,
           fill: '#ffffff',  // White text like auto-connected edges
           fontWeight: 600,
           fontSize: '12px'
         },
         labelBgStyle: {
-          ...connectionInfo.labelBgStyle,
+          ...enhancedConnectionInfo.labelBgStyle,
           fill: 'rgba(17, 24, 39, 0.9)',  // Dark background like auto-connected edges
-          stroke: '#10B981',  // Green border like auto-connected edges
+          stroke: enhancedConnectionInfo.warnings?.length > 0 ? '#EF4444' : '#10B981',  // Red border for warnings
           strokeWidth: 1,
           fillOpacity: 0.9
         },
@@ -843,7 +848,11 @@ function AppContent() {
           // Store initial control points and label position
           controlPoint1: { x: 0, y: 0 },
           controlPoint2: { x: 0, y: 0 },
-          labelPosition: 0.5
+          labelPosition: 0.5,
+          // Store warnings for tooltip display
+          warnings: enhancedConnectionInfo.warnings || [],
+          sourceNode: sourceNode,
+          targetNode: targetNode
         }
       };
       
