@@ -9,7 +9,7 @@ import json
 import sys
 
 # Use the production URL from review request
-BASE_URL = "https://element-iconography.preview.emergentagent.com/api"
+BASE_URL = "https://flowmap-enhance.preview.emergentagent.com/api"
 
 class Phase2QuestionnaireTester:
     def __init__(self):

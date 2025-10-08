@@ -6,7 +6,7 @@ Simple STRIDE debug - test without updating diagram
 import requests
 import json
 
-BASE_URL = "https://element-iconography.preview.emergentagent.com/api"
+BASE_URL = "https://flowmap-enhance.preview.emergentagent.com/api"
 
 def simple_stride_debug():
     session = requests.Session()

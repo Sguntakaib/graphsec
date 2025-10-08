@@ -8,7 +8,7 @@ import json
 import uuid
 import time
 
-BASE_URL = "https://element-iconography.preview.emergentagent.com/api"
+BASE_URL = "https://flowmap-enhance.preview.emergentagent.com/api"
 
 def detailed_stride_debug():
     session = requests.Session()
