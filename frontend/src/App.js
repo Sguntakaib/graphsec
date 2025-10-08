@@ -1369,6 +1369,158 @@ function AppContent() {
     setShowClearAllConfirm(false);
   };
 
+  // ========================================================================================
+  // ENHANCED DATA FLOW CONNECTION SYSTEM - Security & Intelligence Features
+  // ========================================================================================
+
+  // Helper function to determine data classification level from nodes
+  const getDataClassification = (sourceNode, targetNode) => {
+    const sourceClass = sourceNode?.data?.data_classification;
+    const targetClass = targetNode?.data?.data_classification;
+    
+    // Priority order: Restricted > Confidential > Internal > Public
+    const classificationPriority = {
+      'Restricted': 4,
+      'Confidential': 3, 
+      'Internal': 2,
+      'Public': 1,
+      'Unknown': 0
+    };
+    
+    const sourceLevel = classificationPriority[sourceClass] || 0;
+    const targetLevel = classificationPriority[targetClass] || 0;
+    const highestLevel = Math.max(sourceLevel, targetLevel);
+    
+    // Return the highest classification level
+    const levelNames = ['Unknown', 'Public', 'Internal', 'Confidential', 'Restricted'];
+    return levelNames[highestLevel] || 'Unknown';
+  };
+
+  // Helper function to check if connection is encrypted
+  const isEncryptedConnection = (sourceNode, targetNode, questionnaire_answers = {}) => {
+    // Check questionnaire answers for encryption settings
+    const encryptionEnabled = questionnaire_answers?.encryption_enabled === true ||
+                             questionnaire_answers?.api_encryption === 'TLS/HTTPS' ||
+                             questionnaire_answers?.database_encryption_in_transit === 'SSL/TLS' ||
+                             questionnaire_answers?.webapp_encryption === 'HTTPS';
+    
+    // Check if protocol indicates encryption (HTTPS, TLS, SSL)
+    const protocol = questionnaire_answers?.api_protocol || questionnaire_answers?.webapp_protocol || '';
+    const hasSecureProtocol = protocol.includes('HTTPS') || protocol.includes('TLS') || protocol.includes('SSL');
+    
+    return encryptionEnabled || hasSecureProtocol;
+  };
+
+  // Helper function to check if connection has proper authentication
+  const hasAuthentication = (sourceNode, targetNode, questionnaire_answers = {}) => {
+    const authMethods = [
+      questionnaire_answers?.authentication_method,
+      questionnaire_answers?.api_auth_method,
+      questionnaire_answers?.database_authentication,
+      questionnaire_answers?.webapp_authentication
+    ];
+    
+    return authMethods.some(method => 
+      method && method !== 'None' && method !== 'none' && method !== 'No authentication'
+    );
+  };
+
+  // Helper function to validate connections and identify security risks
+  const validateConnection = (sourceNode, targetNode, questionnaire_answers = {}) => {
+    const warnings = [];
+    const sourceType = sourceNode?.data?.subtype || sourceNode?.type;
+    const targetType = targetNode?.data?.subtype || targetNode?.type;
+    const dataClass = getDataClassification(sourceNode, targetNode);
+    const isEncrypted = isEncryptedConnection(sourceNode, targetNode, questionnaire_answers);
+    const hasAuth = hasAuthentication(sourceNode, targetNode, questionnaire_answers);
+    
+    // Critical: Database directly exposed to internet
+    if (sourceType === 'Internet' && targetType === 'Database') {
+      warnings.push({
+        level: 'critical',
+        message: 'Database directly exposed to internet',
+        icon: '🚨'
+      });
+    }
+    
+    // High: Unencrypted sensitive data flows
+    if ((dataClass === 'Confidential' || dataClass === 'Restricted') && !isEncrypted) {
+      warnings.push({
+        level: 'high', 
+        message: 'Unencrypted sensitive data flow',
+        icon: '🔴'
+      });
+    }
+    
+    // Medium: Unauthenticated access to sensitive resources  
+    if ((targetType === 'Database' || targetType === 'API') && !hasAuth) {
+      warnings.push({
+        level: 'medium',
+        message: 'Unauthenticated access to sensitive resource',
+        icon: '⚠️'
+      });
+    }
+    
+    // Low: Public data over unencrypted connection
+    if (dataClass === 'Public' && !isEncrypted) {
+      warnings.push({
+        level: 'low',
+        message: 'Public data over unencrypted connection',  
+        icon: '⚡'
+      });
+    }
+    
+    // High: Threat actor with direct database access
+    if ((sourceType === 'ExternalAttacker' || sourceType === 'Insider' || sourceType === 'MaliciousInsider') && 
+        targetType === 'Database') {
+      warnings.push({
+        level: 'critical',
+        message: 'Direct threat actor database access',
+        icon: '💀'
+      });
+    }
+    
+    return warnings;
+  };
+
+  // Helper function to get security context styling
+  const getSecurityStyling = (isEncrypted, hasAuth, warnings) => {
+    const hasHighWarnings = warnings.some(w => w.level === 'critical' || w.level === 'high');
+    const hasMediumWarnings = warnings.some(w => w.level === 'medium');
+    
+    if (hasHighWarnings) {
+      return {
+        stroke: '#DC2626', // Red for high risk
+        strokeWidth: 3,
+        strokeDasharray: '8,4' // Dashed for warnings
+      };
+    } else if (hasMediumWarnings) {
+      return {
+        stroke: '#F59E0B', // Orange for medium risk  
+        strokeWidth: 2,
+        strokeDasharray: '6,3'
+      };
+    } else if (isEncrypted && hasAuth) {
+      return {
+        stroke: '#10B981', // Green for secure
+        strokeWidth: 2,
+        strokeDasharray: '0' // Solid for secure
+      };
+    } else if (isEncrypted) {
+      return {
+        stroke: '#3B82F6', // Blue for encrypted but not fully secure
+        strokeWidth: 2,
+        strokeDasharray: '0'
+      };
+    } else {
+      return {
+        stroke: '#EF4444', // Red for unencrypted
+        strokeWidth: 2,
+        strokeDasharray: '4,2' // Dashed for insecure
+      };
+    }
+  };
+
   // Enhanced function to determine edge label and styling based on connection type
   const getConnectionInfo = (sourceNode, targetNode, questionnaire_answers = {}) => {
     const sourceType = sourceNode?.data?.subtype || sourceNode?.type;
