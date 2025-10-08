@@ -12,7 +12,21 @@ import {
   ChevronDown,
   ChevronRight,
   Search,
-  Filter
+  Filter,
+  Globe,
+  HardDrive,
+  Monitor,
+  Container,
+  Zap,
+  Eye,
+  FileText as File,
+  Cpu,
+  Wifi,
+  Router,
+  Bug,
+  Lock,
+  Network,
+  Activity
 } from 'lucide-react';
 
 const AdvancedNodeLibrary = ({ onAddNode }) => {
