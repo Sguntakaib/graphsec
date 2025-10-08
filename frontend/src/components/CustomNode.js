@@ -1,6 +1,28 @@
 import React, { useState, useRef, useMemo, useCallback, memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Shield, Server, AlertTriangle, Lock, Network, Activity } from 'lucide-react';
+import { 
+  Shield, 
+  Server, 
+  AlertTriangle, 
+  Lock, 
+  Network, 
+  Activity,
+  Globe,
+  Database,
+  HardDrive,
+  Cloud,
+  Monitor,
+  Container,
+  Zap,
+  Users,
+  Settings,
+  Eye,
+  FileText,
+  Cpu,
+  Wifi,
+  Router,
+  Bug
+} from 'lucide-react';
 
 // Icon mapping - moved outside component to prevent recreation
 const ICON_MAP = {
