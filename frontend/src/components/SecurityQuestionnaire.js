@@ -475,89 +475,90 @@ const SecurityQuestionnaire = ({
 
       // Proceed with original completion logic
       const validationResult = await validateAnswers();
-    
-    if (validationResult) {
-      // Check for conditional dependencies
-      let dependentNodes = [];
-      try {
-        const dependencyResponse = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/check-dependencies`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ answers })
-          }
-        );
-        
-        if (dependencyResponse.ok) {
-          const dependencyData = await dependencyResponse.json();
-          const allDependentNodes = dependencyData.dependent_nodes || [];
-          
-          // Filter out dependencies that are already COMPLETED if filter function is provided
-          if (getIncompleteDependencies && sourceNode?.id) {
-            dependentNodes = getIncompleteDependencies(sourceNode.id, allDependentNodes);
-            console.log('🎯 Dependency check result (filtered):', {
-              nodeSubtype,
-              answers,
-              allDependentNodes,
-              incompleteDependentNodes: dependentNodes,
-              triggerRequired: dependentNodes.length > 0
-            });
-          } else {
-            dependentNodes = allDependentNodes;
-            console.log('🎯 Dependency check result (unfiltered):', {
-              nodeSubtype,
-              answers,
-              dependentNodes,
-              triggerRequired: dependentNodes.length > 0
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error checking dependencies:', error);
-      }
-
-      // Phase 2: Generate completion summary
-      const answeredQuestions = Object.keys(answers).length;
-      const securityControls = Object.entries(answers)
-        .filter(([_, value]) => value === true || value === 'Yes' || (typeof value === 'string' && value !== 'No' && value !== 'False'))
-        .map(([key, _]) => prompts.find(p => p.id === key)?.question || key);
-
-      const summary = {
-        nodeType: nodeSubtype,
-        questionsAnswered: answeredQuestions,
-        totalQuestions: prompts.length,
-        completionPercentage: validationResult.validation?.completion_percentage || 0,
-        dependenciesCreated: dependentNodes,
-        securityControlsEnabled: securityControls.slice(0, 5), // Top 5 controls
-        markedForLaterCount: markedForLater.size,
-        recommendations: validationResult.recommendations?.slice(0, 3) || [] // Top 3 recommendations
-      };
-
-      setCompletionSummary(summary);
-
-      // Trigger smart node creation if callback is provided
-      let smartNodeResult = null;
-      if (onCreateLinkedNodes && sourceNode && currentNodes) {
+      
+      if (validationResult) {
+        // Check for conditional dependencies
+        let dependentNodes = [];
         try {
-          smartNodeResult = await onCreateLinkedNodes(sourceNode.id, nodeSubtype, answers, currentNodes);
+          const dependencyResponse = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/api/intelligent-nodes/${nodeSubtype}/check-dependencies`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ answers })
+            }
+          );
+          
+          if (dependencyResponse.ok) {
+            const dependencyData = await dependencyResponse.json();
+            const allDependentNodes = dependencyData.dependent_nodes || [];
+            
+            // Filter out dependencies that are already COMPLETED if filter function is provided
+            if (getIncompleteDependencies && sourceNode?.id) {
+              dependentNodes = getIncompleteDependencies(sourceNode.id, allDependentNodes);
+              console.log('🎯 Dependency check result (filtered):', {
+                nodeSubtype,
+                answers,
+                allDependentNodes,
+                incompleteDependentNodes: dependentNodes,
+                triggerRequired: dependentNodes.length > 0
+              });
+            } else {
+              dependentNodes = allDependentNodes;
+              console.log('🎯 Dependency check result (unfiltered):', {
+                nodeSubtype,
+                answers,
+                dependentNodes,
+                triggerRequired: dependentNodes.length > 0
+              });
+            }
+          }
         } catch (error) {
-          console.error('Error creating linked nodes:', error);
+          console.error('Error checking dependencies:', error);
         }
-      }
 
-      onComplete({
-        answers,
-        validation: validationResult.validation,
-        recommendations: validationResult.recommendations,
-        smartNodeResult,
-        dependentNodes,
-        triggerDependentQuestionnaires: dependentNodes.length > 0,
-        isActualCompletion: true, // Flag to indicate this was a real completion button click
-        completionSummary: summary // Phase 2: Include completion summary
-      });
+        // Phase 2: Generate completion summary
+        const answeredQuestions = Object.keys(answers).length;
+        const securityControls = Object.entries(answers)
+          .filter(([_, value]) => value === true || value === 'Yes' || (typeof value === 'string' && value !== 'No' && value !== 'False'))
+          .map(([key, _]) => prompts.find(p => p.id === key)?.question || key);
+
+        const summary = {
+          nodeType: nodeSubtype,
+          questionsAnswered: answeredQuestions,
+          totalQuestions: prompts.length,
+          completionPercentage: validationResult.validation?.completion_percentage || 0,
+          dependenciesCreated: dependentNodes,
+          securityControlsEnabled: securityControls.slice(0, 5), // Top 5 controls
+          markedForLaterCount: markedForLater.size,
+          recommendations: validationResult.recommendations?.slice(0, 3) || [] // Top 3 recommendations
+        };
+
+        setCompletionSummary(summary);
+
+        // Trigger smart node creation if callback is provided
+        let smartNodeResult = null;
+        if (onCreateLinkedNodes && sourceNode && currentNodes) {
+          try {
+            smartNodeResult = await onCreateLinkedNodes(sourceNode.id, nodeSubtype, answers, currentNodes);
+          } catch (error) {
+            console.error('Error creating linked nodes:', error);
+          }
+        }
+
+        onComplete({
+          answers,
+          validation: validationResult.validation,
+          recommendations: validationResult.recommendations,
+          smartNodeResult,
+          dependentNodes,
+          triggerDependentQuestionnaires: dependentNodes.length > 0,
+          isActualCompletion: true, // Flag to indicate this was a real completion button click
+          completionSummary: summary // Phase 2: Include completion summary
+        });
+      }
     } catch (error) {
       console.error('❌ Error during questionnaire completion:', error);
     } finally {
