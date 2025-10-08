@@ -440,31 +440,41 @@ const SecurityQuestionnaire = ({
   };
 
   const handleComplete = async () => {
-    // Check for incomplete answers first
-    const incompleteCheck = checkIncompleteAnswers();
-    
-    if (incompleteCheck.hasUnanswered) {
-      // Show confirmation modal for incomplete questionnaire
-      const confirmed = await showConfirmation({
-        unansweredCount: incompleteCheck.count,
-        totalQuestions: incompleteCheck.totalQuestions,
-        unansweredQuestions: incompleteCheck.questions,
-        onConfirm: () => {
-          console.log('✅ User confirmed completion with incomplete answers');
-        },
-        onCancel: () => {
-          console.log('❌ User cancelled completion, returning to questionnaire');
-        }
-      });
-
-      if (!confirmed) {
-        // User chose to continue editing
-        return;
-      }
+    // Prevent double-click
+    if (isCompleting) {
+      console.log('⏸️ Already completing questionnaire, ignoring duplicate click');
+      return;
     }
+    
+    setIsCompleting(true);
+    
+    try {
+      // Check for incomplete answers first
+      const incompleteCheck = checkIncompleteAnswers();
+      
+      if (incompleteCheck.hasUnanswered) {
+        // Show confirmation modal for incomplete questionnaire
+        const confirmed = await showConfirmation({
+          unansweredCount: incompleteCheck.count,
+          totalQuestions: incompleteCheck.totalQuestions,
+          unansweredQuestions: incompleteCheck.questions,
+          onConfirm: () => {
+            console.log('✅ User confirmed completion with incomplete answers');
+          },
+          onCancel: () => {
+            console.log('❌ User cancelled completion, returning to questionnaire');
+          }
+        });
 
-    // Proceed with original completion logic
-    const validationResult = await validateAnswers();
+        if (!confirmed) {
+          // User chose to continue editing
+          setIsCompleting(false);
+          return;
+        }
+      }
+
+      // Proceed with original completion logic
+      const validationResult = await validateAnswers();
     
     if (validationResult) {
       // Check for conditional dependencies
