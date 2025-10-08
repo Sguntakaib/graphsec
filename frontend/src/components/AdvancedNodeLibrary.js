@@ -449,6 +449,67 @@ const AdvancedNodeLibrary = ({ onAddNode }) => {
     }));
   }, []);
 
+  // Dedicated icon mapping for each node subtype
+  const getNodeIcon = (subtype) => {
+    const iconMap = {
+      // Actor subtypes
+      'ExternalAttacker': Shield,
+      'MaliciousInsider': Users,
+      'CompromisedAccount': Settings,
+      
+      // Asset subtypes
+      'WebApp': Globe,
+      'API': Zap,
+      'Database': Database,
+      'S3Bucket': HardDrive,
+      'VM': Monitor,
+      'Container': Container,
+      'LoadBalancer': Router,
+      'CDN': Wifi,
+      
+      // Surface subtypes (Attack Surfaces)  
+      'SQLInjection': Database,
+      'WeakIdentityAccess': Users,
+      'UnencryptedData': Lock,
+      'APIVulnerability': Bug,
+      'CrossSiteScripting': Globe,
+      'InsecureDeserialization': Cpu,
+      'SecurityMisconfiguration': Settings,
+      'SensitiveDataExposure': Eye,
+      'InsufficientLogging': File,
+      'ServerSideRequestForgery': Network,
+      'InsecureDirectObjectReference': File,
+      'RemoteCodeExecution': Cpu,
+      
+      // Control subtypes (Security Controls)
+      'WebApplicationFirewall': Shield,
+      'EndpointDetectionResponse': Eye,
+      'NetworkSegmentation': Network,
+      'IdentityAccessManagement': Users,
+      'DataLossPrevention': Lock,
+      'SecurityInformationEventManagement': Activity,
+      'VulnerabilityManagement': Bug,
+      'IncidentResponsePlan': AlertTriangle,
+      'BackupRecovery': HardDrive,
+      'SecurityAwarenessTraining': Users,
+      
+      // Zone subtypes
+      'InternetZone': Globe,
+      'DMZZone': Network,
+      'InternalNetwork': Lock,
+      'CloudEnvironment': Cloud,
+      'PartnerNetwork': Users,
+      'ManagementNetwork': Settings,
+      
+      // Infrastructure subtypes
+      'CloudDeployment': Cloud,
+      'OnPremisesInfrastructure': Server,
+      'HybridEnvironment': Network,
+      'ThirdPartyIntegrations': Users
+    };
+    return iconMap[subtype] || Server;
+  };
+
   const getCategoryIcon = (categoryId) => {
     const category = enrichedCategories.find(cat => cat.id === categoryId);
     return category ? category.icon : FileText;
