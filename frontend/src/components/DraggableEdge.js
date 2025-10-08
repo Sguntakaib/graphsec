@@ -443,17 +443,23 @@ const DraggableEdge = memo(({
               />
             </foreignObject>
           ) : (
-            <text
-              {...labelTextStyle}
-              style={{ 
-                ...labelTextStyle, 
-                cursor: isDragging ? 'grabbing' : 'pointer',
-                pointerEvents: 'none',
-                fill: isDragging ? '#60A5FA' : (labelStyle.fill || '#FFFFFF')
-              }}
-            >
-              {label}
-            </text>
+            <>
+              <text
+                {...labelTextStyle}
+                style={{ 
+                  ...labelTextStyle, 
+                  cursor: isDragging ? 'grabbing' : 'pointer',
+                  pointerEvents: 'none',
+                  fill: isDragging ? '#60A5FA' : (labelStyle.fill || '#FFFFFF')
+                }}
+              >
+                {displayLabel}
+              </text>
+              {/* Full label tooltip on hover */}
+              {label && label !== displayLabel && (
+                <title>{label}</title>
+              )}
+            </>
           )}
           
           {/* Security Warning Indicator - positioned dynamically based on label width */}
