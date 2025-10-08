@@ -2968,36 +2968,48 @@ function AppContent() {
                             newEdges.some(edge => edge.id === edgeId);
 
           if (!edgeExists) {
+            // Get questionnaire answers for enhanced connection info
+            const sourceQuestionnaireAnswers = sourceNode?.data?.questionnaire_answers || {};
+            const targetQuestionnaireAnswers = selectedNode?.data?.questionnaire_answers || {};
+            const combinedAnswers = { ...sourceQuestionnaireAnswers, ...targetQuestionnaireAnswers };
+            
+            // Get enhanced connection info
+            const baseConnectionInfo = getConnectionInfo(sourceNode, selectedNode, combinedAnswers);
+            const enhancedConnectionInfo = applySecurityEnhancements(baseConnectionInfo, sourceNode, selectedNode, combinedAnswers);
+            
             const reuseEdge = {
               id: edgeId,
               source: sourceNode.id,
               target: selectedNode.id,
-              label: 'reuses',
+              label: `${enhancedConnectionInfo.label} (reuses)`,
               type: 'draggable',
               animated: true,
               style: {
-                strokeWidth: 2,
-                stroke: '#3B82F6',
+                ...enhancedConnectionInfo.style,
                 strokeDasharray: '5,5'
               },
               labelStyle: {
+                ...enhancedConnectionInfo.labelStyle,
                 fill: '#ffffff',
                 fontWeight: 600,
-                fontSize: '12px',
-                backgroundColor: 'rgba(59, 130, 246, 0.9)',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                border: '1px solid #3B82F6'
+                fontSize: '12px'
               },
               labelBgStyle: {
+                ...enhancedConnectionInfo.labelBgStyle,
                 fill: 'rgba(59, 130, 246, 0.9)',
-                stroke: '#3B82F6',
+                stroke: enhancedConnectionInfo.warnings?.length > 0 ? '#EF4444' : '#3B82F6',
                 strokeWidth: 1,
                 fillOpacity: 0.9
               },
               markerEnd: {
+                ...enhancedConnectionInfo.markerEnd,
                 type: 'arrowclosed',
                 color: '#3B82F6',
+              },
+              data: {
+                warnings: enhancedConnectionInfo.warnings || [],
+                sourceNode: sourceNode,
+                targetNode: selectedNode
               }
             };
             newEdges.push(reuseEdge);
