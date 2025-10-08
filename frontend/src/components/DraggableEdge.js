@@ -20,6 +20,14 @@ const DraggableEdge = memo(({
   style = {},
   selected = false
 }) => {
+  // Truncate long labels to fit in small boxes
+  const truncateLabel = (text, maxLength = 28) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 3) + '...';
+  };
+  
+  const displayLabel = truncateLabel(label);
   // Control points for bezier curve (stored as offset from default position)
   // Initialize with defaults if data is missing
   const [controlPoint1, setControlPoint1] = useState(() => {
