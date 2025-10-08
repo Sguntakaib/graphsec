@@ -3020,14 +3020,67 @@ function AppContent() {
 
       // Create new node (either no existing nodes found or user chose to create new)
       console.log(`🔄 Creating new ${nodeType} node via conditional dependency`);
+      
+      // Smart positioning algorithm to avoid overlaps
+      const findNonOverlappingPosition = (sourcePos, existingNodes, attemptIndex) => {
+        const baseDistance = 300; // Increased base distance
+        const nodeWidth = 180; // Approximate node width
+        const nodeHeight = 80; // Approximate node height
+        const padding = 40; // Extra padding between nodes
+        
+        // Use radial positioning with increasing radius for multiple nodes
+        const angle = (attemptIndex * 60) * (Math.PI / 180); // 60 degrees apart
+        const radius = baseDistance + Math.floor(attemptIndex / 6) * 150; // Increase radius every 6 nodes
+        
+        let proposedX = sourcePos.x + Math.cos(angle) * radius;
+        let proposedY = sourcePos.y + Math.sin(angle) * radius;
+        
+        // Check for overlaps with all existing nodes
+        let maxAttempts = 50;
+        let attempt = 0;
+        
+        while (attempt < maxAttempts) {
+          let hasOverlap = false;
+          
+          for (const existingNode of existingNodes) {
+            const dx = Math.abs(proposedX - existingNode.position.x);
+            const dy = Math.abs(proposedY - existingNode.position.y);
+            
+            // Check if nodes would overlap (with padding)
+            if (dx < (nodeWidth + padding) && dy < (nodeHeight + padding)) {
+              hasOverlap = true;
+              break;
+            }
+          }
+          
+          if (!hasOverlap) {
+            return { x: proposedX, y: proposedY };
+          }
+          
+          // Try a different position by adding a spiral offset
+          attempt++;
+          const spiralAngle = angle + (attempt * 30) * (Math.PI / 180);
+          const spiralRadius = radius + (attempt * 30);
+          proposedX = sourcePos.x + Math.cos(spiralAngle) * spiralRadius;
+          proposedY = sourcePos.y + Math.sin(spiralAngle) * spiralRadius;
+        }
+        
+        // Fallback: just use radial position with larger spacing
+        return {
+          x: sourcePos.x + Math.cos(angle) * (radius + attempt * 50),
+          y: sourcePos.y + Math.sin(angle) * (radius + attempt * 50)
+        };
+      };
+      
+      // Get all existing nodes on canvas including newly created ones in this batch
+      const allExistingNodes = [...nodes, ...newNodes];
+      const optimalPosition = findNonOverlappingPosition(sourceNode.position, allExistingNodes, index);
+      
       const newNode = {
         id: `${nodeType.toLowerCase()}-${sourceNode.id}-${Date.now()}-${index}`,
         type: 'custom',
         subtype: nodeType,
-        position: {
-          x: sourceNode.position.x + 200 + (index * 100),
-          y: sourceNode.position.y + (index % 2 === 0 ? -100 : 100)
-        },
+        position: optimalPosition,
         data: {
           type: 'Asset',
           subtype: nodeType,
