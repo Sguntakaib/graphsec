@@ -3021,33 +3021,59 @@ function AppContent() {
       // Create new node (either no existing nodes found or user chose to create new)
       console.log(`🔄 Creating new ${nodeType} node via conditional dependency`);
       
-      // Smart positioning algorithm to avoid overlaps
-      const findNonOverlappingPosition = (sourcePos, existingNodes, attemptIndex) => {
-        const baseDistance = 300; // Increased base distance
-        const nodeWidth = 180; // Approximate node width
-        const nodeHeight = 80; // Approximate node height
-        const padding = 40; // Extra padding between nodes
+      // Grid-based positioning algorithm for clean vertical/horizontal layout
+      const findGridPosition = (sourcePos, existingNodes, nodeIndex, totalNodes) => {
+        const nodeWidth = 200; // Node width with spacing
+        const nodeHeight = 140; // Node height with spacing
+        const horizontalSpacing = 320; // Space between columns
+        const verticalSpacing = 160; // Space between rows
         
-        // Use radial positioning with increasing radius for multiple nodes
-        const angle = (attemptIndex * 60) * (Math.PI / 180); // 60 degrees apart
-        const radius = baseDistance + Math.floor(attemptIndex / 6) * 150; // Increase radius every 6 nodes
+        // Determine optimal grid layout based on number of nodes
+        let columns, rows;
+        if (totalNodes <= 2) {
+          columns = 2; // 2 columns for 1-2 nodes
+          rows = 1;
+        } else if (totalNodes <= 4) {
+          columns = 2; // 2x2 grid for 3-4 nodes
+          rows = 2;
+        } else if (totalNodes <= 6) {
+          columns = 3; // 3x2 grid for 5-6 nodes
+          rows = 2;
+        } else if (totalNodes <= 9) {
+          columns = 3; // 3x3 grid for 7-9 nodes
+          rows = 3;
+        } else {
+          columns = 4; // 4xN grid for 10+ nodes
+          rows = Math.ceil(totalNodes / 4);
+        }
         
-        let proposedX = sourcePos.x + Math.cos(angle) * radius;
-        let proposedY = sourcePos.y + Math.sin(angle) * radius;
+        // Calculate position in grid
+        const col = nodeIndex % columns;
+        const row = Math.floor(nodeIndex / columns);
         
-        // Check for overlaps with all existing nodes
-        let maxAttempts = 50;
-        let attempt = 0;
+        // Calculate base offset to center the grid relative to source
+        const gridWidth = (columns - 1) * horizontalSpacing;
+        const gridHeight = (rows - 1) * verticalSpacing;
+        const offsetX = -gridWidth / 2;
+        const offsetY = -gridHeight / 2;
         
-        while (attempt < maxAttempts) {
+        // Calculate actual position
+        let proposedX = sourcePos.x + horizontalSpacing * 1.5 + offsetX + (col * horizontalSpacing);
+        let proposedY = sourcePos.y + offsetY + (row * verticalSpacing);
+        
+        // Check for overlaps with existing nodes and adjust if needed
+        let attempts = 0;
+        let maxAttempts = 20;
+        
+        while (attempts < maxAttempts) {
           let hasOverlap = false;
           
           for (const existingNode of existingNodes) {
             const dx = Math.abs(proposedX - existingNode.position.x);
             const dy = Math.abs(proposedY - existingNode.position.y);
             
-            // Check if nodes would overlap (with padding)
-            if (dx < (nodeWidth + padding) && dy < (nodeHeight + padding)) {
+            // Check if nodes would overlap
+            if (dx < nodeWidth && dy < nodeHeight) {
               hasOverlap = true;
               break;
             }
@@ -3057,24 +3083,22 @@ function AppContent() {
             return { x: proposedX, y: proposedY };
           }
           
-          // Try a different position by adding a spiral offset
-          attempt++;
-          const spiralAngle = angle + (attempt * 30) * (Math.PI / 180);
-          const spiralRadius = radius + (attempt * 30);
-          proposedX = sourcePos.x + Math.cos(spiralAngle) * spiralRadius;
-          proposedY = sourcePos.y + Math.sin(spiralAngle) * spiralRadius;
+          // If overlap, shift right and down slightly
+          attempts++;
+          proposedX += 50;
+          proposedY += 30 * (attempts % 3 === 0 ? 1 : 0); // Shift down every 3 attempts
         }
         
-        // Fallback: just use radial position with larger spacing
+        // Fallback: just use original grid position with extra offset
         return {
-          x: sourcePos.x + Math.cos(angle) * (radius + attempt * 50),
-          y: sourcePos.y + Math.sin(angle) * (radius + attempt * 50)
+          x: proposedX + (attempts * 30),
+          y: proposedY + (attempts * 20)
         };
       };
       
       // Get all existing nodes on canvas including newly created ones in this batch
       const allExistingNodes = [...nodes, ...newNodes];
-      const optimalPosition = findNonOverlappingPosition(sourceNode.position, allExistingNodes, index);
+      const optimalPosition = findGridPosition(sourceNode.position, allExistingNodes, index, dependentNodeTypes.length);
       
       const newNode = {
         id: `${nodeType.toLowerCase()}-${sourceNode.id}-${Date.now()}-${index}`,
