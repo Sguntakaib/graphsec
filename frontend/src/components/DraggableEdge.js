@@ -464,7 +464,7 @@ const DraggableEdge = memo(({
                 {data.warnings.map(w => `${w.icon} ${w.message}`).join('\n')}
               </title>
               <circle
-                cx={Math.max(25, (label?.length || 0) * 1.8) + 4}
+                cx={Math.max(28, (displayLabel?.length || 0) * 2.2) + 4}
                 cy={0}
                 r={5}
                 fill={data.warnings.some(w => w.level === 'critical') ? '#DC2626' : 
@@ -475,7 +475,7 @@ const DraggableEdge = memo(({
                 style={{ cursor: 'help' }}
               />
               <text
-                x={Math.max(25, (label?.length || 0) * 1.8) + 4}
+                x={Math.max(28, (displayLabel?.length || 0) * 2.2) + 4}
                 y={0}
                 fontSize="7px"
                 fontWeight="bold"
