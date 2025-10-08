@@ -448,7 +448,7 @@ const DraggableEdge = memo(({
             </text>
           )}
           
-          {/* Security Warning Indicator */}
+          {/* Security Warning Indicator - positioned dynamically based on label width */}
           {!isEditingLabel && data?.warnings && data.warnings.length > 0 && (
             <g>
               {/* Warning icon with tooltip */}
@@ -456,9 +456,9 @@ const DraggableEdge = memo(({
                 {data.warnings.map(w => `${w.icon} ${w.message}`).join('\n')}
               </title>
               <circle
-                cx={45}
+                cx={Math.max(50, (label?.length || 0) * 3.5) + 5}
                 cy={0}
-                r={8}
+                r={7}
                 fill={data.warnings.some(w => w.level === 'critical') ? '#DC2626' : 
                       data.warnings.some(w => w.level === 'high') ? '#EF4444' : 
                       data.warnings.some(w => w.level === 'medium') ? '#F59E0B' : '#FCD34D'}
@@ -467,9 +467,9 @@ const DraggableEdge = memo(({
                 style={{ cursor: 'help' }}
               />
               <text
-                x={45}
+                x={Math.max(50, (label?.length || 0) * 3.5) + 5}
                 y={0}
-                fontSize="10px"
+                fontSize="9px"
                 fontWeight="bold"
                 fill="#FFFFFF"
                 textAnchor="middle"
