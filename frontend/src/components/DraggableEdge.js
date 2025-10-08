@@ -402,9 +402,9 @@ const DraggableEdge = memo(({
         >
           {labelShowBg && (
             <rect
-              x={-Math.max(25, (label?.length || 0) * 1.8)}
+              x={-Math.max(28, (displayLabel?.length || 0) * 2.2)}
               y={-7}
-              width={Math.max(50, (label?.length || 0) * 3.6)}
+              width={Math.max(56, (displayLabel?.length || 0) * 4.4)}
               height={14}
               {...labelBoxStyle}
               style={{ 
