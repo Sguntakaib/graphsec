@@ -3852,44 +3852,69 @@ function AppContent() {
               color="#374151" 
             />
             
-            {/* Connection Types Legend */}
-            <Panel position="bottom-left" className="bg-gray-800 border border-gray-700 rounded-lg p-3 m-4 max-w-sm">
-              <div className="text-white text-sm font-semibold mb-2 flex items-center">
-                <Network className="h-4 w-4 mr-2" />
-                Connection Types
+            {/* Enhanced Connection Security Legend */}
+            <Panel position="bottom-left" className="bg-gray-800 border border-gray-700 rounded-lg p-3 m-4 max-w-xs">
+              <div className="text-white text-sm font-semibold mb-3 flex items-center">
+                <Shield className="h-4 w-4 mr-2" />
+                Connection Security
               </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-blue-500"></div>
-                  <span className="text-blue-300">HTTPS REST</span>
+              
+              {/* Security Indicators */}
+              <div className="mb-3 space-y-1">
+                <div className="text-xs text-gray-300 font-medium mb-1">Security Indicators:</div>
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className="text-green-400">🔒</span>
+                  <span className="text-green-300">Encrypted Connection</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-purple-500"></div>
-                  <span className="text-purple-300">SQL DB</span>
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className="text-orange-400">⚠️</span>
+                  <span className="text-orange-300">Unencrypted Connection</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-green-500" style={{clipPath: 'polygon(0 50%, 25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%)'}}></div>
-                  <span className="text-green-300">File I/O</span>
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className="text-blue-400">🔑</span>
+                  <span className="text-blue-300">Authenticated Access</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-amber-500" style={{borderStyle: 'dashed', borderWidth: '1px 0'}}></div>
-                  <span className="text-amber-300">Message</span>
+              </div>
+              
+              {/* Risk Levels */}
+              <div className="mb-3 space-y-1">
+                <div className="text-xs text-gray-300 font-medium mb-1">Risk Levels:</div>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-3 h-0.5 bg-green-500"></div>
+                  <span className="text-green-300">Secure</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-red-500" style={{borderStyle: 'dashed', borderWidth: '2px 0'}}></div>
-                  <span className="text-red-300">Attack Vector</span>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-3 h-0.5 bg-orange-500" style={{borderStyle: 'dashed', borderWidth: '1px 0'}}></div>
+                  <span className="text-orange-300">Medium Risk</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-emerald-600" style={{borderStyle: 'dashed', borderWidth: '1px 0'}}></div>
-                  <span className="text-emerald-200 font-medium">Protects</span>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-3 h-0.5 bg-red-500" style={{borderStyle: 'dashed', borderWidth: '2px 0'}}></div>
+                  <span className="text-red-300">High Risk</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-cyan-500"></div>
-                  <span className="text-cyan-200 font-medium">Cloud API</span>
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className="text-red-500">💀</span>
+                  <span className="text-red-300">Critical Threat</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-0.5 bg-gray-500"></div>
-                  <span className="text-gray-200 font-medium">Data Flow</span>
+              </div>
+              
+              {/* Data Classifications */}
+              <div className="space-y-1">
+                <div className="text-xs text-gray-300 font-medium mb-1">Data Classifications:</div>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-2 h-2 bg-gray-400 rounded"></div>
+                  <span className="text-gray-300">Public</span>
+                </div>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-2 h-2 bg-blue-400 rounded"></div>
+                  <span className="text-blue-300">Internal</span>
+                </div>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-2 h-2 bg-orange-400 rounded"></div>
+                  <span className="text-orange-300">Confidential</span>
+                </div>
+                <div className="flex items-center space-x-2 text-xs">
+                  <div className="w-2 h-2 bg-red-400 rounded"></div>
+                  <span className="text-red-300">Restricted</span>
                 </div>
               </div>
             </Panel>
