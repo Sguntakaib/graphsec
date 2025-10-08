@@ -805,24 +805,23 @@ function AppContent() {
       const sourceNode = nodes.find(n => n.id === params.source);
       const targetNode = nodes.find(n => n.id === params.target);
       
-      // Get connection info with enhanced styling
-      const connectionInfo = getConnectionInfo(sourceNode, targetNode);
+      // Get connection info with enhanced security styling
+      const baseConnectionInfo = getConnectionInfo(sourceNode, targetNode);
+      const enhancedConnectionInfo = applySecurityEnhancements(baseConnectionInfo, sourceNode, targetNode);
       
-      // Create enhanced edge with connection-specific styling
+      // Create enhanced edge with security-aware styling
       const newEdge = {
         ...params,
         id: `edge-${params.source}-${params.target}-${Date.now()}`,
         type: 'draggable',  // Use draggable edge type
-        label: connectionInfo.label,
+        label: enhancedConnectionInfo.label,
         animated: true,  // Add animation like auto-connected edges
         style: {
-          ...connectionInfo.style,
-          strokeDasharray: '3,3',  // Add dotted pattern like auto-connected edges
-          stroke: '#10B981'  // Use same green color as auto-connected dependency edges
+          ...enhancedConnectionInfo.style,
+          strokeDasharray: enhancedConnectionInfo.style.strokeDasharray || '3,3'
         },
         markerEnd: {
-          ...connectionInfo.markerEnd,
-          color: '#10B981'  // Use same green color as auto-connected dependency edges
+          ...enhancedConnectionInfo.markerEnd
         },
         labelStyle: {
           ...connectionInfo.labelStyle,
